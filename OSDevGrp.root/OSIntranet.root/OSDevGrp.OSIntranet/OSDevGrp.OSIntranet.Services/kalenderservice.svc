@@ -1,1 +1,0 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="OSDevGrp.OSIntranet.Services.Implementations.KalenderService" CodeBehind="Implementations/KalenderService.cs" %>
