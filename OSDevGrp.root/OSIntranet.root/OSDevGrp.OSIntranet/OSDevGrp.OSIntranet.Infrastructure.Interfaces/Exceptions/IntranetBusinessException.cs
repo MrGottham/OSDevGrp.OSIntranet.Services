@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace OSDevGrp.OSIntranet.DataAccess.Infrastructure.Interfaces.Exceptions
+namespace OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions
 {
     /// <summary>
     /// Businessexception.
     /// </summary>
     [Serializable]
-    public class DataAccessBusinessException : Exception
+    public class IntranetBusinessException : Exception
     {
+        #region Constructors
+
         /// <summary>
         /// Danner en businessexception.
         /// </summary>
         /// <param name="message">Exception message.</param>
-        public DataAccessBusinessException(string message)
+        public IntranetBusinessException(string message)
             : base(message)
         {
         }
@@ -23,7 +25,7 @@ namespace OSDevGrp.OSIntranet.DataAccess.Infrastructure.Interfaces.Exceptions
         /// </summary>
         /// <param name="message">Exception message.</param>
         /// <param name="innerException">Inner exception.</param>
-        public DataAccessBusinessException(string message, Exception innerException)
+        public IntranetBusinessException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
@@ -33,9 +35,11 @@ namespace OSDevGrp.OSIntranet.DataAccess.Infrastructure.Interfaces.Exceptions
         /// </summary>
         /// <param name="info">Serialization information.</param>
         /// <param name="context">Streaming context.</param>
-        protected DataAccessBusinessException(SerializationInfo info, StreamingContext context)
+        protected IntranetBusinessException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+
+        #endregion
     }
 }
