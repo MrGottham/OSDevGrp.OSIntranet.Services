@@ -1,6 +1,7 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces;
+using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
@@ -33,7 +34,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at container konfiguraiton kan indlæses og typer kan resolves.
         /// </summary>
         [Test]
-        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof(IContainer))] Type type)
+        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof(IContainer), typeof(IAdresseRepository), typeof(IFinansstyringRepository))] Type type)
         {
             var resolvedType = _container.Resolve(type);
             Assert.That(resolvedType, Is.Not.Null);
