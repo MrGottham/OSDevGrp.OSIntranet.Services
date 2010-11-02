@@ -42,7 +42,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab.Konti, Is.Not.Null);
             Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
             Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(4));
+            foreach (var konto in regnskab.Konti.OfType<Konto>().ToList())
+            {
+                Assert.That(konto, Is.Not.Null);
+                Assert.That(konto.Kreditoplysninger, Is.Not.Null);
+                Assert.That(konto.Kreditoplysninger.Count, Is.GreaterThan(0));
+                Assert.That(konto.Bogføringslinjer, Is.Not.Null);
+                Assert.That(konto.Bogføringslinjer.Count, Is.GreaterThan(0));
+            }
             Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(72));
+            foreach (var budgetkonto in regnskab.Konti.OfType<Budgetkonto>().ToList())
+            {
+                Assert.That(budgetkonto, Is.Not.Null);
+                Assert.That(budgetkonto.Budgetoplysninger, Is.Not.Null);
+                Assert.That(budgetkonto.Budgetoplysninger.Count, Is.GreaterThan(0));
+                Assert.That(budgetkonto.Bogføringslinjer, Is.Not.Null);
+                Assert.That(budgetkonto.Bogføringslinjer.Count, Is.GreaterThan(0));
+            }
         }
 
         /// <summary>

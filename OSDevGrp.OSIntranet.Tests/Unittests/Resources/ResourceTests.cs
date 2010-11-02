@@ -52,8 +52,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtResourceExceptionKastesHvisExceptionMessageIkkeFindes()
         {
-            Assert.Throws<ResourceException>(() => Resource.GetExceptionMessage((ExceptionMessage) 1));
-            Assert.Throws<ResourceException>(() => Resource.GetExceptionMessage((ExceptionMessage) 1, 1, 2, 3));
+            Assert.Throws<ResourceException>(() => Resource.GetExceptionMessage((ExceptionMessage) 100));
+            Assert.Throws<ResourceException>(() => Resource.GetExceptionMessage((ExceptionMessage) 100, 1, 2, 3));
         }
     }
 }
