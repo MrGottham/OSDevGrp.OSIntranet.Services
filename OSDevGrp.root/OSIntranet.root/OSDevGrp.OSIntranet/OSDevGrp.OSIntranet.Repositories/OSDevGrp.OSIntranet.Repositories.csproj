@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E510F652-6E85-402E-9EFF-474841121181}</ProjectGuid>
+    <ProjectGuid>{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OSDevGrp.OSIntranet.Infrastructure.Interfaces</RootNamespace>
-    <AssemblyName>OSDevGrp.OSIntranet.Infrastructure.Interfaces</AssemblyName>
+    <RootNamespace>OSDevGrp.OSIntranet.Repositories</RootNamespace>
+    <AssemblyName>OSDevGrp.OSIntranet.Repositories</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -46,9 +46,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Exceptions\IntranetBusinessException.cs" />
-    <Compile Include="Exceptions\IntranetRepositoryException.cs" />
-    <Compile Include="Exceptions\IntranetSystemException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -58,10 +55,6 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories.Interfaces\OSDevGrp.OSIntranet.Repositories.Interfaces.csproj">
       <Project>{4775A5D7-009A-4B8D-A9DE-0CEBDFCC1535}</Project>
       <Name>OSDevGrp.OSIntranet.Repositories.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories\OSDevGrp.OSIntranet.Repositories.csproj">
-      <Project>{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}</Project>
-      <Name>OSDevGrp.OSIntranet.Repositories</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

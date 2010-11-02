@@ -82,6 +82,14 @@
       <Project>{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}</Project>
       <Name>OSDevGrp.OSIntranet.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories.Interfaces\OSDevGrp.OSIntranet.Repositories.Interfaces.csproj">
+      <Project>{4775A5D7-009A-4B8D-A9DE-0CEBDFCC1535}</Project>
+      <Name>OSDevGrp.OSIntranet.Repositories.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories\OSDevGrp.OSIntranet.Repositories.csproj">
+      <Project>{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}</Project>
+      <Name>OSDevGrp.OSIntranet.Repositories</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Resources\OSDevGrp.OSIntranet.Resources.csproj">
       <Project>{EC187CDE-4BB1-4B84-8AAE-1CE461296611}</Project>
       <Name>OSDevGrp.OSIntranet.Resources</Name>
