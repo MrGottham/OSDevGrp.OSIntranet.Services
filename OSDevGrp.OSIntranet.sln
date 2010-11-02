@@ -32,9 +32,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "en-US", "en-US", "{A8CFDF7F
 		External references\en-US\OSDevGrp.OSIntranet.CommonLibrary.Resources.resources.dll = External references\en-US\OSDevGrp.OSIntranet.CommonLibrary.Resources.resources.dll
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Resources", "OSDevGrp.OSIntranet.Resources\OSDevGrp.OSIntranet.Resources.csproj", "{EC187CDE-4BB1-4B84-8AAE-1CE461296611}"
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Infrastructure.Interfaces\\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj
 		SccLocalPath1 = .
@@ -45,6 +47,9 @@ Global
 		SccProjectUniqueName3 = OSDevGrp.OSIntranet.Infrastructure\\OSDevGrp.OSIntranet.Infrastructure.csproj
 		SccLocalPath3 = .
 		SccProjectFilePathRelativizedFromConnection3 = OSDevGrp.OSIntranet.Infrastructure\\
+		SccProjectUniqueName4 = OSDevGrp.OSIntranet.Resources\\OSDevGrp.OSIntranet.Resources.csproj
+		SccLocalPath4 = .
+		SccProjectFilePathRelativizedFromConnection4 = OSDevGrp.OSIntranet.Resources\\
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +68,10 @@ Global
 		{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC187CDE-4BB1-4B84-8AAE-1CE461296611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC187CDE-4BB1-4B84-8AAE-1CE461296611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC187CDE-4BB1-4B84-8AAE-1CE461296611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC187CDE-4BB1-4B84-8AAE-1CE461296611}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
