@@ -42,8 +42,27 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.IoC">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.dll</HintPath>
+    </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Wcf">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll</HintPath>
+    </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.DataAccess.Contracts">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdresseRepository.cs" />
@@ -54,9 +73,17 @@
     <None Include="OSDevGrp.OSIntranet.snk" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Infrastructure.Interfaces\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj">
+      <Project>{E510F652-6E85-402E-9EFF-474841121181}</Project>
+      <Name>OSDevGrp.OSIntranet.Infrastructure.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories.Interfaces\OSDevGrp.OSIntranet.Repositories.Interfaces.csproj">
       <Project>{4775A5D7-009A-4B8D-A9DE-0CEBDFCC1535}</Project>
       <Name>OSDevGrp.OSIntranet.Repositories.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Resources\OSDevGrp.OSIntranet.Resources.csproj">
+      <Project>{EC187CDE-4BB1-4B84-8AAE-1CE461296611}</Project>
+      <Name>OSDevGrp.OSIntranet.Resources</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

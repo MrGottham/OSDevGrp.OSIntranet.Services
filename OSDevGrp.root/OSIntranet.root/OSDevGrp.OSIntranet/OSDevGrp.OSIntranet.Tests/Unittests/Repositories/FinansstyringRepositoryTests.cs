@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.Repositories;
+using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 {
@@ -7,5 +10,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
     /// </summary>
     public class FinansstyringRepositoryTests
     {
+        /// <summary>
+        /// Tester, at RegnskabslisteGet henter alle regnskaber.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabslisteGetHenterAlleRegnskaber()
+        {
+            var repository = new FinansstyringRepository();
+            var regnskaber = repository.RegnskabslisteGet();
+            Assert.That(regnskaber, Is.Not.Null);
+            Assert.That(regnskaber.Count, Is.EqualTo(2));
+            Assert.That(regnskaber[0].Nummer, Is.EqualTo(1));
+            Assert.That(regnskaber[0].Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(regnskaber[1].Nummer, Is.EqualTo(2));
+            Assert.That(regnskaber[1].Navn, Is.EqualTo("Bryllup"));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet henter et givent regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabGetHenterRegnskab()
+        {
+            var repository = new FinansstyringRepository();
+            var regnskab = repository.RegnskabGet(1);
+            Assert.That(regnskab, Is.Not.Null);
+            Assert.That(regnskab.Nummer, Is.EqualTo(1));
+            Assert.That(regnskab.Navn, Is.Not.Null);
+            Assert.That(regnskab.Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(regnskab.Konti, Is.Not.Null);
+            Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
+            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(4));
+            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(72));
+        }
     }
 }

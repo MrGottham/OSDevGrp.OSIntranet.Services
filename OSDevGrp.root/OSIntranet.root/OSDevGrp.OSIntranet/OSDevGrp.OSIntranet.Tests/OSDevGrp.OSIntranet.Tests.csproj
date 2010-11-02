@@ -51,6 +51,9 @@
     <Reference Include="nunit.framework">
       <HintPath>..\External references\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
+    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.IoC">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.dll</HintPath>
     </Reference>

@@ -5,5 +5,8 @@
     /// </summary>
     public enum ExceptionMessage
     {
+        RepositoryError,
+        UnhandledSwitchValue,
+        CantFindObjectById
     }
 }
