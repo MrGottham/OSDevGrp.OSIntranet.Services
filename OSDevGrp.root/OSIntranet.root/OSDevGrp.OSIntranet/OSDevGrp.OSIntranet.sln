@@ -12,12 +12,29 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External references", "External references", "{8CC59821-8B5B-420E-81DA-01CB7CABB700}"
 	ProjectSection(SolutionItems) = preProject
+		External references\Castle.Core.dll = External references\Castle.Core.dll
+		External references\Castle.Windsor.dll = External references\Castle.Windsor.dll
 		External references\nunit.framework.dll = External references\nunit.framework.dll
+		External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.dll
+		External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.dll
+		External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Infrastructure", "OSDevGrp.OSIntranet.Infrastructure\OSDevGrp.OSIntranet.Infrastructure.csproj", "{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "da-DK", "da-DK", "{7CB00384-51F7-4001-A7F9-AB45F59F6412}"
+	ProjectSection(SolutionItems) = preProject
+		External references\da-DK\OSDevGrp.OSIntranet.CommonLibrary.Resources.resources.dll = External references\da-DK\OSDevGrp.OSIntranet.CommonLibrary.Resources.resources.dll
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "en-US", "en-US", "{A8CFDF7F-ADD7-4554-92D2-AFA497A7BD76}"
+	ProjectSection(SolutionItems) = preProject
+		External references\en-US\OSDevGrp.OSIntranet.CommonLibrary.Resources.resources.dll = External references\en-US\OSDevGrp.OSIntranet.CommonLibrary.Resources.resources.dll
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 4
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Infrastructure.Interfaces\\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj
 		SccLocalPath1 = .
@@ -25,6 +42,9 @@ Global
 		SccProjectUniqueName2 = OSDevGrp.OSIntranet.Tests\\OSDevGrp.OSIntranet.Tests.csproj
 		SccLocalPath2 = .
 		SccProjectFilePathRelativizedFromConnection2 = OSDevGrp.OSIntranet.Tests\\
+		SccProjectUniqueName3 = OSDevGrp.OSIntranet.Infrastructure\\OSDevGrp.OSIntranet.Infrastructure.csproj
+		SccLocalPath3 = .
+		SccProjectFilePathRelativizedFromConnection3 = OSDevGrp.OSIntranet.Infrastructure\\
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,8 +59,16 @@ Global
 		{A1EBFC92-C81D-4A5C-959E-F2FDC48E6B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1EBFC92-C81D-4A5C-959E-F2FDC48E6B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1EBFC92-C81D-4A5C-959E-F2FDC48E6B02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7CB00384-51F7-4001-A7F9-AB45F59F6412} = {8CC59821-8B5B-420E-81DA-01CB7CABB700}
+		{A8CFDF7F-ADD7-4554-92D2-AFA497A7BD76} = {8CC59821-8B5B-420E-81DA-01CB7CABB700}
 	EndGlobalSection
 EndGlobal
