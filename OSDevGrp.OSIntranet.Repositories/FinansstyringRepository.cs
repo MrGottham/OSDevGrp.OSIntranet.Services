@@ -164,13 +164,13 @@ namespace OSDevGrp.OSIntranet.Repositories
         }
 
         /// <summary>
-        /// Mapper et kontoview til en konto.
+        /// Mapper et kontolisteview til en konto.
         /// </summary>
         /// <param name="regnskab">Regnskab.</param>
-        /// <param name="kontoView">Kontoview.</param>
+        /// <param name="kontoView">Kontolisteview.</param>
         /// <param name="kontogrupper">Kontogrupper.</param>
         /// <returns>Konto.</returns>
-        private static Konto MapKonto(Regnskab regnskab, KontoView kontoView, IEnumerable<Kontogruppe> kontogrupper)
+        private static Konto MapKonto(Regnskab regnskab, KontoListeView kontoView, IEnumerable<Kontogruppe> kontogrupper)
         {
             if (regnskab == null)
             {
@@ -208,12 +208,12 @@ namespace OSDevGrp.OSIntranet.Repositories
         }
 
         /// <summary>
-        /// Mapper et budgetkontoview til en budgetkonto.
+        /// Mapper et budgetkontolisteview til en budgetkonto.
         /// </summary>
         /// <param name="regnskab">Regnskab.</param>
-        /// <param name="budgetkontoView">Budgetkontoview.</param>
+        /// <param name="budgetkontoView">Budgetkontolisteview.</param>
         /// <param name="budgetkontogrupper">Grupper af budgetkonti.</param>
-        private static Budgetkonto MapBudgetkonto(Regnskab regnskab, BudgetkontoView budgetkontoView, IEnumerable<Budgetkontogruppe> budgetkontogrupper)
+        private static Budgetkonto MapBudgetkonto(Regnskab regnskab, BudgetkontoListeView budgetkontoView, IEnumerable<Budgetkontogruppe> budgetkontogrupper)
         {
             if (regnskab == null)
             {

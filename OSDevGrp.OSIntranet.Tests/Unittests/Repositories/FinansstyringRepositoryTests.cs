@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories;
 using NUnit.Framework;
 
@@ -42,6 +43,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
             Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(4));
             Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(72));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet kaster en IntranetRepositoryException, hvis regnskabet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabGetKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
+        {
+            var repository = new FinansstyringRepository();
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
         }
     }
 }
