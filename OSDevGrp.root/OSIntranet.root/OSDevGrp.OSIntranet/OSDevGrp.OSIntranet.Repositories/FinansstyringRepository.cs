@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
@@ -40,8 +41,8 @@ namespace OSDevGrp.OSIntranet.Repositories
             var channel = channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
-                var query = new RegnskabGetAllQuery();
-                var regnskabViews = channel.RegnskabGetAll(query);
+                var regnskabQuery = new RegnskabGetAllQuery();
+                var regnskabViews = channel.RegnskabGetAll(regnskabQuery);
                 return regnskabViews.Select(MapRegnskab).ToList();
             }
             catch (IntranetRepositoryException)
@@ -70,6 +71,17 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="nummer">Unik identifikation af regnskabet.</param>
         /// <returns>Regnskab.</returns>
         public Regnskab RegnskabGet(int nummer)
+        {
+            return RegnskabGet(nummer, null);
+        }
+
+        /// <summary>
+        /// Henter et givent regnskab.
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af regnskabet.</param>
+        /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
+        /// <returns>Regnskab.</returns>
+        public Regnskab RegnskabGet(int nummer, Func<int, AdresseBase> callback)
         {
             var container = ContainerFactory.Create();
             var channelFactory = container.Resolve<IChannelFactory>();
@@ -160,6 +172,11 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 regnskab.TilføjKonto(MapBudgetkonto(regnskab, budgetkontoView, budgetkontogrupper));
             }
+            foreach (var bogføringslinjeView in regnskabView.Konti.SelectMany(m => m.Bogføringslinjer).ToList())
+            {
+                MapBogføringslinje(bogføringslinjeView, regnskab.Konti.OfType<Konto>().ToList(),
+                                   regnskab.Konti.OfType<Budgetkonto>().ToList());
+            }
             return regnskab;
         }
 
@@ -208,11 +225,56 @@ namespace OSDevGrp.OSIntranet.Repositories
         }
 
         /// <summary>
+        /// Mapper et kontoview til en konto.
+        /// </summary>
+        /// <param name="regnskab">Regnskab.</param>
+        /// <param name="kontoView">Kontolisteview.</param>
+        /// <param name="kontogrupper">Kontogrupper.</param>
+        /// <returns>Konto.</returns>
+        private static Konto MapKonto(Regnskab regnskab, KontoView kontoView, IEnumerable<Kontogruppe> kontogrupper)
+        {
+            if (regnskab == null)
+            {
+                throw new ArgumentNullException("regnskab");
+            }
+            if (kontoView == null)
+            {
+                throw new ArgumentNullException("kontoView");
+            }
+            if (kontogrupper == null)
+            {
+                throw new ArgumentNullException("kontogrupper");
+            }
+            var konto = MapKonto(regnskab, kontoView as KontoListeView, kontogrupper);
+            foreach (var kreditoplysningerView in kontoView.Kreditoplysninger)
+            {
+                konto.TilføjKreditoplysninger(MapKreditoplysninger(kreditoplysningerView));
+            }
+            return konto;
+        }
+
+        /// <summary>
+        /// Mapper et kreditoplysningsview til kreditoplysninger.
+        /// </summary>
+        /// <param name="kreditoplysningerView">Kreditoplysningsview.</param>
+        /// <returns>Kreditoplysninger.</returns>
+        private static Kreditoplysninger MapKreditoplysninger(KreditoplysningerView kreditoplysningerView)
+        {
+            if (kreditoplysningerView == null)
+            {
+                throw new ArgumentNullException("kreditoplysningerView");
+            }
+            return new Kreditoplysninger(kreditoplysningerView.År, kreditoplysningerView.Måned,
+                                         kreditoplysningerView.Kredit);
+        }
+
+        /// <summary>
         /// Mapper et budgetkontolisteview til en budgetkonto.
         /// </summary>
         /// <param name="regnskab">Regnskab.</param>
         /// <param name="budgetkontoView">Budgetkontolisteview.</param>
         /// <param name="budgetkontogrupper">Grupper af budgetkonti.</param>
+        /// <returns>Budgetkonto.</returns>
         private static Budgetkonto MapBudgetkonto(Regnskab regnskab, BudgetkontoListeView budgetkontoView, IEnumerable<Budgetkontogruppe> budgetkontogrupper)
         {
             if (regnskab == null)
@@ -249,6 +311,100 @@ namespace OSDevGrp.OSIntranet.Repositories
                 budgetkonto.SætNote(budgetkontoView.Note);
             }
             return budgetkonto;
+        }
+
+        /// <summary>
+        /// Mapper et budgetkontoview til en budgetkonto.
+        /// </summary>
+        /// <param name="regnskab">Regnskab.</param>
+        /// <param name="budgetkontoView">Budgetkontoview.</param>
+        /// <param name="budgetkontogrupper">Grupper af budgetkonti.</param>
+        /// <returns>Budgetkonto.</returns>
+        private static Budgetkonto MapBudgetkonto(Regnskab regnskab, BudgetkontoView budgetkontoView, IEnumerable<Budgetkontogruppe> budgetkontogrupper)
+        {
+            if (regnskab == null)
+            {
+                throw new ArgumentNullException("regnskab");
+            }
+            if (budgetkontoView == null)
+            {
+                throw new ArgumentNullException("budgetkontoView");
+            }
+            if (budgetkontogrupper == null)
+            {
+                throw new ArgumentNullException("budgetkontogrupper");
+            }
+            var budgetkonto = MapBudgetkonto(regnskab, budgetkontoView as BudgetkontoListeView, budgetkontogrupper);
+            foreach (var budgetoplysningerView in budgetkontoView.Budgetoplysninger)
+            {
+                budgetkonto.TilføjBudgetoplysninger(MapBudgetoplysninger(budgetoplysningerView));
+            }
+            return budgetkonto;
+        }
+
+        /// <summary>
+        /// Mapper et budgetoplysningsview til budgetoplysninger.
+        /// </summary>
+        /// <param name="budgetoplysningerView">Budgetoplysningsview.</param>
+        /// <returns>Budgetoplysninger.</returns>
+        private static Budgetoplysninger MapBudgetoplysninger(BudgetoplysningerView budgetoplysningerView)
+        {
+            if (budgetoplysningerView == null)
+            {
+                throw new ArgumentNullException("budgetoplysningerView");
+            }
+            return new Budgetoplysninger(budgetoplysningerView.År, budgetoplysningerView.Måned,
+                                         budgetoplysningerView.Indtægter, budgetoplysningerView.Udgifter);
+        }
+
+        /// <summary>
+        /// Mapper et bogføringslinjeview til en bogføringslinje.
+        /// </summary>
+        /// <param name="bogføringslinjeView">Bogføringslinjeview.</param>
+        /// <param name="konti">Konti.</param>
+        /// <param name="budgetkonti">Budgetkonti.</param>
+        /// <returns>Bogføringslinje.</returns>
+        private static void MapBogføringslinje(BogføringslinjeView bogføringslinjeView, IEnumerable<Konto> konti, IEnumerable<Budgetkonto> budgetkonti)
+        {
+            if (bogføringslinjeView == null)
+            {
+                throw new ArgumentNullException("bogføringslinjeView");
+            }
+            if (konti == null)
+            {
+                throw new ArgumentNullException("konti");
+            }
+            var bogføringslinje = new Bogføringslinje(bogføringslinjeView.Løbenummer, bogføringslinjeView.Dato,
+                                                      bogføringslinjeView.Bilag, bogføringslinjeView.Tekst,
+                                                      bogføringslinjeView.Debit, bogføringslinjeView.Kredit);
+            Konto konto;
+            try
+            {
+                konto = konti.Single(m => m.Kontonummer.CompareTo(bogføringslinjeView.Konto.Kontonummer) == 0);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto),
+                                                 bogføringslinjeView.Konto.Kontonummer), ex);
+            }
+            konto.TilføjBogføringslinje(bogføringslinje);
+            if (bogføringslinjeView.Budgetkonto != null)
+            {
+                Budgetkonto budgetkonto;
+                try
+                {
+                    budgetkonto = budgetkonti
+                        .Single(m => m.Kontonummer.CompareTo(bogføringslinjeView.Budgetkonto.Kontonummer) == 0);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new IntranetRepositoryException(
+                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto),
+                                                     bogføringslinjeView.Budgetkonto.Kontonummer), ex);
+                }
+                budgetkonto.TilføjBogføringslinje(bogføringslinje);
+            }
         }
 
         /// <summary>

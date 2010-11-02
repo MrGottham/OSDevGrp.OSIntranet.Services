@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 
 namespace OSDevGrp.OSIntranet.Repositories.Interfaces
@@ -20,5 +22,13 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// <param name="nummer">Unik identifikation af regnskabet.</param>
         /// <returns>Regnskab.</returns>
         Regnskab RegnskabGet(int nummer);
+
+        /// <summary>
+        /// Henter et givent regnskab.
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af regnskabet.</param>
+        /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
+        /// <returns>Regnskab.</returns>
+        Regnskab RegnskabGet(int nummer, Func<int, AdresseBase> callback);
     }
 }
