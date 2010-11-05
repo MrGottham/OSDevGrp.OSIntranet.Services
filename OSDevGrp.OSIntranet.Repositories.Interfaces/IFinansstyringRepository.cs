@@ -30,5 +30,17 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
         /// <returns>Regnskab.</returns>
         Regnskab RegnskabGet(int nummer, Func<int, AdresseBase> callback);
+
+        /// <summary>
+        /// Henter alle kontogrupper.
+        /// </summary>
+        /// <returns>Liste af kontogrupper.</returns>
+        IList<Kontogruppe> KontogruppeGetAll();
+
+        /// <summary>
+        /// Hetner alle grupper til budgetkonti.
+        /// </summary>
+        /// <returns>Liste af grupper til budgetkonti.</returns>
+        IList<Budgetkontogruppe> BudgetkontogruppeGetAll();
     }
 }
