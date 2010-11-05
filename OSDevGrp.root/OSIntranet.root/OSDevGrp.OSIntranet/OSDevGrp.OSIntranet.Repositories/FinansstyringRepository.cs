@@ -102,7 +102,77 @@ namespace OSDevGrp.OSIntranet.Repositories
                 var budgetgruppeViews = channel.BudgetkontogruppeGetAll(budgetgruppeQuery);
                 // Mapning og returnering af regnskab.)
                 return MapRegnskab(regnskabView, kontogruppeViews.Select(MapKontogruppe).ToList(),
-                                   budgetgruppeViews.Select(MapBudgetkontogruppe));
+                                   budgetgruppeViews.Select(MapBudgetkontogruppe), callback);
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetRepositoryException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(channel);
+            }
+        }
+
+        /// <summary>
+        /// Henter alle kontogrupper.
+        /// </summary>
+        /// <returns>Liste af kontogrupper.</returns>
+        public IList<Kontogruppe> KontogruppeGetAll()
+        {
+            var container = ContainerFactory.Create();
+            var channelFactory = container.Resolve<IChannelFactory>();
+            var channel = channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            try
+            {
+                var query = new KontogruppeGetAllQuery();
+                var kontogruppeViews = channel.KontogruppeGetAll(query);
+                return kontogruppeViews.Select(MapKontogruppe).ToList();
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetRepositoryException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(channel);
+            }
+        }
+
+        /// <summary>
+        /// Hetner alle grupper til budgetkonti.
+        /// </summary>
+        /// <returns>Liste af grupper til budgetkonti.</returns>
+        public IList<Budgetkontogruppe> BudgetkontogruppeGetAll()
+        {
+            var container = ContainerFactory.Create();
+            var channelFactory = container.Resolve<IChannelFactory>();
+            var channel = channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            try
+            {
+                var query = new BudgetkontogruppeGetAllQuery();
+                var budgetkontogruppeViews = channel.BudgetkontogruppeGetAll(query);
+                return budgetkontogruppeViews.Select(MapBudgetkontogruppe).ToList();
             }
             catch (IntranetRepositoryException)
             {
@@ -148,8 +218,9 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="regnskabView">Regnskabsview.</param>
         /// <param name="kontogrupper">Kontogrupper.</param>
         /// <param name="budgetkontogrupper">Budgetkontogrupper.</param>
+        /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
         /// <returns>Regnskab.</returns>
-        private static Regnskab MapRegnskab(RegnskabView regnskabView, IEnumerable<Kontogruppe> kontogrupper, IEnumerable<Budgetkontogruppe> budgetkontogrupper)
+        private static Regnskab MapRegnskab(RegnskabView regnskabView, IEnumerable<Kontogruppe> kontogrupper, IEnumerable<Budgetkontogruppe> budgetkontogrupper, Func<int, AdresseBase> callback)
         {
             if (regnskabView == null)
             {
@@ -175,7 +246,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             foreach (var bogføringslinjeView in regnskabView.Konti.SelectMany(m => m.Bogføringslinjer).ToList())
             {
                 MapBogføringslinje(bogføringslinjeView, regnskab.Konti.OfType<Konto>().ToList(),
-                                   regnskab.Konti.OfType<Budgetkonto>().ToList());
+                                   regnskab.Konti.OfType<Budgetkonto>().ToList(), callback);
             }
             return regnskab;
         }
@@ -363,8 +434,9 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="bogføringslinjeView">Bogføringslinjeview.</param>
         /// <param name="konti">Konti.</param>
         /// <param name="budgetkonti">Budgetkonti.</param>
+        /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
         /// <returns>Bogføringslinje.</returns>
-        private static void MapBogføringslinje(BogføringslinjeView bogføringslinjeView, IEnumerable<Konto> konti, IEnumerable<Budgetkonto> budgetkonti)
+        private static void MapBogføringslinje(BogføringslinjeView bogføringslinjeView, IEnumerable<Konto> konti, IEnumerable<Budgetkonto> budgetkonti, Func<int, AdresseBase> callback)
         {
             if (bogføringslinjeView == null)
             {
@@ -405,6 +477,18 @@ namespace OSDevGrp.OSIntranet.Repositories
                 }
                 budgetkonto.TilføjBogføringslinje(bogføringslinje);
             }
+            if (bogføringslinjeView.Adresse == null || callback == null)
+            {
+                return;
+            }
+            var adresse = callback(bogføringslinjeView.Adresse.Nummer);
+            if (adresse == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
+                                                                                   typeof (AdresseBase),
+                                                                                   bogføringslinjeView.Adresse.Nummer));
+            }
+            adresse.TilføjBogføringslinje(bogføringslinje);
         }
 
         /// <summary>
