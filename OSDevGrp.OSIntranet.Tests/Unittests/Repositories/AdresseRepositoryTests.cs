@@ -20,7 +20,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository();
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
-            Assert.That(adresser.OfType<Firma>().Count(), Is.EqualTo(10));
+            Assert.That(adresser.OfType<Firma>().Count(), Is.EqualTo(24));
+        }
+
+        /// <summary>
+        /// Tester, at et firma mappes korrekt.
+        /// </summary>
+        [Test]
+        public void TestAtFirmaMappesKorrekt()
+        {
+            var repository = new AdresseRepository();
+            var adresser = repository.AdresseGetAll();
+            Assert.That(adresser, Is.Not.Null);
+            Assert.That(adresser.OfType<Firma>().Count(), Is.GreaterThan(0));
+
+            var firma = adresser.OfType<Firma>().SingleOrDefault(m => m.Nummer == 48);
+            Assert.That(firma, Is.Not.Null);
+            Assert.That(firma.Nummer, Is.EqualTo(48));
+            Assert.That(firma.Navn, Is.Not.Null);
+            Assert.That(firma.Navn, Is.EqualTo("DSI DATA A/S"));
+            Assert.That(firma.Adresse1, Is.Not.Null);
+            Assert.That(firma.Adresse1, Is.EqualTo("Kokkedal Industripark 2"));
+            Assert.That(firma.Adresse2, Is.Null);
+            Assert.That(firma.PostnrBy, Is.Not.Null);
+            Assert.That(firma.PostnrBy, Is.EqualTo("2980  Kokkedal"));
         }
 
         /// <summary>
