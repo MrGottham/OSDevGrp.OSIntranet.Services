@@ -44,9 +44,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Reposit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Contracts", "OSDevGrp.OSIntranet.Contracts\OSDevGrp.OSIntranet.Contracts.csproj", "{776EB809-1060-4037-A993-2B3E74DF779D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Services", "OSDevGrp.OSIntranet.Services\OSDevGrp.OSIntranet.Services.csproj", "{46A9F437-6741-4CB8-B2F5-CFF0A8272C0F}"
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 8
+		SccNumberOfProjects = 9
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Infrastructure.Interfaces\\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj
 		SccLocalPath1 = .
@@ -69,6 +71,9 @@ Global
 		SccProjectUniqueName7 = OSDevGrp.OSIntranet.Contracts\\OSDevGrp.OSIntranet.Contracts.csproj
 		SccLocalPath7 = .
 		SccProjectFilePathRelativizedFromConnection7 = OSDevGrp.OSIntranet.Contracts\\
+		SccProjectUniqueName8 = OSDevGrp.OSIntranet.Services\\OSDevGrp.OSIntranet.Services.csproj
+		SccLocalPath8 = .
+		SccProjectFilePathRelativizedFromConnection8 = OSDevGrp.OSIntranet.Services\\
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +108,10 @@ Global
 		{776EB809-1060-4037-A993-2B3E74DF779D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{776EB809-1060-4037-A993-2B3E74DF779D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{776EB809-1060-4037-A993-2B3E74DF779D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46A9F437-6741-4CB8-B2F5-CFF0A8272C0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46A9F437-6741-4CB8-B2F5-CFF0A8272C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46A9F437-6741-4CB8-B2F5-CFF0A8272C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46A9F437-6741-4CB8-B2F5-CFF0A8272C0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

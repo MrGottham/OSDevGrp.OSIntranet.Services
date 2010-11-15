@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="OSDevGrp.OSIntranet.Services.Implementations.FinansstyringService" CodeBehind="Implementations/FinansstyringService.cs" %>
