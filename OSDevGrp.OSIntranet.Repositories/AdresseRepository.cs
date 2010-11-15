@@ -47,17 +47,25 @@ namespace OSDevGrp.OSIntranet.Repositories
                 // Henter alle betalingsbetingelser.
                 var betalingsbetingelseQuery = new BetalingsbetingelseGetAllQuery();
                 var betalingsbetingelseViews = channel.BetalingsbetingelseGetAll(betalingsbetingelseQuery);
-
-                // Henter alle adresser.
+                // Henter alle firmaadresser.
                 var firmaQuery = new FirmaGetAllQuery();
                 var firmaViews = channel.FirmaGetAll(firmaQuery);
-
+                // Henter alle personadresser.
+                var personQuery = new PersonGetAllQuery();
+                var personViews = channel.PersonGetAll(personQuery);
+                // Mapper views til adresser.
                 var adresser = new List<AdresseBase>();
                 adresser.AddRange(
                     firmaViews.Select(
                         firmaView =>
                         MapFirma(firmaView, adressegruppeViews.Select(MapAdressegruppe).ToList(),
                                  betalingsbetingelseViews.Select(MapBetalingsbetingelse).ToList())).ToList());
+                adresser.AddRange(
+                    personViews.Select(
+                        personView =>
+                        MapPerson(personView, adresser.OfType<Firma>().ToList(),
+                                  adressegruppeViews.Select(MapAdressegruppe).ToList(),
+                                  betalingsbetingelseViews.Select(MapBetalingsbetingelse).ToList())).ToList());
                 return adresser.OrderBy(m => m, new AdresseComparer()).ToList();
             }
             catch (IntranetRepositoryException)
@@ -194,7 +202,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Mapper et firmaview til et firma.
         /// </summary>
         /// <param name="firmaView">Firmaview.</param>
-        /// <param name="adressegrupper">Adresser.</param>
+        /// <param name="adressegrupper">Adressegrupper.</param>
         /// <param name="betalingsbetingelser">Betalingsbetingelser.</param>
         /// <returns>Firma.</returns>
         private static Firma MapFirma(FirmaView firmaView, IEnumerable<Adressegruppe> adressegrupper, IEnumerable<Betalingsbetingelse> betalingsbetingelser)
@@ -247,6 +255,87 @@ namespace OSDevGrp.OSIntranet.Repositories
             firma.SætUdlånsfrist(firmaView.Udlånsfrist);
             firma.SætFilofaxAdresselabel(firmaView.FilofaxAdresselabel);
             return firma;
+        }
+
+        /// <summary>
+        /// Mapper et personview til en person.
+        /// </summary>
+        /// <param name="personView">Personview.</param>
+        /// <param name="firmaer">Firmaer.</param>
+        /// <param name="adressegrupper">Adressegrupper.</param>
+        /// <param name="betalingsbetingelser">Betalingsbetingelser.</param>
+        /// <returns>Person.</returns>
+        private static Person MapPerson(PersonView personView, IEnumerable<Firma> firmaer, IEnumerable<Adressegruppe> adressegrupper, IEnumerable<Betalingsbetingelse> betalingsbetingelser)
+        {
+            if (personView == null)
+            {
+                throw new ArgumentNullException("personView");
+            }
+            if (firmaer == null)
+            {
+                throw new ArgumentNullException("firmaer");
+            }
+            if (adressegrupper == null)
+            {
+                throw new ArgumentNullException("adressegrupper");
+            }
+            if (betalingsbetingelser == null)
+            {
+                throw new ArgumentNullException("betalingsbetingelser");
+            }
+            Adressegruppe adressegruppe;
+            try
+            {
+                adressegruppe = adressegrupper.Single(m => m.Nummer == personView.Adressegruppe.Nummer);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Adressegruppe),
+                                                 personView.Adressegruppe.Nummer), ex);
+            }
+            var person = new Person(personView.Nummer, personView.Navn, adressegruppe);
+
+            person.SætAdresseoplysninger(personView.Adresse1, personView.Adresse2, personView.PostnummerBy);
+            person.SætTelefon(personView.Telefon, personView.Mobil);
+            person.SætFødselsdato(personView.Fødselsdato);
+            person.SætBekendtskab(personView.Bekendtskab);
+            person.SætMailadresse(personView.Mailadresse);
+            person.SætWebadresse(personView.Webadresse);
+            if (personView.Betalingsbetingelse != null)
+            {
+                Betalingsbetingelse betalingsbetingelse;
+                try
+                {
+                    betalingsbetingelse =
+                        betalingsbetingelser.Single(m => m.Nummer == personView.Betalingsbetingelse.Nummer);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new IntranetRepositoryException(
+                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse),
+                                                     personView.Betalingsbetingelse.Nummer), ex);
+                }
+                person.SætBetalingsbetingelse(betalingsbetingelse);
+            }
+            person.SætUdlånsfrist(personView.Udlånsfrist);
+            person.SætFilofaxAdresselabel(personView.FilofaxAdresselabel);
+            if (personView.Firma != null)
+            {
+                Firma firma;
+                try
+                {
+                    firma = firmaer.Single(m => m.Nummer == personView.Firma.Nummer);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new IntranetRepositoryException(
+                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma),
+                                                     personView.Firma.Nummer), ex);
+                }
+                firma.TilføjPerson(person);
+            }
+            return person;
         }
 
         /// <summary>

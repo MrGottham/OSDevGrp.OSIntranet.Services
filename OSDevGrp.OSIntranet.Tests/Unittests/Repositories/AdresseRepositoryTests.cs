@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Repositories;
 using NUnit.Framework;
@@ -21,6 +22,56 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
             Assert.That(adresser.OfType<Firma>().Count(), Is.EqualTo(24));
+            Assert.That(adresser.OfType<Person>().Count(), Is.EqualTo(112));
+        }
+
+        /// <summary>
+        /// Tester, at en person mappes korrekt.
+        /// </summary>
+        [Test]
+        public void TestAtPersonMappesKorrekt()
+        {
+            var repository = new AdresseRepository();
+            var adresser = repository.AdresseGetAll();
+            Assert.That(adresser, Is.Not.Null);
+            Assert.That(adresser.OfType<Person>().Count(), Is.GreaterThan(0));
+
+            var person = adresser.OfType<Person>().SingleOrDefault(m => m.Nummer == 1);
+            Assert.That(person, Is.Not.Null);
+            Assert.That(person.Nummer, Is.EqualTo(1));
+            Assert.That(person.Navn, Is.Not.Null);
+            Assert.That(person.Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(person.Adresse1, Is.Not.Null);
+            Assert.That(person.Adresse1, Is.EqualTo("Eggertsvænge 2"));
+            Assert.That(person.Adresse2, Is.Null);
+            Assert.That(person.PostnrBy, Is.Not.Null);
+            Assert.That(person.PostnrBy, Is.EqualTo("5700  Svendborg"));
+            Assert.That(person.Telefon, Is.Not.Null);
+            Assert.That(person.Telefon, Is.EqualTo("62 21 49 60"));
+            Assert.That(person.Mobil, Is.Not.Null);
+            Assert.That(person.Mobil, Is.EqualTo("25 24 49 75"));
+            Assert.That(person.Fødselsdato, Is.Not.Null);
+            Assert.That(person.Fødselsdato, Is.EqualTo(new DateTime(1975, 8, 21, 0, 0, 0).Date).Within(0).Days);
+            Assert.That(person.Adressegruppe, Is.Not.Null);
+            Assert.That(person.Adressegruppe.Nummer, Is.EqualTo(1));
+            Assert.That(person.Adressegruppe.Navn, Is.Not.Null);
+            Assert.That(person.Adressegruppe.Navn, Is.EqualTo("Familie (Ole)"));
+            Assert.That(person.Adressegruppe.AdressegruppeOswebdb, Is.EqualTo(1));
+            Assert.That(person.Bekendtskab, Is.Null);
+            Assert.That(person.Mailadresse, Is.Not.Null);
+            Assert.That(person.Mailadresse, Is.EqualTo("os@dsidata.dk"));
+            Assert.That(person.Webadresse, Is.Not.Null);
+            Assert.That(person.Webadresse, Is.EqualTo("www.MrGottham.dk"));
+            Assert.That(person.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(person.Betalingsbetingelse.Nummer, Is.EqualTo(1));
+            Assert.That(person.Betalingsbetingelse.Navn, Is.Not.Null);
+            Assert.That(person.Betalingsbetingelse.Navn, Is.EqualTo("Kontant"));
+            Assert.That(person.Udlånsfrist, Is.EqualTo(14));
+            Assert.That(person.Firma, Is.Not.Null);
+            Assert.That(person.Firma.Nummer, Is.EqualTo(48));
+            Assert.That(person.Firma.Navn, Is.Not.Null);
+            Assert.That(person.Firma.Navn, Is.EqualTo("DSI DATA A/S"));
+            Assert.That(person.FilofaxAdresselabel, Is.True);
         }
 
         /// <summary>
@@ -44,6 +95,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(firma.Adresse2, Is.Null);
             Assert.That(firma.PostnrBy, Is.Not.Null);
             Assert.That(firma.PostnrBy, Is.EqualTo("2980  Kokkedal"));
+            Assert.That(firma.Telefon1, Is.Not.Null);
+            Assert.That(firma.Telefon1, Is.EqualTo("49 18 49 18"));
+            Assert.That(firma.Telefon2, Is.Null);
+            Assert.That(firma.Telefax, Is.Not.Null);
+            Assert.That(firma.Telefax, Is.EqualTo("49 18 49 44"));
+            Assert.That(firma.Adressegruppe, Is.Not.Null);
+            Assert.That(firma.Adressegruppe.Nummer, Is.EqualTo(3));
+            Assert.That(firma.Adressegruppe.Navn, Is.Not.Null);
+            Assert.That(firma.Adressegruppe.Navn, Is.EqualTo("Arbejdsrelationer"));
+            Assert.That(firma.Adressegruppe.AdressegruppeOswebdb, Is.EqualTo(3));
+            Assert.That(firma.Bekendtskab, Is.Not.Null);
+            Assert.That(firma.Bekendtskab, Is.EqualTo("Arbejdsplads, Ole"));
+            Assert.That(firma.Mailadresse, Is.Not.Null);
+            Assert.That(firma.Mailadresse, Is.EqualTo("info@dsidata.dk"));
+            Assert.That(firma.Webadresse, Is.Not.Null);
+            Assert.That(firma.Webadresse, Is.EqualTo("www.dsidata.dk"));
+            Assert.That(firma.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(firma.Betalingsbetingelse.Nummer, Is.EqualTo(1));
+            Assert.That(firma.Betalingsbetingelse.Navn, Is.Not.Null);
+            Assert.That(firma.Betalingsbetingelse.Navn, Is.EqualTo("Kontant"));
+            Assert.That(firma.Udlånsfrist, Is.EqualTo(14));
+            Assert.That(firma.FilofaxAdresselabel, Is.True);
+            Assert.That(firma.Personer, Is.Not.Null);
+            Assert.That(firma.Personer.Count, Is.GreaterThan(0));
         }
 
         /// <summary>
