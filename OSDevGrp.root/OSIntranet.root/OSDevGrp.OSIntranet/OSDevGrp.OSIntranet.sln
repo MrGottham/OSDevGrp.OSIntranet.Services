@@ -42,9 +42,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Reposit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Repositories", "OSDevGrp.OSIntranet.Repositories\OSDevGrp.OSIntranet.Repositories.csproj", "{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Contracts", "OSDevGrp.OSIntranet.Contracts\OSDevGrp.OSIntranet.Contracts.csproj", "{776EB809-1060-4037-A993-2B3E74DF779D}"
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 8
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Infrastructure.Interfaces\\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj
 		SccLocalPath1 = .
@@ -64,6 +66,9 @@ Global
 		SccProjectUniqueName6 = OSDevGrp.OSIntranet.Repositories\\OSDevGrp.OSIntranet.Repositories.csproj
 		SccLocalPath6 = .
 		SccProjectFilePathRelativizedFromConnection6 = OSDevGrp.OSIntranet.Repositories\\
+		SccProjectUniqueName7 = OSDevGrp.OSIntranet.Contracts\\OSDevGrp.OSIntranet.Contracts.csproj
+		SccLocalPath7 = .
+		SccProjectFilePathRelativizedFromConnection7 = OSDevGrp.OSIntranet.Contracts\\
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +99,10 @@ Global
 		{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{776EB809-1060-4037-A993-2B3E74DF779D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{776EB809-1060-4037-A993-2B3E74DF779D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{776EB809-1060-4037-A993-2B3E74DF779D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{776EB809-1060-4037-A993-2B3E74DF779D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
