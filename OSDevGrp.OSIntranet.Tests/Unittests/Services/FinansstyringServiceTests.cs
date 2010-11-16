@@ -29,5 +29,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 ChannelTools.CloseChannel(host);
             }
         }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis QueryBus er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisQueryBusErNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new FinansstyringService(null));
+        }
     }
 }
