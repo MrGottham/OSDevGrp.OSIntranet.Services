@@ -26,6 +26,9 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories")
                                    .BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)));
 
+            container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.QueryHandlers")
+                                   .BasedOn(typeof (IQueryHandler)).WithService.FromInterface(typeof (IQueryHandler)));
+
             container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.Services")
                                    .BasedOn(typeof (IIntranetService)).WithService.FromInterface(typeof (IIntranetService)));
         }

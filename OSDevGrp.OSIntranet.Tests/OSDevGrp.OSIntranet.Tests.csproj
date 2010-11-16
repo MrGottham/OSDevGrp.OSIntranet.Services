@@ -92,6 +92,8 @@
     <Compile Include="Unittests\Infrastructure\IntranetBusinessExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\FinansstyringQueryHandlerTestsBase.cs" />
+    <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
@@ -115,6 +117,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Infrastructure\OSDevGrp.OSIntranet.Infrastructure.csproj">
       <Project>{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}</Project>
       <Name>OSDevGrp.OSIntranet.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.QueryHandlers\OSDevGrp.OSIntranet.QueryHandlers.csproj">
+      <Project>{821C03BD-0315-4084-804E-C3BD4590E73F}</Project>
+      <Name>OSDevGrp.OSIntranet.QueryHandlers</Name>
     </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories.Interfaces\OSDevGrp.OSIntranet.Repositories.Interfaces.csproj">
       <Project>{4775A5D7-009A-4B8D-A9DE-0CEBDFCC1535}</Project>
