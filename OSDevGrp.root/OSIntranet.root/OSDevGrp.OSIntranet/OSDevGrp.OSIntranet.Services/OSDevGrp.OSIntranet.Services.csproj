@@ -47,6 +47,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
     </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll</HintPath>
+    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll</HintPath>
     </Reference>
@@ -90,6 +93,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Contracts\OSDevGrp.OSIntranet.Contracts.csproj">
       <Project>{776EB809-1060-4037-A993-2B3E74DF779D}</Project>
       <Name>OSDevGrp.OSIntranet.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Infrastructure.Interfaces\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj">
+      <Project>{E510F652-6E85-402E-9EFF-474841121181}</Project>
+      <Name>OSDevGrp.OSIntranet.Infrastructure.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Infrastructure\OSDevGrp.OSIntranet.Infrastructure.csproj">
       <Project>{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}</Project>
