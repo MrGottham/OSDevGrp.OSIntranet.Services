@@ -102,7 +102,6 @@ namespace OSDevGrp.OSIntranet.Repositories
                 var query = new PostnummerGetAllQuery();
                 var postnummerViews = channel.PostnummerGetAll(query);
                 return postnummerViews.Select(MapPostnummer).ToList();
-
             }
             catch (IntranetRepositoryException)
             {

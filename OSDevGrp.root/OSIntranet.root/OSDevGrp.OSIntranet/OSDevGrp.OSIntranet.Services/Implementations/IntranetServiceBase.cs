@@ -97,10 +97,6 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <returns>Formaterer fejlbesekder.</returns>
         private static string FormatExceptionMessage(Exception exception)
         {
-            if (exception == null)
-            {
-                throw new ArgumentNullException("exception");
-            }
             if (exception.InnerException != null)
             {
                 return string.Format("{0}\r\n\r\n{1}", exception.Message,
