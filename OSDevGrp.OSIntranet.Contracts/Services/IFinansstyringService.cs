@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
+using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 
@@ -14,10 +15,11 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <summary>
         /// Henter en regnskabsliste.
         /// </summary>
-        /// <param name="getQuery">Forespørgelse efter en regnskabsliste.</param>
+        /// <param name="query">Forespørgelse efter en regnskabsliste.</param>
         /// <returns>Regnskabsliste.</returns>
         [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<RegnskabslisteView> RegnskabslisteGet(RegnskabslisteGetQuery getQuery);
+        IEnumerable<RegnskabslisteView> RegnskabslisteGet(RegnskabslisteGetQuery query);
     }
 }

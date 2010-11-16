@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 
 namespace OSDevGrp.OSIntranet.Services.Implementations
 {
@@ -41,12 +42,31 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <summary>
         /// Henter en regnskabsliste.
         /// </summary>
-        /// <param name="getQuery">Forespørgelse efter en regnskabsliste.</param>
+        /// <param name="query">Forespørgelse efter en regnskabsliste.</param>
         /// <returns>Regnskabsliste.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<RegnskabslisteView> RegnskabslisteGet(RegnskabslisteGetQuery getQuery)
+        public IEnumerable<RegnskabslisteView> RegnskabslisteGet(RegnskabslisteGetQuery query)
         {
-            throw new System.NotImplementedException();
+            try
+            {
+                return _queryBus.Query<RegnskabslisteGetQuery, IEnumerable<RegnskabslisteView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
         }
 
         #endregion
