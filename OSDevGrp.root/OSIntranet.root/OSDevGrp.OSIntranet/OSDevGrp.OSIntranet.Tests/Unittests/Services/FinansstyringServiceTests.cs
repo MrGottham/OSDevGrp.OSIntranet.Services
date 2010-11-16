@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System;
+using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Services.Implementations;
 using NUnit.Framework;
@@ -16,7 +17,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestAtFinansstyringServiceKanHostes()
         {
-            var host = new ServiceHost(typeof (FinansstyringService));
+            var uri = new Uri("http://localhost:7000/OSIntranet/");
+            var host = new ServiceHost(typeof (FinansstyringService), new [] {uri});
             try
             {
                 host.Open();
