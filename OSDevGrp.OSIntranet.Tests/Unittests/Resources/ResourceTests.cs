@@ -17,8 +17,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForRepositoryErrorHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError,
-                                                                MethodBase.GetCurrentMethod().Name, "Test");
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError,
+                                                            MethodBase.GetCurrentMethod().Name, "Test");
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -29,8 +33,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForUnhandledSwitchValueHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, "1", "Test",
-                                                                MethodBase.GetCurrentMethod().Name);
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, "1", "Test",
+                                                            MethodBase.GetCurrentMethod().Name);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -41,7 +49,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForCantFindObjectByIdHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Konto), "XYZ");
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Konto), "XYZ");
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
