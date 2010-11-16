@@ -102,6 +102,10 @@
       <Project>{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}</Project>
       <Name>OSDevGrp.OSIntranet.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.QueryHandlers\OSDevGrp.OSIntranet.QueryHandlers.csproj">
+      <Project>{821C03BD-0315-4084-804E-C3BD4590E73F}</Project>
+      <Name>OSDevGrp.OSIntranet.QueryHandlers</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
