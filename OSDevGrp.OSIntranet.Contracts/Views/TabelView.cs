@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     /// Viewobjekt for generelle tabeloplysninger.
     /// </summary>
     [DataContract(Name = "Tabel", Namespace = SoapNamespaces.IntranetNamespace)]
-    public class TabelView : IView
+    public abstract class TabelView : IView
     {
         /// <summary>
         /// Nummer.
