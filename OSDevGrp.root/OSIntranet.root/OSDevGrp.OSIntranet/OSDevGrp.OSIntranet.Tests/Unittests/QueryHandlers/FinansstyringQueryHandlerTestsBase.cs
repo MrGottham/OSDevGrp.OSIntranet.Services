@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.Infrastructure;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using Rhino.Mocks;
 
@@ -32,6 +34,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(2))).Return(regnskaber.Single(m => m.Nummer == 2));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(3))).Return(regnskaber.Single(m => m.Nummer == 3));
             return repository;
+        }
+
+        /// <summary>
+        /// Danner og returnerer en objectmapper.
+        /// </summary>
+        /// <returns>ObjectMapper.</returns>
+        protected static IObjectMapper GetObjectMapper()
+        {
+            return new ObjectMapper();
         }
     }
 }
