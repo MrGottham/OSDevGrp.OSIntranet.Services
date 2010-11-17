@@ -18,7 +18,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new RegnskabslisteGetQueryHandler(null));
+            Assert.Throws<ArgumentNullException>(() => new RegnskabslisteGetQueryHandler(null, null));
+        }
+
+        /// <summary>
+        /// Test, at konstruktøren kaster en ArgumentNullException, hvis objectmapper er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new RegnskabslisteGetQueryHandler(GetFinansstyringRepository(), null));
         }
 
         /// <summary>
@@ -27,7 +36,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryHenterRegnskaber()
         {
-            var queryHandler = new RegnskabslisteGetQueryHandler(GetFinansstyringRepository());
+            var queryHandler = new RegnskabslisteGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
             var query = new RegnskabslisteGetQuery();
             Assert.That(queryHandler, Is.Not.Null);
             Assert.That(query, Is.Not.Null);
@@ -42,7 +51,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
         {
-            var queryHandler = new RegnskabslisteGetQueryHandler(GetFinansstyringRepository());
+            var queryHandler = new RegnskabslisteGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
             Assert.That(queryHandler, Is.Not.Null);
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
         }
