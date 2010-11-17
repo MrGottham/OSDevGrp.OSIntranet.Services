@@ -42,11 +42,18 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper">
+      <HintPath>..\External references\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Core">
       <HintPath>..\External references\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Windsor">
       <HintPath>..\External references\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1719c289d1070527, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
     </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll</HintPath>
@@ -62,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IoC\ConfigurationProvider.cs" />
+    <Compile Include="ObjectMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

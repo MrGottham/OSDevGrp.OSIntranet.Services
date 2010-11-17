@@ -49,6 +49,7 @@
     <Compile Include="Exceptions\IntranetBusinessException.cs" />
     <Compile Include="Exceptions\IntranetRepositoryException.cs" />
     <Compile Include="Exceptions\IntranetSystemException.cs" />
+    <Compile Include="IObjectMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
