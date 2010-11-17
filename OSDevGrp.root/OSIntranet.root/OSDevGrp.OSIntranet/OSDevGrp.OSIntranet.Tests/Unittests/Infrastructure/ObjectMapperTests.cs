@@ -33,7 +33,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
             var regnskabslisteView = objectMapper.Map<Regnskab, RegnskabslisteView>(regnskab);
             Assert.That(regnskabslisteView, Is.Not.Null);
-            Assert.That(regnskabslisteView.Number, Is.EqualTo(1));
+            Assert.That(regnskabslisteView.Nummer, Is.EqualTo(1));
             Assert.That(regnskabslisteView.Navn, Is.Not.Null);
             Assert.That(regnskabslisteView.Navn, Is.EqualTo("Privatregnskab, Ole Sørensen"));
         }
