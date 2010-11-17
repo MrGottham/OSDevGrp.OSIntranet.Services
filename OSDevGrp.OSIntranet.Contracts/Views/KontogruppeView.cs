@@ -1,29 +1,28 @@
 ﻿using System.Runtime.Serialization;
-using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 
 namespace OSDevGrp.OSIntranet.Contracts.Views
 {
     /// <summary>
-    /// Viewobjekt for generelle tabeloplysninger.
+    /// Viewobject for en kontogruppe.
     /// </summary>
-    [DataContract(Name = "Tabel", Namespace = SoapNamespaces.IntranetNamespace)]
-    public abstract class TabelView : IView
+    [DataContract(Name = "KontogruppeView", Namespace = SoapNamespaces.IntranetNamespace)]
+    public class KontogruppeView : TabelView
     {
         /// <summary>
-        /// Nummer.
+        /// Angivelse af, om kontogruppen er aktiver.
         /// </summary>
         [DataMember(IsRequired = true)]
-        public int Nummer
+        public bool ErAktiver
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Navn.
+        /// Angivelse af, om kontogruppen er passiver.
         /// </summary>
         [DataMember(IsRequired = true)]
-        public string Navn
+        public bool ErPassiver
         {
             get;
             set;

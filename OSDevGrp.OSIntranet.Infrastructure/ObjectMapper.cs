@@ -22,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         static ObjectMapper()
         {
             Mapper.CreateMap<Regnskab, RegnskabslisteView>()
-                .ForMember(x => x.Number, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
 
             Mapper.AssertConfigurationIsValid();
