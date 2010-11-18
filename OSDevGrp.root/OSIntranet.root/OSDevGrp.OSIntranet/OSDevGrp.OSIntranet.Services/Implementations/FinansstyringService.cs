@@ -69,6 +69,36 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Henter en kontoplan.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en kontoplan.</param>
+        /// <returns>Kontoplan.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<KontoplanView> KontoplanGet(KontoplanGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<KontoplanGetQuery, IEnumerable<KontoplanView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
         #endregion
     }
 }
