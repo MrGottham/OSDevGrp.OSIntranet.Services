@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Views;
@@ -41,7 +42,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
-        /// Tester, at en konto kan mappes til et kontoplanView.
+        /// Tester, at en konto kan mappes til et kontoplanview.
         /// </summary>
         [Test]
         public void TestAtKontoKanMappesTilKontoplanView()
@@ -74,6 +75,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kontoplanView.Kredit, Is.EqualTo(5000M));
             Assert.That(kontoplanView.Saldo, Is.EqualTo(2250M));
             Assert.That(kontoplanView.Disponibel, Is.EqualTo(7250M));
+        }
+
+        /// <summary>
+        /// Tester, at budgetoplysninger kan mappes til et budgetoplysningsview.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetoplysningerKanMappesTilBudgetoplysningerView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
+            var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
+            var budgetkonto = new Budgetkonto(regnskab, "1000", "Indtægter", budgetkontogruppe);
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(2010, 10, 15000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Indbetaling", 5000M, 0));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 5), null, "Indbetaling", 9000M, 0));
+            budgetkonto.Calculate(new DateTime(2010, 10, 31));
+
+            var budgetoplysningerView =
+                objectMapper.Map<Budgetoplysninger, BudgetoplysningerView>(
+                    budgetkonto.Budgetoplysninger.Single(m => m.År == 2010 && m.Måned == 10));
+            Assert.That(budgetoplysningerView, Is.Not.Null);
+            Assert.That(budgetoplysningerView.År, Is.EqualTo(2010));
+            Assert.That(budgetoplysningerView.Måned, Is.EqualTo(10));
+            Assert.That(budgetoplysningerView.Budget, Is.EqualTo(15000M));
+            Assert.That(budgetoplysningerView.Bogført, Is.EqualTo(14000M));
+            Assert.That(budgetoplysningerView.Disponibel, Is.EqualTo(1000M));
         }
 
         /// <summary>

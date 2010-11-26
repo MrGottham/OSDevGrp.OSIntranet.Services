@@ -6,7 +6,7 @@ using OSDevGrp.OSIntranet.Contracts.Views;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {
     /// <summary>
-    /// Tester viewobject for en kontogruppe.Tester viewobject for en kontoplan.
+    /// Tester viewobject for en kontoplan.
     /// </summary>
     [TestFixture]
     public class KontoplanViewTests
