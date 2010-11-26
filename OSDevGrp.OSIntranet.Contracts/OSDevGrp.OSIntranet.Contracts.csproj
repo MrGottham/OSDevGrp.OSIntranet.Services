@@ -64,6 +64,7 @@
     <Compile Include="Views\BudgetkontogruppeView.cs" />
     <Compile Include="Views\BudgetkontoplanView.cs" />
     <Compile Include="Views\BudgetoplysningerView.cs" />
+    <Compile Include="Views\BudgetplanView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />
     <Compile Include="Views\KontogruppeView.cs" />
     <Compile Include="Views\KontoplanView.cs" />
