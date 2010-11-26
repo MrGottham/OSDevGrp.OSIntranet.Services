@@ -99,6 +99,36 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Henter en budgetplan.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en budgetplan.</param>
+        /// <returns>Budgetplan.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<BudgetplanView> BudgetplanGet(BudgetplanGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<BudgetplanGetQuery, IEnumerable<BudgetplanView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
         #endregion
     }
 }

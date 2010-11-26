@@ -31,5 +31,15 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<KontoplanView> KontoplanGet(KontoplanGetQuery query);
+
+        /// <summary>
+        /// Henter en budgetplan.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en budgetplan.</param>
+        /// <returns>Budgetplan.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<BudgetplanView> BudgetplanGet(BudgetplanGetQuery query);
     }
 }
