@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
-using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {
@@ -17,42 +19,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         [Test]
         public void TestAtViewKanInitieres()
         {
-            var view = new KontoplanView
-            {
-                Regnskab = new RegnskabslisteView
-                {
-                    Nummer = 1,
-                    Navn = "Privatregnskab, Ole Sørensen"
-                },
-                Kontonummer = "DANKORT",
-                Kontonavn = "Dankort",
-                Beskrivelse = "Dankort/Lønkonto",
-                Notat = "Kredit på kr. 10.000,00",
-                Kontogruppe = new KontogruppeView
-                {
-                    Nummer = 1,
-                    Navn = "Bankkonti",
-                    ErAktiver = true,
-                    ErPassiver = false
-                },
-                Kredit = 10000M,
-                Saldo = 5000M,
-                Disponibel = 15000M
-            };
+            var view = new BudgetplanView
+                           {
+                               Nummer = 1,
+                               Navn = "Indtægter",
+                               Budgetkonti = new List<BudgetkontoplanView>()
+                           };
             Assert.That(view, Is.Not.Null);
-            Assert.That(view.Regnskab, Is.Not.Null);
-            Assert.That(view.Kontonummer, Is.Not.Null);
-            Assert.That(view.Kontonummer, Is.EqualTo("DANKORT"));
-            Assert.That(view.Kontonavn, Is.Not.Null);
-            Assert.That(view.Kontonavn, Is.EqualTo("Dankort"));
-            Assert.That(view.Beskrivelse, Is.Not.Null);
-            Assert.That(view.Beskrivelse, Is.EqualTo("Dankort/Lønkonto"));
-            Assert.That(view.Notat, Is.Not.Null);
-            Assert.That(view.Notat, Is.EqualTo("Kredit på kr. 10.000,00"));
-            Assert.That(view.Kontogruppe, Is.Not.Null);
-            Assert.That(view.Kredit, Is.EqualTo(10000M));
-            Assert.That(view.Saldo, Is.EqualTo(5000M));
-            Assert.That(view.Disponibel, Is.EqualTo(15000M));
+            Assert.That(view.Nummer, Is.EqualTo(1));
+            Assert.That(view.Navn, Is.Not.Null);
+            Assert.That(view.Navn, Is.EqualTo("Indtægter"));
+            Assert.That(view.Budgetkonti, Is.Not.Null);
+            Assert.That(view.Budgetkonti.Count(), Is.EqualTo(0));
         }
 
         /// <summary>
@@ -61,28 +39,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         [Test]
         public void TestAtViewKanSerialiseres()
         {
-            var view = new KontoplanView
-            {
-                Regnskab = new RegnskabslisteView
-                {
-                    Nummer = 1,
-                    Navn = "Privatregnskab, Ole Sørensen"
-                },
-                Kontonummer = "DANKORT",
-                Kontonavn = "Dankort",
-                Beskrivelse = "Dankort/Lønkonto",
-                Notat = "Kredit på kr. 10.000,00",
-                Kontogruppe = new KontogruppeView
-                {
-                    Nummer = 1,
-                    Navn = "Bankkonti",
-                    ErAktiver = true,
-                    ErPassiver = false
-                },
-                Kredit = 10000M,
-                Saldo = 5000M,
-                Disponibel = 15000M
-            };
+            var view = new BudgetplanView
+                           {
+                               Nummer = 1,
+                               Navn = "Indtægter",
+                               Budgetkonti = new List<BudgetkontoplanView>()
+                           };
             Assert.That(view, Is.Not.Null);
             var memoryStream = new MemoryStream();
             try

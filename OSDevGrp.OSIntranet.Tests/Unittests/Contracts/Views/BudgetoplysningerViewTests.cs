@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
-using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {
