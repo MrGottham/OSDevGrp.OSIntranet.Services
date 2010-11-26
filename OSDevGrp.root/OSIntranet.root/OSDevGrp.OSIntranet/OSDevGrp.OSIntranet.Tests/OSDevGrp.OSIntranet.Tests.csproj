@@ -88,6 +88,7 @@
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\BudgetoplysningerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontoplanViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />

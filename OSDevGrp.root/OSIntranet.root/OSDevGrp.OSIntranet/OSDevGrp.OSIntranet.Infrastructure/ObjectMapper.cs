@@ -37,6 +37,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato))
                 .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato));
 
+            Mapper.CreateMap<Budgetoplysninger, BudgetoplysningerView>()
+                .ForMember(x => x.År, opt => opt.MapFrom(s => s.År))
+                .ForMember(x => x.Måned, opt => opt.MapFrom(s => s.Måned))
+                .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.Budget))
+                .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusDato))
+                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusDato));
+
             Mapper.CreateMap<Kontogruppe, KontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
