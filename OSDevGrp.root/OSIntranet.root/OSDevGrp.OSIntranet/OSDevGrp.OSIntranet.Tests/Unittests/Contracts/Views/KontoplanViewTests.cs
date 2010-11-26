@@ -31,8 +31,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                                Kontogruppe = new KontogruppeView
                                                  {
                                                      Nummer = 1,
-                                                     Navn = "Bankkonti½"
-
+                                                     Navn = "Bankkonti",
+                                                     ErAktiver = true,
+                                                     ErPassiver = false
                                                  },
                                Kredit = 10000M,
                                Saldo = 5000M,
@@ -74,8 +75,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                                Kontogruppe = new KontogruppeView
                                                  {
                                                      Nummer = 1,
-                                                     Navn = "Bankkonti½"
-
+                                                     Navn = "Bankkonti",
+                                                     ErAktiver = true,
+                                                     ErPassiver = false
                                                  },
                                Kredit = 10000M,
                                Saldo = 5000M,

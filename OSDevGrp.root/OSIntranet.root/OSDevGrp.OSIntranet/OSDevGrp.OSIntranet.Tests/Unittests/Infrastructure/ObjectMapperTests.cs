@@ -132,5 +132,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kontogruppePassiverView.ErAktiver, Is.False);
             Assert.That(kontogruppePassiverView.ErPassiver, Is.True);
         }
+
+        /// <summary>
+        /// Tester, at en budgetkontogruppe kan mappes til et bugdetkontogruppeview.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontogruppeKanMappesTilBudgetkontogruppeView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
+            var budgetkontogruppeView = objectMapper.Map<Budgetkontogruppe, BudgetkontogruppeView>(budgetkontogruppe);
+            Assert.That(budgetkontogruppeView, Is.Not.Null);
+            Assert.That(budgetkontogruppeView.Nummer, Is.EqualTo(1));
+            Assert.That(budgetkontogruppeView.Navn, Is.Not.Null);
+            Assert.That(budgetkontogruppeView.Navn, Is.EqualTo("Indtægter"));
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     /// <summary>
     /// Viewobject for en kontogruppe.
     /// </summary>
-    [DataContract(Name = "KontogruppeView", Namespace = SoapNamespaces.IntranetNamespace)]
+    [DataContract(Name = "Kontogruppe", Namespace = SoapNamespaces.IntranetNamespace)]
     public class KontogruppeView : TabelView
     {
         /// <summary>
