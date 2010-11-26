@@ -7,6 +7,7 @@
     {
         RepositoryError,
         UnhandledSwitchValue,
-        CantFindObjectById
+        CantFindObjectById,
+        IllegalValue
     }
 }
