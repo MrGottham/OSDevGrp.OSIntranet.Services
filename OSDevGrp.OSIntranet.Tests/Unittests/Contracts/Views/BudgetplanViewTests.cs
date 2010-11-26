@@ -23,14 +23,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                            {
                                Nummer = 1,
                                Navn = "Indtægter",
-                               Budgetkonti = new List<BudgetkontoplanView>()
+                               Budget = 15000M,
+                               Bogført = 14000M,
+                               Disponibel = 1000M,
+                               Budgetkonti = new List<BudgetkontoplanView>(),
+                               Budgetoplysninger = new List<BudgetoplysningerView>()
                            };
             Assert.That(view, Is.Not.Null);
             Assert.That(view.Nummer, Is.EqualTo(1));
             Assert.That(view.Navn, Is.Not.Null);
             Assert.That(view.Navn, Is.EqualTo("Indtægter"));
+            Assert.That(view.Budget, Is.EqualTo(15000M));
+            Assert.That(view.Bogført, Is.EqualTo(14000M));
+            Assert.That(view.Disponibel, Is.EqualTo(1000M));
             Assert.That(view.Budgetkonti, Is.Not.Null);
             Assert.That(view.Budgetkonti.Count(), Is.EqualTo(0));
+            Assert.That(view.Budgetoplysninger, Is.Not.Null);
+            Assert.That(view.Budgetoplysninger.Count(), Is.EqualTo(0));
         }
 
         /// <summary>
@@ -43,7 +52,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                            {
                                Nummer = 1,
                                Navn = "Indtægter",
-                               Budgetkonti = new List<BudgetkontoplanView>()
+                               Budget = 15000M,
+                               Bogført = 14000M,
+                               Disponibel = 1000M,
+                               Budgetkonti = new List<BudgetkontoplanView>(),
+                               Budgetoplysninger = new List<BudgetoplysningerView>()
                            };
             Assert.That(view, Is.Not.Null);
             var memoryStream = new MemoryStream();

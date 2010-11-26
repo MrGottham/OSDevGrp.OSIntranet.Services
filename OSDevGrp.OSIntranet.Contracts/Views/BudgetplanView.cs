@@ -10,10 +10,50 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     public class BudgetplanView : BudgetkontogruppeView
     {
         /// <summary>
+        /// Budget.
+        /// </summary>
+        [DataMember(IsRequired = false)]
+        public decimal Budget
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Bogført beløb.
+        /// </summary>
+        [DataMember(IsRequired = false)]
+        public decimal Bogført
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Disponibel beløb.
+        /// </summary>
+        [DataMember(IsRequired = false)]
+        public decimal Disponibel
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Budgetkonti.
         /// </summary>
         [DataMember(IsRequired = true)]
         public IEnumerable<BudgetkontoplanView> Budgetkonti
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Budgetoplysninger.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public IEnumerable<BudgetoplysningerView> Budgetoplysninger
         {
             get;
             set;
