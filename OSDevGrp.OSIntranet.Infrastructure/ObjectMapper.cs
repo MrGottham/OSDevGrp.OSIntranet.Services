@@ -37,18 +37,34 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato))
                 .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato));
 
+            Mapper.CreateMap<Budgetkonto, BudgetkontoplanView>()
+                .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
+                .ForMember(x => x.Kontonummer, opt => opt.MapFrom(s => s.Kontonummer))
+                .ForMember(x => x.Kontonavn, opt => opt.MapFrom(s => s.Kontonavn))
+                .ForMember(x => x.Beskrivelse, opt => opt.MapFrom(s => s.Beskrivelse))
+                .ForMember(x => x.Notat, opt => opt.MapFrom(s => s.Note))
+                .ForMember(x => x.Budgetkontogruppe, opt => opt.MapFrom(s => s.Budgetkontogruppe))
+                .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.BudgetPrStatusdato))
+                .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato))
+                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato))
+                .ForMember(x => x.Budgetoplysninger, opt => opt.MapFrom(s => s.Budgetoplysninger));
+
             Mapper.CreateMap<Budgetoplysninger, BudgetoplysningerView>()
                 .ForMember(x => x.År, opt => opt.MapFrom(s => s.År))
                 .ForMember(x => x.Måned, opt => opt.MapFrom(s => s.Måned))
                 .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.Budget))
-                .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusDato))
-                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusDato));
+                .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato))
+                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato));
 
             Mapper.CreateMap<Kontogruppe, KontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
                 .ForMember(x => x.ErAktiver, opt => opt.MapFrom(s => s.KontogruppeType == KontogruppeType.Aktiver))
                 .ForMember(x => x.ErPassiver, opt => opt.MapFrom(s => s.KontogruppeType == KontogruppeType.Passiver));
+
+            Mapper.CreateMap<Budgetkontogruppe, BudgetkontogruppeView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
 
             Mapper.AssertConfigurationIsValid();
         }

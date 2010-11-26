@@ -61,6 +61,8 @@
     <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="SoapNamespaces.cs" />
+    <Compile Include="Views\BudgetkontogruppeView.cs" />
+    <Compile Include="Views\BudgetkontoplanView.cs" />
     <Compile Include="Views\BudgetoplysningerView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />
     <Compile Include="Views\KontogruppeView.cs" />
