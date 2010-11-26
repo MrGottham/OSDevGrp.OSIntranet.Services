@@ -62,6 +62,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.ErAktiver, opt => opt.MapFrom(s => s.KontogruppeType == KontogruppeType.Aktiver))
                 .ForMember(x => x.ErPassiver, opt => opt.MapFrom(s => s.KontogruppeType == KontogruppeType.Passiver));
 
+            Mapper.CreateMap<Budgetkontogruppe, BudgetplanView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.Budget, opg => opg.Ignore())
+                .ForMember(x => x.Bogført, opt => opt.Ignore())
+                .ForMember(x => x.Disponibel, opt => opt.Ignore())
+                .ForMember(x => x.Budgetkonti, opt => opt.Ignore())
+                .ForMember(x => x.Budgetoplysninger, opt => opt.Ignore());
+
             Mapper.CreateMap<Budgetkontogruppe, BudgetkontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
