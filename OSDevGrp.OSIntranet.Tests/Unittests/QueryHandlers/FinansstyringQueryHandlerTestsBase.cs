@@ -38,12 +38,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             regnskab.TilføjKonto(kontoOpsparing);
             // Dan testdata for kreditter.
             kontoDankort.TilføjKreditoplysninger(new Kreditoplysninger(2010, 10, 5000M));
+            // Dan testdata for budgetkontogrupper.
+            var budgetkontogruppeIndtægter = new Budgetkontogruppe(1, "Indtægter");
+            var budgetkontogruppeUdgifter = new Budgetkontogruppe(2, "Udgifter");
+            var budgetkontogrupper = new List<Budgetkontogruppe>
+                                         {
+                                             budgetkontogruppeIndtægter,
+                                             budgetkontogruppeUdgifter
+                                         };
             // Dan testdata for bogføringslinjer.
             var bogføringslinje = new Bogføringslinje(1, new DateTime(2010, 1, 1), null, "Saldo", 3000M, 0M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             bogføringslinje = new Bogføringslinje(2, new DateTime(2010, 10, 31), null, "Kvickly", 0M, 250M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
-            bogføringslinje = new Bogføringslinje(3, new DateTime(2010, 11, 07), null, "Indbetaling fra Sygesikring Danmark", 300M, 0M);
+            bogføringslinje = new Bogføringslinje(3, new DateTime(2010, 11, 07), null,
+                                                  "Indbetaling fra Sygesikring Danmark", 300M, 0M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             // Dan mockup af repository.
             var repository = MockRepository.GenerateMock<IFinansstyringRepository>();
@@ -51,7 +60,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(1))).Return(regnskaber.Single(m => m.Nummer == 1));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(2))).Return(regnskaber.Single(m => m.Nummer == 2));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(3))).Return(regnskaber.Single(m => m.Nummer == 3));
-            repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything)).Throw(new IntranetRepositoryException("Regnskab ikke fundet."));
+            repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything)).Throw(
+                new IntranetRepositoryException("Regnskab ikke fundet."));
+            repository.Expect(m => m.BudgetkontogruppeGetAll()).Return(budgetkontogrupper);
             return repository;
         }
 

@@ -101,6 +101,7 @@
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\BudgetplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FinansstyringQueryHandlerTestsBase.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
