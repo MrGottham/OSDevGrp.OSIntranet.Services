@@ -7,10 +7,10 @@ using NUnit.Framework;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
 {
     /// <summary>
-    /// Tester datakontrakt til forespørgelse efter en regnskabsliste.
+    /// Tester datakontrakt til forespørgelse efter en budgetplan.
     /// </summary>
     [TestFixture]
-    public class KontoplanGetQueryTests
+    public class BudgetplanGetQueryTests
     {
         /// <summary>
         /// Tester, at Query kan initieres.
@@ -19,14 +19,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanInitieres()
         {
             var statusDato = new DateTime(2010, 10, 31);
-            var query = new KontoplanGetQuery
+            var query = new BudgetplanGetQuery
                             {
                                 Regnskabsnummer = 1,
-                                StatusDato = statusDato
+                                StatusDato = statusDato,
+                                Budgethistorik = 3
                             };
             Assert.That(query, Is.Not.Null);
             Assert.That(query.Regnskabsnummer, Is.EqualTo(1));
             Assert.That(query.StatusDato, Is.EqualTo(statusDato));
+            Assert.That(query.Budgethistorik, Is.EqualTo(3));
         }
 
         /// <summary>
@@ -36,11 +38,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanSerialiseres()
         {
             var statusDato = new DateTime(2010, 10, 31);
-            var query = new KontoplanGetQuery
-                            {
-                                Regnskabsnummer = 1,
-                                StatusDato = statusDato
-                            };
+            var query = new BudgetplanGetQuery
+            {
+                Regnskabsnummer = 1,
+                StatusDato = statusDato,
+                Budgethistorik = 3
+            };
             Assert.That(query, Is.Not.Null);
             var memoryStream = new MemoryStream();
             try
