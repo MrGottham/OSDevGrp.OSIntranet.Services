@@ -78,6 +78,44 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en budgetkonto kan mappes til et budgetkontoplanview.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoKanMappesTilBudgetkontoplanView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
+            var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
+            var budgetkonto = new Budgetkonto(regnskab, "1000", "Indtægter", budgetkontogruppe);
+            budgetkonto.SætBeskrivelse("Salg m.m.");
+            budgetkonto.SætNote("Indtægter vedrørende salg m.m.");
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(2010, 10, 15000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Indbetaling", 10000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 5), null, "Indbetaling", 4000M, 0M));
+            budgetkonto.Calculate(new DateTime(2010, 10, 31));
+
+            var bugetkontoplanView = objectMapper.Map<Budgetkonto, BudgetkontoplanView>(budgetkonto);
+            Assert.That(bugetkontoplanView, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Regnskab, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Kontonummer, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Kontonummer, Is.EqualTo("1000"));
+            Assert.That(bugetkontoplanView.Kontonavn, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Kontonavn, Is.EqualTo("Indtægter"));
+            Assert.That(bugetkontoplanView.Beskrivelse, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Beskrivelse, Is.EqualTo("Salg m.m."));
+            Assert.That(bugetkontoplanView.Notat, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Notat, Is.EqualTo("Indtægter vedrørende salg m.m."));
+            Assert.That(bugetkontoplanView.Budgetkontogruppe, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Budget, Is.EqualTo(15000M));
+            Assert.That(bugetkontoplanView.Bogført, Is.EqualTo(14000M));
+            Assert.That(bugetkontoplanView.Disponibel, Is.EqualTo(1000M));
+            Assert.That(bugetkontoplanView.Budgetoplysninger, Is.Not.Null);
+            Assert.That(bugetkontoplanView.Budgetoplysninger.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
         /// Tester, at budgetoplysninger kan mappes til et budgetoplysningsview.
         /// </summary>
         [Test]
