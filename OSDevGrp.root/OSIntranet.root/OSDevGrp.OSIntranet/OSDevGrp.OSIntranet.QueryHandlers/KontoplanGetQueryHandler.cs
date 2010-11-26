@@ -63,7 +63,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 calculatable.Calculate(query.StatusDato);
             }
-            throw new System.NotImplementedException();
+            return _objectMapper.Map<IList<Konto>, IEnumerable<KontoplanView>>(regnskab.Konti.OfType<Konto>().ToList());
         }
 
         #endregion

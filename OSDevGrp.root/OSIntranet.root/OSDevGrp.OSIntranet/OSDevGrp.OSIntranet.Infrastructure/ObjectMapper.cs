@@ -31,7 +31,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Kontonummer, opt => opt.MapFrom(s => s.Kontonummer))
                 .ForMember(x => x.Kontonavn, opt => opt.MapFrom(s => s.Kontonavn))
                 .ForMember(x => x.Beskrivelse, opt => opt.MapFrom(s => s.Beskrivelse))
-                .ForMember(x => x.Notat, opt => opt.MapFrom(s => s.Note));
+                .ForMember(x => x.Notat, opt => opt.MapFrom(s => s.Note))
+                .ForMember(x => x.Kontogruppe, opt => opt.MapFrom(s => s.Kontogruppe))
+                .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.KreditPrStatusdato))
+                .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato))
+                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato));
 
             Mapper.CreateMap<Kontogruppe, KontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))

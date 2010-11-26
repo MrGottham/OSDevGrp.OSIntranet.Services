@@ -1,4 +1,5 @@
-﻿using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
+﻿using System;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure;
@@ -37,6 +38,42 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(regnskabslisteView.Nummer, Is.EqualTo(1));
             Assert.That(regnskabslisteView.Navn, Is.Not.Null);
             Assert.That(regnskabslisteView.Navn, Is.EqualTo("Privatregnskab, Ole Sørensen"));
+        }
+
+        /// <summary>
+        /// Tester, at en konto kan mappes til et kontoplanView.
+        /// </summary>
+        [Test]
+        public void TestAtKontoKanMappesTilKontoplanView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
+            var kontogruppe = new Kontogruppe(1, "Bankkonti", KontogruppeType.Aktiver);
+            var konto = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
+            konto.SætBeskrivelse("Dankort/lønkonto");
+            konto.SætNote("Kredit på kr. 5.000,00");
+            konto.TilføjKreditoplysninger(new Kreditoplysninger(2010, 10, 5000M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Saldo", 2500M, 0M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 1), null, "Kvickly", 0M, 250M));
+            konto.Calculate(new DateTime(2010, 10, 31));
+
+            var kontoplanView = objectMapper.Map<Konto, KontoplanView>(konto);
+            Assert.That(kontoplanView, Is.Not.Null);
+            Assert.That(kontoplanView.Regnskab, Is.Not.Null);
+            Assert.That(kontoplanView.Kontonummer, Is.Not.Null);
+            Assert.That(kontoplanView.Kontonummer, Is.EqualTo("DANKORT"));
+            Assert.That(kontoplanView.Kontonavn, Is.Not.Null);
+            Assert.That(kontoplanView.Kontonavn, Is.EqualTo("Dankort"));
+            Assert.That(kontoplanView.Beskrivelse, Is.Not.Null);
+            Assert.That(kontoplanView.Beskrivelse, Is.EqualTo("Dankort/lønkonto"));
+            Assert.That(kontoplanView.Notat, Is.Not.Null);
+            Assert.That(kontoplanView.Notat, Is.EqualTo("Kredit på kr. 5.000,00"));
+            Assert.That(kontoplanView.Kontogruppe, Is.Not.Null);
+            Assert.That(kontoplanView.Kredit, Is.EqualTo(5000M));
+            Assert.That(kontoplanView.Saldo, Is.EqualTo(2250M));
+            Assert.That(kontoplanView.Disponibel, Is.EqualTo(7250M));
         }
 
         /// <summary>
