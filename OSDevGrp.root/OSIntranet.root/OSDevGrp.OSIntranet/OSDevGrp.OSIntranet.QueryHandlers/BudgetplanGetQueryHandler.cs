@@ -70,6 +70,19 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 calculatable.Calculate(query.StatusDato);
             }
+            var calculateFrom = query.StatusDato.AddMonths((query.Budgethistorik - 1)*-1);
+            var budgetkontoplanViews = _objectMapper
+                .Map<IList<Budgetkonto>, IEnumerable<BudgetkontoplanView>>(
+                    regnskab.Konti.OfType<Budgetkonto>().ToList());
+            foreach (var budgetkontoplanView in budgetkontoplanViews)
+            {
+                budgetkontoplanView.Budgetoplysninger = budgetkontoplanView.Budgetoplysninger
+                    .Where(
+                        m =>
+                        (m.År == calculateFrom.Year && m.Måned >= calculateFrom.Month) &&
+                        (m.År == query.StatusDato.Year && m.Måned <= query.StatusDato.Month))
+                    .ToList();
+            }
             var budgetplanViews = _objectMapper
                 .Map<IList<Budgetkontogruppe>, IEnumerable<BudgetplanView>>(
                     _finansstyringRepository.BudgetkontogruppeGetAll());
