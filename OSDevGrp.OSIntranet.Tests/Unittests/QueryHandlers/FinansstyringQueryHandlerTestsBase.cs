@@ -46,6 +46,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                              budgetkontogruppeIndtægter,
                                              budgetkontogruppeUdgifter
                                          };
+            var budgetkontoLønninger = new Budgetkonto(regnskab, "1000", "Lønninger", budgetkontogruppeIndtægter);
+            var budgetkonotØvrigeIndtægter = new Budgetkonto(regnskab, "1010", "Øvrige indtægter",
+                                                             budgetkontogruppeIndtægter);
+            var budgetkontoSupermarkeder = new Budgetkonto(regnskab, "2000", "Supermarkeder",
+                                                           budgetkontogruppeUdgifter);
+            var budgetkontoØvrigeUdgifter = new Budgetkonto(regnskab, "2010", "Øvrige udgifter",
+                                                            budgetkontogruppeUdgifter);
+            for (var i = 0; i < 12; i++)
+            {
+                budgetkontoLønninger.TilføjBudgetoplysninger(new Budgetoplysninger(2010, i + 1, 15000M, 0M));
+                budgetkontoSupermarkeder.TilføjBudgetoplysninger(new Budgetoplysninger(2010, i + 1, 0M, 3500M));
+            }
+            regnskab.TilføjKonto(budgetkontoLønninger);
+            regnskab.TilføjKonto(budgetkonotØvrigeIndtægter);
+            regnskab.TilføjKonto(budgetkontoSupermarkeder);
+            regnskab.TilføjKonto(budgetkontoØvrigeUdgifter);
             // Dan testdata for bogføringslinjer.
             var bogføringslinje = new Bogføringslinje(1, new DateTime(2010, 1, 1), null, "Saldo", 3000M, 0M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
