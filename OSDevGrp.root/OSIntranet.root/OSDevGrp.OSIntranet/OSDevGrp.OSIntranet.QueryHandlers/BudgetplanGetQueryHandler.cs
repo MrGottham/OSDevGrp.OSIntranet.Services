@@ -79,8 +79,9 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
                 budgetkontoplanView.Budgetoplysninger = budgetkontoplanView.Budgetoplysninger
                     .Where(
                         m =>
-                        (m.År == calculateFrom.Year && m.Måned >= calculateFrom.Month) &&
-                        (m.År == query.StatusDato.Year && m.Måned <= query.StatusDato.Month))
+                        ((m.År > calculateFrom.Year) || (m.År == calculateFrom.Year && m.Måned >= calculateFrom.Month)) &&
+                        ((m.År < query.StatusDato.Year) ||
+                         (m.År == query.StatusDato.Year && m.Måned <= query.StatusDato.Month)))
                     .ToList();
             }
             var budgetplanViews = _objectMapper
