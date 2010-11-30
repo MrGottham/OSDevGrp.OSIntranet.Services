@@ -87,6 +87,13 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             var budgetplanViews = _objectMapper
                 .Map<IList<Budgetkontogruppe>, IEnumerable<BudgetplanView>>(
                     _finansstyringRepository.BudgetkontogruppeGetAll());
+            foreach (var budgetplanView in budgetplanViews)
+            {
+                var view = budgetplanView;
+                budgetplanView.Budgetkonti = budgetkontoplanViews
+                    .Where(m => m.Budgetkontogruppe.Nummer == view.Nummer)
+                    .ToList();
+            }
             throw new NotImplementedException();
         }
 
