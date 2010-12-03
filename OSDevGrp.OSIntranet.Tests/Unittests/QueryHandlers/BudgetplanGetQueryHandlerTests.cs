@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             Assert.That(query, Is.Not.Null);
             var budgetplan = queryHandler.Query(query);
             Assert.That(budgetplan, Is.Not.Null);
-            Assert.That(budgetplan.Count(), Is.EqualTo(2));
+            Assert.That(budgetplan.Count(), Is.EqualTo(3));
         }
 
         /// <summary>

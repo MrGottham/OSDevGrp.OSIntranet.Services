@@ -41,10 +41,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             // Dan testdata for budgetkontogrupper.
             var budgetkontogruppeIndtægter = new Budgetkontogruppe(1, "Indtægter");
             var budgetkontogruppeUdgifter = new Budgetkontogruppe(2, "Udgifter");
+            var budgetkontogruppeAndet = new Budgetkontogruppe(3, "Andet");
             var budgetkontogrupper = new List<Budgetkontogruppe>
                                          {
                                              budgetkontogruppeIndtægter,
-                                             budgetkontogruppeUdgifter
+                                             budgetkontogruppeUdgifter,
+                                             budgetkontogruppeAndet,
                                          };
             var budgetkontoLønninger = new Budgetkonto(regnskab, "1000", "Lønninger", budgetkontogruppeIndtægter);
             var budgetkonotØvrigeIndtægter = new Budgetkonto(regnskab, "1010", "Øvrige indtægter",
@@ -67,9 +69,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             bogføringslinje = new Bogføringslinje(2, new DateTime(2010, 10, 31), null, "Kvickly", 0M, 250M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
+            budgetkontoSupermarkeder.TilføjBogføringslinje(bogføringslinje);
             bogføringslinje = new Bogføringslinje(3, new DateTime(2010, 11, 07), null,
                                                   "Indbetaling fra Sygesikring Danmark", 300M, 0M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
+            budgetkonotØvrigeIndtægter.TilføjBogføringslinje(bogføringslinje);
             // Dan mockup af repository.
             var repository = MockRepository.GenerateMock<IFinansstyringRepository>();
             repository.Expect(m => m.RegnskabslisteGet()).Return(regnskaber);
