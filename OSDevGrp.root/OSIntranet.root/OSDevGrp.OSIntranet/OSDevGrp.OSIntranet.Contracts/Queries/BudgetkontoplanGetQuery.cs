@@ -5,10 +5,10 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 namespace OSDevGrp.OSIntranet.Contracts.Queries
 {
     /// <summary>
-    /// Query til forespørgelse efter en budgetplan.
+    /// Query til forespørgelse efter en budgetkontoplan.
     /// </summary>
-    [DataContract(Name = "BudgetplanGetQuery", Namespace = SoapNamespaces.IntranetNamespace)]
-    public class BudgetplanGetQuery : IQuery
+    [DataContract(Name = "BudgetkontoplanGetQuery", Namespace = SoapNamespaces.IntranetNamespace)]
+    public class BudgetkontoplanGetQuery : IQuery
     {
         /// <summary>
         /// Regnskabsnummer.
