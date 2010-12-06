@@ -8,10 +8,10 @@ using NUnit.Framework;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 {
     /// <summary>
-    /// Tester QueryHandler til håndtering af forespørgelsen: BudgetplanGetQuery.
+    /// Tester QueryHandler til håndtering af forespørgelsen: BudgetkontoplanGetQuery.
     /// </summary>
     [TestFixture]
-    public class BudgetplanGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
+    public class BudgetkontoplanGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
     {
         /// <summary>
         /// Test, at konstruktøren kaster en ArgumentNullException, hvis repository for finansstyring er null.
@@ -32,10 +32,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         }
 
         /// <summary>
-        /// Test, at Query henter budgetplan.
+        /// Test, at Query henter budgetkontoplan.
         /// </summary>
         [Test]
-        public void TestAtQueryHenterBudgetplan()
+        public void TestAtQueryHenterBudgetkontoplan()
         {
             var queryHandler = new BudgetkontoplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
             var query = new BudgetkontoplanGetQuery
@@ -45,9 +45,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                             };
             Assert.That(queryHandler, Is.Not.Null);
             Assert.That(query, Is.Not.Null);
-            var budgetplan = queryHandler.Query(query);
-            Assert.That(budgetplan, Is.Not.Null);
-            Assert.That(budgetplan.Count(), Is.EqualTo(3));
+            var budgetkontoplan = queryHandler.Query(query);
+            Assert.That(budgetkontoplan, Is.Not.Null);
+            Assert.That(budgetkontoplan.Count(), Is.EqualTo(4));
         }
 
         /// <summary>
