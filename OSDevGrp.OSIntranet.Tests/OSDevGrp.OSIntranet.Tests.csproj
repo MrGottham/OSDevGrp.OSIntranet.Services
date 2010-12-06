@@ -91,7 +91,6 @@
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontogruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontoplanViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BudgetplanViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontoplanViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />

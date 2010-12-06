@@ -141,27 +141,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
-        /// Tester, at en budgetkontogruppe kan mappes til et budgetplanview.
-        /// </summary>
-        [Test]
-        public void TestAtBudgetkontogruppeKanMappesTilBudgetplanView()
-        {
-            var objectMapper = new ObjectMapper();
-            Assert.That(objectMapper, Is.Not.Null);
-
-            var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
-            var budgetplanView = objectMapper.Map<Budgetkontogruppe, BudgetplanView>(budgetkontogruppe);
-            Assert.That(budgetplanView, Is.Not.Null);
-            Assert.That(budgetplanView.Nummer, Is.EqualTo(1));
-            Assert.That(budgetplanView.Navn, Is.Not.Null);
-            Assert.That(budgetplanView.Navn, Is.EqualTo("Indtægter"));
-            Assert.That(budgetplanView.Budget, Is.EqualTo(0));
-            Assert.That(budgetplanView.Bogført, Is.EqualTo(0));
-            Assert.That(budgetplanView.Disponibel, Is.EqualTo(0));
-            Assert.That(budgetplanView.Budgetkonti, Is.Null);
-        }
-
-        /// <summary>
         /// Tester, at en budgetkontogruppe kan mappes til et bugdetkontogruppeview.
         /// </summary>
         [Test]
