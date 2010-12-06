@@ -11,9 +11,9 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces;
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
     /// <summary>
-    /// QueryHandler til håndtering af forespørgelsen: BudgetplanGetQuery.
+    /// QueryHandler til håndtering af forespørgelsen: BudgetkontoplanGetQuery.
     /// </summary>
-    public class BudgetplanGetQueryHandler : IQueryHandler<BudgetkontoplanGetQuery, IEnumerable<BudgetplanView>>
+    public class BudgetkontoplanGetQueryHandler : IQueryHandler<BudgetkontoplanGetQuery, IEnumerable<BudgetplanView>>
     {
         #region Private variables
 
@@ -25,11 +25,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         #region Constructor
 
         /// <summary>
-        /// Danner QueryHandler til håndtering af forespørgelsen: BudgetplanGetQuery.
+        /// Danner QueryHandler til håndtering af forespørgelsen: BudgetkontoplanGetQuery.
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        public BudgetplanGetQueryHandler(IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper)
+        public BudgetkontoplanGetQueryHandler(IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper)
         {
             if (finansstyringRepository == null)
             {
@@ -45,7 +45,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
 
         #endregion
 
-        #region IQueryHandler<BudgetplanGetQuery,IEnumerable<BudgetplanView>> Members
+        #region IQueryHandler<BudgetkontoplanGetQuery,IEnumerable<BudgetplanView>> Members
 
         /// <summary>
         /// Henter og returnerer en budgetplan.

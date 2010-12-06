@@ -19,7 +19,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new BudgetplanGetQueryHandler(null, null));
+            Assert.Throws<ArgumentNullException>(() => new BudgetkontoplanGetQueryHandler(null, null));
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new BudgetplanGetQueryHandler(GetFinansstyringRepository(), null));
+            Assert.Throws<ArgumentNullException>(() => new BudgetkontoplanGetQueryHandler(GetFinansstyringRepository(), null));
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryHenterBudgetplan()
         {
-            var queryHandler = new BudgetplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
+            var queryHandler = new BudgetkontoplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
             var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = 1,
@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
         {
-            var queryHandler = new BudgetplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
+            var queryHandler = new BudgetkontoplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
             var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = -1,
@@ -73,7 +73,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
         {
-            var queryHandler = new BudgetplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
+            var queryHandler = new BudgetkontoplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
             Assert.That(queryHandler, Is.Not.Null);
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
         }
