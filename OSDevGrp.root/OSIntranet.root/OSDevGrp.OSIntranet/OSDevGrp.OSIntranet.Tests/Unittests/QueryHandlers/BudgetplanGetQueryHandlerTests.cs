@@ -41,8 +41,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = 1,
-                                StatusDato = new DateTime(2010, 10, 31),
-                                Budgethistorik = 3
+                                StatusDato = new DateTime(2010, 10, 31)
                             };
             Assert.That(queryHandler, Is.Not.Null);
             Assert.That(query, Is.Not.Null);
@@ -61,30 +60,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = -1,
-                                StatusDato = new DateTime(2010, 10, 31),
-                                Budgethistorik = 3
+                                StatusDato = new DateTime(2010, 10, 31)
                             };
             Assert.That(queryHandler, Is.Not.Null);
             Assert.That(query, Is.Not.Null);
             Assert.Throws<IntranetRepositoryException>(() => queryHandler.Query(query));
-        }
-
-        /// <summary>
-        /// Test, at Query kaster en IntranetSystemException, hvis værdien for budgethistorik er invalid.
-        /// </summary>
-        [Test]
-        public void TestAtQueryKasterIntranetSystemExceptionHvisBudgethistoriskErInvalid()
-        {
-            var queryHandler = new BudgetplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
-            var query = new BudgetkontoplanGetQuery
-                            {
-                                Regnskabsnummer = 1,
-                                StatusDato = new DateTime(2010, 10, 31),
-                                Budgethistorik = 0
-                            };
-            Assert.That(queryHandler, Is.Not.Null);
-            Assert.That(query, Is.Not.Null);
-            Assert.Throws<IntranetSystemException>(() => queryHandler.Query(query));
         }
 
         /// <summary>

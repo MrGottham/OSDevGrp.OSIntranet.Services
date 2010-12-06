@@ -7,10 +7,10 @@ using NUnit.Framework;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
 {
     /// <summary>
-    /// Tester datakontrakt til forespørgelse efter en budgetplan.
+    /// Tester datakontrakt til forespørgelse efter en budgetkontoplan.
     /// </summary>
     [TestFixture]
-    public class BudgetplanGetQueryTests
+    public class BudgetkontoplanGetQueryTests
     {
         /// <summary>
         /// Tester, at Query kan initieres.
@@ -22,13 +22,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
             var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = 1,
-                                StatusDato = statusDato,
-                                Budgethistorik = 3
+                                StatusDato = statusDato
                             };
             Assert.That(query, Is.Not.Null);
             Assert.That(query.Regnskabsnummer, Is.EqualTo(1));
             Assert.That(query.StatusDato, Is.EqualTo(statusDato));
-            Assert.That(query.Budgethistorik, Is.EqualTo(3));
         }
 
         /// <summary>
@@ -39,11 +37,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         {
             var statusDato = new DateTime(2010, 10, 31);
             var query = new BudgetkontoplanGetQuery
-            {
-                Regnskabsnummer = 1,
-                StatusDato = statusDato,
-                Budgethistorik = 3
-            };
+                            {
+                                Regnskabsnummer = 1,
+                                StatusDato = statusDato
+                            };
             Assert.That(query, Is.Not.Null);
             var memoryStream = new MemoryStream();
             try
