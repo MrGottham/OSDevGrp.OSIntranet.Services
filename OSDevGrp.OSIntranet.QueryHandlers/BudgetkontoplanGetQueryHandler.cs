@@ -13,7 +13,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// <summary>
     /// QueryHandler til håndtering af forespørgelsen: BudgetkontoplanGetQuery.
     /// </summary>
-    public class BudgetkontoplanGetQueryHandler : IQueryHandler<BudgetkontoplanGetQuery, IEnumerable<BudgetplanView>>
+    public class BudgetkontoplanGetQueryHandler : IQueryHandler<BudgetkontoplanGetQuery, IEnumerable<BudgetkontoplanView>>
     {
         #region Private variables
 
@@ -45,44 +45,27 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
 
         #endregion
 
-        #region IQueryHandler<BudgetkontoplanGetQuery,IEnumerable<BudgetplanView>> Members
+        #region IQueryHandler<BudgetkontoplanGetQuery,IEnumerable<BudgetkontoplanView>> Members
 
         /// <summary>
-        /// Henter og returnerer en budgetplan.
+        /// Henter og returnerer en budgetkontoplan.
         /// </summary>
-        /// <param name="query">Forespørgelse til at hente en kontoplan.</param>
-        /// <returns>Budgetplan.</returns>
-        public IEnumerable<BudgetplanView> Query(BudgetkontoplanGetQuery query)
+        /// <param name="query">Forespørgelse til at hente en kontokontoplan.</param>
+        /// <returns>Budgetkontoplan.</returns>
+        public IEnumerable<BudgetkontoplanView> Query(BudgetkontoplanGetQuery query)
         {
             if (query == null)
             {
                 throw new ArgumentNullException("query");
             }
-            // Beregning af budgetkonti i forhold til statusdato.
             var regnskab = _finansstyringRepository.RegnskabGet(query.Regnskabsnummer);
             foreach (var calculatable in regnskab.Konti.OfType<ICalculatable>())
             {
                 calculatable.Calculate(query.StatusDato);
             }
-            // Dan liste af budgetkonti med budgetoplysninger for de ønskede måneder.
-            var budgetkontoplanViews = _objectMapper
-                .Map<IList<Budgetkonto>, IEnumerable<BudgetkontoplanView>>(
+            return
+                _objectMapper.Map<IList<Budgetkonto>, IEnumerable<BudgetkontoplanView>>(
                     regnskab.Konti.OfType<Budgetkonto>().ToList());
-            // Dan liste af budgetkontogrupper med budgetkonti og budgetoplysninger for de ønskede måneder.
-            var budgetplanViews = _objectMapper
-                .Map<IList<Budgetkontogruppe>, IEnumerable<BudgetplanView>>(
-                    _finansstyringRepository.BudgetkontogruppeGetAll());
-            foreach (var budgetplanView in budgetplanViews)
-            {
-                var view = budgetplanView;
-                budgetplanView.Budgetkonti = budgetkontoplanViews
-                    .Where(m => m.Budgetkontogruppe.Nummer == view.Nummer)
-                    .ToList();
-                view.Budget = 0M;
-                view.Bogført = 0M;
-                view.Disponibel = 0M;
-            }
-            return budgetplanViews;
         }
 
         #endregion
