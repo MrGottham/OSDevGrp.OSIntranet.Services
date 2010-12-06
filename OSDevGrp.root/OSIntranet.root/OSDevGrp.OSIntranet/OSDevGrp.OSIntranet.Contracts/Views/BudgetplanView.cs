@@ -48,15 +48,5 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
             get;
             set;
         }
-
-        /// <summary>
-        /// Budgetoplysninger.
-        /// </summary>
-        [DataMember(IsRequired = true)]
-        public IEnumerable<BudgetoplysningerView> Budgetoplysninger
-        {
-            get;
-            set;
-        }
     }
 }

@@ -46,14 +46,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Budgetkontogruppe, opt => opt.MapFrom(s => s.Budgetkontogruppe))
                 .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.BudgetPrStatusdato))
                 .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato))
-                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato))
-                .ForMember(x => x.Budgetoplysninger, opt => opt.MapFrom(s => s.Budgetoplysninger));
-
-            Mapper.CreateMap<Budgetoplysninger, BudgetoplysningerView>()
-                .ForMember(x => x.År, opt => opt.MapFrom(s => s.År))
-                .ForMember(x => x.Måned, opt => opt.MapFrom(s => s.Måned))
-                .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.Budget))
-                .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato))
                 .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato));
 
             Mapper.CreateMap<Kontogruppe, KontogruppeView>()
@@ -68,8 +60,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Budget, opg => opg.Ignore())
                 .ForMember(x => x.Bogført, opt => opt.Ignore())
                 .ForMember(x => x.Disponibel, opt => opt.Ignore())
-                .ForMember(x => x.Budgetkonti, opt => opt.Ignore())
-                .ForMember(x => x.Budgetoplysninger, opt => opt.Ignore());
+                .ForMember(x => x.Budgetkonti, opt => opt.Ignore());
 
             Mapper.CreateMap<Budgetkontogruppe, BudgetkontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))

@@ -72,20 +72,9 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
                 calculatable.Calculate(query.StatusDato);
             }
             // Dan liste af budgetkonti med budgetoplysninger for de ønskede måneder.
-            var calculateFrom = query.StatusDato.AddMonths((query.Budgethistorik - 1)*-1);
             var budgetkontoplanViews = _objectMapper
                 .Map<IList<Budgetkonto>, IEnumerable<BudgetkontoplanView>>(
                     regnskab.Konti.OfType<Budgetkonto>().ToList());
-            foreach (var budgetkontoplanView in budgetkontoplanViews)
-            {
-                budgetkontoplanView.Budgetoplysninger = budgetkontoplanView.Budgetoplysninger
-                    .Where(
-                        m =>
-                        ((m.År > calculateFrom.Year) || (m.År == calculateFrom.Year && m.Måned >= calculateFrom.Month)) &&
-                        ((m.År < query.StatusDato.Year) ||
-                         (m.År == query.StatusDato.Year && m.Måned <= query.StatusDato.Month)))
-                    .ToList();
-            }
             // Dan liste af budgetkontogrupper med budgetkonti og budgetoplysninger for de ønskede måneder.
             var budgetplanViews = _objectMapper
                 .Map<IList<Budgetkontogruppe>, IEnumerable<BudgetplanView>>(
@@ -96,42 +85,9 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
                 budgetplanView.Budgetkonti = budgetkontoplanViews
                     .Where(m => m.Budgetkontogruppe.Nummer == view.Nummer)
                     .ToList();
-                var budgetoplysningerViews = new List<BudgetoplysningerView>(query.Budgethistorik);
-                for (var i = 0; i < query.Budgethistorik; i++)
-                {
-                    var tempDato = calculateFrom.AddMonths(i);
-                    var budget = budgetplanView.Budgetkonti
-                        .SelectMany(m => m.Budgetoplysninger)
-                        .Where(m => m.År == tempDato.Year && m.Måned == tempDato.Month)
-                        .Sum(m => m.Budget);
-                    var bogført = budgetplanView.Budgetkonti
-                        .SelectMany(m => m.Budgetoplysninger)
-                        .Where(m => m.År == tempDato.Year && m.Måned == tempDato.Month)
-                        .Sum(m => m.Bogført);
-                    var disponibel = budgetplanView.Budgetkonti
-                        .SelectMany(m => m.Budgetoplysninger)
-                        .Where(m => m.År == tempDato.Year && m.Måned == tempDato.Month)
-                        .Sum(m => m.Disponibel);
-                    if (budget == 0M && bogført == 0M && disponibel == 0M)
-                    {
-                        continue;
-                    }
-                    var budgetoplysningerView = new BudgetoplysningerView
-                                                    {
-                                                        År = tempDato.Year,
-                                                        Måned = tempDato.Month,
-                                                        Budget = budget,
-                                                        Bogført = bogført,
-                                                        Disponibel = disponibel
-                                                    };
-                    budgetoplysningerViews.Add(budgetoplysningerView);
-                }
-                view.Budgetoplysninger = budgetoplysningerViews;
-                var currentBudgetoplysningerView = view.Budgetoplysninger
-                    .SingleOrDefault(m => m.År == query.StatusDato.Year && m.Måned == query.StatusDato.Month);
-                view.Budget = currentBudgetoplysningerView == null ? 0M : currentBudgetoplysningerView.Budget;
-                view.Bogført = currentBudgetoplysningerView == null ? 0M : currentBudgetoplysningerView.Bogført;
-                view.Disponibel = currentBudgetoplysningerView == null ? 0M : currentBudgetoplysningerView.Disponibel;
+                view.Budget = 0M;
+                view.Bogført = 0M;
+                view.Disponibel = 0M;
             }
             return budgetplanViews;
         }
