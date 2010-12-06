@@ -33,13 +33,13 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         IEnumerable<KontoplanView> KontoplanGet(KontoplanGetQuery query);
 
         /// <summary>
-        /// Henter en budgetplan.
+        /// Henter en budgetkontoplan.
         /// </summary>
-        /// <param name="query">Forespørgelse efter en budgetplan.</param>
-        /// <returns>Budgetplan.</returns>
+        /// <param name="query">Forespørgelse efter en budgetkontoplan.</param>
+        /// <returns>Budgetkontoplan.</returns>
         [OperationContract]
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<BudgetplanView> BudgetplanGet(BudgetkontoplanGetQuery query);
+        IEnumerable<BudgetkontoplanView> BudgetkontoplanGet(BudgetkontoplanGetQuery query);
     }
 }
