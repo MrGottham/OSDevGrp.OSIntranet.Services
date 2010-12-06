@@ -105,11 +105,11 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <param name="query">Forespørgelse efter en budgetplan.</param>
         /// <returns>Budgetplan.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<BudgetplanView> BudgetplanGet(BudgetplanGetQuery query)
+        public IEnumerable<BudgetplanView> BudgetplanGet(BudgetkontoplanGetQuery query)
         {
             try
             {
-                return _queryBus.Query<BudgetplanGetQuery, IEnumerable<BudgetplanView>>(query);
+                return _queryBus.Query<BudgetkontoplanGetQuery, IEnumerable<BudgetplanView>>(query);
             }
             catch (IntranetRepositoryException ex)
             {

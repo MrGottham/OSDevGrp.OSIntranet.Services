@@ -15,7 +15,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// <summary>
     /// QueryHandler til håndtering af forespørgelsen: BudgetplanGetQuery.
     /// </summary>
-    public class BudgetplanGetQueryHandler : IQueryHandler<BudgetplanGetQuery, IEnumerable<BudgetplanView>>
+    public class BudgetplanGetQueryHandler : IQueryHandler<BudgetkontoplanGetQuery, IEnumerable<BudgetplanView>>
     {
         #region Private variables
 
@@ -54,7 +54,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// </summary>
         /// <param name="query">Forespørgelse til at hente en kontoplan.</param>
         /// <returns>Budgetplan.</returns>
-        public IEnumerable<BudgetplanView> Query(BudgetplanGetQuery query)
+        public IEnumerable<BudgetplanView> Query(BudgetkontoplanGetQuery query)
         {
             if (query == null)
             {

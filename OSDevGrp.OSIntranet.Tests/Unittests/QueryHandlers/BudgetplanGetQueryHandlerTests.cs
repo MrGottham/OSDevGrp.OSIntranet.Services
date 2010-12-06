@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         public void TestAtQueryHenterBudgetplan()
         {
             var queryHandler = new BudgetplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
-            var query = new BudgetplanGetQuery
+            var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = 1,
                                 StatusDato = new DateTime(2010, 10, 31),
@@ -58,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         public void TestAtQueryKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
         {
             var queryHandler = new BudgetplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
-            var query = new BudgetplanGetQuery
+            var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = -1,
                                 StatusDato = new DateTime(2010, 10, 31),
@@ -76,7 +76,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         public void TestAtQueryKasterIntranetSystemExceptionHvisBudgethistoriskErInvalid()
         {
             var queryHandler = new BudgetplanGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
-            var query = new BudgetplanGetQuery
+            var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = 1,
                                 StatusDato = new DateTime(2010, 10, 31),

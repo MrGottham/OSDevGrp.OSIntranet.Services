@@ -19,7 +19,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanInitieres()
         {
             var statusDato = new DateTime(2010, 10, 31);
-            var query = new BudgetplanGetQuery
+            var query = new BudgetkontoplanGetQuery
                             {
                                 Regnskabsnummer = 1,
                                 StatusDato = statusDato,
@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanSerialiseres()
         {
             var statusDato = new DateTime(2010, 10, 31);
-            var query = new BudgetplanGetQuery
+            var query = new BudgetkontoplanGetQuery
             {
                 Regnskabsnummer = 1,
                 StatusDato = statusDato,
