@@ -26,8 +26,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                                Budget = 15000M,
                                Bogført = 14000M,
                                Disponibel = 1000M,
-                               Budgetkonti = new List<BudgetkontoplanView>(),
-                               Budgetoplysninger = new List<BudgetoplysningerView>()
+                               Budgetkonti = new List<BudgetkontoplanView>()
                            };
             Assert.That(view, Is.Not.Null);
             Assert.That(view.Nummer, Is.EqualTo(1));
@@ -38,8 +37,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
             Assert.That(view.Disponibel, Is.EqualTo(1000M));
             Assert.That(view.Budgetkonti, Is.Not.Null);
             Assert.That(view.Budgetkonti.Count(), Is.EqualTo(0));
-            Assert.That(view.Budgetoplysninger, Is.Not.Null);
-            Assert.That(view.Budgetoplysninger.Count(), Is.EqualTo(0));
         }
 
         /// <summary>
@@ -55,8 +52,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                                Budget = 15000M,
                                Bogført = 14000M,
                                Disponibel = 1000M,
-                               Budgetkonti = new List<BudgetkontoplanView>(),
-                               Budgetoplysninger = new List<BudgetoplysningerView>()
+                               Budgetkonti = new List<BudgetkontoplanView>()
                            };
             Assert.That(view, Is.Not.Null);
             var memoryStream = new MemoryStream();

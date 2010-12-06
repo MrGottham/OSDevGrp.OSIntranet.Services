@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Runtime.Serialization;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using NUnit.Framework;
@@ -37,18 +35,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                                                        },
                                Budget = 15000M,
                                Bogført = 14000M,
-                               Disponibel = 1000M,
-                               Budgetoplysninger = new List<BudgetoplysningerView>
-                                                       {
-                                                           new BudgetoplysningerView
-                                                               {
-                                                                   År = 2010,
-                                                                   Måned = 10,
-                                                                   Budget = 15000M,
-                                                                   Bogført = 14000M,
-                                                                   Disponibel = 1000M
-                                                               }
-                                                       }
+                               Disponibel = 1000M
                            };
             Assert.That(view, Is.Not.Null);
             Assert.That(view.Regnskab, Is.Not.Null);
@@ -64,8 +51,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
             Assert.That(view.Budget, Is.EqualTo(15000M));
             Assert.That(view.Bogført, Is.EqualTo(14000M));
             Assert.That(view.Disponibel, Is.EqualTo(1000M));
-            Assert.That(view.Budgetoplysninger, Is.Not.Null);
-            Assert.That(view.Budgetoplysninger.Count(), Is.EqualTo(1));
         }
 
         /// <summary>
@@ -92,18 +77,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
                                                        },
                                Budget = 15000M,
                                Bogført = 14000M,
-                               Disponibel = 1000M,
-                               Budgetoplysninger = new List<BudgetoplysningerView>
-                                                       {
-                                                           new BudgetoplysningerView
-                                                               {
-                                                                   År = 2010,
-                                                                   Måned = 10,
-                                                                   Budget = 15000M,
-                                                                   Bogført = 14000M,
-                                                                   Disponibel = 1000M
-                                                               }
-                                                       }
+                               Disponibel = 1000M
                            };
             Assert.That(view, Is.Not.Null);
             var memoryStream = new MemoryStream();

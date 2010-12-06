@@ -64,12 +64,10 @@
     <Compile Include="SoapNamespaces.cs" />
     <Compile Include="Views\BudgetkontogruppeView.cs" />
     <Compile Include="Views\BudgetkontoplanView.cs" />
-    <Compile Include="Views\BudgetoplysningerView.cs" />
     <Compile Include="Views\BudgetplanView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />
     <Compile Include="Views\KontogruppeView.cs" />
     <Compile Include="Views\KontoplanView.cs" />
-    <Compile Include="Views\MånedsoplysningerView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\TabelView.cs" />
   </ItemGroup>
