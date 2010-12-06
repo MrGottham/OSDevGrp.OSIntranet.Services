@@ -6,9 +6,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
-using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
@@ -59,11 +57,6 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             if (query == null)
             {
                 throw new ArgumentNullException("query");
-            }
-            if (query.Budgethistorik <= 0)
-            {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                               query.Budgethistorik, "Budgethistorik"));
             }
             // Beregning af budgetkonti i forhold til statusdato.
             var regnskab = _finansstyringRepository.RegnskabGet(query.Regnskabsnummer);

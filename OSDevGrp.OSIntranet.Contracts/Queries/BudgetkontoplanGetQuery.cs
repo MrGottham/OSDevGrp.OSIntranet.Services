@@ -29,15 +29,5 @@ namespace OSDevGrp.OSIntranet.Contracts.Queries
             get;
             set;
         }
-
-        /// <summary>
-        /// Antal måneder inklusiv indeværende måned, der skal indgår i budgethistorikken.
-        /// </summary>
-        [DataMember(IsRequired = true)]
-        public int Budgethistorik
-        {
-            get;
-            set;
-        }
     }
 }
