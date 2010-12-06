@@ -100,16 +100,16 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
-        /// Henter en budgetplan.
+        /// Henter en budgetkontoplan.
         /// </summary>
-        /// <param name="query">Forespørgelse efter en budgetplan.</param>
-        /// <returns>Budgetplan.</returns>
+        /// <param name="query">Forespørgelse efter en budgetkontoplan.</param>
+        /// <returns>Budgetkontoplan.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<BudgetplanView> BudgetplanGet(BudgetkontoplanGetQuery query)
+        public IEnumerable<BudgetkontoplanView> BudgetkontoplanGet(BudgetkontoplanGetQuery query)
         {
             try
             {
-                return _queryBus.Query<BudgetkontoplanGetQuery, IEnumerable<BudgetplanView>>(query);
+                return _queryBus.Query<BudgetkontoplanGetQuery, IEnumerable<BudgetkontoplanView>>(query);
             }
             catch (IntranetRepositoryException ex)
             {
