@@ -33,6 +33,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         IEnumerable<KontoplanView> KontoplanGet(KontoplanGetQuery query);
 
         /// <summary>
+        /// Henter en konto.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en konto.</param>
+        /// <returns>Konto.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        KontoView KontoGet(KontoGetQuery query);
+
+        /// <summary>
         /// Henter en budgetkontoplan.
         /// </summary>
         /// <param name="query">Forespørgelse efter en budgetkontoplan.</param>
@@ -41,5 +51,15 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<BudgetkontoplanView> BudgetkontoplanGet(BudgetkontoplanGetQuery query);
+
+        /// <summary>
+        /// Henter en budgetkonto.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en budgetkonto.</param>
+        /// <returns>Budgetkonto.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        BudgetkontoView BudgetkontoGet(BudgetkontoGetQuery query);
     }
 }

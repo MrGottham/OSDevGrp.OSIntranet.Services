@@ -37,6 +37,23 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato))
                 .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato));
 
+            Mapper.CreateMap<Konto, KontoView>()
+                .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
+                .ForMember(x => x.Kontonummer, opt => opt.MapFrom(s => s.Kontonummer))
+                .ForMember(x => x.Kontonavn, opt => opt.MapFrom(s => s.Kontonavn))
+                .ForMember(x => x.Beskrivelse, opt => opt.MapFrom(s => s.Beskrivelse))
+                .ForMember(x => x.Notat, opt => opt.MapFrom(s => s.Note))
+                .ForMember(x => x.Kontogruppe, opt => opt.MapFrom(s => s.Kontogruppe))
+                .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.KreditPrStatusdato))
+                .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato))
+                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato))
+                .ForMember(x => x.Kreditoplysninger, opt => opt.MapFrom(s => s.Kreditoplysninger));
+
+            Mapper.CreateMap<Kreditoplysninger, KreditoplysningerView>()
+                .ForMember(x => x.År, opt => opt.MapFrom(s => s.År))
+                .ForMember(x => x.Måned, opt => opt.MapFrom(s => s.Måned))
+                .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.Kredit));
+
             Mapper.CreateMap<Budgetkonto, BudgetkontoplanView>()
                 .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
                 .ForMember(x => x.Kontonummer, opt => opt.MapFrom(s => s.Kontonummer))
@@ -47,6 +64,24 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.BudgetPrStatusdato))
                 .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato))
                 .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato));
+
+            Mapper.CreateMap<Budgetkonto, BudgetkontoView>()
+                .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
+                .ForMember(x => x.Kontonummer, opt => opt.MapFrom(s => s.Kontonummer))
+                .ForMember(x => x.Kontonavn, opt => opt.MapFrom(s => s.Kontonavn))
+                .ForMember(x => x.Beskrivelse, opt => opt.MapFrom(s => s.Beskrivelse))
+                .ForMember(x => x.Notat, opt => opt.MapFrom(s => s.Note))
+                .ForMember(x => x.Budgetkontogruppe, opt => opt.MapFrom(s => s.Budgetkontogruppe))
+                .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.BudgetPrStatusdato))
+                .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato))
+                .ForMember(x => x.Disponibel, opt => opt.MapFrom(s => s.DisponibelPrStatusdato))
+                .ForMember(x => x.Budgetoplysninger, opt => opt.MapFrom(s => s.Budgetoplysninger));
+
+            Mapper.CreateMap<Budgetoplysninger, BudgetoplysningerView>()
+                .ForMember(x => x.År, opt => opt.MapFrom(s => s.År))
+                .ForMember(x => x.Måned, opt => opt.MapFrom(s => s.Måned))
+                .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.Budget))
+                .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato));
 
             Mapper.CreateMap<Kontogruppe, KontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))

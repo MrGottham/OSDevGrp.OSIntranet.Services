@@ -7,10 +7,10 @@ using NUnit.Framework;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
 {
     /// <summary>
-    /// Tester datakontrakt til forespørgelse efter en kontoplan.
+    /// Tester datakontrakt til forespørgelse efter en budgetkonto.
     /// </summary>
     [TestFixture]
-    public class KontoplanGetQueryTests
+    public class BudgetkontoGetQueryTests
     {
         /// <summary>
         /// Tester, at Query kan initieres.
@@ -19,14 +19,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanInitieres()
         {
             var statusDato = new DateTime(2010, 10, 31);
-            var query = new KontoplanGetQuery
+            var query = new BudgetkontoGetQuery
                             {
                                 Regnskabsnummer = 1,
-                                StatusDato = statusDato
+                                StatusDato = statusDato,
+                                Kontonummer = "1000"
                             };
             Assert.That(query, Is.Not.Null);
             Assert.That(query.Regnskabsnummer, Is.EqualTo(1));
             Assert.That(query.StatusDato, Is.EqualTo(statusDato));
+            Assert.That(query.Kontonummer, Is.Not.Null);
+            Assert.That(query.Kontonummer, Is.EqualTo("1000"));
         }
 
         /// <summary>
@@ -36,10 +39,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanSerialiseres()
         {
             var statusDato = new DateTime(2010, 10, 31);
-            var query = new KontoplanGetQuery
+            var query = new BudgetkontoGetQuery
                             {
                                 Regnskabsnummer = 1,
-                                StatusDato = statusDato
+                                StatusDato = statusDato,
+                                Kontonummer = "1000"
                             };
             Assert.That(query, Is.Not.Null);
             var memoryStream = new MemoryStream();

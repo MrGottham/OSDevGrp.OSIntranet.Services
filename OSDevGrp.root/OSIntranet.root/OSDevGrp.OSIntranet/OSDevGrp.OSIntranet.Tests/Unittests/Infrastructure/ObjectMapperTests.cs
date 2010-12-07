@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Views;
@@ -77,6 +78,62 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en konto kan mappes til et kontoview.
+        /// </summary>
+        [Test]
+        public void TestAtKontoKanMappesTilKontoView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
+            var kontogruppe = new Kontogruppe(1, "Bankkonti", KontogruppeType.Aktiver);
+            var konto = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
+            konto.SætBeskrivelse("Dankort/lønkonto");
+            konto.SætNote("Kredit på kr. 5.000,00");
+            konto.TilføjKreditoplysninger(new Kreditoplysninger(2010, 10, 5000M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Saldo", 2500M, 0M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 1), null, "Kvickly", 0M, 250M));
+            konto.Calculate(new DateTime(2010, 10, 31));
+
+            var kontopView = objectMapper.Map<Konto, KontoView>(konto);
+            Assert.That(kontopView, Is.Not.Null);
+            Assert.That(kontopView.Regnskab, Is.Not.Null);
+            Assert.That(kontopView.Kontonummer, Is.Not.Null);
+            Assert.That(kontopView.Kontonummer, Is.EqualTo("DANKORT"));
+            Assert.That(kontopView.Kontonavn, Is.Not.Null);
+            Assert.That(kontopView.Kontonavn, Is.EqualTo("Dankort"));
+            Assert.That(kontopView.Beskrivelse, Is.Not.Null);
+            Assert.That(kontopView.Beskrivelse, Is.EqualTo("Dankort/lønkonto"));
+            Assert.That(kontopView.Notat, Is.Not.Null);
+            Assert.That(kontopView.Notat, Is.EqualTo("Kredit på kr. 5.000,00"));
+            Assert.That(kontopView.Kontogruppe, Is.Not.Null);
+            Assert.That(kontopView.Kredit, Is.EqualTo(5000M));
+            Assert.That(kontopView.Saldo, Is.EqualTo(2250M));
+            Assert.That(kontopView.Disponibel, Is.EqualTo(7250M));
+            Assert.That(kontopView.Kreditoplysninger, Is.Not.Null);
+            Assert.That(kontopView.Kreditoplysninger.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Tester, at kreditoplysninger kan mappes til et kreditoplysningerview.
+        /// </summary>
+        [Test]
+        public void TestAtKreditoplysningerKanMappesTilKreditoplysningerView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var kreditoplysninger = new Kreditoplysninger(2010, 10, 15000M);
+
+            var kreditoplysningerView = objectMapper.Map<Kreditoplysninger, KreditoplysningerView>(kreditoplysninger);
+            Assert.That(kreditoplysningerView, Is.Not.Null);
+            Assert.That(kreditoplysningerView.År, Is.EqualTo(2010));
+            Assert.That(kreditoplysningerView.Måned, Is.EqualTo(10));
+            Assert.That(kreditoplysningerView.Kredit, Is.EqualTo(15000M));
+        }
+
+        /// <summary>
         /// Tester, at en budgetkonto kan mappes til et budgetkontoplanview.
         /// </summary>
         [Test]
@@ -91,8 +148,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             budgetkonto.SætBeskrivelse("Salg m.m.");
             budgetkonto.SætNote("Indtægter vedrørende salg m.m.");
             budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(2010, 10, 15000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Indbetaling", 10000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 5), null, "Indbetaling", 4000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Indbetaling",
+                                                                  10000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 5), null, "Indbetaling",
+                                                                  4000M, 0M));
             budgetkonto.Calculate(new DateTime(2010, 10, 31));
 
             var bugetkontoplanView = objectMapper.Map<Budgetkonto, BudgetkontoplanView>(budgetkonto);
@@ -110,6 +169,76 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(bugetkontoplanView.Budget, Is.EqualTo(15000M));
             Assert.That(bugetkontoplanView.Bogført, Is.EqualTo(14000M));
             Assert.That(bugetkontoplanView.Disponibel, Is.EqualTo(1000M));
+        }
+
+        /// <summary>
+        /// Tester, at en budgetkonto kan mappes til et budgetkontview.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoKanMappesTilBudgetkontoView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
+            var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
+            var budgetkonto = new Budgetkonto(regnskab, "1000", "Indtægter", budgetkontogruppe);
+            budgetkonto.SætBeskrivelse("Salg m.m.");
+            budgetkonto.SætNote("Indtægter vedrørende salg m.m.");
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(2010, 10, 15000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Indbetaling",
+                                                                  10000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 5), null, "Indbetaling",
+                                                                  4000M, 0M));
+            budgetkonto.Calculate(new DateTime(2010, 10, 31));
+
+            var bugetkontoView = objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
+            Assert.That(bugetkontoView, Is.Not.Null);
+            Assert.That(bugetkontoView.Regnskab, Is.Not.Null);
+            Assert.That(bugetkontoView.Kontonummer, Is.Not.Null);
+            Assert.That(bugetkontoView.Kontonummer, Is.EqualTo("1000"));
+            Assert.That(bugetkontoView.Kontonavn, Is.Not.Null);
+            Assert.That(bugetkontoView.Kontonavn, Is.EqualTo("Indtægter"));
+            Assert.That(bugetkontoView.Beskrivelse, Is.Not.Null);
+            Assert.That(bugetkontoView.Beskrivelse, Is.EqualTo("Salg m.m."));
+            Assert.That(bugetkontoView.Notat, Is.Not.Null);
+            Assert.That(bugetkontoView.Notat, Is.EqualTo("Indtægter vedrørende salg m.m."));
+            Assert.That(bugetkontoView.Budgetkontogruppe, Is.Not.Null);
+            Assert.That(bugetkontoView.Budget, Is.EqualTo(15000M));
+            Assert.That(bugetkontoView.Bogført, Is.EqualTo(14000M));
+            Assert.That(bugetkontoView.Disponibel, Is.EqualTo(1000M));
+            Assert.That(bugetkontoView.Budgetoplysninger, Is.Not.Null);
+            Assert.That(bugetkontoView.Budgetoplysninger.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Test, at budgetoplysninger kan mappes til et budgetoplysningerview.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetoplysningerKanMappesTilBudgetoplysningerView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
+            var budgetkontogruppe = new Budgetkontogruppe(1, "Udgifter");
+            var budgetkonto = new Budgetkonto(regnskab, "1000", "Udgifter", budgetkontogruppe);
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(2010, 10, 0M, 3000M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 10, 1), null, "Udbetaling", 0M,
+                                                                  2500M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 10, 5), null, "Udbetaling", 0M,
+                                                                  250M));
+            budgetkonto.Calculate(new DateTime(2010, 10, 31));
+
+            var budgetoplysninger = budgetkonto.Budgetoplysninger.SingleOrDefault(m => m.År == 2010 && m.Måned == 10);
+            Assert.That(budgetoplysninger, Is.Not.Null);
+
+            var budgetoplysningerView = objectMapper.Map<Budgetoplysninger, BudgetoplysningerView>(budgetoplysninger);
+            Assert.That(budgetoplysningerView, Is.Not.Null);
+            Assert.That(budgetoplysningerView.År, Is.EqualTo(2010));
+            Assert.That(budgetoplysningerView.Måned, Is.EqualTo(10));
+            Assert.That(budgetoplysningerView.Budget, Is.EqualTo(-3000M));
+            Assert.That(budgetoplysningerView.Bogført, Is.EqualTo(-2750M));
         }
 
         /// <summary>
