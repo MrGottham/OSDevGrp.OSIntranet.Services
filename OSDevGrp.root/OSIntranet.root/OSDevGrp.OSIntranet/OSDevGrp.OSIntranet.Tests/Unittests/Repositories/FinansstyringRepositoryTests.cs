@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 Assert.That(konto.Bogføringslinjer, Is.Not.Null);
                 Assert.That(konto.Bogføringslinjer.Count, Is.GreaterThan(0));
             }
-            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(72));
+            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(73));
             foreach (var budgetkonto in regnskab.Konti.OfType<Budgetkonto>().ToList())
             {
                 Assert.That(budgetkonto, Is.Not.Null);
