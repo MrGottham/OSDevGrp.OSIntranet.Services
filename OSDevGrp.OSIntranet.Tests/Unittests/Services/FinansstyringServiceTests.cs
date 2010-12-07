@@ -282,5 +282,75 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var query = new BudgetkontoplanGetQuery();
             Assert.Throws<FaultException<IntranetSystemFault>>(() => service.BudgetkontoplanGet(query));
         }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoGetKalderQueryBus()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            var service = new FinansstyringService(queryBus);
+            var query = new BudgetkontoGetQuery();
+            service.BudgetkontoGet(query);
+            queryBus.AssertWasCalled(
+                m => m.Query<BudgetkontoGetQuery, BudgetkontoView>(Arg<BudgetkontoGetQuery>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoGetKasterIntranetRepositoryFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<BudgetkontoGetQuery, BudgetkontoView>(Arg<BudgetkontoGetQuery>.Is.Anything)).
+                Throw(new IntranetRepositoryException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new BudgetkontoGetQuery();
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(() => service.BudgetkontoGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoGetKasterIntranetBusinessFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<BudgetkontoGetQuery, BudgetkontoView>(Arg<BudgetkontoGetQuery>.Is.Anything)).
+                Throw(new IntranetBusinessException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new BudgetkontoGetQuery();
+            Assert.Throws<FaultException<IntranetBusinessFault>>(() => service.BudgetkontoGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoGetKasterIntranetSystemFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<BudgetkontoGetQuery, BudgetkontoView>(Arg<BudgetkontoGetQuery>.Is.Anything)).
+                Throw(new IntranetSystemException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new BudgetkontoGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.BudgetkontoGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontoGet kaster en IntranetSystemFault ved en unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontoGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<BudgetkontoGetQuery, BudgetkontoView>(Arg<BudgetkontoGetQuery>.Is.Anything)).
+                Throw(new Exception("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new BudgetkontoGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.BudgetkontoGet(query));
+        }
     }
 }

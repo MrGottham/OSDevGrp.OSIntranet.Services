@@ -56,7 +56,9 @@
     <Compile Include="Faults\IntranetFaultBase.cs" />
     <Compile Include="Faults\IntranetRepositoryFault.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\BudgetkontoGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoplanGetQuery.cs" />
+    <Compile Include="Queries\KontoGetQuery.cs" />
     <Compile Include="Queries\KontoplanGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Services\IFinansstyringService.cs" />
@@ -64,9 +66,14 @@
     <Compile Include="SoapNamespaces.cs" />
     <Compile Include="Views\BudgetkontogruppeView.cs" />
     <Compile Include="Views\BudgetkontoplanView.cs" />
+    <Compile Include="Views\BudgetkontoView.cs" />
+    <Compile Include="Views\BudgetoplysningerView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />
     <Compile Include="Views\KontogruppeView.cs" />
     <Compile Include="Views\KontoplanView.cs" />
+    <Compile Include="Views\KontoView.cs" />
+    <Compile Include="Views\KreditoplysningerView.cs" />
+    <Compile Include="Views\MånedsoplysningerView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\TabelView.cs" />
   </ItemGroup>

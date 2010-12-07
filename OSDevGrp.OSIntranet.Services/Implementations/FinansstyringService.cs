@@ -100,6 +100,36 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Henter en konto.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en konto.</param>
+        /// <returns>Konto.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public KontoView KontoGet(KontoGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<KontoGetQuery, KontoView>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
         /// Henter en budgetkontoplan.
         /// </summary>
         /// <param name="query">Forespørgelse efter en budgetkontoplan.</param>
@@ -110,6 +140,36 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             try
             {
                 return _queryBus.Query<BudgetkontoplanGetQuery, IEnumerable<BudgetkontoplanView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en budgetkonto.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en budgetkonto.</param>
+        /// <returns>Budgetkonto.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public BudgetkontoView BudgetkontoGet(BudgetkontoGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<BudgetkontoGetQuery, BudgetkontoView>(query);
             }
             catch (IntranetRepositoryException ex)
             {
