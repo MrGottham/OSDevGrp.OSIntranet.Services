@@ -47,16 +47,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab.Navn, Is.EqualTo("Ole Sørensen"));
             Assert.That(regnskab.Konti, Is.Not.Null);
             Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
-            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(4));
+            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(5));
             foreach (var konto in regnskab.Konti.OfType<Konto>().ToList())
             {
                 Assert.That(konto, Is.Not.Null);
                 Assert.That(konto.Kreditoplysninger, Is.Not.Null);
                 Assert.That(konto.Kreditoplysninger.Count, Is.GreaterThan(0));
                 Assert.That(konto.Bogføringslinjer, Is.Not.Null);
-                Assert.That(konto.Bogføringslinjer.Count, Is.GreaterThan(0));
+                Assert.That(konto.Bogføringslinjer.Count, Is.GreaterThanOrEqualTo(0));
             }
-            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(73));
+            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(71));
             foreach (var budgetkonto in regnskab.Konti.OfType<Budgetkonto>().ToList())
             {
                 Assert.That(budgetkonto, Is.Not.Null);
