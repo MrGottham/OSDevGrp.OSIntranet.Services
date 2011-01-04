@@ -185,6 +185,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en betalingsbetingelse kan mappes til et betalingsbetingelseview.
+        /// </summary>
+        [Test]
+        public void TestAtBetalingsbetingelseKanMappesTilBetalingsbetingelseView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var betalingsbetingelse = new Betalingsbetingelse(1, "Kontant");
+            var betalingsbetingelseView = objectMapper.Map<Betalingsbetingelse, BetalingsbetingelseView>(betalingsbetingelse);
+            Assert.That(betalingsbetingelseView, Is.Not.Null);
+            Assert.That(betalingsbetingelseView.Nummer, Is.EqualTo(1));
+            Assert.That(betalingsbetingelseView.Navn, Is.Not.Null);
+            Assert.That(betalingsbetingelseView.Navn, Is.EqualTo("Kontant"));
+        }
+
+        /// <summary>
         /// Tester, at et regnskab kan mappes til et regnskabslisteview.
         /// </summary>
         [Test]

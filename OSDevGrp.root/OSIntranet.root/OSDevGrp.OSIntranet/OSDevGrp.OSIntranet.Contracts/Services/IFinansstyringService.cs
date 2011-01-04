@@ -61,5 +61,35 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         BudgetkontoView BudgetkontoGet(BudgetkontoGetQuery query);
+
+        /// <summary>
+        /// Henter en liste af debitorer.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af debitorer.</param>
+        /// <returns>Liste af debitorer.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<DebitorlisteView> DebitorlisteGet(DebitorlisteGetQuery query);
+
+        /// <summary>
+        /// Henter en liste af kreditorer.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af kreditorer.</param>
+        /// <returns>Liste af kreditorer.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<KreditorlisteView> KreditorlisteGet(KreditorlisteGetQuery query);
+
+        // TODO: Lav metode, der kan hente en enkelt debitor.
+        // TODO: Lav metode, der kan hente en enkelt kreditor.
+
+        // TODO: Lav metode, der kan hente et givent antal bogføringslinjer.
+        // TODO: Lav metode, der kan hente adresser, som kan tilknyttes bogføringslinjer (find godt navn).
+
+        // TODO: Lav metode, der kan hente betalingsbetingelser.
+        // TODO: Lav metode, der kan hente kontogrupper.
+        // TODO: Lav metode, der kan hente budgetkontogrupper.
     }
 }

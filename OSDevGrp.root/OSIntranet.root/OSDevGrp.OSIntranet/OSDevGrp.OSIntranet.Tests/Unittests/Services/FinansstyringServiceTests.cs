@@ -421,5 +421,158 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var query = new BudgetkontoGetQuery();
             Assert.Throws<FaultException<IntranetSystemFault>>(() => service.BudgetkontoGet(query));
         }
+
+        /// <summary>
+        /// Tester, at DebitorlisteGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtDebitorlisteGetKalderQueryBus()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            var service = new FinansstyringService(queryBus);
+            var query = new DebitorlisteGetQuery();
+            service.DebitorlisteGet(query);
+            queryBus.AssertWasCalled(
+                m => m.Query<DebitorlisteGetQuery, IEnumerable<DebitorlisteView>>(Arg<DebitorlisteGetQuery>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at DebitorlisteGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtDebitorlisteGetKasterIntranetRepositoryFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<DebitorlisteGetQuery, IEnumerable<DebitorlisteView>>(Arg<DebitorlisteGetQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new DebitorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(() => service.DebitorlisteGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at DebitorlisteGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtDebitorlisteGetKasterIntranetBusinessFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<DebitorlisteGetQuery, IEnumerable<DebitorlisteView>>(Arg<DebitorlisteGetQuery>.Is.Anything))
+                .Throw(new IntranetBusinessException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new DebitorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetBusinessFault>>(() => service.DebitorlisteGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at DebitorlisteGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtDebitorlisteGetKasterIntranetSystemFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<DebitorlisteGetQuery, IEnumerable<DebitorlisteView>>(Arg<DebitorlisteGetQuery>.Is.Anything))
+                .Throw(new IntranetSystemException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new DebitorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.DebitorlisteGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at DebitorlisteGet kaster en IntranetSystemFault ved en unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtDebitorlisteGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<DebitorlisteGetQuery, IEnumerable<DebitorlisteView>>(Arg<DebitorlisteGetQuery>.Is.Anything))
+                .Throw(new Exception("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new DebitorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.DebitorlisteGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at KreditorlisteGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtKreditorlisteGetKalderQueryBus()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            var service = new FinansstyringService(queryBus);
+            var query = new KreditorlisteGetQuery();
+            service.KreditorlisteGet(query);
+            queryBus.AssertWasCalled(
+                m =>
+                m.Query<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>(Arg<KreditorlisteGetQuery>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at KreditorlisteGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtKreditorlisteGetKasterIntranetRepositoryFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m =>
+                m.Query<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>(Arg<KreditorlisteGetQuery>.Is.Anything)).
+                Throw(new IntranetRepositoryException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new KreditorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(() => service.KreditorlisteGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at KreditorlisteGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtKreditorlisteGetKasterIntranetBusinessFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m =>
+                m.Query<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>(Arg<KreditorlisteGetQuery>.Is.Anything)).
+                Throw(new IntranetBusinessException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new KreditorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetBusinessFault>>(() => service.KreditorlisteGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at KreditorlisteGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtKreditorlisteGetKasterIntranetSystemFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m =>
+                m.Query<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>(Arg<KreditorlisteGetQuery>.Is.Anything)).
+                Throw(new IntranetSystemException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new KreditorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.KreditorlisteGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at KreditorlisteGet kaster en IntranetSystemFault ved en unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtKreditorlisteGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m =>
+                m.Query<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>(Arg<KreditorlisteGetQuery>.Is.Anything)).
+                Throw(new Exception("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new KreditorlisteGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.KreditorlisteGet(query));
+        }
     }
 }

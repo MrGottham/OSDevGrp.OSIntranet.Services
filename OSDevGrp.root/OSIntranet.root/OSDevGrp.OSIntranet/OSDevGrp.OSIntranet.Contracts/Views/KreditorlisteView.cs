@@ -6,16 +6,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     /// Viewobjekt for en kreditorliste.
     /// </summary>
     [DataContract(Name = "Kreditorliste", Namespace = SoapNamespaces.IntranetNamespace)]
-    public class KreditorlisteView : TelefonlisteView
+    public class KreditorlisteView : SaldolisteBaseView
     {
-        /// <summary>
-        /// Saldo.
-        /// </summary>
-        [DataMember(IsRequired = true)]
-        public decimal Saldo
-        {
-            get;
-            set;
-        }
     }
 }
