@@ -38,6 +38,12 @@ namespace OSDevGrp.OSIntranet.Repositories
                 throw new IntranetRepositoryException(
                     Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "DebitorSaldoOverNul"), ex);
             }
+            value = nameValueCollection["KreditorSaldoOverNul"];
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "KreditorSaldoOverNul"));
+            }
         }
 
         #endregion
