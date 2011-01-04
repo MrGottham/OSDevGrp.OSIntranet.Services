@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Views;
-using OSDevGrp.OSIntranet.Infrastructure;
+using AutoMapper;
 using NUnit.Framework;
+using ObjectMapper = OSDevGrp.OSIntranet.Infrastructure.ObjectMapper;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 {
@@ -15,6 +17,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
     public class ObjectMapperTests
     {
         /// <summary>
+        /// Adresseklasse, der kan benyttes til test.
+        /// </summary>
+        private class OtherAddress : AdresseBase
+        {
+            /// <summary>
+            /// Konstruerer adresseklasse, der kan benyttes til test.
+            /// </summary>
+            /// <param name="nummer">Nummer på adressen.</param>
+            /// <param name="navn">Navn på adressen.</param>
+            /// <param name="adressegruppe">Adressegruppe.</param>
+            public OtherAddress(int nummer, string navn, Adressegruppe adressegruppe)
+                : base(nummer, navn, adressegruppe)
+            {
+            }
+        }
+
+        /// <summary>
         /// Tester, at ObjectMapper kan initieres.
         /// </summary>
         [Test]
@@ -22,6 +41,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Tester, at en basisadresse kan mappes til et telefonlisteview.
+        /// </summary>
+        [Test]
+        public void TestAtAdresseBaseMappesTilTelefonliste()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var telefonlisteView = objectMapper.Map<AdresseBase, TelefonlisteView>(null);
+            Assert.That(telefonlisteView, Is.Null);
+
+            var adressegruppe = new Adressegruppe(1, "Adresser", 0);
+            Assert.That(adressegruppe, Is.Not.Null);
+
+            var person = new Person(1, "Ole Sørensen", adressegruppe);
+            person.SætTelefon("62 21 49 60", "25 24 49 75");
+            telefonlisteView = objectMapper.Map<AdresseBase, TelefonlisteView>(person);
+            Assert.That(telefonlisteView, Is.Not.Null);
+            Assert.That(telefonlisteView.Nummer, Is.EqualTo(1));
+            Assert.That(telefonlisteView.Navn, Is.Not.Null);
+            Assert.That(telefonlisteView.Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(telefonlisteView.PrimærTelefon, Is.Not.Null);
+            Assert.That(telefonlisteView.PrimærTelefon, Is.EqualTo("62 21 49 60"));
+            Assert.That(telefonlisteView.SekundærTelefon, Is.Not.Null);
+            Assert.That(telefonlisteView.SekundærTelefon, Is.EqualTo("25 24 49 75"));
+
+            var firma = new Firma(2, "OS Development Group", adressegruppe);
+            firma.SætTelefon("62 21 49 60", "25 24 49 75", null);
+            telefonlisteView = objectMapper.Map<AdresseBase, TelefonlisteView>(firma);
+            Assert.That(telefonlisteView, Is.Not.Null);
+            Assert.That(telefonlisteView.Nummer, Is.EqualTo(2));
+            Assert.That(telefonlisteView.Navn, Is.Not.Null);
+            Assert.That(telefonlisteView.Navn, Is.EqualTo("OS Development Group"));
+            Assert.That(telefonlisteView.PrimærTelefon, Is.Not.Null);
+            Assert.That(telefonlisteView.PrimærTelefon, Is.EqualTo("62 21 49 60"));
+            Assert.That(telefonlisteView.SekundærTelefon, Is.Not.Null);
+            Assert.That(telefonlisteView.SekundærTelefon, Is.EqualTo("25 24 49 75"));
+
+            var andenAdresse = new OtherAddress(3, "Bente Susanne Rasmussen", adressegruppe);
+            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, TelefonlisteView>(andenAdresse));
         }
 
         /// <summary>

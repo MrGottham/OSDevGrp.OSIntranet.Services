@@ -8,6 +8,7 @@
         RepositoryError,
         UnhandledSwitchValue,
         CantFindObjectById,
-        IllegalValue
+        IllegalValue,
+        CantAutoMapType
     }
 }

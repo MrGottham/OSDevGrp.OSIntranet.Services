@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Resources;
 using IObjectMapper = OSDevGrp.OSIntranet.Infrastructure.Interfaces.IObjectMapper;
 
 namespace OSDevGrp.OSIntranet.Infrastructure
@@ -22,6 +25,38 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static ObjectMapper()
         {
+            Mapper.CreateMap<AdresseBase, TelefonlisteView>()
+                .ConvertUsing(s =>
+                                  {
+                                      if (s == null)
+                                      {
+                                          return null;
+                                      }
+                                      var mapper = new ObjectMapper();
+                                      if (s is Person)
+                                      {
+                                          return mapper.Map<Person, TelefonlisteView>(s as Person);
+                                      }
+                                      if (s is Firma)
+                                      {
+                                          return mapper.Map<Firma, TelefonlisteView>(s as Firma);
+                                      }
+                                      throw new IntranetSystemException(
+                                          Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                                  });
+
+            Mapper.CreateMap<Person, TelefonlisteView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
+                .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil));
+
+            Mapper.CreateMap<Firma, TelefonlisteView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
+                .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2));
+
             Mapper.CreateMap<Regnskab, RegnskabslisteView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));

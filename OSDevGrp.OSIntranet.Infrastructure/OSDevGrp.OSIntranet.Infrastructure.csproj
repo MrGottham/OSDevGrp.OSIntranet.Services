@@ -85,6 +85,10 @@
       <Project>{4775A5D7-009A-4B8D-A9DE-0CEBDFCC1535}</Project>
       <Name>OSDevGrp.OSIntranet.Repositories.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Resources\OSDevGrp.OSIntranet.Resources.csproj">
+      <Project>{EC187CDE-4BB1-4B84-8AAE-1CE461296611}</Project>
+      <Name>OSDevGrp.OSIntranet.Resources</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />
