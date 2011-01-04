@@ -21,6 +21,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 throw new ArgumentNullException("nameValueCollection");
             }
+            var value = nameValueCollection["DebitorSaldoOverNul"];
         }
 
         #endregion
