@@ -14,7 +14,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
     {
         private readonly NameValueCollection _validNameValueCollection = new NameValueCollection
                                                                              {
-                                                                                 {"DebitorSaldoOverNul", "true"}
+                                                                                 {"DebitorSaldoOverNul", "true"},
+                                                                                 {"KreditorSaldoOverNul", "true"}
                                                                              };
 
         /// <summary>
@@ -48,6 +49,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                           };
             Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
         }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en IntranetRepositoryException, hvis KreditorSaldoOverNul ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterIntranetRepositoryExceptionHvisKreditorSaldoOverNulIkkeErRegistreret()
+        {
+            var nameValueCollection = new NameValueCollection
+                                          {
+                                              {"DebitorSaldoOverNul", "True"}
+                                          };
+            Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
+        }
+
 
         /// <summary>
         /// Tester, at DebitorSaldoOverNul er true.
