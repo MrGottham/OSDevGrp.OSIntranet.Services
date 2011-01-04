@@ -59,6 +59,36 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for IllegalValue hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForIllegalValueHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, null, "konto");
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for CantAutoMapType hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForCantAutoMapTypeHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, typeof (Konto));
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]
