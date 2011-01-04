@@ -103,11 +103,13 @@
     <Compile Include="Unittests\Contracts\Views\BudgetkontoViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetoplysningerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\DebitorlisteViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\DebitorViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontoplanViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontoViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KreditoplysningerViewTest.cs" />
     <Compile Include="Unittests\Contracts\Views\KreditorlisteViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\KreditorViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TelefonlisteViewTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
