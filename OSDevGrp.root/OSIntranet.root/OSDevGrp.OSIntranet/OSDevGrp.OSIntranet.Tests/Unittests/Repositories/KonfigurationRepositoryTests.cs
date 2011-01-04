@@ -12,6 +12,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
     [TestFixture]
     public class KonfigurationRepositoryTests
     {
+        private readonly NameValueCollection _validNameValueCollection = new NameValueCollection
+                                                                             {
+                                                                                 {"DebitorSaldoOverNul", "true"}
+                                                                             };
+
         /// <summary>
         /// Tester, at konstruktøren kaster en ArgumentNullException, hvis samlingen af navne og værdier er null.
         /// </summary>
@@ -29,6 +34,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         {
             var nameValueCollection = new NameValueCollection();
             Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en IntranetRepositoryException, hvis DebitorSaldoOverNul er invalid.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterIntranetRepositoryExceptionHvisDebitorSaldoOverNulErInvalid()
+        {
+            var nameValueCollection = new NameValueCollection
+                                          {
+                                              {"DebitorSaldoOverNul", "XYZ"}
+                                          };
+            Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
+        }
+
+        /// <summary>
+        /// Tester, at DebitorSaldoOverNul er true.
+        /// </summary>
+        [Test]
+        public void TestAtDebitorSaldoOverNulErTrue()
+        {
+            var repository = new KonfigurationRepository(_validNameValueCollection);
+            Assert.That(repository, Is.Not.Null);
+            Assert.That(repository.DebitorSaldoOverNul, Is.True);
         }
     }
 }
