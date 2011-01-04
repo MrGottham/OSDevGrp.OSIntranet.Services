@@ -58,6 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\BudgetkontoGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoplanGetQuery.cs" />
+    <Compile Include="Queries\DebitorGetQuery.cs" />
     <Compile Include="Queries\DebitorlisteGetQuery.cs" />
     <Compile Include="Queries\KontoGetQuery.cs" />
     <Compile Include="Queries\KontoplanGetQuery.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Views\KontoView.cs" />
     <Compile Include="Views\KreditoplysningerView.cs" />
     <Compile Include="Views\KreditorlisteView.cs" />
+    <Compile Include="Views\KreditorView.cs" />
     <Compile Include="Views\MånedsoplysningerView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\SaldoBaseView.cs" />
