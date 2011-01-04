@@ -189,6 +189,66 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Henter en liste af debitorer.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af debitorer.</param>
+        /// <returns>Liste af debitorer.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<DebitorlisteView> DebitorlisteGet(DebitorlisteGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<DebitorlisteGetQuery, IEnumerable<DebitorlisteView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en liste af kreditorer.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af kreditorer.</param>
+        /// <returns>Liste af kreditorer.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<KreditorlisteView> KreditorlisteGet(KreditorlisteGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
         #endregion
     }
 }

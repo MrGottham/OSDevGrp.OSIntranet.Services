@@ -66,11 +66,13 @@
     <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="SoapNamespaces.cs" />
+    <Compile Include="Views\BetalingsbetingelseView.cs" />
     <Compile Include="Views\BudgetkontogruppeView.cs" />
     <Compile Include="Views\BudgetkontoplanView.cs" />
     <Compile Include="Views\BudgetkontoView.cs" />
     <Compile Include="Views\BudgetoplysningerView.cs" />
     <Compile Include="Views\DebitorListeView.cs" />
+    <Compile Include="Views\DebitorView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />
     <Compile Include="Views\KontogruppeView.cs" />
     <Compile Include="Views\KontoplanView.cs" />
@@ -79,6 +81,8 @@
     <Compile Include="Views\KreditorlisteView.cs" />
     <Compile Include="Views\MånedsoplysningerView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />
+    <Compile Include="Views\SaldoBaseView.cs" />
+    <Compile Include="Views\SaldolisteBaseView.cs" />
     <Compile Include="Views\TabelView.cs" />
     <Compile Include="Views\TelefonlisteView.cs" />
   </ItemGroup>
