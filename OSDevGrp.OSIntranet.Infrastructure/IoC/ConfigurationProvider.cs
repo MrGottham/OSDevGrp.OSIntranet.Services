@@ -1,10 +1,12 @@
-﻿using Castle.MicroKernel.Registration;
+﻿using System.Configuration;
+using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.Windsor;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Repositories;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
 namespace OSDevGrp.OSIntranet.Infrastructure.IoC
@@ -22,8 +24,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
         /// <param name="container">Container, hvortil der skal tilføjes konfiguration.</param>
         public void AddConfiguration(IWindsorContainer container)
         {
+            var konfigurationRepository = new KonfigurationRepository(ConfigurationManager.AppSettings);
+
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Transient);
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);
+            container.Register(Component.For<IKonfigurationRepository>().Instance(konfigurationRepository).LifeStyle.Transient);
 
             container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories")
                                    .BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)));

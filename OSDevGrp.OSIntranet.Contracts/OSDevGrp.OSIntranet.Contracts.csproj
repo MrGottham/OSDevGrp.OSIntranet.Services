@@ -62,6 +62,7 @@
     <Compile Include="Queries\DebitorlisteGetQuery.cs" />
     <Compile Include="Queries\KontoGetQuery.cs" />
     <Compile Include="Queries\KontoplanGetQuery.cs" />
+    <Compile Include="Queries\KreditorGetQuery.cs" />
     <Compile Include="Queries\KreditorlisteGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Services\IFinansstyringService.cs" />

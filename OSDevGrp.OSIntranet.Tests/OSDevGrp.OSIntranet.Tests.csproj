@@ -92,9 +92,11 @@
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoplanGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\DebitorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DebitorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoplanGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\KreditorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BetalingsbetingelseViewTests.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
+    <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
     <Compile Include="Unittests\Resources\ResourceTests.cs" />
     <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />
