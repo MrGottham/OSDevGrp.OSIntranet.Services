@@ -73,6 +73,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         IEnumerable<DebitorlisteView> DebitorlisteGet(DebitorlisteGetQuery query);
 
         /// <summary>
+        /// Henter en debitor.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en debitor.</param>
+        /// <returns>Debitor.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        DebitorView DebitorGet(DebitorGetQuery query);
+
+        /// <summary>
         /// Henter en liste af kreditorer.
         /// </summary>
         /// <param name="query">Forespørgelse efter en liste af kreditorer.</param>
@@ -82,8 +92,15 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<KreditorlisteView> KreditorlisteGet(KreditorlisteGetQuery query);
 
-        // TODO: Lav metode, der kan hente en enkelt debitor.
-        // TODO: Lav metode, der kan hente en enkelt kreditor.
+        /// <summary>
+        /// Henter en kreditor.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en kreditor.</param>
+        /// <returns>Kreditor</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        KreditorView KreditorGet(KreditorGetQuery query);
 
         // TODO: Lav metode, der kan hente et givent antal bogføringslinjer.
         // TODO: Lav metode, der kan hente adresser, som kan tilknyttes bogføringslinjer (find godt navn).

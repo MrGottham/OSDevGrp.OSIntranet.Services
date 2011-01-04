@@ -220,6 +220,36 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Henter en debitor.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en debitor.</param>
+        /// <returns>Debitor.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public DebitorView DebitorGet(DebitorGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<DebitorGetQuery, DebitorView>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
         /// Henter en liste af kreditorer.
         /// </summary>
         /// <param name="query">Forespørgelse efter en liste af kreditorer.</param>
@@ -230,6 +260,36 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             try
             {
                 return _queryBus.Query<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en kreditor.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en kreditor.</param>
+        /// <returns>Kreditor</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public KreditorView KreditorGet(KreditorGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<KreditorGetQuery, KreditorView>(query);
             }
             catch (IntranetRepositoryException ex)
             {
