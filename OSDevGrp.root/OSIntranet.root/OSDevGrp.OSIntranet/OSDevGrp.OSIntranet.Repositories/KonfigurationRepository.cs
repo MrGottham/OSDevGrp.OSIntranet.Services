@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Specialized;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Repositories
 {
@@ -22,6 +24,11 @@ namespace OSDevGrp.OSIntranet.Repositories
                 throw new ArgumentNullException("nameValueCollection");
             }
             var value = nameValueCollection["DebitorSaldoOverNul"];
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "DebitorSaldoOverNul"));
+            }
         }
 
         #endregion

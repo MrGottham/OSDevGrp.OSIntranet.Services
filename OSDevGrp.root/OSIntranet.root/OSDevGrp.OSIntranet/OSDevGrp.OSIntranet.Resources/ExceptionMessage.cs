@@ -9,6 +9,7 @@
         UnhandledSwitchValue,
         CantFindObjectById,
         IllegalValue,
-        CantAutoMapType
+        CantAutoMapType,
+        MissingApplicationSetting
     }
 }
