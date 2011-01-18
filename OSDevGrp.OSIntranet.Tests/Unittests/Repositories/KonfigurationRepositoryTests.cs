@@ -63,6 +63,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
         }
 
+        /// <summary>
+        /// Tester, at konstruktøren kaster en IntranetRepositoryException, hvis KreditorSaldoOverNul ikke er invalid.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterIntranetRepositoryExceptionHvisKreditorSaldoOverNulErInvalid()
+        {
+            var nameValueCollection = new NameValueCollection
+                                          {
+                                              {"DebitorSaldoOverNul", "True"},
+                                              {"KreditorSaldoOverNul", "XYZ"}
+                                          };
+            Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
+        }
 
         /// <summary>
         /// Tester, at DebitorSaldoOverNul er true.
@@ -73,6 +86,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new KonfigurationRepository(_validNameValueCollection);
             Assert.That(repository, Is.Not.Null);
             Assert.That(repository.DebitorSaldoOverNul, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at KreditorSaldoOverNul er true.
+        /// </summary>
+        [Test]
+        public void TestAtKreditorSaldoOverNulErTrue()
+        {
+            var repository = new KonfigurationRepository(_validNameValueCollection);
+            Assert.That(repository, Is.Not.Null);
+            Assert.That(repository.KreditorSaldoOverNul, Is.True);
         }
     }
 }

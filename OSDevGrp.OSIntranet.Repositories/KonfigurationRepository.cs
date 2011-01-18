@@ -44,6 +44,15 @@ namespace OSDevGrp.OSIntranet.Repositories
                 throw new IntranetRepositoryException(
                     Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "KreditorSaldoOverNul"));
             }
+            try
+            {
+                KreditorSaldoOverNul = bool.Parse(value);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "KreditorSaldoOverNul"), ex);
+            }
         }
 
         #endregion
@@ -64,7 +73,8 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// </summary>
         public bool KreditorSaldoOverNul
         {
-            get { throw new NotImplementedException(); }
+            get;
+            private set;
         }
 
         #endregion
