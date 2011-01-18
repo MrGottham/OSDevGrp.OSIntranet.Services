@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="BudgetkontoplanGetQueryHandler.cs" />
     <Compile Include="BudgetkontoGetQueryHandler.cs" />
+    <Compile Include="DebitorlisteGetQueryHandler.cs" />
     <Compile Include="KontoGetQueryHandler.cs" />
     <Compile Include="KontoplanGetQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

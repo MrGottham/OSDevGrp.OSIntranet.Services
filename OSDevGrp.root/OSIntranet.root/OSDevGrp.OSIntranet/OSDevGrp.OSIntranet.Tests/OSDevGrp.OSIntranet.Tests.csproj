@@ -121,6 +121,7 @@
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\DebitorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FinansstyringQueryHandlerTestsBase.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoplanGetQueryHandlerTests.cs" />
