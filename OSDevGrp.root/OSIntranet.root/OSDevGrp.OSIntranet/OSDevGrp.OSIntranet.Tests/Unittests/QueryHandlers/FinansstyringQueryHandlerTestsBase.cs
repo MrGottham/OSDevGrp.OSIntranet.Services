@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure;
@@ -16,6 +17,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     /// </summary>
     public abstract class FinansstyringQueryHandlerTestsBase
     {
+        /// <summary>
+        /// Danner og returnerer repository for adressekartotek.
+        /// </summary>
+        /// <returns>Repository for adressekartotek, der kan benyttes til test.</returns>
+        protected static IAdresseRepository GetAdresseRepository()
+        {
+            // Dan testdata for adressegrupper.
+            var adresseGruppePersoner = new Adressegruppe(1, "Personer", 0);
+            var adresseGruppeFirmaer = new Adressegruppe(2, "Firmaer", 0);
+            // Dan testdata for adresser.
+            var adresser = new List<AdresseBase>
+                               {
+                                   new Person(1, "Ole Sørensen", adresseGruppePersoner),
+                                   new Person(2, "Bente Susanne Rasmussen", adresseGruppePersoner),
+                                   new Firma(3, "OS Development Group", adresseGruppeFirmaer)
+                               };
+            // Dan mockup af repoistory.
+            var repository = MockRepository.GenerateMock<IAdresseRepository>();
+            repository.Expect(m => m.AdresseGetAll()).Return(adresser);
+            return repository;
+        }
+
         /// <summary>
         /// Danner og returnerer et repository for finansstyring.
         /// </summary>
