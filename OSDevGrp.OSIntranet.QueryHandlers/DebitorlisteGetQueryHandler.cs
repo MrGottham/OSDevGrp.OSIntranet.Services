@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
@@ -32,6 +33,14 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <param name="objectMapper">Implementering af objectmapper.</param>
         public DebitorlisteGetQueryHandler(IAdresseRepository adresseRepository, IFinansstyringRepository finansstyringRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper)
         {
+            if (adresseRepository == null)
+            {
+                throw new ArgumentNullException("adresseRepository");
+            }
+            if (finansstyringRepository == null)
+            {
+                throw new ArgumentNullException("finansstyringRepository");
+            }
             _adresseRepository = adresseRepository;
             _finansstyringRepository = finansstyringRepository;
             _konfigurationRepository = konfigurationRepository;
