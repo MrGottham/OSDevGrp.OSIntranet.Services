@@ -9,9 +9,9 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces;
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
     /// <summary>
-    /// QueryHandler til håndtering af forespørgelsen: DebitorlisteGetQuery.
+    /// QueryHandler til håndtering af forespørgelsen: KreditorlisteGetQuery.
     /// </summary>
-    public class DebitorlisteGetQueryHandler : AdressekontoQueryHandlerBase, IQueryHandler<DebitorlisteGetQuery, IEnumerable<DebitorlisteView>>
+    public class KreditorlisteGetQueryHandler : AdressekontoQueryHandlerBase, IQueryHandler<KreditorlisteGetQuery, IEnumerable<KreditorlisteView>>
     {
         #region Private variables
 
@@ -23,13 +23,13 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         #region Constructor
 
         /// <summary>
-        /// Danner QueryHandler til håndtering af forespørgelsen: DebitorlisteGetQuery.
+        /// Danner QueryHandler til håndtering af forespørgelsen: KreditorlisteGetQuery.
         /// </summary>
         /// <param name="adresseRepository">Implementering af repository til adresser.</param>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="konfigurationRepository">Implementering af konfigurationsrepository.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        public DebitorlisteGetQueryHandler(IAdresseRepository adresseRepository, IFinansstyringRepository finansstyringRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper)
+        public KreditorlisteGetQueryHandler(IAdresseRepository adresseRepository, IFinansstyringRepository finansstyringRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper)
             : base(adresseRepository, finansstyringRepository)
         {
             if (konfigurationRepository == null)
@@ -46,20 +46,20 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
 
         #endregion
 
-        #region IQueryHandler<DebitorlisteGetQuery,IEnumerable<DebitorlisteView>> Members
+        #region IQueryHandler<KreditorlisteGetQuery,IEnumerable<KreditorlisteView>> Members
 
         /// <summary>
-        /// Henter og returnerer en debitorliste.
+        /// Henter og returnerer en kreditorliste.
         /// </summary>
-        /// <param name="query">Forespørgelse til at hente en debitorliste.</param>
-        /// <returns>Debitorliste.</returns>
-        public IEnumerable<DebitorlisteView> Query(DebitorlisteGetQuery query)
+        /// <param name="query">Forespørgelse til at hente en kreditorliste.</param>
+        /// <returns>Kreditorliste</returns>
+        public IEnumerable<KreditorlisteView> Query(KreditorlisteGetQuery query)
         {
             if (query == null)
             {
                 throw new ArgumentNullException("query");
             }
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         #endregion

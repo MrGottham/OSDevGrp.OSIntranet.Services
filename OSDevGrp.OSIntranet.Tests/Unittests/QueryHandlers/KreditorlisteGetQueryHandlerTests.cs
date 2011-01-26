@@ -7,10 +7,10 @@ using Rhino.Mocks;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 {
     /// <summary>
-    /// Tester QueryHandler til håndtering af forespørgelsen: DebitorlisteGetQuery.
+    /// Tester QueryHandler til håndtering af forespørgelsen: KreditorlisteGetQuery.
     /// </summary>
     [TestFixture]
-    public class DebitorlisteGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
+    public class KreditorlisteGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
     {
         /// <summary>
         /// Tester, at konstruktøren kaster en ArgumentNullException, hvis konfigurationsrepositoryet er null.
@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         {
             var adresseRepository = GetAdresseRepository();
             var finansstyringRepositoruy = GetFinansstyringRepository();
-            Assert.Throws<ArgumentNullException>(() => new DebitorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, null, null));
+            Assert.Throws<ArgumentNullException>(() => new KreditorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, null, null));
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var adresseRepository = GetAdresseRepository();
             var finansstyringRepositoruy = GetFinansstyringRepository();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            Assert.Throws<ArgumentNullException>(() => new DebitorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, konfigurationRepository, null));
+            Assert.Throws<ArgumentNullException>(() => new KreditorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, konfigurationRepository, null));
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var finansstyringRepositoruy = GetFinansstyringRepository();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             var objectMapper = GetObjectMapper();
-            var queryHandler = new DebitorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, konfigurationRepository, objectMapper);
+            var queryHandler = new KreditorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, konfigurationRepository, objectMapper);
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
         }
     }
