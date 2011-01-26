@@ -101,8 +101,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(1))).Return(regnskaber.Single(m => m.Nummer == 1));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(2))).Return(regnskaber.Single(m => m.Nummer == 2));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(3))).Return(regnskaber.Single(m => m.Nummer == 3));
-            repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything)).Throw(
-                new IntranetRepositoryException("Regnskab ikke fundet."));
+            repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Regnskab ikke fundet."));
+            repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, AdresseBase>>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Regnskab ikke fundet."));
             repository.Expect(m => m.BudgetkontogruppeGetAll()).Return(budgetkontogrupper);
             return repository;
         }
