@@ -63,7 +63,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         /// Tester, at AdressekontoGetAllByRegnskabsnummer kaster en IntranetRepositoryException, hvis regnskabet ikke findes.
         /// </summary>
         [Test]
-        public void TestAtAdressekontoGetAllByRegnskabsnummerKasterIntranetRepositoryExceptionHvisRegnskabIkkerFindes()
+        public void TestAtAdressekontoGetAllByRegnskabsnummerKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
         {
             var adresseRepository = GetAdresseRepository();
             var finansstyringRepository = GetFinansstyringRepository();
