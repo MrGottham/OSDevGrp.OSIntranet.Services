@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.QueryHandlers;
@@ -57,6 +58,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         {
             var adresseRepository = GetAdresseRepository();
             Assert.Throws<ArgumentNullException>(() => new MyAdressekontoQueryHandler(adresseRepository, null));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAllByRegnskabsnummer henter adressekonti.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetAllByRegnskabsnummerHenterAdressekonti()
+        {
+            var adresseRepository = GetAdresseRepository();
+            var finansstyringRepository = GetFinansstyringRepository();
+            var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
+            var adressekonti = adressekontoQueryHandler.AdressekontoGetAllByRegnskabsnummer(1);
+            Assert.That(adressekonti, Is.Not.Null);
+            Assert.That(adressekonti.Count(), Is.EqualTo(3));
         }
 
         /// <summary>
