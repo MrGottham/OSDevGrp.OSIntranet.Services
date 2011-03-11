@@ -95,6 +95,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                   "Indbetaling fra Sygesikring Danmark", 300M, 0M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             budgetkonotØvrigeIndtægter.TilføjBogføringslinje(bogføringslinje);
+
+            bogføringslinje = new Bogføringslinje(4, new DateTime(2011, 3, 02), null, "Udlån", 0M, 1000M);
+
+            var tempAdresse = new Person(1, "Temporary", new Adressegruppe(1, "Temporary", 0));
+            tempAdresse.TilføjBogføringslinje(bogføringslinje);
+            kontoDankort.TilføjBogføringslinje(bogføringslinje);
+
             // Dan mockup af repository.
             var repository = MockRepository.GenerateMock<IFinansstyringRepository>();
             repository.Expect(m => m.RegnskabslisteGet()).Return(regnskaber);
@@ -103,6 +110,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(3))).Return(regnskaber.Single(m => m.Nummer == 3));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything))
                 .Throw(new IntranetRepositoryException("Regnskab ikke fundet."));
+            repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(1), Arg<Func<int, AdresseBase>>.Is.Anything))
+                .WhenCalled(x =>
+                                {
+                                    var callback = (Func<int, AdresseBase>) x.Arguments[1];
+                                    regnskab = regnskaber.Single(m => m.Nummer == 1);
+                                    foreach (var linje in regnskab.Konti.OfType<Konto>().SelectMany(m => m.Bogføringslinjer))
+                                    {
+                                        if (linje.Adresse == null)
+                                        {
+                                            continue;
+                                        }
+                                        var adresse = callback(linje.Adresse.Nummer);
+                                        adresse.TilføjBogføringslinje(linje);
+                                    }
+                                })
+                .Return(null);
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, AdresseBase>>.Is.Anything))
                 .Throw(new IntranetRepositoryException("Regnskab ikke fundet."));
             repository.Expect(m => m.BudgetkontogruppeGetAll()).Return(budgetkontogrupper);
