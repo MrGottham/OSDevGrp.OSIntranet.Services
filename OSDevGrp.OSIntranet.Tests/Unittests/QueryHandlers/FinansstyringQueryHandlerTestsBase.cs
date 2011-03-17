@@ -91,17 +91,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             bogføringslinje = new Bogføringslinje(2, new DateTime(2010, 10, 31), null, "Kvickly", 0M, 250M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             budgetkontoSupermarkeder.TilføjBogføringslinje(bogføringslinje);
-            bogføringslinje = new Bogføringslinje(3, new DateTime(2010, 11, 07), null,
+            bogføringslinje = new Bogføringslinje(3, new DateTime(2010, 11, 7), null,
                                                   "Indbetaling fra Sygesikring Danmark", 300M, 0M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             budgetkonotØvrigeIndtægter.TilføjBogføringslinje(bogføringslinje);
-
-            bogføringslinje = new Bogføringslinje(4, new DateTime(2011, 3, 02), null, "Udlån", 0M, 1000M);
-
+            bogføringslinje = new Bogføringslinje(4, new DateTime(2011, 3, 2), null, "Udlån", 0M, 1000M);
             var tempAdresse = new Person(1, "Temporary", new Adressegruppe(1, "Temporary", 0));
             tempAdresse.TilføjBogføringslinje(bogføringslinje);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
-
+            bogføringslinje = new Bogføringslinje(5, new DateTime(2011, 3, 4), null, "Indbetaling", 1000M, 0M);
+            tempAdresse = new Person(2, "Temporary", new Adressegruppe(1, "Temporary", 0));
+            tempAdresse.TilføjBogføringslinje(bogføringslinje);
+            kontoDankort.TilføjBogføringslinje(bogføringslinje);
+            bogføringslinje = new Bogføringslinje(6, new DateTime(2011, 3, 5), null, "Udlån", 0M, 5000M);
+            tempAdresse = new Person(-1, "Temporary", new Adressegruppe(1, "Temporary", 0));
+            tempAdresse.TilføjBogføringslinje(bogføringslinje);
+            kontoDankort.TilføjBogføringslinje(bogføringslinje);
             // Dan mockup af repository.
             var repository = MockRepository.GenerateMock<IFinansstyringRepository>();
             repository.Expect(m => m.RegnskabslisteGet()).Return(regnskaber);
@@ -121,8 +126,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                         {
                                             continue;
                                         }
-                                        var adresse = callback(linje.Adresse.Nummer);
-                                        adresse.TilføjBogføringslinje(linje);
+                                        try
+                                        {
+                                            var adresse = callback(linje.Adresse.Nummer);
+                                            adresse.TilføjBogføringslinje(linje);
+                                        }
+                                        catch (IntranetRepositoryException)
+                                        {
+                                            // Nothing to do.
+                                        }
                                     }
                                 })
                 .Return(null);

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
@@ -48,19 +50,38 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// Henter en liste af adressekonti i et givent regnskab.
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+        /// <param name="statusDato">Statusdato.</param>
         /// <returns>Adressekonti.</returns>
-        protected virtual IEnumerable<AdresseBase> AdressekontoGetAllByRegnskabsnummer(int regnskabsnummer)
+        protected virtual IEnumerable<AdresseBase> AdressekontoGetAllByRegnskabsnummer(int regnskabsnummer, DateTime statusDato)
         {
             var adresser = _adresseRepository.AdresseGetAll();
-            var regnskab = _finansstyringRepository.RegnskabGet(regnskabsnummer, nummer =>
-                                                                                     {
-                                                                                         var adresse = adresser.SingleOrDefault(m => m.Nummer == nummer);
-                                                                                         if (adresse == null)
-                                                                                         {
-                                                                                             throw new IntranetRepositoryException(string.Empty);
-                                                                                         }
-                                                                                         return adresse;
-                                                                                     });
+            _finansstyringRepository.RegnskabGet(regnskabsnummer, nummer =>
+                                                                      {
+                                                                          var adresse = adresser.SingleOrDefault(m => m.Nummer == nummer);
+                                                                          if (adresse == null)
+                                                                          {
+                                                                              var message = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, "AdresseBase", nummer);
+                                                                              throw new IntranetRepositoryException(message);
+                                                                          }
+                                                                          return adresse;
+                                                                      });
+            foreach (ICalculatable calculatable in adresser)
+            {
+                calculatable.Calculate(statusDato);
+            }
+            return adresser;
+        }
+
+        /// <summary>
+        /// Henter en liste af adressekonti, der har en saldo pr. en given statusdato, i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+        /// <param name="statusDato">Statusdato.</param>
+        /// <param name="underNul">Angivelse af, om saldo skal være mindre end 0.</param>
+        /// <returns>Adressekonti.</returns>
+        protected virtual IEnumerable<AdresseBase> AdressekontoGetAllWithValueByRegnskabsnummer(int regnskabsnummer, DateTime statusDato, bool underNul)
+        {
+            var adresser = AdressekontoGetAllByRegnskabsnummer(regnskabsnummer, statusDato);
             throw new NotImplementedException();
         }
 
