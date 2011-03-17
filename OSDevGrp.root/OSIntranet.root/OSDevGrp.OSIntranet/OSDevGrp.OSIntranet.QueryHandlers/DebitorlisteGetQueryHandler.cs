@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
@@ -59,7 +60,9 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("query");
             }
-            throw new System.NotImplementedException();
+            var debitorer = AdressekontoGetAllWithValueByRegnskabsnummer(query.Regnskabsnummer, query.StatusDato,
+                                                                         _konfigurationRepository.DebitorSaldoOverNul);
+            return _objectMapper.Map<IEnumerable<AdresseBase>, IEnumerable<DebitorlisteView>>(debitorer);
         }
 
         #endregion
