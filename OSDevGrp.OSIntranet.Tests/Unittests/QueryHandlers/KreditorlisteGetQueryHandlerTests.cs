@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
@@ -47,6 +49,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var objectMapper = GetObjectMapper();
             var queryHandler = new KreditorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, konfigurationRepository, objectMapper);
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
+        }
+
+        /// <summary>
+        /// Tester, at Query henter kreditorer.
+        /// </summary>
+        [Test]
+        public void TestAtQueryHenterKreditorer()
+        {
+            var adresseRepository = GetAdresseRepository();
+            var finansstyringRepositoruy = GetFinansstyringRepository();
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            konfigurationRepository.Expect(m => m.KreditorSaldoOverNul).Return(false);
+            var objectMapper = GetObjectMapper();
+            var queryHandler = new KreditorlisteGetQueryHandler(adresseRepository, finansstyringRepositoruy, konfigurationRepository, objectMapper);
+            var query = new KreditorlisteGetQuery
+                            {
+                                Regnskabsnummer = 1,
+                                StatusDato = new DateTime(2011, 3, 15)
+                            };
+            var kreditorer = queryHandler.Query(query);
+            Assert.That(kreditorer, Is.Not.Null);
+            Assert.That(kreditorer.Count(), Is.EqualTo(1));
         }
     }
 }
