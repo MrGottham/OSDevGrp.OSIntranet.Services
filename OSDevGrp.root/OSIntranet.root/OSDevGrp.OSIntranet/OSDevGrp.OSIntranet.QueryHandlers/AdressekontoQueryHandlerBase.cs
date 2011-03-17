@@ -89,6 +89,25 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             return adresser.Where(m => m.SaldoPrStatusdato < 0M);
         }
 
+        /// <summary>
+        /// Henter en adressekonto med en saldo i et givent regnskab på en given statusdato.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+        /// <param name="statusDato">Statusdato.</param>
+        /// <param name="nummer">Unik identifikation af adressekontoen.</param>
+        /// <returns>Adressekonto.</returns>
+        protected virtual AdresseBase AdressekontoGetByRegnskabsnummerAndNummer(int regnskabsnummer, DateTime statusDato, int nummer)
+        {
+            var adresse = AdressekontoGetAllByRegnskabsnummer(regnskabsnummer, statusDato)
+                .SingleOrDefault(m => m.Nummer == nummer);
+            if (adresse == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
+                                                                                   "AdresseBase", nummer));
+            }
+            return adresse;
+        }
+
         #endregion
     }
 }

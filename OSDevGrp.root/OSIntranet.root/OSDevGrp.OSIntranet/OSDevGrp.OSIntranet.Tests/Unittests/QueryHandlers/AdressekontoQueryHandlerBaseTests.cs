@@ -52,6 +52,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             {
                 return base.AdressekontoGetAllWithValueByRegnskabsnummer(regnskabsnummer, statusDato, overNul);
             }
+
+            /// <summary>
+            /// Henter en adressekonto med en saldo i et givent regnskab på en given statusdato.
+            /// </summary>
+            /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+            /// <param name="statusDato">Statusdato.</param>
+            /// <param name="nummer">Unik identifikation af adressekontoen.</param>
+            /// <returns>Adressekonto.</returns>
+            public new AdresseBase AdressekontoGetByRegnskabsnummerAndNummer(int regnskabsnummer, DateTime statusDato, int nummer)
+            {
+                return base.AdressekontoGetByRegnskabsnummerAndNummer(regnskabsnummer, statusDato, nummer);
+            }
         }
 
         /// <summary>
@@ -125,6 +137,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var adressekonti = adressekontoQueryHandler.AdressekontoGetAllWithValueByRegnskabsnummer(1, new DateTime(2011, 3, 15), true);
             Assert.That(adressekonti, Is.Not.Null);
             Assert.That(adressekonti.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetByRegnskabsnummerAndNummer henter en adressekonto.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetByRegnskabsnummerAndNummerHenterEnAdressekonto()
+        {
+            var adresseRepository = GetAdresseRepository();
+            var finansstyringRepository = GetFinansstyringRepository();
+            var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
+            var adressekonto = adressekontoQueryHandler.AdressekontoGetByRegnskabsnummerAndNummer(1, new DateTime(2011, 3, 15), 1);
+            Assert.That(adressekonto, Is.Not.Null);
+            Assert.That(adressekonto.Nummer, Is.EqualTo(1));
+            Assert.That(adressekonto.Navn, Is.Not.Null);
+            Assert.That(adressekonto.Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(adressekonto.SaldoPrStatusdato, Is.EqualTo(-1000M));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetByRegnskabsnummerAndNummer kaster en IntranetRepositoryException, hvis adressekontoen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetByRegnskabsnummerAndNummerKasterIntranetRepositoryExceptionHvisAdressekontoIkkeFindes()
+        {
+            var adresseRepository = GetAdresseRepository();
+            var finansstyringRepository = GetFinansstyringRepository();
+            var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
+            Assert.Throws<IntranetRepositoryException>(() => adressekontoQueryHandler.AdressekontoGetByRegnskabsnummerAndNummer(1, new DateTime(2011, 3, 15), -1));
         }
     }
 }
