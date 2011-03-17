@@ -102,8 +102,10 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [TransactionFlow(TransactionFlowOption.Allowed)]
         KreditorView KreditorGet(KreditorGetQuery query);
 
-        // TODO: Lav metode, der kan hente et givent antal bogføringslinjer.
         // TODO: Lav metode, der kan hente adresser, som kan tilknyttes bogføringslinjer (find godt navn).
+        // TODO: Lav metode, der kan hente adresse, som kan tilknyttes bogføringslinjer (find godt navn).
+
+        // TODO: Lav metode, der kan hente et givent antal bogføringslinjer.
 
         // TODO: Lav metode, der kan hente betalingsbetingelser.
         // TODO: Lav metode, der kan hente kontogrupper.
