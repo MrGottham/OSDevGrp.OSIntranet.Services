@@ -77,16 +77,16 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// </summary>
         /// <param name="regnskabsnummer">Regnskabsnummer.</param>
         /// <param name="statusDato">Statusdato.</param>
-        /// <param name="underNul">Angivelse af, om saldo skal være mindre end 0.</param>
+        /// <param name="overNul">Angivelse af, om saldo skal være større end eller mindre end 0.</param>
         /// <returns>Adressekonti.</returns>
-        protected virtual IEnumerable<AdresseBase> AdressekontoGetAllWithValueByRegnskabsnummer(int regnskabsnummer, DateTime statusDato, bool underNul)
+        protected virtual IEnumerable<AdresseBase> AdressekontoGetAllWithValueByRegnskabsnummer(int regnskabsnummer, DateTime statusDato, bool overNul)
         {
             var adresser = AdressekontoGetAllByRegnskabsnummer(regnskabsnummer, statusDato);
-            if (underNul)
+            if (overNul)
             {
-                return adresser.Where(m => m.SaldoPrStatusdato < 0M);
+                return adresser.Where(m => m.SaldoPrStatusdato > 0M);
             }
-            return adresser.Where(m => m.SaldoPrStatusdato > 0M);
+            return adresser.Where(m => m.SaldoPrStatusdato < 0M);
         }
 
         #endregion
