@@ -124,7 +124,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
             var adressekonti = adressekontoQueryHandler.AdressekontoGetAllWithValueByRegnskabsnummer(1, new DateTime(2011, 3, 15), false);
             Assert.That(adressekonti, Is.Not.Null);
-            Assert.That(adressekonti.Count(), Is.EqualTo(3));
+            Assert.That(adressekonti.Count(), Is.EqualTo(1));
         }
     }
 }
