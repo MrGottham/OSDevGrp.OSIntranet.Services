@@ -82,7 +82,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         protected virtual IEnumerable<AdresseBase> AdressekontoGetAllWithValueByRegnskabsnummer(int regnskabsnummer, DateTime statusDato, bool underNul)
         {
             var adresser = AdressekontoGetAllByRegnskabsnummer(regnskabsnummer, statusDato);
-            throw new NotImplementedException();
+            if (underNul)
+            {
+                return adresser.Where(m => m.SaldoPrStatusdato < 0M);
+            }
+            return adresser.Where(m => m.SaldoPrStatusdato > 0M);
         }
 
         #endregion
