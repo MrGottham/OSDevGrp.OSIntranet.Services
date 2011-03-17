@@ -34,10 +34,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             /// Henter en liste af adressekonti i et givent regnskab.
             /// </summary>
             /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+            /// <param name="statusDato">Statusdato.</param>
             /// <returns>Adressekonti.</returns>
-            public new IEnumerable<AdresseBase> AdressekontoGetAllByRegnskabsnummer(int regnskabsnummer)
+            public new IEnumerable<AdresseBase> AdressekontoGetAllByRegnskabsnummer(int regnskabsnummer, DateTime statusDato)
             {
-                return base.AdressekontoGetAllByRegnskabsnummer(regnskabsnummer);
+                return base.AdressekontoGetAllByRegnskabsnummer(regnskabsnummer, statusDato);
+            }
+
+            /// <summary>
+            /// Henter en liste af adressekonti, der har en saldo pr. en given statusdato, i et givent regnskab.
+            /// </summary>
+            /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+            /// <param name="statusDato">Statusdato.</param>
+            /// <param name="underNul">Angivelse af, om saldo skal være mindre end 0.</param>
+            /// <returns>Adressekonti.</returns>
+            public new IEnumerable<AdresseBase> AdressekontoGetAllWithValueByRegnskabsnummer(int regnskabsnummer, DateTime statusDato, bool underNul)
+            {
+                return base.AdressekontoGetAllWithValueByRegnskabsnummer(regnskabsnummer, statusDato, underNul);
             }
         }
 
@@ -69,7 +82,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var adresseRepository = GetAdresseRepository();
             var finansstyringRepository = GetFinansstyringRepository();
             var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
-            var adressekonti = adressekontoQueryHandler.AdressekontoGetAllByRegnskabsnummer(1);
+            var adressekonti = adressekontoQueryHandler.AdressekontoGetAllByRegnskabsnummer(1, new DateTime(2011, 3, 15));
             Assert.That(adressekonti, Is.Not.Null);
             Assert.That(adressekonti.Count(), Is.EqualTo(3));
         }
@@ -83,7 +96,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var adresseRepository = GetAdresseRepository();
             var finansstyringRepository = GetFinansstyringRepository();
             var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
-            Assert.Throws<IntranetRepositoryException>(() => adressekontoQueryHandler.AdressekontoGetAllByRegnskabsnummer(-1));
+            Assert.Throws<IntranetRepositoryException>(() => adressekontoQueryHandler.AdressekontoGetAllByRegnskabsnummer(-1, new DateTime(2011, 3, 15)));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAllWithValueByRegnskabsnummer henter adressekonti, hvor saldoen er under 0.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetAllWithValueByRegnskabsnummerHenterAdressekontiMedSaldoUnderNul()
+        {
+            var adresseRepository = GetAdresseRepository();
+            var finansstyringRepository = GetFinansstyringRepository();
+            var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
+            var adressekonti = adressekontoQueryHandler.AdressekontoGetAllWithValueByRegnskabsnummer(1, new DateTime(2011, 3, 15), true);
+            Assert.That(adressekonti, Is.Not.Null);
+            Assert.That(adressekonti.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAllWithValueByRegnskabsnummer henter adressekonti, hvor saldoen er over 0.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetAllWithValueByRegnskabsnummerHenterAdressekontiMedSaldoOverNul()
+        {
+            var adresseRepository = GetAdresseRepository();
+            var finansstyringRepository = GetFinansstyringRepository();
+            var adressekontoQueryHandler = new MyAdressekontoQueryHandler(adresseRepository, finansstyringRepository);
+            var adressekonti = adressekontoQueryHandler.AdressekontoGetAllWithValueByRegnskabsnummer(1, new DateTime(2011, 3, 15), false);
+            Assert.That(adressekonti, Is.Not.Null);
+            Assert.That(adressekonti.Count(), Is.EqualTo(3));
         }
     }
 }
