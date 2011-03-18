@@ -102,8 +102,26 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [TransactionFlow(TransactionFlowOption.Allowed)]
         KreditorView KreditorGet(KreditorGetQuery query);
 
-        // TODO: Lav metode, der kan hente adresser, som kan tilknyttes bogføringslinjer (find godt navn).
-        // TODO: Lav metode, der kan hente adresse, som kan tilknyttes bogføringslinjer (find godt navn).
+        /// <summary>
+        /// Hente en liste af adressekonti.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af adressekonti.</param>
+        /// <returns>Liste af adressekonti.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<AdressekontiView> AdressekontiGet(AdressekontiGetQuery query);
+
+        /// <summary>
+        /// Hente en adressekonto.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en adressekonto.</param>
+        /// <returns>Liste af adressekonto.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        AdressekontoView AdressekontoGet(AdressekontoGetQuery query);
+
 
         // TODO: Lav metode, der kan hente et givent antal bogføringslinjer.
 

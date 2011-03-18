@@ -712,5 +712,143 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var query = new KreditorGetQuery();
             Assert.Throws<FaultException<IntranetSystemFault>>(() => service.KreditorGet(query));
         }
+
+        /// <summary>
+        /// Tester, at AdressekontiGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontiGetKalderQueryBus()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontiGetQuery();
+            service.AdressekontiGet(query);
+            queryBus.AssertWasCalled(m => m.Query<AdressekontiGetQuery, IEnumerable<AdressekontiView>>(Arg<AdressekontiGetQuery>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontiGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontiGetKasterIntranetRepositoryFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontiGetQuery, IEnumerable<AdressekontiView>>(Arg<AdressekontiGetQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontiGetQuery();
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(() => service.AdressekontiGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontiGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontiGetKasterIntranetBusinessFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontiGetQuery, IEnumerable<AdressekontiView>>(Arg<AdressekontiGetQuery>.Is.Anything))
+                .Throw(new IntranetBusinessException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontiGetQuery();
+            Assert.Throws<FaultException<IntranetBusinessFault>>(() => service.AdressekontiGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontiGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontiGetKasterIntranetSystemFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontiGetQuery, IEnumerable<AdressekontiView>>(Arg<AdressekontiGetQuery>.Is.Anything))
+                .Throw(new IntranetSystemException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontiGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.AdressekontiGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontiGet kaster en IntranetSystemFault ved en unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontiGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontiGetQuery, IEnumerable<AdressekontiView>>(Arg<AdressekontiGetQuery>.Is.Anything))
+                .Throw(new Exception("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontiGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.AdressekontiGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetKalderQueryBus()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontoGetQuery();
+            service.AdressekontoGet(query);
+            queryBus.AssertWasCalled(m => m.Query<AdressekontoGetQuery, AdressekontoView>(Arg<AdressekontoGetQuery>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetKasterIntranetRepositoryFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontoGetQuery, AdressekontoView>(Arg<AdressekontoGetQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontoGetQuery();
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(() => service.AdressekontoGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetKasterIntranetBusinessFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontoGetQuery, AdressekontoView>(Arg<AdressekontoGetQuery>.Is.Anything))
+                .Throw(new IntranetBusinessException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontoGetQuery();
+            Assert.Throws<FaultException<IntranetBusinessFault>>(() => service.AdressekontoGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetKasterIntranetSystemFault()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontoGetQuery, AdressekontoView>(Arg<AdressekontoGetQuery>.Is.Anything))
+                .Throw(new IntranetSystemException("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontoGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.AdressekontoGet(query));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGet kaster en IntranetSystemFault ved en unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<AdressekontoGetQuery, AdressekontoView>(Arg<AdressekontoGetQuery>.Is.Anything))
+                .Throw(new Exception("Test", new Exception("Test")));
+            var service = new FinansstyringService(queryBus);
+            var query = new AdressekontoGetQuery();
+            Assert.Throws<FaultException<IntranetSystemFault>>(() => service.AdressekontoGet(query));
+        }
     }
 }

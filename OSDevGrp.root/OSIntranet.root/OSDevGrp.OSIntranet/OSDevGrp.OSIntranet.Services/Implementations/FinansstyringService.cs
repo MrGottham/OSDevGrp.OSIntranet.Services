@@ -309,6 +309,66 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Hente en liste af adressekonti.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af adressekonti.</param>
+        /// <returns>Liste af adressekonti.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<AdressekontiView> AdressekontiGet(AdressekontiGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<AdressekontiGetQuery, IEnumerable<AdressekontiView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Hente en adressekonto.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en adressekonto.</param>
+        /// <returns>Liste af adressekonto.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public AdressekontoView AdressekontoGet(AdressekontoGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<AdressekontoGetQuery, AdressekontoView>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
         #endregion
     }
 }
