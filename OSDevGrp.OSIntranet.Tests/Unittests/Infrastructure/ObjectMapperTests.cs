@@ -87,6 +87,55 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en basisadresse kan mappes til et adressekontiview.
+        /// </summary>
+        [Test]
+        public void TestAtAdresseBaseMappesTilAdressekontiView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var debitorlisteView = objectMapper.Map<AdresseBase, AdressekontiView>(null);
+            Assert.That(debitorlisteView, Is.Null);
+
+            var adressegruppe = new Adressegruppe(1, "Adresser", 0);
+            Assert.That(adressegruppe, Is.Not.Null);
+
+            var person = new Person(1, "Ole Sørensen", adressegruppe);
+            person.SætTelefon("62 21 49 60", "25 24 49 75");
+            person.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 12, 31), null, "Saldo", 1500M, 0M));
+            person.Calculate(new DateTime(2010, 12, 31));
+            debitorlisteView = objectMapper.Map<AdresseBase, AdressekontiView>(person);
+            Assert.That(debitorlisteView, Is.Not.Null);
+            Assert.That(debitorlisteView.Nummer, Is.EqualTo(1));
+            Assert.That(debitorlisteView.Navn, Is.Not.Null);
+            Assert.That(debitorlisteView.Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(debitorlisteView.PrimærTelefon, Is.Not.Null);
+            Assert.That(debitorlisteView.PrimærTelefon, Is.EqualTo("62 21 49 60"));
+            Assert.That(debitorlisteView.SekundærTelefon, Is.Not.Null);
+            Assert.That(debitorlisteView.SekundærTelefon, Is.EqualTo("25 24 49 75"));
+            Assert.That(debitorlisteView.Saldo, Is.EqualTo(1500M));
+
+            var firma = new Firma(2, "OS Development Group", adressegruppe);
+            firma.SætTelefon("62 21 49 60", "25 24 49 75", null);
+            firma.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 12, 31), null, "Saldo", 2500M, 0M));
+            firma.Calculate(new DateTime(2010, 12, 31));
+            debitorlisteView = objectMapper.Map<AdresseBase, AdressekontiView>(firma);
+            Assert.That(debitorlisteView, Is.Not.Null);
+            Assert.That(debitorlisteView.Nummer, Is.EqualTo(2));
+            Assert.That(debitorlisteView.Navn, Is.Not.Null);
+            Assert.That(debitorlisteView.Navn, Is.EqualTo("OS Development Group"));
+            Assert.That(debitorlisteView.PrimærTelefon, Is.Not.Null);
+            Assert.That(debitorlisteView.PrimærTelefon, Is.EqualTo("62 21 49 60"));
+            Assert.That(debitorlisteView.SekundærTelefon, Is.Not.Null);
+            Assert.That(debitorlisteView.SekundærTelefon, Is.EqualTo("25 24 49 75"));
+            Assert.That(debitorlisteView.Saldo, Is.EqualTo(2500M));
+
+            var andenAdresse = new OtherAddress(3, "Bente Susanne Rasmussen", adressegruppe);
+            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontiView>(andenAdresse));
+        }
+
+        /// <summary>
         /// Tester, at en basisadresse kan mappes til et debitorlisteview.
         /// </summary>
         [Test]
@@ -133,6 +182,82 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var andenAdresse = new OtherAddress(3, "Bente Susanne Rasmussen", adressegruppe);
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, DebitorlisteView>(andenAdresse));
+        }
+
+        /// <summary>
+        /// Tester, at en basisadresse kan mappes til et adressekontoview.
+        /// </summary>
+        [Test]
+        public void TestAtAdresseBaseMappesTilAdressekontoView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var debitorView = objectMapper.Map<AdresseBase, AdressekontoView>(null);
+            Assert.That(debitorView, Is.Null);
+
+            var adressegruppe = new Adressegruppe(1, "Adresser", 0);
+            Assert.That(adressegruppe, Is.Not.Null);
+
+            var betalingsbetingelse = new Betalingsbetingelse(1, "Kontant");
+            Assert.That(betalingsbetingelse, Is.Not.Null);
+
+            var person = new Person(1, "Ole Sørensen", adressegruppe);
+            person.SætAdresseoplysninger("Eggertsvænge 2", "c/o:", "5700  Svendborg");
+            person.SætTelefon("62 21 49 60", "25 24 49 75");
+            person.SætMailadresse("os@dsidata.dk");
+            person.SætBetalingsbetingelse(betalingsbetingelse);
+            person.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 12, 31), null, "Saldo", 1500M, 0M));
+            person.Calculate(new DateTime(2010, 12, 31));
+            debitorView = objectMapper.Map<AdresseBase, AdressekontoView>(person);
+            Assert.That(debitorView, Is.Not.Null);
+            Assert.That(debitorView.Nummer, Is.EqualTo(1));
+            Assert.That(debitorView.Navn, Is.Not.Null);
+            Assert.That(debitorView.Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(debitorView.Adresse1, Is.Not.Null);
+            Assert.That(debitorView.Adresse1, Is.EqualTo("Eggertsvænge 2"));
+            Assert.That(debitorView.Adresse2, Is.Not.Null);
+            Assert.That(debitorView.Adresse2, Is.EqualTo("c/o:"));
+            Assert.That(debitorView.PostnummerBy, Is.Not.Null);
+            Assert.That(debitorView.PostnummerBy, Is.EqualTo("5700  Svendborg"));
+            Assert.That(debitorView.PrimærTelefon, Is.Not.Null);
+            Assert.That(debitorView.PrimærTelefon, Is.EqualTo("62 21 49 60"));
+            Assert.That(debitorView.SekundærTelefon, Is.Not.Null);
+            Assert.That(debitorView.SekundærTelefon, Is.EqualTo("25 24 49 75"));
+            Assert.That(debitorView.Mailadresse, Is.Not.Null);
+            Assert.That(debitorView.Mailadresse, Is.EqualTo("os@dsidata.dk"));
+            Assert.That(debitorView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(debitorView.Saldo, Is.EqualTo(1500M));
+
+            var firma = new Firma(2, "OS Development Group", adressegruppe);
+            firma.SætAdresseoplysninger("Eggertsvænge 2", "c/o:", "5700  Svendborg");
+            firma.SætTelefon("62 21 49 60", "25 24 49 75", null);
+            firma.SætMailadresse("os@dsidata.dk");
+            firma.SætBetalingsbetingelse(betalingsbetingelse);
+            firma.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 12, 31), null, "Saldo", 2500M, 0M));
+            firma.Calculate(new DateTime(2010, 12, 31));
+            debitorView = objectMapper.Map<AdresseBase, AdressekontoView>(firma);
+            Assert.That(debitorView, Is.Not.Null);
+            Assert.That(debitorView.Nummer, Is.EqualTo(2));
+            Assert.That(debitorView.Navn, Is.Not.Null);
+            Assert.That(debitorView.Navn, Is.EqualTo("OS Development Group"));
+            Assert.That(debitorView.Adresse1, Is.Not.Null);
+            Assert.That(debitorView.Adresse1, Is.EqualTo("Eggertsvænge 2"));
+            Assert.That(debitorView.Adresse2, Is.Not.Null);
+            Assert.That(debitorView.Adresse2, Is.EqualTo("c/o:"));
+            Assert.That(debitorView.PostnummerBy, Is.Not.Null);
+            Assert.That(debitorView.PostnummerBy, Is.EqualTo("5700  Svendborg"));
+            Assert.That(debitorView.PrimærTelefon, Is.Not.Null);
+            Assert.That(debitorView.PrimærTelefon, Is.EqualTo("62 21 49 60"));
+            Assert.That(debitorView.SekundærTelefon, Is.Not.Null);
+            Assert.That(debitorView.SekundærTelefon, Is.EqualTo("25 24 49 75"));
+            Assert.That(debitorView.Mailadresse, Is.Not.Null);
+            Assert.That(debitorView.Mailadresse, Is.EqualTo("os@dsidata.dk"));
+            Assert.That(debitorView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(debitorView.Saldo, Is.EqualTo(2500M));
+
+            var andenAdresse = new OtherAddress(3, "Bente Susanne Rasmussen", adressegruppe);
+            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontoView>(andenAdresse));
         }
 
         /// <summary>
