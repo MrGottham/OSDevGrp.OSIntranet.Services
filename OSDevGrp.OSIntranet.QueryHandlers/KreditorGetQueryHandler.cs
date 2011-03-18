@@ -15,7 +15,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     {
         #region Private variables
 
-        private IObjectMapper _objectMapper;
+        private readonly IObjectMapper _objectMapper;
 
         #endregion
 
