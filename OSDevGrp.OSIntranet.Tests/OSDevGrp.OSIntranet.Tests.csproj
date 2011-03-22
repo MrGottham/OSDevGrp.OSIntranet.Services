@@ -123,6 +123,8 @@
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\AdressekontiGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />

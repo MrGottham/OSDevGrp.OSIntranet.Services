@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdressekontiGetQueryHandler.cs" />
+    <Compile Include="AdressekontoGetQueryHandler.cs" />
     <Compile Include="AdressekontoQueryHandlerBase.cs" />
     <Compile Include="BudgetkontoplanGetQueryHandler.cs" />
     <Compile Include="BudgetkontoGetQueryHandler.cs" />
