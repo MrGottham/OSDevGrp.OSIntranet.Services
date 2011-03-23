@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
@@ -14,6 +13,12 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// </summary>
     public class AdressekontoGetQueryHandler : AdressekontoQueryHandlerBase, IQueryHandler<AdressekontoGetQuery, AdressekontoView>
     {
+        #region Private variables
+
+        private readonly IObjectMapper _objectMapper;
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -25,7 +30,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         public AdressekontoGetQueryHandler(IAdresseRepository adresseRepository, IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper)
             : base(adresseRepository, finansstyringRepository)
         {
-            throw new NotImplementedException();
+            if (objectMapper == null)
+            {
+                throw new ArgumentNullException("objectMapper");
+            }
+            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -39,7 +48,13 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <returns>Adressekonto.</returns>
         public AdressekontoView Query(AdressekontoGetQuery query)
         {
-            throw new NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            var adressekonto = AdressekontoGetByRegnskabsnummerAndNummer(query.Regnskabsnummer, query.StatusDato,
+                                                                         query.Nummer);
+            return _objectMapper.Map<AdresseBase, AdressekontoView>(adressekonto);
         }
 
         #endregion
