@@ -108,6 +108,7 @@
     <Compile Include="Unittests\Contracts\Views\AdressekontolisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontoViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BetalingsbetingelseViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\BogføringslinjeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontogruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontoplanViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontoViewTests.cs" />

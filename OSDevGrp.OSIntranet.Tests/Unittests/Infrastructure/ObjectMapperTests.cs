@@ -696,6 +696,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Test, at en bogføringslinje kan mappes til et bogføringslinjeview.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjeKanMappesTilBogføringslinjeView()
+        {
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var regnskab = new Regnskab(1, "Privatregnskab, Ole Sørensen");
+            var dankort = new Konto(regnskab, "DANKORT", "Dankort", new Kontogruppe(1, "Bankkonti", 0));
+            var udgifter = new Budgetkonto(regnskab, "1000", "Udgifter", new Budgetkontogruppe(1, "Udgifter"));
+            var adresse = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Personer", 0));
+
+            var bogføringsdato = new DateTime(2011, 3, 15);
+            var bogføringslinje = new Bogføringslinje(1, bogføringsdato, "XYZ", "Test", 1000M, -500M);
+            dankort.TilføjBogføringslinje(bogføringslinje);
+            udgifter.TilføjBogføringslinje(bogføringslinje);
+            adresse.TilføjBogføringslinje(bogføringslinje);
+
+            var bogføringslinjeView = objectMapper.Map<Bogføringslinje, BogføringslinjeView>(bogføringslinje);
+            Assert.That(bogføringslinjeView, Is.Not.Null);
+        }
+
+        /// <summary>
         /// Tester, at en kontogruppe kan mappes til et kontogruppeview.
         /// </summary>
         [Test]
