@@ -356,6 +356,17 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.Budget))
                 .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato));
 
+            Mapper.CreateMap<Bogføringslinje, BogføringslinjeView>()
+                .ForMember(x => x.Løbenr, opt => opt.MapFrom(s => s.Løbenummer))
+                .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Konto))
+                .ForMember(x => x.Budgetkonto, opt => opt.MapFrom(s => s.Budgetkonto))
+                .ForMember(x => x.Adressekonto, opt => opt.MapFrom(s => s.Adresse))
+                .ForMember(x => x.Dato, opt => opt.MapFrom(s => s.Dato))
+                .ForMember(x => x.Bilag, opt => opt.MapFrom(s => s.Bilag))
+                .ForMember(x => x.Tekst, opt => opt.MapFrom(s => s.Tekst))
+                .ForMember(x => x.Debit, opt => opt.MapFrom(s => s.Debit))
+                .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.Kredit));
+
             Mapper.CreateMap<Kontogruppe, KontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
