@@ -92,11 +92,15 @@
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\AdressekontolisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\AdressekontoGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\BetalingsbetingelserGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\BogføringerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\BudgetkontogrupperGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DebitorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DebitorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\KontogrupperGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />

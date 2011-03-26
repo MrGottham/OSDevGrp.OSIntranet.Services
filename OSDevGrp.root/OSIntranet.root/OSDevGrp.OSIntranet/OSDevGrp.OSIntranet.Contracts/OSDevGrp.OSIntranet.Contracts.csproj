@@ -51,6 +51,7 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Queries\BetalingsbetingelserGetQuery.cs" />
     <Compile Include="Faults\IntranetBusinessFault.cs" />
     <Compile Include="Faults\IntranetSystemFault.cs" />
     <Compile Include="Faults\IntranetFaultBase.cs" />
@@ -58,11 +59,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\AdressekontolisteGetQuery.cs" />
     <Compile Include="Queries\AdressekontoGetQuery.cs" />
+    <Compile Include="Queries\BogføringerGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoGetQuery.cs" />
+    <Compile Include="Queries\BudgetkontogrupperGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoplanGetQuery.cs" />
     <Compile Include="Queries\DebitorGetQuery.cs" />
     <Compile Include="Queries\DebitorlisteGetQuery.cs" />
     <Compile Include="Queries\KontoGetQuery.cs" />
+    <Compile Include="Queries\KontogrupperGetQuery.cs" />
     <Compile Include="Queries\KontoplanGetQuery.cs" />
     <Compile Include="Queries\KreditorGetQuery.cs" />
     <Compile Include="Queries\KreditorlisteGetQuery.cs" />
