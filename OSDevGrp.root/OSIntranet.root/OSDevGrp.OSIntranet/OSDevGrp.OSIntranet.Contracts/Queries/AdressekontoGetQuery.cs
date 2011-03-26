@@ -6,7 +6,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Queries
     /// Query til forespørgelse efter en adressekonto.
     /// </summary>
     [DataContract(Name = "AdressekontoGetQuery", Namespace = SoapNamespaces.IntranetNamespace)]
-    public class AdressekontoGetQuery : AdressekontiGetQuery
+    public class AdressekontoGetQuery : AdressekontolisteGetQuery
     {
         /// <summary>
         /// Unik identifikation af adressekontoen.

@@ -110,7 +110,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [OperationContract]
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<AdressekontiView> AdressekontiGet(AdressekontiGetQuery query);
+        IEnumerable<AdressekontolisteView> AdressekontolisteGet(AdressekontolisteGetQuery query);
 
         /// <summary>
         /// Hente en adressekonto.

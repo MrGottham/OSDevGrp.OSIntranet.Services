@@ -87,15 +87,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
-        /// Tester, at en basisadresse kan mappes til et adressekontiview.
+        /// Tester, at en basisadresse kan mappes til et adressekontolisteview.
         /// </summary>
         [Test]
-        public void TestAtAdresseBaseMappesTilAdressekontiView()
+        public void TestAtAdresseBaseMappesTilAdressekontolisteView()
         {
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var debitorlisteView = objectMapper.Map<AdresseBase, AdressekontiView>(null);
+            var debitorlisteView = objectMapper.Map<AdresseBase, AdressekontolisteView>(null);
             Assert.That(debitorlisteView, Is.Null);
 
             var adressegruppe = new Adressegruppe(1, "Adresser", 0);
@@ -105,7 +105,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             person.SætTelefon("62 21 49 60", "25 24 49 75");
             person.TilføjBogføringslinje(new Bogføringslinje(1, new DateTime(2010, 12, 31), null, "Saldo", 1500M, 0M));
             person.Calculate(new DateTime(2010, 12, 31));
-            debitorlisteView = objectMapper.Map<AdresseBase, AdressekontiView>(person);
+            debitorlisteView = objectMapper.Map<AdresseBase, AdressekontolisteView>(person);
             Assert.That(debitorlisteView, Is.Not.Null);
             Assert.That(debitorlisteView.Nummer, Is.EqualTo(1));
             Assert.That(debitorlisteView.Navn, Is.Not.Null);
@@ -120,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             firma.SætTelefon("62 21 49 60", "25 24 49 75", null);
             firma.TilføjBogføringslinje(new Bogføringslinje(2, new DateTime(2010, 12, 31), null, "Saldo", 2500M, 0M));
             firma.Calculate(new DateTime(2010, 12, 31));
-            debitorlisteView = objectMapper.Map<AdresseBase, AdressekontiView>(firma);
+            debitorlisteView = objectMapper.Map<AdresseBase, AdressekontolisteView>(firma);
             Assert.That(debitorlisteView, Is.Not.Null);
             Assert.That(debitorlisteView.Nummer, Is.EqualTo(2));
             Assert.That(debitorlisteView.Navn, Is.Not.Null);
@@ -132,7 +132,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorlisteView.Saldo, Is.EqualTo(2500M));
 
             var andenAdresse = new OtherAddress(3, "Bente Susanne Rasmussen", adressegruppe);
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontiView>(andenAdresse));
+            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontolisteView>(andenAdresse));
         }
 
         /// <summary>

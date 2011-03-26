@@ -56,7 +56,7 @@
     <Compile Include="Faults\IntranetFaultBase.cs" />
     <Compile Include="Faults\IntranetRepositoryFault.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\AdressekontiGetQuery.cs" />
+    <Compile Include="Queries\AdressekontolisteGetQuery.cs" />
     <Compile Include="Queries\AdressekontoGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoplanGetQuery.cs" />
@@ -70,7 +70,7 @@
     <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="SoapNamespaces.cs" />
-    <Compile Include="Views\AdressekontiView.cs" />
+    <Compile Include="Views\AdressekontolisteView.cs" />
     <Compile Include="Views\AdressekontoView.cs" />
     <Compile Include="Views\BetalingsbetingelseView.cs" />
     <Compile Include="Views\BudgetkontogruppeView.cs" />

@@ -57,7 +57,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2));
 
-            Mapper.CreateMap<AdresseBase, AdressekontiView>()
+            Mapper.CreateMap<AdresseBase, AdressekontolisteView>()
                 .ConvertUsing(s =>
                 {
                     if (s == null)
@@ -67,24 +67,24 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     var mapper = new ObjectMapper();
                     if (s is Person)
                     {
-                        return mapper.Map<Person, AdressekontiView>(s as Person);
+                        return mapper.Map<Person, AdressekontolisteView>(s as Person);
                     }
                     if (s is Firma)
                     {
-                        return mapper.Map<Firma, AdressekontiView>(s as Firma);
+                        return mapper.Map<Firma, AdressekontolisteView>(s as Firma);
                     }
                     throw new IntranetSystemException(
                         Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
                 });
 
-            Mapper.CreateMap<Person, AdressekontiView>()
+            Mapper.CreateMap<Person, AdressekontolisteView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
-            Mapper.CreateMap<Firma, AdressekontiView>()
+            Mapper.CreateMap<Firma, AdressekontolisteView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
