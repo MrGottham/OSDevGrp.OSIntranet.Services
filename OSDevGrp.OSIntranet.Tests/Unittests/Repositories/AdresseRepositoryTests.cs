@@ -22,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
             Assert.That(adresser.OfType<Firma>().Count(), Is.EqualTo(24));
-            Assert.That(adresser.OfType<Person>().Count(), Is.EqualTo(112));
+            Assert.That(adresser.OfType<Person>().Count(), Is.EqualTo(113));
         }
 
         /// <summary>

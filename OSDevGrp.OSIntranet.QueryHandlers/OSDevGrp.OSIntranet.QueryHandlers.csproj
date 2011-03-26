@@ -52,7 +52,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdressekontiGetQueryHandler.cs" />
+    <Compile Include="AdressekontolisteGetQueryHandler.cs" />
     <Compile Include="AdressekontoGetQueryHandler.cs" />
     <Compile Include="AdressekontoQueryHandlerBase.cs" />
     <Compile Include="BudgetkontoplanGetQueryHandler.cs" />

@@ -315,11 +315,11 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <param name="query">Forespørgelse efter en liste af adressekonti.</param>
         /// <returns>Liste af adressekonti.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<AdressekontiView> AdressekontiGet(AdressekontiGetQuery query)
+        public IEnumerable<AdressekontolisteView> AdressekontolisteGet(AdressekontolisteGetQuery query)
         {
             try
             {
-                return _queryBus.Query<AdressekontiGetQuery, IEnumerable<AdressekontiView>>(query);
+                return _queryBus.Query<AdressekontolisteGetQuery, IEnumerable<AdressekontolisteView>>(query);
             }
             catch (IntranetRepositoryException ex)
             {
