@@ -710,13 +710,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var adresse = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Personer", 0));
 
             var bogføringsdato = new DateTime(2011, 3, 15);
-            var bogføringslinje = new Bogføringslinje(1, bogføringsdato, "XYZ", "Test", 1000M, -500M);
+            var bogføringslinje = new Bogføringslinje(1, bogføringsdato, "XYZ", "Test", 1000M, 500M);
             dankort.TilføjBogføringslinje(bogføringslinje);
             udgifter.TilføjBogføringslinje(bogføringslinje);
             adresse.TilføjBogføringslinje(bogføringslinje);
 
             var bogføringslinjeView = objectMapper.Map<Bogføringslinje, BogføringslinjeView>(bogføringslinje);
             Assert.That(bogføringslinjeView, Is.Not.Null);
+
+            Assert.That(bogføringslinjeView.Løbenr, Is.EqualTo(1));
+            Assert.That(bogføringslinjeView.Konto, Is.Not.Null);
+            Assert.That(bogføringslinjeView.Budgetkonto, Is.Not.Null);
+            Assert.That(bogføringslinjeView.Adressekonto, Is.Not.Null);
+            Assert.That(bogføringslinjeView.Dato, Is.EqualTo(bogføringsdato));
+            Assert.That(bogføringslinjeView.Bilag, Is.Not.Null);
+            Assert.That(bogføringslinjeView.Bilag, Is.EqualTo("XYZ"));
+            Assert.That(bogføringslinjeView.Tekst, Is.Not.Null);
+            Assert.That(bogføringslinjeView.Tekst, Is.EqualTo("Test"));
+            Assert.That(bogføringslinjeView.Debit, Is.EqualTo(1000M));
+            Assert.That(bogføringslinjeView.Kredit, Is.EqualTo(500M));
         }
 
         /// <summary>
