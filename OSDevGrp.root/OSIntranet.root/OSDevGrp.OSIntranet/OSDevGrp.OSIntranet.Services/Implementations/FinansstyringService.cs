@@ -369,6 +369,50 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Henter et givent antal bogføringslinjer fra en given statusdato.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter et givent antal bogføringslinjer.</param>
+        /// <returns>Liste af bogføringslinjer.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<BogføringslinjeView> BogføringerGet(BogføringerGetQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Henter alle betalingsbetingelser.
+        /// </summary>
+        /// <param name="query">Foresprøgelse efter alle betalingsbetingelser.</param>
+        /// <returns>Liste af betalingsbetingelser.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<BetalingsbetingelseView> BetalingsbetingelserGet(BetalingsbetingelserGetQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Henter alle kontogrupper.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter alle kontogrupper.</param>
+        /// <returns>Liste af kontogrupper.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<KontogruppeView> KontogrupperGet(KontogrupperGetQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Henter alle grupper af budgetkonti.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter alle grupper af budgetkonti.</param>
+        /// <returns>Liste af grupper for budgetkonti.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<BudgetkontogruppeView> BudgetkontogrupperGet(BudgetkontogrupperGetQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }
