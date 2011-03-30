@@ -17,6 +17,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <UseIISExpress>false</UseIISExpress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -105,6 +106,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.QueryHandlers\OSDevGrp.OSIntranet.QueryHandlers.csproj">
       <Project>{821C03BD-0315-4084-804E-C3BD4590E73F}</Project>
       <Name>OSDevGrp.OSIntranet.QueryHandlers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories\OSDevGrp.OSIntranet.Repositories.csproj">
+      <Project>{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}</Project>
+      <Name>OSDevGrp.OSIntranet.Repositories</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

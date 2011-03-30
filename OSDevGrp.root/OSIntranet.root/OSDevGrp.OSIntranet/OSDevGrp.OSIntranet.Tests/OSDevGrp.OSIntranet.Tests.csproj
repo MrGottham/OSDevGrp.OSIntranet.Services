@@ -131,6 +131,8 @@
     <Compile Include="Unittests\QueryHandlers\AdressekontolisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoQueryHandlerBaseTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\BetalingsbetingelserGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\BogføringerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorGetQueryHandlerTests.cs" />
