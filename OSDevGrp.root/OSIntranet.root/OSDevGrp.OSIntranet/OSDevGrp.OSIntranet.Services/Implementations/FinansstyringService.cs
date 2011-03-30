@@ -377,7 +377,26 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public IEnumerable<BogføringslinjeView> BogføringerGet(BogføringerGetQuery query)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _queryBus.Query<BogføringerGetQuery, IEnumerable<BogføringslinjeView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
         }
 
         /// <summary>
@@ -388,7 +407,26 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public IEnumerable<BetalingsbetingelseView> BetalingsbetingelserGet(BetalingsbetingelserGetQuery query)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _queryBus.Query<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
         }
 
         /// <summary>
@@ -399,7 +437,26 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public IEnumerable<KontogruppeView> KontogrupperGet(KontogrupperGetQuery query)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _queryBus.Query<KontogrupperGetQuery, IEnumerable<KontogruppeView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
         }
 
         /// <summary>
@@ -410,7 +467,26 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public IEnumerable<BudgetkontogruppeView> BudgetkontogrupperGet(BudgetkontogrupperGetQuery query)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _queryBus.Query<BudgetkontogrupperGetQuery, IEnumerable<BudgetkontogruppeView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
         }
 
         #endregion
