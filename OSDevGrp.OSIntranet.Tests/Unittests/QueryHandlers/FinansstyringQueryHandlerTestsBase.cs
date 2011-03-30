@@ -26,6 +26,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             // Dan testdata for adressegrupper.
             var adresseGruppePersoner = new Adressegruppe(1, "Personer", 0);
             var adresseGruppeFirmaer = new Adressegruppe(2, "Firmaer", 0);
+            // Dan testdata for betalingsbetingelser.
+            var betalingsbetingelser = new List<Betalingsbetingelse>
+                                           {
+                                               new Betalingsbetingelse(1, "Kontant"),
+                                               new Betalingsbetingelse(1, "Netto + 8 dage")
+                                           };
             // Dan testdata for adresser.
             var adresser = new List<AdresseBase>
                                {
@@ -33,9 +39,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                    new Person(2, "Bente Susanne Rasmussen", adresseGruppePersoner),
                                    new Firma(3, "OS Development Group", adresseGruppeFirmaer)
                                };
+
             // Dan mockup af repoistory.
             var repository = MockRepository.GenerateMock<IAdresseRepository>();
             repository.Expect(m => m.AdresseGetAll()).Return(adresser);
+            repository.Expect(m => m.BetalingsbetingelseGetAll()).Return(betalingsbetingelser);
             return repository;
         }
 
@@ -137,7 +145,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                         }
                                     }
                                 })
-                .Return(null);
+                .Return(regnskaber.Single(m => m.Nummer == 1));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, AdresseBase>>.Is.Anything))
                 .Throw(new IntranetRepositoryException("Regnskab ikke fundet."));
             repository.Expect(m => m.BudgetkontogruppeGetAll()).Return(budgetkontogrupper);
