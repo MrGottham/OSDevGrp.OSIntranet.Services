@@ -57,11 +57,13 @@
     <Compile Include="AdressekontoQueryHandlerBase.cs" />
     <Compile Include="BetalingsbetingelserGetQueryHandler.cs" />
     <Compile Include="BogføringerGetQueryHandler.cs" />
+    <Compile Include="BudgetkontogrupperGetQueryHandler.cs" />
     <Compile Include="BudgetkontoplanGetQueryHandler.cs" />
     <Compile Include="BudgetkontoGetQueryHandler.cs" />
     <Compile Include="DebitorGetQueryHandler.cs" />
     <Compile Include="DebitorlisteGetQueryHandler.cs" />
     <Compile Include="KontoGetQueryHandler.cs" />
+    <Compile Include="KontogrupperGetQueryHandler.cs" />
     <Compile Include="KontoplanGetQueryHandler.cs" />
     <Compile Include="KreditorGetQueryHandler.cs" />
     <Compile Include="KreditorlisteGetQueryHandler.cs" />

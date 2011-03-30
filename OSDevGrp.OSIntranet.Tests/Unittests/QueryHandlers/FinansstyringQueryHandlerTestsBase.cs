@@ -62,6 +62,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                  };
             // Dan testdata for konti.
             var kontogruppeBankkonti = new Kontogruppe(1, "Bankkonti", KontogruppeType.Aktiver);
+            var kontogrupper = new List<Kontogruppe>
+                                   {
+                                       kontogruppeBankkonti
+                                   };
             var regnskab = regnskaber.Single(m => m.Nummer == 1);
             var kontoDankort = new Konto(regnskab, "DANKORT", "Dankort", kontogruppeBankkonti);
             var kontoOpsparing = new Konto(regnskab, "OPSPARING", "Opsparing", kontogruppeBankkonti);
@@ -148,6 +152,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 .Return(regnskaber.Single(m => m.Nummer == 1));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, AdresseBase>>.Is.Anything))
                 .Throw(new IntranetRepositoryException("Regnskab ikke fundet."));
+            repository.Expect(m => m.KontogruppeGetAll()).Return(kontogrupper);
             repository.Expect(m => m.BudgetkontogruppeGetAll()).Return(budgetkontogrupper);
             return repository;
         }
