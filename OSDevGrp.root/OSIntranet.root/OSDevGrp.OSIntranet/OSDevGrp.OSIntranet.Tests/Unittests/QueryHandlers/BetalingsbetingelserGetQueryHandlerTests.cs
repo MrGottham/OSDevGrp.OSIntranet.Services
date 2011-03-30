@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 {
     /// <summary>
-    /// Tester QueryHandler til håndtering af forespørgelsen: BogføringerGetQuery.
+    /// Tester QueryHandler til håndtering af forespørgelsen: BetalingsbetingelserGetQuery.
     /// </summary>
     [TestFixture]
     public class BetalingsbetingelserGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
