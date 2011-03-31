@@ -89,6 +89,7 @@
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetRepositoryFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Unittests\Contracts\Queries\KreditorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Responses\BogføringslinjeOpretResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontolisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontoViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BetalingsbetingelseViewTests.cs" />

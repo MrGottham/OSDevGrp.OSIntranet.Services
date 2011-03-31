@@ -51,6 +51,7 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\BogføringslinjeOpretCommand.cs" />
     <Compile Include="Queries\BetalingsbetingelserGetQuery.cs" />
     <Compile Include="Faults\IntranetBusinessFault.cs" />
     <Compile Include="Faults\IntranetSystemFault.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Queries\KreditorGetQuery.cs" />
     <Compile Include="Queries\KreditorlisteGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
+    <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
     <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="SoapNamespaces.cs" />
