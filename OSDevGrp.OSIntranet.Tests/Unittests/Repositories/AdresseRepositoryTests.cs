@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -31,12 +35,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtAdresseGetAllHenterAdresser()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
+                .Return(GetPersoner());
+            service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
+                .Return(GetFirmaer());
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Return(GetAdressegrupper());
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Return(GetBetalingsbetingelser());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new AdresseRepository(channelFactory);
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
-            Assert.That(adresser.OfType<Firma>().Count(), Is.EqualTo(24));
-            Assert.That(adresser.OfType<Person>().Count(), Is.EqualTo(113));
+            Assert.That(adresser.OfType<Firma>().Count(), Is.EqualTo(1));
+            Assert.That(adresser.OfType<Person>().Count(), Is.EqualTo(2));
         }
 
         /// <summary>
@@ -143,11 +163,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtPostnummerGetAllHenterPostnumre()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
+                .Return(GetPostnumre());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new AdresseRepository(channelFactory);
             var postnumre = repository.PostnummerGetAll();
             Assert.That(postnumre, Is.Not.Null);
-            Assert.That(postnumre.Count, Is.EqualTo(1324));
+            Assert.That(postnumre.Count, Is.EqualTo(3));
         }
 
         /// <summary>
@@ -156,7 +186,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtPostnummerMappesKorrekt()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
+                .Return(GetPostnumre());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new AdresseRepository(channelFactory);
             var postnumre = repository.PostnummerGetAll();
             Assert.That(postnumre, Is.Not.Null);
@@ -173,16 +213,89 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at PostnummerGetAll kaster IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtPostnummerGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.PostnummerGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at PostnummerGetAll kaster IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtPostnummerGetAllKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.PostnummerGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at PostnummerGetAll kaster IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtPostnummerGetAllKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.PostnummerGetAll());
+        }
+
+        /// <summary>
         /// Tester, at AdressegruppeGetAll henter alle adressegrupper.
         /// </summary>
         [Test]
         public void TestAtAdressegruppeGetAllHenterAdressegrupper()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Return(GetAdressegrupper());
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new AdresseRepository(channelFactory);
             var adressegrupper = repository.AdressegruppeGetAll();
             Assert.That(adressegrupper, Is.Not.Null);
-            Assert.That(adressegrupper.Count, Is.EqualTo(9));
+            Assert.That(adressegrupper.Count, Is.EqualTo(3));
             Assert.That(adressegrupper[0], Is.Not.Null);
             Assert.That(adressegrupper[0].Nummer, Is.EqualTo(1));
             Assert.That(adressegrupper[0].Navn, Is.Not.Null);
@@ -198,49 +311,86 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(adressegrupper[2].Navn, Is.Not.Null);
             Assert.That(adressegrupper[2].Navn, Is.EqualTo("Arbejdsrelationer"));
             Assert.That(adressegrupper[2].AdressegruppeOswebdb, Is.EqualTo(3));
-            Assert.That(adressegrupper[3], Is.Not.Null);
-            Assert.That(adressegrupper[3].Nummer, Is.EqualTo(4));
-            Assert.That(adressegrupper[3].Navn, Is.Not.Null);
-            Assert.That(adressegrupper[3].Navn, Is.EqualTo("Øvrige relationer"));
-            Assert.That(adressegrupper[3].AdressegruppeOswebdb, Is.EqualTo(5));
-            Assert.That(adressegrupper[4], Is.Not.Null);
-            Assert.That(adressegrupper[4].Nummer, Is.EqualTo(5));
-            Assert.That(adressegrupper[4].Navn, Is.Not.Null);
-            Assert.That(adressegrupper[4].Navn, Is.EqualTo("Familie (Merete)"));
-            Assert.That(adressegrupper[4].AdressegruppeOswebdb, Is.EqualTo(6));
-            Assert.That(adressegrupper[5], Is.Not.Null);
-            Assert.That(adressegrupper[5].Nummer, Is.EqualTo(6));
-            Assert.That(adressegrupper[5].Navn, Is.Not.Null);
-            Assert.That(adressegrupper[5].Navn, Is.EqualTo("Den Danske Billard Union"));
-            Assert.That(adressegrupper[5].AdressegruppeOswebdb, Is.EqualTo(4));
-            Assert.That(adressegrupper[6], Is.Not.Null);
-            Assert.That(adressegrupper[6].Nummer, Is.EqualTo(7));
-            Assert.That(adressegrupper[6].Navn, Is.Not.Null);
-            Assert.That(adressegrupper[6].Navn, Is.EqualTo("Sydfyns Billard Klub"));
-            Assert.That(adressegrupper[6].AdressegruppeOswebdb, Is.EqualTo(4));
-            Assert.That(adressegrupper[7], Is.Not.Null);
-            Assert.That(adressegrupper[7].Nummer, Is.EqualTo(8));
-            Assert.That(adressegrupper[7].Navn, Is.Not.Null);
-            Assert.That(adressegrupper[7].Navn, Is.EqualTo("Billard Union Fyn"));
-            Assert.That(adressegrupper[7].AdressegruppeOswebdb, Is.EqualTo(4));
-            Assert.That(adressegrupper[8], Is.Not.Null);
-            Assert.That(adressegrupper[8].Nummer, Is.EqualTo(9));
-            Assert.That(adressegrupper[8].Navn, Is.Not.Null);
-            Assert.That(adressegrupper[8].Navn, Is.EqualTo("Billardspillere"));
-            Assert.That(adressegrupper[8].AdressegruppeOswebdb, Is.EqualTo(4));
         }
 
         /// <summary>
-        /// Tester, at BetalingsbetingelseGetAllHenterBetalingsbetingelser.
+        /// Tester, at AdressegruppeGetAll kaster en IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtAdressegruppeGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.AdressegruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at AdressegruppeGetAll kaster en IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtAdressegruppeGetAllKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.AdressegruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at AdressegruppeGetAll kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtAdressegruppeGetAllKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.AdressegruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at BetalingsbetingelseGetAll henter alle betalingsbetingelser.
         /// </summary>
         [Test]
         public void TestAtBetalingsbetingelseGetAllHenterBetalingsbetingelser()
         {
-            var service = MockRepository.GenerateMock<IAdresseRepositoryService>();
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Return(GetBetalingsbetingelser());
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
 
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-            channelFactory
-                .Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
                 .Return(service);
 
             var repository = new AdresseRepository(channelFactory);
@@ -255,6 +405,173 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(betalingsbetingelser[1].Nummer, Is.EqualTo(2));
             Assert.That(betalingsbetingelser[1].Navn, Is.Not.Null);
             Assert.That(betalingsbetingelser[1].Navn, Is.EqualTo("Netto + 8 dage"));
+        }
+
+        /// <summary>
+        /// Tester, at BetalingsbetingelserGetAll kaster en IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBetalingsbetingelserGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BetalingsbetingelseGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at BetalingsbetingelserGetAll kaster en IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtBetalingsbetingelserGetAllKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BetalingsbetingelseGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at BetalingsbetingelserGetAll kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtBetalingsbetingelserGetAllKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BetalingsbetingelseGetAll());
+        }
+
+        /// <summary>
+        /// Danner personer til test.
+        /// </summary>
+        /// <returns>personer til test.</returns>
+        public static IList<PersonView> GetPersoner()
+        {
+            return new List<PersonView>
+                       {
+                           new PersonView(),
+                           new PersonView()
+                       };
+        }
+
+        /// <summary>
+        /// Danner firmaer til test.
+        /// </summary>
+        /// <returns>Firmaer til test.</returns>
+        public static IList<FirmaView> GetFirmaer()
+        {
+            return new List<FirmaView>
+                       {
+                           new FirmaView()
+                       };
+        }
+
+        /// <summary>
+        /// Danner postnumre til test.
+        /// </summary>
+        /// <returns>Postnumre til test.</returns>
+        public static IList<PostnummerView> GetPostnumre()
+        {
+            return new List<PostnummerView>
+                       {
+                           new PostnummerView
+                               {
+                                   Landekode = "DK",
+                                   Postnummer = "2700",
+                                   Bynavn = "Brønshøj"
+                               },
+                           new PostnummerView
+                               {
+                                   Landekode = "DK",
+                                   Postnummer = "5700",
+                                   Bynavn = "Svendborg"
+                               },
+                           new PostnummerView
+                               {
+                                   Landekode = "DK",
+                                   Postnummer = "7860",
+                                   Bynavn = "Spøttrup"
+                               }
+                       };
+        }
+
+        /// <summary>
+        /// Danner adressegrupper til test.
+        /// </summary>
+        /// <returns>Adressegrupper til test.</returns>
+        private static IList<AdressegruppeView> GetAdressegrupper()
+        {
+            return new List<AdressegruppeView>
+                       {
+                           new AdressegruppeView
+                               {
+                                   Nummer = 1,
+                                   Navn = "Familie (Ole)",
+                                   AdressegruppeOswebdb = 1,
+                               },
+                           new AdressegruppeView
+                               {
+                                   Nummer = 2,
+                                   Navn = "Venner og veninder",
+                                   AdressegruppeOswebdb = 2,
+                               },
+                           new AdressegruppeView
+                               {
+                                   Nummer = 3,
+                                   Navn = "Arbejdsrelationer",
+                                   AdressegruppeOswebdb = 3,
+                               }
+                       };
+        }
+
+        /// <summary>
+        /// Danner betalingsbetingelser til test.
+        /// </summary>
+        /// <returns>Betalingsbetingelser til test.</returns>
+        private static IList<BetalingsbetingelseView> GetBetalingsbetingelser()
+        {
+            return new List<BetalingsbetingelseView>
+                       {
+                           new BetalingsbetingelseView
+                               {
+                                   Nummer = 1,
+                                   Navn = "Kontant"
+                               },
+                           new BetalingsbetingelseView
+                               {
+                                   Nummer = 2,
+                                   Navn = "Netto + 8 dage"
+                               }
+                       };
         }
     }
 }
