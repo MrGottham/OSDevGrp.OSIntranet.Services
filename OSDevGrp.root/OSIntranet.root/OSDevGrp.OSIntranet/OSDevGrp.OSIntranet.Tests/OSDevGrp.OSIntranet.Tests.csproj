@@ -75,6 +75,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll</HintPath>
     </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.DataAccess.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4e66eaaa909a8fa2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll</HintPath>
+    </Reference>
     <Reference Include="Rhino.Mocks">
       <HintPath>..\External references\Rhino.Mocks.dll</HintPath>
     </Reference>

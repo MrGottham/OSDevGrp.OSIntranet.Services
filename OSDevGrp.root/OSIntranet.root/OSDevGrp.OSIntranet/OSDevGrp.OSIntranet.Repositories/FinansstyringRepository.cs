@@ -5,7 +5,6 @@ using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
-using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
@@ -28,6 +27,29 @@ namespace OSDevGrp.OSIntranet.Repositories
 
         #endregion
 
+        #region Private variables
+
+        private readonly IChannelFactory _channelFactory;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Danner repository til finansstyring.
+        /// </summary>
+        /// <param name="channelFactory">Implementering af en ChannelFactory.</param>
+        public FinansstyringRepository(IChannelFactory channelFactory)
+        {
+            if (channelFactory == null)
+            {
+                throw new ArgumentNullException("channelFactory");
+            }
+            _channelFactory = channelFactory;
+        }
+
+        #endregion
+
         #region IFinansstyringRepository Members
 
         /// <summary>
@@ -36,9 +58,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af regnskaber.</returns>
         public IList<Regnskab> RegnskabslisteGet()
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
                 var regnskabQuery = new RegnskabGetAllQuery();
@@ -83,9 +103,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Regnskab.</returns>
         public Regnskab RegnskabGet(int nummer, Func<int, AdresseBase> callback)
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
                 // Hent regnskabet.
@@ -130,9 +148,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af kontogrupper.</returns>
         public IList<Kontogruppe> KontogruppeGetAll()
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new KontogruppeGetAllQuery();
@@ -165,9 +181,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af grupper til budgetkonti.</returns>
         public IList<Budgetkontogruppe> BudgetkontogruppeGetAll()
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new BudgetkontogruppeGetAllQuery();
