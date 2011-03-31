@@ -3,9 +3,11 @@ using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 {
@@ -15,12 +17,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
     public class FinansstyringRepositoryTests
     {
         /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis ChannelFactory er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisChannelFactoryErNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new FinansstyringRepository(null));
+        }
+
+        /// <summary>
         /// Tester, at RegnskabslisteGet henter alle regnskaber.
         /// </summary>
         [Test]
         public void TestAtRegnskabslisteGetHenterAlleRegnskaber()
         {
-            var repository = new FinansstyringRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
             var regnskaber = repository.RegnskabslisteGet();
             Assert.That(regnskaber, Is.Not.Null);
             Assert.That(regnskaber.Count, Is.EqualTo(2));
@@ -39,7 +51,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtRegnskabGetHenterRegnskab()
         {
             var person = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Familie (Ole)", 1));
-            var repository = new FinansstyringRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
             var regnskab = repository.RegnskabGet(1, nummer => person);
             Assert.That(regnskab, Is.Not.Null);
             Assert.That(regnskab.Nummer, Is.EqualTo(1));
@@ -75,7 +88,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtKontoMappesKorrekt()
         {
-            var repository = new FinansstyringRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
             var regnskab = repository.RegnskabGet(1);
             Assert.That(regnskab, Is.Not.Null);
             Assert.That(regnskab.Konti, Is.Not.Null);
@@ -112,7 +126,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBudgetkontoMappesKorrekt()
         {
-            var repository = new FinansstyringRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
             var regnskab = repository.RegnskabGet(1);
             Assert.That(regnskab, Is.Not.Null);
             Assert.That(regnskab.Konti, Is.Not.Null);
@@ -148,7 +163,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtRegnskabGetKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
         {
-            var repository = new FinansstyringRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
             Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
         }
 
@@ -158,7 +174,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtKontogruppeGetAllHenterAlleKontogrupper()
         {
-            var repository = new FinansstyringRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
             var kontogrupper = repository.KontogruppeGetAll();
             Assert.That(kontogrupper, Is.Not.Null);
             Assert.That(kontogrupper.Count, Is.EqualTo(2));
@@ -180,7 +197,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBudgetkontogruppeGetAllHenterAlleBudgetkontogrupper()
         {
-            var repository = new FinansstyringRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
             var budgetkontogrupper = repository.BudgetkontogruppeGetAll();
             Assert.That(budgetkontogrupper, Is.Not.Null);
             Assert.That(budgetkontogrupper.Count, Is.EqualTo(8));

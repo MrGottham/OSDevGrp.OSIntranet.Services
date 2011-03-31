@@ -5,7 +5,6 @@ using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Comparers;
-using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
@@ -28,6 +27,29 @@ namespace OSDevGrp.OSIntranet.Repositories
 
         #endregion
 
+        #region Private variables
+
+        private readonly IChannelFactory _channelFactory;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Danner repository til adressekartoteket.
+        /// </summary>
+        /// <param name="channelFactory">Implementering af en ChannelFactory.</param>
+        public AdresseRepository(IChannelFactory channelFactory)
+        {
+            if (channelFactory == null)
+            {
+                throw new ArgumentNullException("channelFactory");
+            }
+            _channelFactory = channelFactory;
+        }
+
+        #endregion
+
         #region IAdresseRepository Members
 
         /// <summary>
@@ -36,9 +58,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af adresser.</returns>
         public IList<AdresseBase> AdresseGetAll()
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
             {
                 // Henter alle adressegrupper.
@@ -94,9 +114,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af postnumre.</returns>
         public IList<Postnummer> PostnummerGetAll()
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new PostnummerGetAllQuery();
@@ -129,9 +147,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af adressegrupper.</returns>
         public IList<Adressegruppe> AdressegruppeGetAll()
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new AdressegruppeGetAllQuery();
@@ -164,9 +180,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af betalingsbetingelser.</returns>
         public IList<Betalingsbetingelse> BetalingsbetingelseGetAll()
         {
-            var container = ContainerFactory.Create();
-            var channelFactory = container.Resolve<IChannelFactory>();
-            var channel = channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
+            var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new BetalingsbetingelseGetAllQuery();

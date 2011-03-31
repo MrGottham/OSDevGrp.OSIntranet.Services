@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
 using OSDevGrp.OSIntranet.Repositories;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 {
@@ -13,12 +17,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
     public class AdresseRepositoryTests
     {
         /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis ChannelFactory er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisChannelFactoryErNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new AdresseRepository(null));
+        }
+
+        /// <summary>
         /// Tester, at AdresseGetAll henter adresser.
         /// </summary>
         [Test]
         public void TestAtAdresseGetAllHenterAdresser()
         {
-            var repository = new AdresseRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new AdresseRepository(channelFactory);
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
             Assert.That(adresser.OfType<Firma>().Count(), Is.EqualTo(24));
@@ -31,7 +45,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtPersonMappesKorrekt()
         {
-            var repository = new AdresseRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new AdresseRepository(channelFactory);
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
             Assert.That(adresser.OfType<Person>().Count(), Is.GreaterThan(0));
@@ -80,7 +95,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtFirmaMappesKorrekt()
         {
-            var repository = new AdresseRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new AdresseRepository(channelFactory);
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
             Assert.That(adresser.OfType<Firma>().Count(), Is.GreaterThan(0));
@@ -127,7 +143,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtPostnummerGetAllHenterPostnumre()
         {
-            var repository = new AdresseRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new AdresseRepository(channelFactory);
             var postnumre = repository.PostnummerGetAll();
             Assert.That(postnumre, Is.Not.Null);
             Assert.That(postnumre.Count, Is.EqualTo(1324));
@@ -139,7 +156,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtPostnummerMappesKorrekt()
         {
-            var repository = new AdresseRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new AdresseRepository(channelFactory);
             var postnumre = repository.PostnummerGetAll();
             Assert.That(postnumre, Is.Not.Null);
             Assert.That(postnumre.Count, Is.GreaterThan(0));
@@ -160,7 +178,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtAdressegruppeGetAllHenterAdressegrupper()
         {
-            var repository = new AdresseRepository();
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new AdresseRepository(channelFactory);
             var adressegrupper = repository.AdressegruppeGetAll();
             Assert.That(adressegrupper, Is.Not.Null);
             Assert.That(adressegrupper.Count, Is.EqualTo(9));
@@ -217,7 +236,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBetalingsbetingelseGetAllHenterBetalingsbetingelser()
         {
-            var repository = new AdresseRepository();
+            var service = MockRepository.GenerateMock<IAdresseRepositoryService>();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory
+                .Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
             var betalingsbetingelser = repository.BetalingsbetingelseGetAll();
             Assert.That(betalingsbetingelser, Is.Not.Null);
             Assert.That(betalingsbetingelser.Count, Is.EqualTo(2));
