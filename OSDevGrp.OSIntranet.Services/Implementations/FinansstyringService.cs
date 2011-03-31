@@ -25,9 +25,14 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <summary>
         /// Danner service til finansstyring.
         /// </summary>
+        /// <param name="commandBus">Implementering af en CommandBus.</param>
         /// <param name="queryBus">Implementering af en QueryBus.</param>
-        public FinansstyringService(IQueryBus queryBus)
+        public FinansstyringService(ICommandBus commandBus, IQueryBus queryBus)
         {
+            if (commandBus == null)
+            {
+                throw new ArgumentNullException("commandBus");
+            }
             if (queryBus == null)
             {
                 throw new ArgumentNullException("queryBus");
