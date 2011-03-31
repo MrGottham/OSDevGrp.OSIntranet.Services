@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 
 namespace OSDevGrp.OSIntranet.Contracts.Services
@@ -131,6 +133,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<BogføringslinjeView> BogføringerGet(BogføringerGetQuery query);
+
+        /// <summary>
+        /// Opretter en bogføringslinje.
+        /// </summary>
+        /// <param name="command">Kommando til oprettelse af en bogføringslinje.</param>
+        /// <returns>Svar fra oprettelse af en bogføringslinje.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        BogføringslinjeOpretResponse BogføringslinjeOpret(BogføringslinjeOpretCommand command);
 
         /// <summary>
         /// Henter alle betalingsbetingelser.

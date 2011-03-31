@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -16,6 +18,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
     {
         #region Private variables
 
+        private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;
 
         #endregion
@@ -37,6 +40,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             {
                 throw new ArgumentNullException("queryBus");
             }
+            _commandBus = commandBus;
             _queryBus = queryBus;
         }
 
@@ -385,6 +389,36 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             try
             {
                 return _queryBus.Query<BogføringerGetQuery, IEnumerable<BogføringslinjeView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Opretter en bogføringslinje.
+        /// </summary>
+        /// <param name="command">Kommando til oprettelse af en bogføringslinje.</param>
+        /// <returns>Svar fra oprettelse af en bogføringslinje.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public BogføringslinjeOpretResponse BogføringslinjeOpret(BogføringslinjeOpretCommand command)
+        {
+            try
+            {
+                return _commandBus.Publish<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(command);
             }
             catch (IntranetRepositoryException ex)
             {
