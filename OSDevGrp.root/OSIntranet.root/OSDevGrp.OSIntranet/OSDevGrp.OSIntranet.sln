@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Infrast
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0A1F688-C012-4C39-92DF-E435C33FB0A7}"
 	ProjectSection(SolutionItems) = preProject
+		OSDevGrp.OSIntranet.Clients.cer = OSDevGrp.OSIntranet.Clients.cer
+		OSDevGrp.OSIntranet.Clients.pfx = OSDevGrp.OSIntranet.Clients.pfx
 		OSDevGrp.OSIntranet.Services.cer = OSDevGrp.OSIntranet.Services.cer
 		OSDevGrp.OSIntranet.Services.pfx = OSDevGrp.OSIntranet.Services.pfx
 		OSDevGrp.OSIntranet.snk = OSDevGrp.OSIntranet.snk
