@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Services.Implementations;
 using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
@@ -26,8 +27,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         #region Private variables
 
         private readonly Uri _serviceUri = new Uri("http://localhost:7000/OSIntranet/");
-        //private ServiceHost _serviceHost;
-
+        private ServiceHost _serviceHost;
         private IChannelFactory _channelFactory;
 
         #endregion
@@ -38,20 +38,33 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         [TestFixtureSetUp]
         public void TestSetUp()
         {
-            /*
             _serviceHost = new ServiceHost(typeof (FinansstyringService), new[] {_serviceUri});
             try
             {
                 _serviceHost.Open();
                 Assert.That(_serviceHost.State, Is.EqualTo(CommunicationState.Opened));
             }
-            finally
+            catch
             {
                 ChannelTools.CloseChannel(_serviceHost);
+                _serviceHost = null;
             }
-            */
             var container = ContainerFactory.Create();
             _channelFactory = container.Resolve<IChannelFactory>();
+        }
+
+        /// <summary>
+        /// Disposing test.
+        /// </summary>
+        [TestFixtureTearDown]
+        public void Dispose()
+        {
+            if (_serviceHost == null)
+            {
+                return;
+            }
+            ChannelTools.CloseChannel(_serviceHost);
+            _serviceHost = null;
         }
 
         /// <summary>
