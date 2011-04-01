@@ -65,7 +65,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtPersonMappesKorrekt()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
+                .Return(GetPersoner());
+            service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
+                .Return(GetFirmaer());
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Return(GetAdressegrupper());
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Return(GetBetalingsbetingelser());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new AdresseRepository(channelFactory);
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
@@ -476,10 +492,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         /// <returns>personer til test.</returns>
         public static IList<PersonView> GetPersoner()
         {
+            var adressegrupper = GetAdressegrupper();
+            var betalingsbetingelser = GetBetalingsbetingelser();
             return new List<PersonView>
                        {
-                           new PersonView(),
-                           new PersonView()
+                           new PersonView
+                               {
+                                   Nummer = 1,
+                                   Navn = "Ole Sørensen",
+                                   Adresse1 = "Eggertsvænge 2",
+                                   PostnummerBy = "5700  Svendborg",
+                                   Telefon = "62 21 49 60",
+                                   Mobil = "25 24 49 75",
+                                   Fødselsdato = new DateTime(1975, 8, 21),
+                                   Adressegruppe = adressegrupper.Single(m => m.Nummer == 1),
+                                   Mailadresse = "os@dsidata.dk",
+                                   Webadresse = "www.MrGottham.dk",
+                                   Betalingsbetingelse = betalingsbetingelser.Single(m => m.Nummer == 1),
+                                   Udlånsfrist = 14,
+                                   Firma = new AdressereferenceView
+                                               {
+                                                   Nummer = 48,
+                                                   Navn = "DSI DATA A/S"
+                                               },
+                                   FilofaxAdresselabel = true
+                               },
+                           new PersonView
+                               {
+                                   Nummer = 2,
+                                   Navn = "Bente Rasmussen",
+                                   Adresse1 = "Brønshøjvej 74B",
+                                   PostnummerBy = "2700  Brønshøj",
+                                   Telefon = "26 70 80 48",
+                                   Mobil = "26 70 80 48",
+                                   Fødselsdato = new DateTime(1958, 8, 20),
+                                   Adressegruppe = adressegrupper.Single(m => m.Nummer == 2),
+                                   Mailadresse = "ska@adslhome.dk",
+                                   Betalingsbetingelse = betalingsbetingelser.Single(m => m.Nummer == 1),
+                                   Udlånsfrist = 14,
+                                   FilofaxAdresselabel = true
+                               }
                        };
         }
 
@@ -489,9 +541,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         /// <returns>Firmaer til test.</returns>
         public static IList<FirmaView> GetFirmaer()
         {
+            var adressegrupper = GetAdressegrupper();
+            var betalingsbetingelser = GetBetalingsbetingelser();
             return new List<FirmaView>
                        {
-                           new FirmaView()
+                           new FirmaView
+                               {
+                                   Nummer = 48,
+                                   Navn = "DSI DATA A/S",
+                                   Adresse1 = "Kokkedal Industripark 2",
+                                   PostnummerBy = "2980  Kokkedal",
+                                   Telefon1 = "49 18 49 18",
+                                   Telefax = "49 18 49 44",
+                                   Adressegruppe = adressegrupper.Single(m => m.Nummer == 3),
+                                   Bekendtskab = "Arbejdsplads, Ole",
+                                   Mailadresse = "info@dsidata.dk",
+                                   Webadresse = "www.dsidata.dk",
+                                   Betalingsbetingelse = betalingsbetingelser.Single(m => m.Nummer == 1),
+                                   Udlånsfrist = 14,
+                                   FilofaxAdresselabel = true
+                               }
                        };
         }
 
