@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
@@ -131,7 +132,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtFirmaMappesKorrekt()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
+                .Return(GetPersoner());
+            service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
+                .Return(GetFirmaer());
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Return(GetAdressegrupper());
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Return(GetBetalingsbetingelser());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new AdresseRepository(channelFactory);
             var adresser = repository.AdresseGetAll();
             Assert.That(adresser, Is.Not.Null);
@@ -171,6 +188,87 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(firma.FilofaxAdresselabel, Is.True);
             Assert.That(firma.Personer, Is.Not.Null);
             Assert.That(firma.Personer.Count, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at AdresseGetAll kaster IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtAdresseGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Return(GetAdressegrupper());
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Return(GetBetalingsbetingelser());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.AdresseGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at AdresseGetAll kaster IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtAdresseGetAllKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Return(GetAdressegrupper());
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Return(GetBetalingsbetingelser());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.AdresseGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at AdresseGetAll kaster IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtAdresseGetAllKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
+                .Return(GetAdressegrupper());
+            service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
+                .Return(GetBetalingsbetingelser());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IAdresseRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new AdresseRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.AdresseGetAll());
         }
 
         /// <summary>
@@ -484,6 +582,332 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var repository = new AdresseRepository(channelFactory);
             Assert.Throws<IntranetRepositoryException>(() => repository.BetalingsbetingelseGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at MapFirma kaster en ArgumentNullException, hvis firmaviewet er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapFirmaKasterArgumentNullExceptionHvisFirmaViewErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] {null, null, null});
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapFirma kaster en ArgumentNullException, hvis adressegrupper er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapFirmaKasterArgumentNullExceptionHvisAdressegrupperErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { new FirmaView(), null, null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapFirma kaster en ArgumentNullException, hvis adressegrupper er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapFirmaKasterArgumentNullExceptionHvisBetalingsbetingelserErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { new FirmaView(), new List<Adressegruppe>(), null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapFirma kaster en IntranetRepositoryException, hvis adressegruppen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtMapFirmaKasterIntranetRepositoryExceptionHvisAdressegruppeIkkeFindes()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                var firmaView = new FirmaView
+                                    {
+                                        Nummer = 1,
+                                        Navn = "DSI DATA A/S",
+                                        Adressegruppe = new AdressegruppeView
+                                                            {
+                                                                Nummer = 3
+                                                            }
+                                    };
+                var adressegrupper = new List<Adressegruppe>
+                                         {
+                                             new Adressegruppe(1, "Familie", 1),
+                                             new Adressegruppe(2, "Venner og veninder", 2)
+                                         };
+                var betalingsbetingelser = new List<Betalingsbetingelse>
+                                               {
+                                                   new Betalingsbetingelse(1, "Kontant"),
+                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                               };
+                method.Invoke(repository, new object[] { firmaView, adressegrupper, betalingsbetingelser });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapFirma kaster en IntranetRepositoryException, hvis betalingsbetingelsen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtMapFirmaKasterIntranetRepositoryExceptionHvisBetalingsbetingelseIkkeFindes()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                var firmaView = new FirmaView
+                                    {
+                                        Nummer = 1,
+                                        Navn = "DSI DATA A/S",
+                                        Adressegruppe = new AdressegruppeView
+                                                            {
+                                                                Nummer = 1
+                                                            },
+                                        Betalingsbetingelse = new BetalingsbetingelseView
+                                                                  {
+                                                                      Nummer = 3
+                                                                  }
+                                    };
+                var adressegrupper = new List<Adressegruppe>
+                                         {
+                                             new Adressegruppe(1, "Familie", 1),
+                                             new Adressegruppe(2, "Venner og veninder", 2)
+                                         };
+                var betalingsbetingelser = new List<Betalingsbetingelse>
+                                               {
+                                                   new Betalingsbetingelse(1, "Kontant"),
+                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                               };
+                method.Invoke(repository, new object[] { firmaView, adressegrupper, betalingsbetingelser });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapPerson kaster en ArgumentNullException, hvis personviewet er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapPersonKasterArgumentNullExceptionHvisPersonViewErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { null, null, null, null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapPerson kaster en ArgumentNullException, hvis personviewet er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapPersonKasterArgumentNullExceptionHvisFirmaerErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { new PersonView(), null, null, null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapPerson kaster en ArgumentNullException, hvis adressegrupper er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapPersonKasterArgumentNullExceptionHvisAdressegrupperErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { new PersonView(), new List<Firma>(), null, null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapPerson kaster en ArgumentNullException, hvis betalingsbetingelser er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapPersonKasterArgumentNullExceptionHvisBetalingsbetingelserErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { new PersonView(), new List<Firma>(), new List<Adressegruppe>(), null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapPerson kaster en IntranetRepositoryException, hvis adressegruppen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtMapPersonKasterIntranetRepositoryExceptionHvisAdressegruppeIkkeFindes()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                var personView = new PersonView
+                                     {
+                                         Nummer = 1,
+                                         Navn = "Ole Sørensen",
+                                         Adressegruppe = new AdressegruppeView
+                                                             {
+                                                                 Nummer = 3
+                                                             }
+                                     };
+                var adressegrupper = new List<Adressegruppe>
+                                         {
+                                             new Adressegruppe(1, "Familie", 1),
+                                             new Adressegruppe(2, "Venner og veninder", 2)
+                                         };
+                var betalingsbetingelser = new List<Betalingsbetingelse>
+                                               {
+                                                   new Betalingsbetingelse(1, "Kontant"),
+                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                               };
+                method.Invoke(repository, new object[] {personView, new List<Firma>(), adressegrupper, betalingsbetingelser});
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapPerson kaster en IntranetRepositoryException, hvis betalingsbetingelsen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtMapPersonKasterIntranetRepositoryExceptionHvisBetalingsbetingelseIkkeFindes()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                var personView = new PersonView
+                                     {
+                                         Nummer = 1,
+                                         Navn = "Ole Sørensen",
+                                         Adressegruppe = new AdressegruppeView
+                                                             {
+                                                                 Nummer = 1
+                                                             },
+                                         Betalingsbetingelse = new BetalingsbetingelseView
+                                                                   {
+                                                                       Nummer = 3
+                                                                   }
+                                     };
+                var adressegrupper = new List<Adressegruppe>
+                                         {
+                                             new Adressegruppe(1, "Familie", 1),
+                                             new Adressegruppe(2, "Venner og veninder", 2)
+                                         };
+                var betalingsbetingelser = new List<Betalingsbetingelse>
+                                               {
+                                                   new Betalingsbetingelse(1, "Kontant"),
+                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                               };
+                method.Invoke(repository, new object[] { personView, new List<Firma>(), adressegrupper, betalingsbetingelser });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
+            }
         }
 
         /// <summary>
