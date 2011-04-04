@@ -911,6 +911,121 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at MapPerson kaster en IntranetRepositoryException, hvis firmaet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtMapPersonKasterIntranetRepositoryExceptionHvisFirmaIkkeFindes()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                var personView = new PersonView
+                                     {
+                                         Nummer = 1,
+                                         Navn = "Ole Sørensen",
+                                         Adressegruppe = new AdressegruppeView
+                                                             {
+                                                                 Nummer = 1
+                                                             },
+                                         Betalingsbetingelse = new BetalingsbetingelseView
+                                                                   {
+                                                                       Nummer = 2
+                                                                   },
+                                         Firma = new AdressereferenceView
+                                         {
+                                             Nummer = 48
+                                         }
+                                     };
+                var adressegrupper = new List<Adressegruppe>
+                                         {
+                                             new Adressegruppe(1, "Familie", 1),
+                                             new Adressegruppe(2, "Venner og veninder", 2)
+                                         };
+                var betalingsbetingelser = new List<Betalingsbetingelse>
+                                               {
+                                                   new Betalingsbetingelse(1, "Kontant"),
+                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                               };
+                method.Invoke(repository, new object[] { personView, new List<Firma>(), adressegrupper, betalingsbetingelser });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapPostnummer kaster en ArgumentNullException, hvis postnummerview er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapPostnummerKasterArgumentNullExceptionHvisAdressegrupperErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapPostnummer", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapAdressegruppe kaster en ArgumentNullException, hvis adressegruppeview er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapAdressegruppeKasterArgumentNullExceptionHvisAdressegrupperErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapAdressegruppe", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapBetalingsbetingelse kaster en ArgumentNullException, hvis betalingsbetingelsesview er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapBetalingsbetingelseKasterArgumentNullExceptionHvisBetalingsbetingelseErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new AdresseRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapBetalingsbetingelse", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
         /// Danner personer til test.
         /// </summary>
         /// <returns>personer til test.</returns>
