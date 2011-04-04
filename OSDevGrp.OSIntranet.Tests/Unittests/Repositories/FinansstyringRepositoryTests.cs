@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Enums;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories;
 using NUnit.Framework;
@@ -31,7 +36,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtRegnskabslisteGetHenterAlleRegnskaber()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetAll(Arg<RegnskabGetAllQuery>.Is.Anything))
+                .Return(GetRegnskabsliste());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+            
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+            
             var repository = new FinansstyringRepository(channelFactory);
             var regnskaber = repository.RegnskabslisteGet();
             Assert.That(regnskaber, Is.Not.Null);
@@ -45,15 +60,102 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at RegnskabslisteGet kaster en IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabslisteGetKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetAll(Arg<RegnskabGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet());
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabslisteGet kaster en IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabslisteGetKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetAll(Arg<RegnskabGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet());
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabslisteGet kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabslisteGetKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetAll(Arg<RegnskabGetAllQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet());
+        }
+
+        /// <summary>
         /// Tester, at RegnskabGet henter et givent regnskab.
         /// </summary>
         [Test]
         public void TestAtRegnskabGetHenterRegnskab()
         {
-            var person = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Familie (Ole)", 1));
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Return(GetRegnskab()).Repeat.Any();
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetKontogrupper()).Repeat.Any();
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetBudgetkontogrupper()).Repeat.Any();
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service).Repeat.Any();
+
             var repository = new FinansstyringRepository(channelFactory);
-            var regnskab = repository.RegnskabGet(1, nummer => person);
+
+            var regnskab = repository.RegnskabGet(1);
+            Assert.That(regnskab, Is.Not.Null);
+            Assert.That(regnskab.Nummer, Is.EqualTo(1));
+            Assert.That(regnskab.Navn, Is.Not.Null);
+            Assert.That(regnskab.Navn, Is.EqualTo("Ole Sørensen"));
+            Assert.That(regnskab.Konti, Is.Not.Null);
+            Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
+            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(5));
+
+            var person = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Familie (Ole)", 1));
+            regnskab = repository.RegnskabGet(1, nummer => person);
             Assert.That(regnskab, Is.Not.Null);
             Assert.That(regnskab.Nummer, Is.EqualTo(1));
             Assert.That(regnskab.Navn, Is.Not.Null);
@@ -234,6 +336,106 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(budgetkontogrupper[7].Nummer, Is.EqualTo(8));
             Assert.That(budgetkontogrupper[7].Navn, Is.Not.Null);
             Assert.That(budgetkontogrupper[7].Navn, Is.EqualTo("Øvrige udgifter"));
+        }
+
+        /// <summary>
+        /// Danner regnskabsliste til test.
+        /// </summary>
+        /// <returns>Regnskabsliste til test.</returns>
+        private static IList<RegnskabListeView> GetRegnskabsliste()
+        {
+            return new List<RegnskabListeView>
+                       {
+                           new RegnskabListeView
+                               {
+                                   Nummer = 1,
+                                   Navn = "Ole Sørensen"
+                               },
+                           new RegnskabListeView
+                               {
+                                   Nummer = 2,
+                                   Navn = "Bryllup"
+                               }
+                       };
+        }
+
+        /// <summary>
+        /// Danner regnskab til test.
+        /// </summary>
+        /// <returns>Regnskab til test.</returns>
+        private static RegnskabView GetRegnskab()
+        {
+            return new RegnskabView
+                       {
+                           Nummer = 1,
+                           Navn = "Ole Sørensen",
+                           Konti = new List<KontoView>
+                                       {
+                                           new KontoView
+                                               {
+                                                   Kontonummer = "DANKORT",
+                                                   Kontonavn = "Dankort",
+                                                   Kontogruppe = new KontogruppeView
+                                                                     {
+                                                                         Nummer = 1
+                                                                     }
+                                               },
+                                           new KontoView
+                                               {
+                                                   Kontonummer = "KONTANTER",
+                                                   Kontonavn = "Kontanter",
+                                                   Kontogruppe = new KontogruppeView
+                                                                     {
+                                                                         Nummer = 2
+                                                                     }
+                                               }
+                                       },
+                           Budgetkonti = new List<BudgetkontoView>()
+                       };
+        }
+
+        /// <summary>
+        /// Danner kontogrupper til test.
+        /// </summary>
+        /// <returns>Kontogrupper til test.</returns>
+        private static IList<KontogruppeView> GetKontogrupper()
+        {
+            return new List<KontogruppeView>
+                       {
+                           new KontogruppeView
+                               {
+                                   Nummer = 1,
+                                   Navn = "Bankkonti",
+                                   KontogruppeType = KontogruppeType.Aktiver
+                               },
+                           new KontogruppeView
+                               {
+                                   Nummer = 2,
+                                   Navn = "Kontanter",
+                                   KontogruppeType = KontogruppeType.Aktiver
+                               }
+                       };
+        }
+
+        /// <summary>
+        /// Danner grupper for budgetkonti til test.
+        /// </summary>
+        /// <returns>Grupper for budgetkonti til test</returns>
+        private static IList<BudgetkontogruppeView> GetBudgetkontogrupper()
+        {
+            return new List<BudgetkontogruppeView>
+                       {
+                           new BudgetkontogruppeView
+                               {
+                                   Nummer = 1,
+                                   Navn = "Indtægter"
+                               },
+                           new BudgetkontogruppeView
+                               {
+                                   Nummer = 2,
+                                   Navn = "Udgifter"
+                               }
+                       };
         }
     }
 }
