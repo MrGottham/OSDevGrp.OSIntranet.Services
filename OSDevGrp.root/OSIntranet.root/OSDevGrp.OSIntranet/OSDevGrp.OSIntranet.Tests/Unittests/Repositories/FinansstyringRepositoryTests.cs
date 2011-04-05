@@ -152,7 +152,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab.Navn, Is.EqualTo("Ole Sørensen"));
             Assert.That(regnskab.Konti, Is.Not.Null);
             Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
-            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(5));
+            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(2));
 
             var person = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Familie (Ole)", 1));
             regnskab = repository.RegnskabGet(1, nummer => person);
@@ -162,7 +162,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab.Navn, Is.EqualTo("Ole Sørensen"));
             Assert.That(regnskab.Konti, Is.Not.Null);
             Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
-            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(5));
+            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(2));
             foreach (var konto in regnskab.Konti.OfType<Konto>().ToList())
             {
                 Assert.That(konto, Is.Not.Null);
@@ -375,10 +375,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                {
                                                    Kontonummer = "DANKORT",
                                                    Kontonavn = "Dankort",
+                                                   Beskrivelse = "Dankort/lønkonto",
+                                                   Note = "Bla, bla og mere bla",
                                                    Kontogruppe = new KontogruppeView
                                                                      {
                                                                          Nummer = 1
-                                                                     }
+                                                                     },
+                                                   Kreditoplysninger = new List<KreditoplysningerView>
+                                                                           {
+                                                                               new KreditoplysningerView
+                                                                                   {
+                                                                                       År = 2011,
+                                                                                       Måned = 4,
+                                                                                       Kredit = 0M
+                                                                                   }
+                                                                           },
+                                                   Bogføringslinjer = new List<BogføringslinjeView>
+                                                                          {
+                                                                              new BogføringslinjeView
+                                                                                  {
+                                                                                      Løbenummer = 1,
+                                                                                      Dato = new DateTime(2011, 4, 1),
+                                                                                      Konto = new KontoListeView
+                                                                                                  {
+                                                                                                      Kontonummer = "DANKORT"
+                                                                                                  },
+                                                                                      Tekst = "Saldo",
+                                                                                      Debit = 10000M
+                                                                                  }
+                                                                          }
                                                },
                                            new KontoView
                                                {
@@ -387,7 +412,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                    Kontogruppe = new KontogruppeView
                                                                      {
                                                                          Nummer = 2
-                                                                     }
+                                                                     },
+                                                   Kreditoplysninger = new List<KreditoplysningerView>
+                                                                           {
+                                                                               new KreditoplysningerView
+                                                                                   {
+                                                                                       År = 2011,
+                                                                                       Måned = 4,
+                                                                                       Kredit = 0M
+                                                                                   }
+                                                                           },
+                                                   Bogføringslinjer = new List<BogføringslinjeView>
+                                                                          {
+                                                                              new BogføringslinjeView
+                                                                                  {
+                                                                                      Løbenummer = 2,
+                                                                                      Dato = new DateTime(2011, 4, 1),
+                                                                                      Konto = new KontoListeView
+                                                                                                  {
+                                                                                                      Kontonummer = "KONTANTER"
+                                                                                                  },
+                                                                                      Tekst = "Saldo",
+                                                                                      Debit = 250M
+                                                                                  }
+                                                                          }
                                                }
                                        },
                            Budgetkonti = new List<BudgetkontoView>()
