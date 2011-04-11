@@ -171,7 +171,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 Assert.That(konto.Bogføringslinjer, Is.Not.Null);
                 Assert.That(konto.Bogføringslinjer.Count, Is.GreaterThanOrEqualTo(0));
             }
-            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(71));
+            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(5));
             foreach (var budgetkonto in regnskab.Konti.OfType<Budgetkonto>().ToList())
             {
                 Assert.That(budgetkonto, Is.Not.Null);
@@ -398,10 +398,104 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer = "DANKORT"
+                                                                                                      Kontonummer =
+                                                                                                          "DANKORT"
                                                                                                   },
                                                                                       Tekst = "Saldo",
                                                                                       Debit = 10000M
+                                                                                  },
+                                                                              new BogføringslinjeView
+                                                                                  {
+                                                                                      Løbenummer = 3,
+                                                                                      Dato = new DateTime(2011, 4, 1),
+                                                                                      Konto = new KontoListeView
+                                                                                                  {
+                                                                                                      Kontonummer =
+                                                                                                          "DANKORT"
+                                                                                                  },
+                                                                                      Tekst = "Løn",
+                                                                                      Budgetkonto =
+                                                                                          new BudgetkontoListeView
+                                                                                              {
+                                                                                                  Kontonummer = "1000"
+                                                                                              },
+                                                                                      Debit = 25000M
+                                                                                  },
+                                                                              new BogføringslinjeView
+                                                                                  {
+                                                                                      Løbenummer = 4,
+                                                                                      Dato = new DateTime(2011, 4, 1),
+                                                                                      Konto = new KontoListeView
+                                                                                                  {
+                                                                                                      Kontonummer =
+                                                                                                          "DANKORT"
+                                                                                                  },
+                                                                                      Tekst = "Indbetaling",
+                                                                                      Budgetkonto =
+                                                                                          new BudgetkontoListeView
+                                                                                              {
+                                                                                                  Kontonummer = "1010"
+                                                                                              },
+                                                                                      Debit = 500M,
+                                                                                      Adresse = new AdressereferenceView
+                                                                                                    {
+                                                                                                        Nummer = 1
+                                                                                                    }
+                                                                                  },
+                                                                              new BogføringslinjeView
+                                                                                  {
+                                                                                      Løbenummer = 5,
+                                                                                      Dato = new DateTime(2011, 4, 1),
+                                                                                      Konto = new KontoListeView
+                                                                                                  {
+                                                                                                      Kontonummer =
+                                                                                                          "DANKORT"
+                                                                                                  },
+                                                                                      Tekst = "Budget",
+                                                                                      Budgetkonto =
+                                                                                          new BudgetkontoListeView
+                                                                                              {
+                                                                                                  Kontonummer = "2000"
+                                                                                              },
+                                                                                      Kredit = 7500M
+                                                                                  },
+                                                                              new BogføringslinjeView
+                                                                                  {
+                                                                                      Løbenummer = 6,
+                                                                                      Dato = new DateTime(2011, 4, 1),
+                                                                                      Konto = new KontoListeView
+                                                                                                  {
+                                                                                                      Kontonummer =
+                                                                                                          "DANKORT"
+                                                                                                  },
+                                                                                      Tekst = "Udlån",
+                                                                                      Budgetkonto =
+                                                                                          new BudgetkontoListeView
+                                                                                              {
+                                                                                                  Kontonummer = "2010"
+                                                                                              },
+                                                                                      Kredit = 2500M,
+                                                                                      Adresse = new AdressereferenceView
+                                                                                                    {
+                                                                                                        Nummer = 1
+                                                                                                    }
+                                                                                  },
+                                                                              new BogføringslinjeView
+                                                                                  {
+                                                                                      Løbenummer = 7,
+                                                                                      Dato = new DateTime(2011, 4, 1),
+                                                                                      Konto = new KontoListeView
+                                                                                                  {
+                                                                                                      Kontonummer =
+                                                                                                          "DANKORT"
+                                                                                                  },
+                                                                                      Tekst = "Tab",
+                                                                                      Budgetkonto =
+                                                                                          new BudgetkontoListeView
+                                                                                              {
+                                                                                                  Kontonummer = "2020"
+                                                                                              },
+                                                                                      Kredit = 700M
                                                                                   }
                                                                           }
                                                },
@@ -430,7 +524,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer = "KONTANTER"
+                                                                                                      Kontonummer =
+                                                                                                          "KONTANTER"
                                                                                                   },
                                                                                       Tekst = "Saldo",
                                                                                       Debit = 250M
@@ -438,7 +533,106 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                           }
                                                }
                                        },
-                           Budgetkonti = new List<BudgetkontoView>()
+                           Budgetkonti = new List<BudgetkontoView>
+                                             {
+                                                 new BudgetkontoView
+                                                     {
+                                                         Kontonummer = "1000",
+                                                         Kontonavn = "Lønninger",
+                                                         Beskrivelse = "Lønindtægter",
+                                                         Note = "Bla, bla og mere bla",
+                                                         Budgetkontogruppe = new BudgetkontogruppeView
+                                                                                 {
+                                                                                     Nummer = 1
+                                                                                 },
+                                                         Budgetoplysninger = new List<BudgetoplysningerView>
+                                                                                 {
+                                                                                     new BudgetoplysningerView
+                                                                                         {
+                                                                                             År = 2011,
+                                                                                             Måned = 4,
+                                                                                             Indtægter = 0M,
+                                                                                             Udgifter = 0M
+                                                                                         }
+                                                                                 }
+                                                     },
+                                                 new BudgetkontoView
+                                                     {
+                                                         Kontonummer = "1010",
+                                                         Kontonavn = "Øvrige indtægter",
+                                                         Budgetkontogruppe = new BudgetkontogruppeView
+                                                                                 {
+                                                                                     Nummer = 1
+                                                                                 },
+                                                         Budgetoplysninger = new List<BudgetoplysningerView>
+                                                                                 {
+                                                                                     new BudgetoplysningerView
+                                                                                         {
+                                                                                             År = 2011,
+                                                                                             Måned = 4,
+                                                                                             Indtægter = 0M,
+                                                                                             Udgifter = 0M
+                                                                                         }
+                                                                                 }
+                                                     },
+                                                 new BudgetkontoView
+                                                     {
+                                                         Kontonummer = "2000",
+                                                         Kontonavn = "Budget",
+                                                         Budgetkontogruppe = new BudgetkontogruppeView
+                                                                                 {
+                                                                                     Nummer = 2
+                                                                                 },
+                                                         Budgetoplysninger = new List<BudgetoplysningerView>
+                                                                                 {
+                                                                                     new BudgetoplysningerView
+                                                                                         {
+                                                                                             År = 2011,
+                                                                                             Måned = 4,
+                                                                                             Indtægter = 0M,
+                                                                                             Udgifter = 0M
+                                                                                         }
+                                                                                 }
+                                                     },
+                                                 new BudgetkontoView
+                                                     {
+                                                         Kontonummer = "2010",
+                                                         Kontonavn = "Udlån",
+                                                         Budgetkontogruppe = new BudgetkontogruppeView
+                                                                                 {
+                                                                                     Nummer = 2
+                                                                                 },
+                                                         Budgetoplysninger = new List<BudgetoplysningerView>
+                                                                                 {
+                                                                                     new BudgetoplysningerView
+                                                                                         {
+                                                                                             År = 2011,
+                                                                                             Måned = 4,
+                                                                                             Indtægter = 0M,
+                                                                                             Udgifter = 0M
+                                                                                         }
+                                                                                 }
+                                                     },
+                                                 new BudgetkontoView
+                                                     {
+                                                         Kontonummer = "2020",
+                                                         Kontonavn = "Øvrige udgifter",
+                                                         Budgetkontogruppe = new BudgetkontogruppeView
+                                                                                 {
+                                                                                     Nummer = 2
+                                                                                 },
+                                                         Budgetoplysninger = new List<BudgetoplysningerView>
+                                                                                 {
+                                                                                     new BudgetoplysningerView
+                                                                                         {
+                                                                                             År = 2011,
+                                                                                             Måned = 4,
+                                                                                             Indtægter = 0M,
+                                                                                             Udgifter = 0M
+                                                                                         }
+                                                                                 }
+                                                     }
+                                             }
                        };
         }
 
