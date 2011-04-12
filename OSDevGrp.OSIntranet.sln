@@ -55,9 +55,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Service
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.QueryHandlers", "OSDevGrp.OSIntranet.QueryHandlers\OSDevGrp.OSIntranet.QueryHandlers.csproj", "{821C03BD-0315-4084-804E-C3BD4590E73F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.CommandHandlers", "OSDevGrp.OSIntranet.CommandHandlers\OSDevGrp.OSIntranet.CommandHandlers.csproj", "{EA39FE1B-157B-4F3F-B5BE-8FFC9E45B42A}"
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 10
+		SccNumberOfProjects = 11
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Infrastructure.Interfaces\\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj
 		SccLocalPath1 = .
@@ -86,6 +88,9 @@ Global
 		SccProjectUniqueName9 = OSDevGrp.OSIntranet.QueryHandlers\\OSDevGrp.OSIntranet.QueryHandlers.csproj
 		SccLocalPath9 = .
 		SccProjectFilePathRelativizedFromConnection9 = OSDevGrp.OSIntranet.QueryHandlers\\
+		SccProjectUniqueName10 = OSDevGrp.OSIntranet.CommandHandlers\\OSDevGrp.OSIntranet.CommandHandlers.csproj
+		SccLocalPath10 = .
+		SccProjectFilePathRelativizedFromConnection10 = OSDevGrp.OSIntranet.CommandHandlers\\
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -128,6 +133,10 @@ Global
 		{821C03BD-0315-4084-804E-C3BD4590E73F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{821C03BD-0315-4084-804E-C3BD4590E73F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{821C03BD-0315-4084-804E-C3BD4590E73F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA39FE1B-157B-4F3F-B5BE-8FFC9E45B42A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA39FE1B-157B-4F3F-B5BE-8FFC9E45B42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA39FE1B-157B-4F3F-B5BE-8FFC9E45B42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA39FE1B-157B-4F3F-B5BE-8FFC9E45B42A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

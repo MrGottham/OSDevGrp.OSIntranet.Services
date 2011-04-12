@@ -91,6 +91,10 @@
     <None Include="OSDevGrp.OSIntranet.snk" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.CommandHandlers\OSDevGrp.OSIntranet.CommandHandlers.csproj">
+      <Project>{EA39FE1B-157B-4F3F-B5BE-8FFC9E45B42A}</Project>
+      <Name>OSDevGrp.OSIntranet.CommandHandlers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Contracts\OSDevGrp.OSIntranet.Contracts.csproj">
       <Project>{776EB809-1060-4037-A993-2B3E74DF779D}</Project>
       <Name>OSDevGrp.OSIntranet.Contracts</Name>
