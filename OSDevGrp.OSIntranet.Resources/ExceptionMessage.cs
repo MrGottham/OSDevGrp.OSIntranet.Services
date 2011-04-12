@@ -10,6 +10,7 @@
         CantFindObjectById,
         IllegalValue,
         CantAutoMapType,
-        MissingApplicationSetting
+        MissingApplicationSetting,
+        ErrorInCommandHandlerWithReturnValue
     }
 }

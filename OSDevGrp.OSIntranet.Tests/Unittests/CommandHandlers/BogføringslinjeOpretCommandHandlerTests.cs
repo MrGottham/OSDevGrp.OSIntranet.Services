@@ -1,7 +1,11 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.CommandHandlers;
+using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 {
@@ -36,6 +40,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestAtConstructorKasterArgumentNullExceptionHvisKonfigurationRepositoryErNull()
         {
             Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), null));
+        }
+
+        /// <summary>
+        /// Tester, at HandleException kaster IntranetSystemException.
+        /// </summary>
+        [Test]
+        public void TestAtHandleExceptionKasterIntranetSystemException()
+        {
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            Assert.Throws<IntranetSystemException>(() => commandHandler.HandleException(new BogføringslinjeOpretCommand(), new Exception("Test")));
         }
     }
 }

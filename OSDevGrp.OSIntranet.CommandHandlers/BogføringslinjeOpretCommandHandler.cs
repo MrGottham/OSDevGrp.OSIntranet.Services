@@ -3,7 +3,9 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.Core;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.CommandHandlers
 {
@@ -66,9 +68,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// </summary>
         /// <param name="command">Kommando til oprettelse af en bogføringslinje.</param>
         /// <param name="exception">Exception.</param>
+        [RethrowException(typeof(IntranetRepositoryException), typeof(IntranetBusinessException), typeof(IntranetSystemException))]
         public void HandleException(BogføringslinjeOpretCommand command, Exception exception)
         {
-            throw new NotImplementedException();
+            throw new IntranetSystemException(
+                Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue,
+                                             typeof (BogføringslinjeOpretCommand), typeof (BogføringslinjeOpretResponse),
+                                             exception.Message));
         }
 
         #endregion
