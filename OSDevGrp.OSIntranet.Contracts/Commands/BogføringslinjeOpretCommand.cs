@@ -89,5 +89,15 @@ namespace OSDevGrp.OSIntranet.Contracts.Commands
             get;
             set;
         }
+
+        /// <summary>
+        /// Unik identifikation af adressekontoen.
+        /// </summary>
+        [DataMember(IsRequired = false)]
+        public int Adressekonto
+        {
+            get;
+            set;
+        }
     }
 }

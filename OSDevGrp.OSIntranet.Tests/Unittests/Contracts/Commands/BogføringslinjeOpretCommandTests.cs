@@ -28,7 +28,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Commands
                                   Tekst = "Test",
                                   Budgetkontonummer = "1000",
                                   Debit = 10000M,
-                                  Kredit = 5000M
+                                  Kredit = 5000M,
+                                  Adressekonto = 1
                               };
             Assert.That(command, Is.Not.Null);
             Assert.That(command.Regnskabsnummer, Is.EqualTo(1));
@@ -43,6 +44,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Commands
             Assert.That(command.Budgetkontonummer, Is.EqualTo("1000"));
             Assert.That(command.Debit, Is.EqualTo(10000M));
             Assert.That(command.Kredit, Is.EqualTo(5000M));
+            Assert.That(command.Adressekonto, Is.EqualTo(1));
         }
 
         /// <summary>
@@ -61,7 +63,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Commands
                                   Tekst = "Test",
                                   Budgetkontonummer = "1000",
                                   Debit = 10000M,
-                                  Kredit = 5000M
+                                  Kredit = 5000M,
+                                  Adressekonto = 1
                               };
             Assert.That(command, Is.Not.Null);
             var memoryStream = new MemoryStream();
