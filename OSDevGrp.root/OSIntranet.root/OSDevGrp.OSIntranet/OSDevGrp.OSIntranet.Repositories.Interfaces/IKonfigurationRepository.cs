@@ -20,5 +20,13 @@
         {
             get;
         }
+
+        /// <summary>
+        /// Angivelse af antal dage for bogføringsperiode.
+        /// </summary>
+        int DageForBogføringsperiode
+        {
+            get;
+        }
     }
 }

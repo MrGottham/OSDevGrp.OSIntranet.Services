@@ -77,6 +77,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Tester, at Execute kaster en IntranetBusinessException, hvis bogføringsdato er for gammel.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteKasterIntranetBusinessExceptionHvisBogføringsdatoErForGammel()
+        {
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var command = new BogføringslinjeOpretCommand
+                              {
+                                  Regnskabsnummer = 1,
+                                  Dato = DateTime.Now.AddDays(-31),
+                                  Bilag = "XYZ",
+                                  Kontonummer = "DANKORT",
+                                  Tekst = "Test",
+                                  Budgetkontonummer = "1000",
+                                  Debit = 1000M,
+                                  Kredit = 0M,
+                                  Adressekonto = 1
+                              };
+            Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
+        }
+
+
+        /// <summary>
         /// Tester, at HandleException kaster IntranetSystemException.
         /// </summary>
         [Test]
