@@ -370,7 +370,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtKontogruppeGetAllHenterAlleKontogrupper()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetKontogrupper());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new FinansstyringRepository(channelFactory);
             var kontogrupper = repository.KontogruppeGetAll();
             Assert.That(kontogrupper, Is.Not.Null);
@@ -379,12 +389,75 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(kontogrupper[0].Nummer, Is.EqualTo(1));
             Assert.That(kontogrupper[0].Navn, Is.Not.Null);
             Assert.That(kontogrupper[0].Navn, Is.EqualTo("Bankkonti"));
-            Assert.That(kontogrupper[0].KontogruppeType, Is.EqualTo(KontogruppeType.Aktiver));
+            Assert.That(kontogrupper[0].KontogruppeType, Is.EqualTo(CommonLibrary.Domain.Enums.KontogruppeType.Aktiver));
             Assert.That(kontogrupper[1], Is.Not.Null);
             Assert.That(kontogrupper[1].Nummer, Is.EqualTo(2));
             Assert.That(kontogrupper[1].Navn, Is.Not.Null);
             Assert.That(kontogrupper[1].Navn, Is.EqualTo("Kontanter"));
-            Assert.That(kontogrupper[1].KontogruppeType, Is.EqualTo(KontogruppeType.Aktiver));
+            Assert.That(kontogrupper[1].KontogruppeType, Is.EqualTo(CommonLibrary.Domain.Enums.KontogruppeType.Aktiver));
+        }
+
+        /// <summary>
+        /// Tester, at KontogruppeGetAll kaster en IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtKontogruppeGetKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.KontogruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at KontogruppeGetAll kaster en IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtKontogruppeGetKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("FaultException"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.KontogruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at KontogruppeGetAll kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtKontogruppeGetKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Throw(new Exception("FaultException"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.KontogruppeGetAll());
         }
 
         /// <summary>
