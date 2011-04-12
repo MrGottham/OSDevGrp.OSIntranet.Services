@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.Core;
 using OSDevGrp.OSIntranet.Contracts.Commands;
@@ -60,6 +61,11 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <returns>Svar for oprettelse af en bogføringslinje.</returns>
         public BogføringslinjeOpretResponse Execute(BogføringslinjeOpretCommand command)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            EvaluateCommand(command);
             throw new NotImplementedException();
         }
 
@@ -78,5 +84,17 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         }
 
         #endregion
+
+        /// <summary>
+        /// Evaluerer kommando til oprettelse af en bogføringslinje.
+        /// </summary>
+        /// <param name="command">Kommando til oprettelse af en bogføringslinje.</param>
+        private void EvaluateCommand(BogføringslinjeOpretCommand command)
+        {
+            var adresser = _adresseRepository.AdresseGetAll();
+            var regnskab = _finansstyringRepository.RegnskabGet(command.Regnskabsnummer,
+                                                                nummer => adresser.Single(m => m.Nummer == nummer));
+            throw new NotImplementedException();
+        }
     }
 }

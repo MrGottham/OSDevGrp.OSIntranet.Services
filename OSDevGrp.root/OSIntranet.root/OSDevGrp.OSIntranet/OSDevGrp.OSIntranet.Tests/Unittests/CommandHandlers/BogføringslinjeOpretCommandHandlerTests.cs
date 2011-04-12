@@ -43,6 +43,40 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Tester, at Execute kaster en ArgumentNullException, hvis kommandoen er null.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteKasterArgumentNullExceptionHvisCommandErNull()
+        {
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            Assert.Throws<ArgumentNullException>(() => commandHandler.Execute(null));
+        }
+
+        /// <summary>
+        /// Tester, at Execute kaster en IntranetRepositoryException, hvis regnskabet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
+        {
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var command = new BogføringslinjeOpretCommand
+                              {
+                                  Regnskabsnummer = -1,
+                                  Dato = new DateTime(2011, 4, 1),
+                                  Bilag = "XYZ",
+                                  Kontonummer = "DANKORT",
+                                  Tekst = "Test",
+                                  Budgetkontonummer = "1000",
+                                  Debit = 1000M,
+                                  Kredit = 0M,
+                                  Adressekonto = 1
+                              };
+            Assert.Throws<IntranetRepositoryException>(() => commandHandler.Execute(command));
+        }
+
+        /// <summary>
         /// Tester, at HandleException kaster IntranetSystemException.
         /// </summary>
         [Test]
