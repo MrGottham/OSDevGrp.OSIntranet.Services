@@ -6,6 +6,7 @@ using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Commands;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Enums;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
@@ -553,6 +554,126 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var repository = new FinansstyringRepository(channelFactory);
             Assert.Throws<IntranetRepositoryException>(() => repository.BudgetkontogruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeAdd kaster en ArgumentNullException, hvis kontoen er null.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjeAddKasterEnArgumentNullExceptionHvisKontoErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<ArgumentNullException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, null, null, null, 0M, 0M, null));
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeAdd kaster en ArgumentNullException, hvis tekst er null.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjeAddKasterEnArgumentNullExceptionHvisTekstErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            var repository = new FinansstyringRepository(channelFactory);
+            var regnskab = new Regnskab(1, "Ole Sørensen");
+            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
+            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
+            Assert.Throws<ArgumentNullException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, null, null, 0M, 0M, null));
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeAdd kalder servicemetode.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjeAddKalderServicemetode()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var regnskab = new Regnskab(1, "Ole Sørensen");
+            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
+            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
+            repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null);
+            service.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeAdd kaster en IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjeAddKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var regnskab = new Regnskab(1, "Ole Sørensen");
+            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
+            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null));
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeAdd kaster en IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjeAddKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var regnskab = new Regnskab(1, "Ole Sørensen");
+            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
+            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null));
+        }
+
+        /// <summary>
+        /// Tester, at BogføringslinjeAdd kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjeAddKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
+                .Throw(new Exception("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var regnskab = new Regnskab(1, "Ole Sørensen");
+            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
+            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null));
         }
 
         /// <summary>
