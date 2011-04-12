@@ -7,6 +7,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
+using OSDevGrp.OSIntranet.DataAccess.Contracts.Commands;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
@@ -176,7 +177,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         }
 
         /// <summary>
-        /// Hetner alle grupper til budgetkonti.
+        /// Henter alle grupper til budgetkonti.
         /// </summary>
         /// <returns>Liste af grupper til budgetkonti.</returns>
         public IList<Budgetkontogruppe> BudgetkontogruppeGetAll()
@@ -187,6 +188,64 @@ namespace OSDevGrp.OSIntranet.Repositories
                 var query = new BudgetkontogruppeGetAllQuery();
                 var budgetkontogruppeViews = channel.BudgetkontogruppeGetAll(query);
                 return budgetkontogruppeViews.Select(MapBudgetkontogruppe).ToList();
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetRepositoryException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(channel);
+            }
+        }
+
+        /// <summary>
+        /// Tilføjer en bogføringslinje.
+        /// </summary>
+        /// <param name="bogføringstidspunkt">Bogføringstidspunkt.</param>
+        /// <param name="bilag">Bilag.</param>
+        /// <param name="konto">Konto.</param>
+        /// <param name="tekst">Tekst.</param>
+        /// <param name="budgetkonto">Budgetkonto.</param>
+        /// <param name="debit">Debitbeløb.</param>
+        /// <param name="kredit">Kreditbeløb.</param>
+        /// <param name="adressekonto">Adressekonto.</param>
+        public void BogføringslinjeAdd(DateTime bogføringstidspunkt, string bilag, Konto konto, string tekst, Budgetkonto budgetkonto, decimal debit, decimal kredit, AdresseBase adressekonto)
+        {
+            if (konto == null)
+            {
+                throw new ArgumentNullException("konto");
+            }
+            if (string.IsNullOrEmpty(tekst))
+            {
+                throw new ArgumentNullException("tekst");
+            }
+            var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            try
+            {
+                var command = new BogføringslinjeAddCommand
+                                  {
+                                      Regnskabsnummer = konto.Regnskab.Nummer,
+                                      Bogføringsdato = bogføringstidspunkt,
+                                      Bilag = bilag,
+                                      Kontonummer = konto.Kontonummer,
+                                      Tekst = tekst,
+                                      Budgetkontonummer = budgetkonto == null ? null : budgetkonto.Kontonummer,
+                                      Debit = debit,
+                                      Kredit = kredit,
+                                      AdresseId = adressekonto == null ? 0 : adressekonto.Nummer
+                                  };
+                channel.BogføringslinjeAdd(command);
             }
             catch (IntranetRepositoryException)
             {

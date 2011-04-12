@@ -38,9 +38,22 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         IList<Kontogruppe> KontogruppeGetAll();
 
         /// <summary>
-        /// Hetner alle grupper til budgetkonti.
+        /// Henter alle grupper til budgetkonti.
         /// </summary>
         /// <returns>Liste af grupper til budgetkonti.</returns>
         IList<Budgetkontogruppe> BudgetkontogruppeGetAll();
+
+        /// <summary>
+        /// Tilføjer en bogføringslinje.
+        /// </summary>
+        /// <param name="bogføringstidspunkt">Bogføringstidspunkt.</param>
+        /// <param name="bilag">Bilag.</param>
+        /// <param name="konto">Konto.</param>
+        /// <param name="tekst">Tekst.</param>
+        /// <param name="budgetkonto">Budgetkonto.</param>
+        /// <param name="debit">Debitbeløb.</param>
+        /// <param name="kredit">Kreditbeløb.</param>
+        /// <param name="adressekonto">Adressekonto.</param>
+        void BogføringslinjeAdd(DateTime bogføringstidspunkt, string bilag, Konto konto, string tekst, Budgetkonto budgetkonto, decimal debit, decimal kredit, AdresseBase adressekonto);
     }
 }
