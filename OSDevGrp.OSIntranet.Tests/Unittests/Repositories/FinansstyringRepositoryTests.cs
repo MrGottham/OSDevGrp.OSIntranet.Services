@@ -144,7 +144,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(service).Repeat.Any();
 
             var repository = new FinansstyringRepository(channelFactory);
-
             var regnskab = repository.RegnskabGet(1);
             Assert.That(regnskab, Is.Not.Null);
             Assert.That(regnskab.Nummer, Is.EqualTo(1));
@@ -190,7 +189,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtKontoMappesKorrekt()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Return(GetRegnskab());
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetKontogrupper());
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetBudgetkontogrupper());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new FinansstyringRepository(channelFactory);
             var regnskab = repository.RegnskabGet(1);
             Assert.That(regnskab, Is.Not.Null);
@@ -206,20 +219,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(konto.Kontonavn, Is.EqualTo("Dankort"));
             Assert.That(konto.Beskrivelse, Is.Not.Null);
             Assert.That(konto.Beskrivelse, Is.EqualTo("Dankort/lønkonto"));
-            Assert.That(konto.Note, Is.Null);
+            Assert.That(konto.Note, Is.Not.Null);
+            Assert.That(konto.Note, Is.EqualTo("Bla, bla og mere bla"));
             Assert.That(konto.Kontogruppe, Is.Not.Null);
             Assert.That(konto.Kontogruppe.Nummer, Is.EqualTo(1));
             Assert.That(konto.Kontogruppe.Navn, Is.Not.Null);
             Assert.That(konto.Kontogruppe.Navn, Is.EqualTo("Bankkonti"));
-            Assert.That(konto.Kontogruppe.KontogruppeType, Is.EqualTo(KontogruppeType.Aktiver));
-            Assert.That(konto.Kreditoplysninger.Where(m => m.År <= 2010 && m.Måned < 11).Count(), Is.EqualTo(122));
-            var kreditoplysninger = konto.Kreditoplysninger.SingleOrDefault(m => m.År == 2000 && m.Måned == 12);
+            Assert.That(konto.Kontogruppe.KontogruppeType, Is.EqualTo(CommonLibrary.Domain.Enums.KontogruppeType.Aktiver));
+            Assert.That(konto.Kreditoplysninger.Where(m => m.År <= 2011 && m.Måned <= 4).Count(), Is.EqualTo(1));
+            var kreditoplysninger = konto.Kreditoplysninger.SingleOrDefault(m => m.År == 2011 && m.Måned == 4);
             Assert.That(kreditoplysninger, Is.Not.Null);
-            Assert.That(kreditoplysninger.År, Is.EqualTo(2000));
-            Assert.That(kreditoplysninger.Måned, Is.EqualTo(12));
+            Assert.That(kreditoplysninger.År, Is.EqualTo(2011));
+            Assert.That(kreditoplysninger.Måned, Is.EqualTo(4));
             Assert.That(kreditoplysninger.Kredit, Is.EqualTo(30000M));
-            var calculateTo = new DateTime(2010, 10, 31);
-            Assert.That(konto.Bogføringslinjer.Where(m => m.Dato.Date.CompareTo(calculateTo) <= 0).Count(), Is.EqualTo(7458));
+            var calculateTo = new DateTime(2011, 4, 1);
+            Assert.That(konto.Bogføringslinjer.Where(m => m.Dato.Date.CompareTo(calculateTo) <= 0).Count(), Is.EqualTo(6));
         }
 
         /// <summary>
@@ -228,44 +242,124 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBudgetkontoMappesKorrekt()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Return(GetRegnskab());
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetKontogrupper());
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetBudgetkontogrupper());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new FinansstyringRepository(channelFactory);
             var regnskab = repository.RegnskabGet(1);
             Assert.That(regnskab, Is.Not.Null);
             Assert.That(regnskab.Konti, Is.Not.Null);
             Assert.That(regnskab.Konti.Count, Is.GreaterThan(0));
-            var budgetkonto = regnskab.Konti.OfType<Budgetkonto>().SingleOrDefault(m => m.Kontonummer.CompareTo("3000") == 0);
+            var budgetkonto = regnskab.Konti.OfType<Budgetkonto>().SingleOrDefault(m => m.Kontonummer.CompareTo("2000") == 0);
             Assert.That(budgetkonto, Is.Not.Null);
             Assert.That(budgetkonto.Regnskab, Is.Not.Null);
             Assert.That(budgetkonto.Regnskab.Nummer, Is.EqualTo(1));
             Assert.That(budgetkonto.Regnskab.Navn, Is.Not.Null);
             Assert.That(budgetkonto.Regnskab.Navn, Is.EqualTo("Ole Sørensen"));
             Assert.That(budgetkonto.Kontonavn, Is.Not.Null);
-            Assert.That(budgetkonto.Kontonavn, Is.EqualTo("Supermarkeder"));
-            Assert.That(budgetkonto.Beskrivelse, Is.Null);
-            Assert.That(budgetkonto.Note, Is.Null);
+            Assert.That(budgetkonto.Kontonavn, Is.EqualTo("Budget"));
+            Assert.That(budgetkonto.Beskrivelse, Is.Not.Null);
+            Assert.That(budgetkonto.Beskrivelse, Is.EqualTo("Fast budgetterede omkostninger"));
+            Assert.That(budgetkonto.Note, Is.Not.Null);
+            Assert.That(budgetkonto.Note, Is.EqualTo("Bla, bla og mere bla"));
             Assert.That(budgetkonto.Budgetkontogruppe, Is.Not.Null);
-            Assert.That(budgetkonto.Budgetkontogruppe.Nummer, Is.EqualTo(3));
+            Assert.That(budgetkonto.Budgetkontogruppe.Nummer, Is.EqualTo(2));
             Assert.That(budgetkonto.Budgetkontogruppe.Navn, Is.Not.Null);
-            Assert.That(budgetkonto.Budgetkontogruppe.Navn, Is.EqualTo("Dagligvareforretninger"));
-            Assert.That(budgetkonto.Budgetoplysninger.Where(m => m.År <= 2010 && m.Måned < 11).Count(), Is.EqualTo(122));
-            var budgetoplysnigner = budgetkonto.Budgetoplysninger.SingleOrDefault(m => m.År == 2000 && m.Måned == 12);
+            Assert.That(budgetkonto.Budgetkontogruppe.Navn, Is.EqualTo("Udgifter"));
+            Assert.That(budgetkonto.Budgetoplysninger.Where(m => m.År <= 2011 && m.Måned <= 4).Count(), Is.EqualTo(1));
+            var budgetoplysnigner = budgetkonto.Budgetoplysninger.SingleOrDefault(m => m.År == 2011 && m.Måned == 4);
             Assert.That(budgetoplysnigner, Is.Not.Null);
-            Assert.That(budgetoplysnigner.År, Is.EqualTo(2000));
-            Assert.That(budgetoplysnigner.Måned, Is.EqualTo(12));
+            Assert.That(budgetoplysnigner.År, Is.EqualTo(2011));
+            Assert.That(budgetoplysnigner.Måned, Is.EqualTo(4));
             Assert.That(budgetoplysnigner.Indtægter, Is.EqualTo(0M));
-            Assert.That(budgetoplysnigner.Udgifter, Is.EqualTo(1500M));
-            var calculateTo = new DateTime(2010, 10, 31);
-            Assert.That(budgetkonto.Bogføringslinjer.Where(m => m.Dato.Date.CompareTo(calculateTo) <= 0).Count(), Is.EqualTo(1902));
+            Assert.That(budgetoplysnigner.Udgifter, Is.EqualTo(7500M));
+            var calculateTo = new DateTime(2011, 4, 1);
+            Assert.That(budgetkonto.Bogføringslinjer.Where(m => m.Dato.Date.CompareTo(calculateTo) <= 0).Count(), Is.EqualTo(1));
         }
 
         /// <summary>
-        /// Tester, at RegnskabGet kaster en IntranetRepositoryException, hvis regnskabet ikke findes.
+        /// Tester, at RegnskabGet kaster en IntranetRepositoryException ved IntranetRepositoryException.
         /// </summary>
         [Test]
-        public void TestAtRegnskabGetKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
+        public void TestAtRegnskabGetKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetKontogrupper());
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetBudgetkontogrupper());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet kaster en IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabGetKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetKontogrupper());
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetBudgetkontogrupper());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabGetKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetKontogrupper());
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetBudgetkontogrupper());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new FinansstyringRepository(channelFactory);
             Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
         }
@@ -387,7 +481,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                    {
                                                                                        År = 2011,
                                                                                        Måned = 4,
-                                                                                       Kredit = 0M
+                                                                                       Kredit = 30000M
                                                                                    }
                                                                            },
                                                    Bogføringslinjer = new List<BogføringslinjeView>
@@ -398,8 +492,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer =
-                                                                                                          "DANKORT"
+                                                                                                      Kontonummer = "DANKORT"
                                                                                                   },
                                                                                       Tekst = "Saldo",
                                                                                       Debit = 10000M
@@ -410,8 +503,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer =
-                                                                                                          "DANKORT"
+                                                                                                      Kontonummer = "DANKORT"
                                                                                                   },
                                                                                       Tekst = "Løn",
                                                                                       Budgetkonto =
@@ -427,8 +519,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer =
-                                                                                                          "DANKORT"
+                                                                                                      Kontonummer = "DANKORT"
                                                                                                   },
                                                                                       Tekst = "Indbetaling",
                                                                                       Budgetkonto =
@@ -448,8 +539,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer =
-                                                                                                          "DANKORT"
+                                                                                                      Kontonummer = "DANKORT"
                                                                                                   },
                                                                                       Tekst = "Budget",
                                                                                       Budgetkonto =
@@ -465,8 +555,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer =
-                                                                                                          "DANKORT"
+                                                                                                      Kontonummer = "DANKORT"
                                                                                                   },
                                                                                       Tekst = "Udlån",
                                                                                       Budgetkonto =
@@ -486,8 +575,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer =
-                                                                                                          "DANKORT"
+                                                                                                      Kontonummer = "DANKORT"
                                                                                                   },
                                                                                       Tekst = "Tab",
                                                                                       Budgetkonto =
@@ -524,8 +612,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                       Dato = new DateTime(2011, 4, 1),
                                                                                       Konto = new KontoListeView
                                                                                                   {
-                                                                                                      Kontonummer =
-                                                                                                          "KONTANTER"
+                                                                                                      Kontonummer = "KONTANTER"
                                                                                                   },
                                                                                       Tekst = "Saldo",
                                                                                       Debit = 250M
@@ -579,6 +666,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                      {
                                                          Kontonummer = "2000",
                                                          Kontonavn = "Budget",
+                                                         Beskrivelse = "Fast budgetterede omkostninger",
+                                                         Note = "Bla, bla og mere bla",
                                                          Budgetkontogruppe = new BudgetkontogruppeView
                                                                                  {
                                                                                      Nummer = 2
@@ -590,7 +679,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                                              År = 2011,
                                                                                              Måned = 4,
                                                                                              Indtægter = 0M,
-                                                                                             Udgifter = 0M
+                                                                                             Udgifter = 7500M
                                                                                          }
                                                                                  }
                                                      },
