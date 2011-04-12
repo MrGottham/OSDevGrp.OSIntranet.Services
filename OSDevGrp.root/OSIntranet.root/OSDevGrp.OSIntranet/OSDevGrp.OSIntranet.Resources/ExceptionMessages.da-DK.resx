@@ -125,6 +125,10 @@
     <value>Kan ikke finde en instans af typen '{0}' med den unikke identifikation '{1}'.</value>
     <comment>{0} = Navn på typen, {1} = Unik identifikation.</comment>
   </data>
+  <data name="ErrorInCommandHandlerWithReturnValue" xml:space="preserve">
+    <value>Fejl i commandhandleren, som håndterer kommandoen '{0}' og returnerer '{1}': {2}</value>
+    <comment>{0} = Type på kommandoen, {1} = Type på returnværdi, {2} = Fejlbesked.</comment>
+  </data>
   <data name="IllegalValue" xml:space="preserve">
     <value>Værdien '{0}' er invalid for '{1}'.</value>
     <comment>{0} = Værdi, {1} = Navn på egenskab.</comment>
