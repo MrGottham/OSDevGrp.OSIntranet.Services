@@ -460,6 +460,10 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 throw new ArgumentNullException("konti");
             }
+            if (budgetkonti == null)
+            {
+                throw new ArgumentNullException("budgetkonti");
+            }
             var bogføringslinje = new Bogføringslinje(bogføringslinjeView.Løbenummer, bogføringslinjeView.Dato,
                                                       bogføringslinjeView.Bilag, bogføringslinjeView.Tekst,
                                                       bogføringslinjeView.Debit, bogføringslinjeView.Kredit);
