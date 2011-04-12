@@ -53,6 +53,20 @@ namespace OSDevGrp.OSIntranet.Repositories
                 throw new IntranetRepositoryException(
                     Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "KreditorSaldoOverNul"), ex);
             }
+            value = nameValueCollection["DageForBogføringsperiode"];
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "DageForBogføringsperiode"));
+            }
+            try
+            {
+                DageForBogføringsperiode = int.Parse(value);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "DageForBogføringsperiode"), ex);
+            }
         }
 
         #endregion
@@ -72,6 +86,15 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Angielse af, om saldo for kreditorer skal være større end 0.
         /// </summary>
         public bool KreditorSaldoOverNul
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Angivelse af antal dage for bogføringsperiode.
+        /// </summary>
+        public int DageForBogføringsperiode
         {
             get;
             private set;

@@ -92,8 +92,16 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         private void EvaluateCommand(BogføringslinjeOpretCommand command)
         {
             var adresser = _adresseRepository.AdresseGetAll();
-            var regnskab = _finansstyringRepository.RegnskabGet(command.Regnskabsnummer,
-                                                                nummer => adresser.Single(m => m.Nummer == nummer));
+            var regnskab = _finansstyringRepository.RegnskabGet(command.Regnskabsnummer, nummer =>
+                                                                                             {
+                                                                                                 var adresse = adresser.SingleOrDefault(m => m.Nummer == nummer);
+                                                                                                 if (adresse == null)
+                                                                                                 {
+                                                                                                     var message = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, "AdresseBase", nummer);
+                                                                                                     throw new IntranetRepositoryException(message);
+                                                                                                 }
+                                                                                                 return adresse;
+                                                                                             });
             throw new NotImplementedException();
         }
     }

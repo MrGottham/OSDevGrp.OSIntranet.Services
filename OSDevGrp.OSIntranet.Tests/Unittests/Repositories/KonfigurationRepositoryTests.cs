@@ -15,7 +15,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         private readonly NameValueCollection _validNameValueCollection = new NameValueCollection
                                                                              {
                                                                                  {"DebitorSaldoOverNul", "true"},
-                                                                                 {"KreditorSaldoOverNul", "true"}
+                                                                                 {"KreditorSaldoOverNul", "true"},
+                                                                                 {"DageForBogføringsperiode", "30"}
                                                                              };
 
         /// <summary>
@@ -78,6 +79,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at konstruktøren kaster en IntranetRepositoryException, hvis DageForBogføringsperiode ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterIntranetRepositoryExceptionHvisDageForBogføringsperiodeIkkeErRegistreret()
+        {
+            var nameValueCollection = new NameValueCollection
+                                          {
+                                              {"DebitorSaldoOverNul", "True"},
+                                              {"KreditorSaldoOverNul", "False"}
+                                          };
+            Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en IntranetRepositoryException, hvis DageForBogføringsperiode ikke er invalid.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterIntranetRepositoryExceptionHvisDageForBogføringsperiodeErInvalid()
+        {
+            var nameValueCollection = new NameValueCollection
+                                          {
+                                              {"DebitorSaldoOverNul", "True"},
+                                              {"KreditorSaldoOverNul", "False"},
+                                              {"DageForBogføringsperiode", "X"},
+                                          };
+            Assert.Throws<IntranetRepositoryException>(() => new KonfigurationRepository(nameValueCollection));
+        }
+
+        /// <summary>
         /// Tester, at DebitorSaldoOverNul er true.
         /// </summary>
         [Test]
@@ -97,6 +127,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new KonfigurationRepository(_validNameValueCollection);
             Assert.That(repository, Is.Not.Null);
             Assert.That(repository.KreditorSaldoOverNul, Is.True);
+        }
+
+        /// <summary>
+        /// Tester, at DageForBogføringsperiode er 30.
+        /// </summary>
+        [Test]
+        public void TestAtDageForBogføringsperiodeEr30()
+        {
+            var repository = new KonfigurationRepository(_validNameValueCollection);
+            Assert.That(repository, Is.Not.Null);
+            Assert.That(repository.DageForBogføringsperiode, Is.EqualTo(30));
         }
     }
 }
