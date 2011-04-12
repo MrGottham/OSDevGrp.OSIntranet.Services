@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
@@ -401,7 +402,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         /// Tester, at KontogruppeGetAll kaster en IntranetRepositoryException ved IntranetRepositoryException.
         /// </summary>
         [Test]
-        public void TestAtKontogruppeGetKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        public void TestAtKontogruppeGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
         {
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
@@ -422,7 +423,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         /// Tester, at KontogruppeGetAll kaster en IntranetRepositoryException ved FaultException.
         /// </summary>
         [Test]
-        public void TestAtKontogruppeGetKasterIntranetRepositoryExceptionVedFaultException()
+        public void TestAtKontogruppeGetAllKasterIntranetRepositoryExceptionVedFaultException()
         {
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
@@ -443,7 +444,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         /// Tester, at KontogruppeGetAll kaster en IntranetRepositoryException ved Exception.
         /// </summary>
         [Test]
-        public void TestAtKontogruppeGetKasterIntranetRepositoryExceptionVedException()
+        public void TestAtKontogruppeGetAllKasterIntranetRepositoryExceptionVedException()
         {
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
@@ -466,11 +467,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBudgetkontogruppeGetAllHenterAlleBudgetkontogrupper()
         {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(GetBudgetkontogrupper());
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
             var repository = new FinansstyringRepository(channelFactory);
             var budgetkontogrupper = repository.BudgetkontogruppeGetAll();
             Assert.That(budgetkontogrupper, Is.Not.Null);
-            Assert.That(budgetkontogrupper.Count, Is.EqualTo(8));
+            Assert.That(budgetkontogrupper.Count, Is.EqualTo(2));
             Assert.That(budgetkontogrupper[0], Is.Not.Null);
             Assert.That(budgetkontogrupper[0].Nummer, Is.EqualTo(1));
             Assert.That(budgetkontogrupper[0].Navn, Is.Not.Null);
@@ -478,31 +489,179 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(budgetkontogrupper[1], Is.Not.Null);
             Assert.That(budgetkontogrupper[1].Nummer, Is.EqualTo(2));
             Assert.That(budgetkontogrupper[1].Navn, Is.Not.Null);
-            Assert.That(budgetkontogrupper[1].Navn, Is.EqualTo("Faste udgifter"));
-            Assert.That(budgetkontogrupper[2], Is.Not.Null);
-            Assert.That(budgetkontogrupper[2].Nummer, Is.EqualTo(3));
-            Assert.That(budgetkontogrupper[2].Navn, Is.Not.Null);
-            Assert.That(budgetkontogrupper[2].Navn, Is.EqualTo("Dagligvareforretninger"));
-            Assert.That(budgetkontogrupper[3], Is.Not.Null);
-            Assert.That(budgetkontogrupper[3].Nummer, Is.EqualTo(4));
-            Assert.That(budgetkontogrupper[3].Navn, Is.Not.Null);
-            Assert.That(budgetkontogrupper[3].Navn, Is.EqualTo("Specialvareforretninger"));
-            Assert.That(budgetkontogrupper[4], Is.Not.Null);
-            Assert.That(budgetkontogrupper[4].Nummer, Is.EqualTo(5));
-            Assert.That(budgetkontogrupper[4].Navn, Is.Not.Null);
-            Assert.That(budgetkontogrupper[4].Navn, Is.EqualTo("Restaurationer"));
-            Assert.That(budgetkontogrupper[5], Is.Not.Null);
-            Assert.That(budgetkontogrupper[5].Nummer, Is.EqualTo(6));
-            Assert.That(budgetkontogrupper[5].Navn, Is.Not.Null);
-            Assert.That(budgetkontogrupper[5].Navn, Is.EqualTo("Transportomkostninger"));
-            Assert.That(budgetkontogrupper[6], Is.Not.Null);
-            Assert.That(budgetkontogrupper[6].Nummer, Is.EqualTo(7));
-            Assert.That(budgetkontogrupper[6].Navn, Is.Not.Null);
-            Assert.That(budgetkontogrupper[6].Navn, Is.EqualTo("Forlystelser"));
-            Assert.That(budgetkontogrupper[7], Is.Not.Null);
-            Assert.That(budgetkontogrupper[7].Nummer, Is.EqualTo(8));
-            Assert.That(budgetkontogrupper[7].Navn, Is.Not.Null);
-            Assert.That(budgetkontogrupper[7].Navn, Is.EqualTo("Øvrige udgifter"));
+            Assert.That(budgetkontogrupper[1].Navn, Is.EqualTo("Udgifter"));
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontogruppeGetAll kaster en IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontogruppeGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Throw(new IntranetRepositoryException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BudgetkontogruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontogruppeGetAll kaster en IntranetRepositoryException ved FaultException.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontogruppeGetAllKasterIntranetRepositoryExceptionVedFaultException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Throw(new FaultException("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BudgetkontogruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at BudgetkontogruppeGetAll kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtBudgetkontogruppeGetAllKasterIntranetRepositoryExceptionVedException()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Throw(new Exception("Test"));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var repository = new FinansstyringRepository(channelFactory);
+            Assert.Throws<IntranetRepositoryException>(() => repository.BudgetkontogruppeGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at MapRegnskab kaster en ArgumentNullException, hvis regnskabslisteviewet er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapRegnskabKasterArgumentNullExceptionHvisRegnskabListeViewErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static, null, new [] {typeof (RegnskabListeView)}, null);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] {null});
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapRegnskab kaster en ArgumentNullException, hvis regnskabsviewet er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapRegnskabKasterArgumentNullExceptionHvisRegnskabViewErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static,
+                                                        null, new[]
+                                                                  {
+                                                                      typeof (RegnskabView),
+                                                                      typeof (IEnumerable<Kontogruppe>),
+                                                                      typeof (IEnumerable<Budgetkontogruppe>),
+                                                                      typeof (Func<int, AdresseBase>)
+                                                                  }, null);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { null, null, null, null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapRegnskab kaster en ArgumentNullException, hvis kontogrupper er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapRegnskabKasterArgumentNullExceptionHvisKontogrupperErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static,
+                                                        null, new[]
+                                                                  {
+                                                                      typeof (RegnskabView),
+                                                                      typeof (IEnumerable<Kontogruppe>),
+                                                                      typeof (IEnumerable<Budgetkontogruppe>),
+                                                                      typeof (Func<int, AdresseBase>)
+                                                                  }, null);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] {new RegnskabView(), null, null, null});
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
+            }
+        }
+
+        /// <summary>
+        /// Tester, at MapRegnskab kaster en ArgumentNullException, hvis grupper af budgetkonti er null.
+        /// </summary>
+        [Test]
+        public void TestAtMapRegnskabKasterArgumentNullExceptionHvisBudgetkontogrupperErNull()
+        {
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+
+            var repository = new FinansstyringRepository(channelFactory);
+            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static,
+                                                        null, new[]
+                                                                  {
+                                                                      typeof (RegnskabView),
+                                                                      typeof (IEnumerable<Kontogruppe>),
+                                                                      typeof (IEnumerable<Budgetkontogruppe>),
+                                                                      typeof (Func<int, AdresseBase>)
+                                                                  }, null);
+            Assert.That(method, Is.Not.Null);
+            try
+            {
+                method.Invoke(repository, new object[] { new RegnskabView(), new List<Kontogruppe>(), null, null });
+            }
+            catch (TargetInvocationException ex)
+            {
+                Assert.That(ex.InnerException, Is.Not.Null);
+                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
+            }
         }
 
         /// <summary>
