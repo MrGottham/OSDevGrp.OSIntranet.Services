@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
+    <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

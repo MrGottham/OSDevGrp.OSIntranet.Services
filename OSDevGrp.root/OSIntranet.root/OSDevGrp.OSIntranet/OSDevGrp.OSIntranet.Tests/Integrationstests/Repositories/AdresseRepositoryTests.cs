@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
 {
     /// <summary>
-    /// Integrationstester servicen til finansstyring med kald fra klienter.
+    /// Integrationstester repository for adressekartotek.
     /// </summary>
     [TestFixture]
     [Category("Integrationstest")]
