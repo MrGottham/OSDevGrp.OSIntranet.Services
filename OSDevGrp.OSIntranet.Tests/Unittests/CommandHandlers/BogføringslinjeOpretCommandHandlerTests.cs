@@ -83,6 +83,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisBogføringsdatoErForGammel()
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
             var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
             var command = new BogføringslinjeOpretCommand
                               {
