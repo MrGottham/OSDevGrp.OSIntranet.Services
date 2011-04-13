@@ -11,6 +11,12 @@
         IllegalValue,
         CantAutoMapType,
         MissingApplicationSetting,
-        ErrorInCommandHandlerWithReturnValue
+        ErrorInCommandHandlerWithReturnValue,
+        BalanceLineDateToOld,
+        BalanceLineDateIsForwardInTime,
+        BalanceLineAccountNumberMissing,
+        BalanceLineTextMissing,
+        BalanceLineValueBelowZero,
+        BalanceLineValueMissing
     }
 }

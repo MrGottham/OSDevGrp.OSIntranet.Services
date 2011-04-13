@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.Core;
 using OSDevGrp.OSIntranet.Contracts.Commands;
@@ -65,7 +67,12 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 throw new ArgumentNullException("command");
             }
-            EvaluateCommand(command);
+
+            Konto konto;
+            Budgetkonto budgetkonto;
+            AdresseBase adressekonto;
+            EvaluateCommand(command, out konto, out budgetkonto, out adressekonto);
+
             throw new NotImplementedException();
         }
 
@@ -89,7 +96,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// Evaluerer kommando til oprettelse af en bogføringslinje.
         /// </summary>
         /// <param name="command">Kommando til oprettelse af en bogføringslinje.</param>
-        private void EvaluateCommand(BogføringslinjeOpretCommand command)
+        /// <param name="konto">Returnering af konto, hvorpå bogføringslinjen skal bogføres.</param>
+        /// <param name="budgetkonto">Returnering af budgetkonto, hvorpå bogføringslinjen skal bogføres.</param>
+        /// <param name="adressekonto">Returnering af adressekonto, hvorpå bogføringslinjen skal bogføres.</param>
+        private void EvaluateCommand(BogføringslinjeOpretCommand command, out Konto konto, out Budgetkonto budgetkonto, out AdresseBase adressekonto)
         {
             var adresser = _adresseRepository.AdresseGetAll();
             var regnskab = _finansstyringRepository.RegnskabGet(command.Regnskabsnummer, nummer =>
@@ -102,7 +112,83 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                                                                                                  }
                                                                                                  return adresse;
                                                                                              });
-            throw new NotImplementedException();
+            var currentTime = DateTime.Now;
+            if (command.Dato.Date < currentTime.AddDays(_konfigurationRepository.DageForBogføringsperiode*-1).Date)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld,
+                                                                                 _konfigurationRepository.
+                                                                                     DageForBogføringsperiode));
+            }
+            if (command.Dato.Date > currentTime.Date)
+            {
+                throw new IntranetBusinessException(
+                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime));
+            }
+            if (string.IsNullOrEmpty(command.Kontonummer))
+            {
+                throw new IntranetBusinessException(
+                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing));
+            }
+            try
+            {
+                konto = regnskab.Konti.OfType<Konto>().Single(m => m.Kontonummer == command.Kontonummer);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto),
+                                                 command.Kontonummer), ex);
+            }
+            if (string.IsNullOrEmpty(command.Tekst))
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineTextMissing));
+            }
+            budgetkonto = null;
+            if (!string.IsNullOrEmpty(command.Budgetkontonummer))
+            {
+                try
+                {
+                    budgetkonto = regnskab.Konti
+                        .OfType<Budgetkonto>()
+                        .Single(m => m.Kontonummer == command.Budgetkontonummer);
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(
+                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto),
+                                                     command.Budgetkontonummer), ex);
+                }
+            }
+            if (command.Debit < 0M)
+            {
+                throw new IntranetBusinessException(
+                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero));
+            }
+            if (command.Kredit < 0M)
+            {
+                throw new IntranetBusinessException(
+                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero));
+            }
+            if (command.Debit == 0M && command.Kredit == 0M)
+            {
+                throw new IntranetBusinessException(
+                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing));
+            }
+            adressekonto = null;
+            if (command.Adressekonto == 0)
+            {
+                return;
+            }
+            try
+            {
+                adressekonto = adresser.Single(m => m.Nummer == command.Adressekonto);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase),
+                                                 command.Adressekonto), ex);
+            }
         }
     }
 }
