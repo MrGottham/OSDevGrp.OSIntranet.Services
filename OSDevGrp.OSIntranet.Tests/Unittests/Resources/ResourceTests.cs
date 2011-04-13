@@ -119,6 +119,76 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for BalanceLineDateToOld hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForBalanceLineDateToOldHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld, 30);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for BalanceLineDateIsForwardInTime hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForBalanceLineDateIsForwardInTimeHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for BalanceLineAccountNumberMissing hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForBalanceLineAccountNumberMissingHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for BalanceLineTextMissing hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForBalanceLineTextMissingHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineTextMissing);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for BalanceLineValueBelowZero hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForBalanceLineValueBelowZeroHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for BalanceLineValueMissing hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForBalanceLineValueMissingHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]
