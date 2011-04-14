@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
@@ -73,7 +74,26 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             AdresseBase adressekonto;
             EvaluateCommand(command, out konto, out budgetkonto, out adressekonto);
 
-            throw new NotImplementedException();
+            var bogføringslinje = new Bogføringslinje(int.MaxValue, command.Dato, command.Bilag, command.Tekst,
+                                                      command.Debit, command.Kredit);
+            _finansstyringRepository.BogføringslinjeAdd(bogføringslinje.Dato, bogføringslinje.Bilag, konto,
+                                                        bogføringslinje.Tekst, budgetkonto, bogføringslinje.Debit,
+                                                        bogføringslinje.Kredit, adressekonto);
+
+            konto.TilføjBogføringslinje(bogføringslinje);
+            konto.Calculate(bogføringslinje.Dato, bogføringslinje.Løbenummer);
+            if (budgetkonto != null)
+            {
+                budgetkonto.TilføjBogføringslinje(bogføringslinje);
+                budgetkonto.Calculate(bogføringslinje.Dato, bogføringslinje.Løbenummer);
+            }
+            if (adressekonto != null)
+            {
+                adressekonto.TilføjBogføringslinje(bogføringslinje);
+                adressekonto.Calculate(bogføringslinje.Dato, bogføringslinje.Løbenummer);
+            }
+
+            return CreateResponse(konto, budgetkonto);
         }
 
         /// <summary>
@@ -189,6 +209,21 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                     Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase),
                                                  command.Adressekonto), ex);
             }
+        }
+
+        /// <summary>
+        /// Danner svar for oprettelse af bogføringslinje.
+        /// </summary>
+        /// <param name="konto">Konto.</param>
+        /// <param name="budgetkonto">Budgetkonto.</param>
+        /// <returns>Svar for oprettelse af bogføringslinje.</returns>
+        private static BogføringslinjeOpretResponse CreateResponse(Konto konto, Budgetkonto budgetkonto)
+        {
+            var response = new BogføringslinjeOpretResponse
+                               {
+                                   Advarsler = new List<string>()
+                               };
+            return response;
         }
     }
 }
