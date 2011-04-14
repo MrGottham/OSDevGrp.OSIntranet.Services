@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommandHandlers;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
@@ -64,19 +65,47 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                                   Budgetkontonummer = "1000",
                                   Debit = 15000M,
                                   Kredit = 0M,
+                                  Adressekonto = 1
                               };
             var result = commandHandler.Execute(command);
             Assert.That(result, Is.Not.Null);
+            Assert.That(result.Advarsler, Is.Not.Null);
             finansstyringRepository.AssertWasCalled(
                 m =>
                 m.BogføringslinjeAdd(Arg<DateTime>.Is.Equal(command.Dato),
                                      Arg<string>.Is.Equal(command.Bilag),
-                                     Arg<Konto>.Is.Anything,
+                                     Arg<Konto>.Is.NotNull,
                                      Arg<string>.Is.Equal(command.Tekst),
-                                     Arg<Budgetkonto>.Is.Anything,
+                                     Arg<Budgetkonto>.Is.NotNull,
                                      Arg<decimal>.Is.Equal(command.Debit),
                                      Arg<decimal>.Is.Equal(command.Kredit),
-                                     Arg<AdresseBase>.Is.Anything));
+                                     Arg<AdresseBase>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at Execute returnerer advarsel ved overtrækkelse af konto.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteReturnerAdvarselVedOvertrækkelseAfKonto()
+        {
+            var finansstyringRepository = GetFinansstyringRepository();
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(finansstyringRepository, GetAdresseRepository(),
+                                                                        konfigurationRepository);
+            var command = new BogføringslinjeOpretCommand
+                              {
+                                  Regnskabsnummer = 1,
+                                  Dato = DateTime.Now,
+                                  Kontonummer = "DANKORT",
+                                  Tekst = "Udbetaling",
+                                  Debit = 0M,
+                                  Kredit = 25000M,
+                              };
+            var result = commandHandler.Execute(command);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Advarsler, Is.Not.Null);
+            Assert.That(result.Advarsler.Count(), Is.EqualTo(1));
         }
 
         /// <summary>
