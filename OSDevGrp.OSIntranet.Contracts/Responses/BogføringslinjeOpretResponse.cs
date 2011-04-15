@@ -19,5 +19,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Responses
             get;
             set;
         }
+
+        // TODO: Advarseler skal bestå af: Tekst ("Budgettet på budgetkontoen er overtrukket."), Regnskab, Budgetkonto og Beløb (overtrukket med kr.).
     }
 }
