@@ -189,6 +189,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for AccountIsOverdrawn hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForAccountIsOverdrawnHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for BudgetAccountIsOverdrawn hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForBudgetAccountIsOverdrawnHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]
