@@ -21,11 +21,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
         {
             var response = new BogføringslinjeOpretResponse
                                {
-                                   Advarsler = new List<string>
+                                   Advarsler = new List<BogføringsadvarselResponse>
                                                    {
-                                                       "Test 1",
-                                                       "Test 2",
-                                                       "Test 3"
+                                                       new BogføringsadvarselResponse(),
+                                                       new BogføringsadvarselResponse(),
+                                                       new BogføringsadvarselResponse()
                                                    }
                                };
             Assert.That(response, Is.Not.Null);
@@ -41,11 +41,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
         {
             var response = new BogføringslinjeOpretResponse
                                {
-                                   Advarsler = new List<string>
+                                   Advarsler = new List<BogføringsadvarselResponse>
                                                    {
-                                                       "Test 1",
-                                                       "Test 2",
-                                                       "Test 3"
+                                                       new BogføringsadvarselResponse(),
+                                                       new BogføringsadvarselResponse(),
+                                                       new BogføringsadvarselResponse()
                                                    }
                                };
             Assert.That(response, Is.Not.Null);

@@ -221,7 +221,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         {
             var response = new BogføringslinjeOpretResponse
                                {
-                                   Advarsler = new List<string>()
+                                   Advarsler = new List<BogføringsadvarselResponse>()
                                };
             return response;
         }

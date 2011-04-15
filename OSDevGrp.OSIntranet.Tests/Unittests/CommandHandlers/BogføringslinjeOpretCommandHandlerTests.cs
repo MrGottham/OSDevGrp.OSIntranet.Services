@@ -100,7 +100,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                                   Kontonummer = "DANKORT",
                                   Tekst = "Udbetaling",
                                   Debit = 0M,
-                                  Kredit = 25000M,
+                                  Kredit = 5000M,
                               };
             var result = commandHandler.Execute(command);
             Assert.That(result, Is.Not.Null);

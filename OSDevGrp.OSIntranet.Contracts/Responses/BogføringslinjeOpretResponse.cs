@@ -14,12 +14,10 @@ namespace OSDevGrp.OSIntranet.Contracts.Responses
         /// Advarsler i forbindelse med oprettelse af bogføringslinjer.
         /// </summary>
         [DataMember(IsRequired = true)]
-        public IEnumerable<string> Advarsler
+        public IEnumerable<BogføringsadvarselResponse> Advarsler
         {
             get;
             set;
         }
-
-        // TODO: Advarseler skal bestå af: Tekst ("Budgettet på budgetkontoen er overtrukket."), Regnskab, Budgetkonto og Beløb (overtrukket med kr.).
     }
 }

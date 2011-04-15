@@ -115,6 +115,7 @@
     <Compile Include="Unittests\Contracts\Queries\KreditorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Responses\BogføringsadvarselResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringslinjeOpretResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontolisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontoViewTests.cs" />
