@@ -24,7 +24,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(null, null, null, null));
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisAdresseRepositoryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), null, null));
+            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), null, null, null));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisKonfigurationRepositoryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), null));
+            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), null, null));
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
             var commandHandler = new BogføringslinjeOpretCommandHandler(finansstyringRepository, GetAdresseRepository(),
-                                                                        konfigurationRepository);
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -92,7 +92,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
             var commandHandler = new BogføringslinjeOpretCommandHandler(finansstyringRepository, GetAdresseRepository(),
-                                                                        konfigurationRepository);
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -106,6 +106,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Advarsler, Is.Not.Null);
             Assert.That(result.Advarsler.Count(), Is.EqualTo(1));
+
+            var e = result.Advarsler.GetEnumerator();
+            Assert.That(e, Is.Not.Null);
+            Assert.That(e.MoveNext(), Is.True);
+            Assert.That(e.Current.Advarsel, Is.Not.Null);
+            Assert.That(e.Current.Advarsel.Length, Is.GreaterThan(0));
+            Assert.That(e.Current.Konto, Is.Not.Null);
+            Assert.That(e.Current.Beløb, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at Execute returnerer advarsel ved overtrækkelse af budgetkonto.
+        /// </summary>
+        [Test]
+        public void TestAtExecuteReturnerAdvarselVedOvertrækkelseAfBudgetkonto()
+        {
+            var finansstyringRepository = GetFinansstyringRepository();
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(finansstyringRepository, GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
+            var command = new BogføringslinjeOpretCommand
+                              {
+                                  Regnskabsnummer = 1,
+                                  Dato = DateTime.Now,
+                                  Kontonummer = "DANKORT",
+                                  Tekst = "Indkøb",
+                                  Budgetkontonummer = "2000",
+                                  Debit = 0M,
+                                  Kredit = 495M,
+                              };
+            var result = commandHandler.Execute(command);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Advarsler, Is.Not.Null);
+            Assert.That(result.Advarsler.Count(), Is.EqualTo(1));
+
+            var e = result.Advarsler.GetEnumerator();
+            Assert.That(e, Is.Not.Null);
+            Assert.That(e.MoveNext(), Is.True);
+            Assert.That(e.Current.Advarsel, Is.Not.Null);
+            Assert.That(e.Current.Advarsel.Length, Is.GreaterThan(0));
+            Assert.That(e.Current.Konto, Is.Not.Null);
+            Assert.That(e.Current.Beløb, Is.GreaterThan(0));
         }
 
         /// <summary>
@@ -115,7 +158,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestAtExecuteKasterArgumentNullExceptionHvisCommandErNull()
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(), konfigurationRepository,
+                                                                        GetObjectMapper());
             Assert.Throws<ArgumentNullException>(() => commandHandler.Execute(null));
         }
 
@@ -126,7 +171,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestAtExecuteKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = -1,
@@ -150,7 +197,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -174,7 +223,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -198,7 +249,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -222,7 +275,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -246,7 +301,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -270,7 +327,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -294,7 +353,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -318,7 +379,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -342,7 +405,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -366,7 +431,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -389,7 +456,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestAtHandleExceptionKasterIntranetSystemException()
         {
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository);
+            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
+                                                                        GetAdresseRepository(),
+                                                                        konfigurationRepository, GetObjectMapper());
             Assert.Throws<IntranetSystemException>(() => commandHandler.HandleException(new BogføringslinjeOpretCommand(), new Exception("Test")));
         }
     }

@@ -7,6 +7,8 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.Core;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Resources;
@@ -23,6 +25,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IAdresseRepository _adresseRepository;
         private readonly IKonfigurationRepository _konfigurationRepository;
+        private readonly IObjectMapper _objectMapper;
 
         #endregion
 
@@ -34,7 +37,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="adresseRepository">Implementering af repository til adressekartoteket.</param>
         /// <param name="konfigurationRepository">Implementering af konfigurationsrepository.</param>
-        public BogføringslinjeOpretCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IKonfigurationRepository konfigurationRepository)
+        /// <param name="objectMapper">Implementering af objectmapper.</param>
+        public BogføringslinjeOpretCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper)
         {
             if (finansstyringRepository == null)
             {
@@ -51,6 +55,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             _finansstyringRepository = finansstyringRepository;
             _adresseRepository = adresseRepository;
             _konfigurationRepository = konfigurationRepository;
+            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -217,11 +222,35 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="konto">Konto.</param>
         /// <param name="budgetkonto">Budgetkonto.</param>
         /// <returns>Svar for oprettelse af bogføringslinje.</returns>
-        private static BogføringslinjeOpretResponse CreateResponse(Konto konto, Budgetkonto budgetkonto)
+        private BogføringslinjeOpretResponse CreateResponse(Konto konto, Budgetkonto budgetkonto)
         {
+            var advarsler = new List<BogføringsadvarselResponse>();
+            if (konto.DisponibelPrStatusdato < 0M)
+            {
+                var advarsel = new BogføringsadvarselResponse
+                                   {
+                                       Advarsel = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn),
+                                       Konto = _objectMapper.Map<Konto, KontoView>(konto),
+                                       Beløb = Math.Abs(konto.DisponibelPrStatusdato)
+                                   };
+                advarsler.Add(advarsel);
+            }
+            if (budgetkonto != null)
+            {
+                if (budgetkonto.BudgetPrStatusdato <= 0M && budgetkonto.DisponibelPrStatusdato < 0M)
+                {
+                    var advarsel = new BogføringsadvarselResponse
+                                       {
+                                           Advarsel = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn),
+                                           Konto = _objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto),
+                                           Beløb = Math.Abs(budgetkonto.DisponibelPrStatusdato)
+                                       };
+                    advarsler.Add(advarsel);
+                }
+            }
             var response = new BogføringslinjeOpretResponse
                                {
-                                   Advarsler = new List<BogføringsadvarselResponse>()
+                                   Advarsler = advarsler
                                };
             return response;
         }

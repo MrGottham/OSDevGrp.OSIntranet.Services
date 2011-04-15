@@ -17,6 +17,8 @@
         BalanceLineAccountNumberMissing,
         BalanceLineTextMissing,
         BalanceLineValueBelowZero,
-        BalanceLineValueMissing
+        BalanceLineValueMissing,
+        AccountIsOverdrawn,
+        BudgetAccountIsOverdrawn
     }
 }

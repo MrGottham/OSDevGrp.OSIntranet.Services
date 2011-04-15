@@ -98,7 +98,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             regnskab.TilføjKonto(budgetkontoSupermarkeder);
             regnskab.TilføjKonto(budgetkontoØvrigeUdgifter);
             // Dan testdata for bogføringslinjer.
-            var bogføringslinje = new Bogføringslinje(1, new DateTime(2010, 1, 1), null, "Saldo", 3000M, 0M);
+            var bogføringslinje = new Bogføringslinje(1, new DateTime(2010, 1, 1), null, "Saldo", 7500M, 0M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             bogføringslinje = new Bogføringslinje(2, new DateTime(2010, 10, 31), null, "Kvickly", 0M, 250M);
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
