@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Responses
     /// <summary>
     /// Response fra oprettelse af en bogføringslinje.
     /// </summary>
-    [DataContract(Name = "BogføringslinjeOpretResponse", Namespace = SoapNamespaces.IntranetNamespace)]
+    [DataContract(Name = "BogføringslinjeOpretResp", Namespace = SoapNamespaces.IntranetNamespace)]
     public class BogføringslinjeOpretResponse : IView
     {
         /// <summary>
