@@ -622,7 +622,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(bugetkontoplanView.Budgetkontogruppe, Is.Not.Null);
             Assert.That(bugetkontoplanView.Budget, Is.EqualTo(15000M));
             Assert.That(bugetkontoplanView.Bogført, Is.EqualTo(14000M));
-            Assert.That(bugetkontoplanView.Disponibel, Is.EqualTo(1000M));
+            Assert.That(bugetkontoplanView.Disponibel, Is.EqualTo(0M));
         }
 
         /// <summary>
@@ -660,7 +660,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(bugetkontoView.Budgetkontogruppe, Is.Not.Null);
             Assert.That(bugetkontoView.Budget, Is.EqualTo(15000M));
             Assert.That(bugetkontoView.Bogført, Is.EqualTo(14000M));
-            Assert.That(bugetkontoView.Disponibel, Is.EqualTo(1000M));
+            Assert.That(bugetkontoView.Disponibel, Is.EqualTo(0M));
             Assert.That(bugetkontoView.Budgetoplysninger, Is.Not.Null);
             Assert.That(bugetkontoView.Budgetoplysninger.Count(), Is.EqualTo(1));
         }

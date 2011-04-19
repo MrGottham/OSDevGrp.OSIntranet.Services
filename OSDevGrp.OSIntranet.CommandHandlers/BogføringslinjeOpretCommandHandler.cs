@@ -52,6 +52,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 throw new ArgumentNullException("konfigurationRepository");
             }
+            if (objectMapper == null)
+            {
+                throw new ArgumentNullException("objectMapper");
+            }
             _finansstyringRepository = finansstyringRepository;
             _adresseRepository = adresseRepository;
             _konfigurationRepository = konfigurationRepository;
