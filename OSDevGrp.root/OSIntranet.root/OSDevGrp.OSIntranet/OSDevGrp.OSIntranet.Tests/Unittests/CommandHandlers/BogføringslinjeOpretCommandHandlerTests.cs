@@ -46,6 +46,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis objectmapper er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisKonfigurationObjectMapperErNull()
+        {
+            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
+            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository, null));
+        }
+
+        /// <summary>
         /// Tester, at Execute tilføjer en bogføringslinje.
         /// </summary>
         [Test]
