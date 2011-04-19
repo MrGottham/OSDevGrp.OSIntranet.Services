@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Responses
     /// <summary>
     /// Response for en bogføringsadvarsel.
     /// </summary>
-    [DataContract(Name = "BogføringsadvarselResponse", Namespace = SoapNamespaces.IntranetNamespace)]
+    [DataContract(Name = "BogføringsadvarselResp", Namespace = SoapNamespaces.IntranetNamespace)]
     [KnownType(typeof(KontoView))]
     [KnownType(typeof(BudgetkontoView))]
     public class BogføringsadvarselResponse : IView
