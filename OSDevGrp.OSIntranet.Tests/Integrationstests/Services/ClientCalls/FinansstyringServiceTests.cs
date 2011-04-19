@@ -3,6 +3,7 @@ using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using NUnit.Framework;
@@ -329,6 +330,65 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 var result = client.BogføringerGet(query);
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Count(), Is.EqualTo(250));
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
+        /// Tester, at bogføringslinjer kan oprettes.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjerKanOprettes()
+        {
+            var client = _channelFactory.CreateChannel<IFinansstyringService>(ClientEndpointName);
+            try
+            {
+                var dato = DateTime.Now;
+
+                var query = new KontoGetQuery
+                                {
+                                    Regnskabsnummer = 1,
+                                    Kontonummer = "DANKORT",
+                                    StatusDato = dato
+                                };
+                var konto = client.KontoGet(query);
+                Assert.That(konto, Is.Not.Null);
+                var saldoBeforeTest = konto.Saldo;
+
+                var command = new BogføringslinjeOpretCommand
+                                  {
+                                      Regnskabsnummer = 1,
+                                      Dato = dato,
+                                      Kontonummer = "DANKORT",
+                                      Tekst = "Test fra Services",
+                                      Budgetkontonummer = "8990",
+                                      Debit = 5000M
+                                  };
+                var result = client.BogføringslinjeOpret(command);
+                Assert.That(result, Is.Not.Null);
+
+                konto = client.KontoGet(query);
+                Assert.That(konto, Is.Not.Null);
+                Assert.That(konto.Saldo, Is.EqualTo(saldoBeforeTest + command.Debit));
+
+                command = new BogføringslinjeOpretCommand
+                              {
+                                  Regnskabsnummer = command.Regnskabsnummer,
+                                  Dato = command.Dato,
+                                  Kontonummer = command.Kontonummer,
+                                  Tekst = command.Tekst,
+                                  Budgetkontonummer = command.Budgetkontonummer,
+                                  Kredit = command.Debit
+                              };
+                result = client.BogføringslinjeOpret(command);
+                Assert.That(result, Is.Not.Null);
+
+                konto = client.KontoGet(query);
+                Assert.That(konto, Is.Not.Null);
+                Assert.That(konto.Saldo, Is.EqualTo(saldoBeforeTest));
             }
             finally
             {

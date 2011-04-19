@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using NUnit.Framework;
@@ -230,6 +231,57 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             var result = _service.BogføringerGet(query);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.EqualTo(250));
+        }
+
+        /// <summary>
+        /// Tester, at bogføringslinjer kan oprettes.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringslinjerKanOprettes()
+        {
+            var dato = DateTime.Now;
+
+            var query = new KontoGetQuery
+                            {
+                                Regnskabsnummer = 1,
+                                Kontonummer = "DANKORT",
+                                StatusDato = dato
+                            };
+            var konto = _service.KontoGet(query);
+            Assert.That(konto, Is.Not.Null);
+            var saldoBeforeTest = konto.Saldo;
+
+            var command = new BogføringslinjeOpretCommand
+                              {
+                                  Regnskabsnummer = 1,
+                                  Dato = dato,
+                                  Kontonummer = "DANKORT",
+                                  Tekst = "Test fra Services",
+                                  Budgetkontonummer = "8990",
+                                  Debit = 5000M
+                              };
+            var result = _service.BogføringslinjeOpret(command);
+            Assert.That(result, Is.Not.Null);
+
+            konto = _service.KontoGet(query);
+            Assert.That(konto, Is.Not.Null);
+            Assert.That(konto.Saldo, Is.EqualTo(saldoBeforeTest + command.Debit));
+
+            command = new BogføringslinjeOpretCommand
+                          {
+                              Regnskabsnummer = command.Regnskabsnummer,
+                              Dato = command.Dato,
+                              Kontonummer = command.Kontonummer,
+                              Tekst = command.Tekst,
+                              Budgetkontonummer = command.Budgetkontonummer,
+                              Kredit = command.Debit
+                          };
+            result = _service.BogføringslinjeOpret(command);
+            Assert.That(result, Is.Not.Null);
+
+            konto = _service.KontoGet(query);
+            Assert.That(konto, Is.Not.Null);
+            Assert.That(konto.Saldo, Is.EqualTo(saldoBeforeTest));
         }
 
         /// <summary>
