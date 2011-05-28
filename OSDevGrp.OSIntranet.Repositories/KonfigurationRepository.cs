@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Specialized;
+using OSDevGrp.OSIntranet.CommonLibrary.Repositories;
+using OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
-using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Repositories
 {
     /// <summary>
     /// Konfigurationsrepository.
     /// </summary>
-    public class KonfigurationRepository : IKonfigurationRepository
+    public class KonfigurationRepository : KonfigurationRepositoryBase, IKonfigurationRepository
     {
         #region Constructor
 
@@ -23,49 +24,15 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 throw new ArgumentNullException("nameValueCollection");
             }
-            var value = nameValueCollection["DebitorSaldoOverNul"];
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "DebitorSaldoOverNul"));
-            }
             try
             {
-                DebitorSaldoOverNul = bool.Parse(value);
+                DebitorSaldoOverNul = base.GetBoolFromApplicationSettings(nameValueCollection, "DebitorSaldoOverNul");
+                KreditorSaldoOverNul = base.GetBoolFromApplicationSettings(nameValueCollection, "KreditorSaldoOverNul");
+                DageForBogføringsperiode = base.GetIntFromApplicationSettings(nameValueCollection, "DageForBogføringsperiode");
             }
-            catch (Exception ex)
+            catch (CommonRepositoryException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "DebitorSaldoOverNul"), ex);
-            }
-            value = nameValueCollection["KreditorSaldoOverNul"];
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "KreditorSaldoOverNul"));
-            }
-            try
-            {
-                KreditorSaldoOverNul = bool.Parse(value);
-            }
-            catch (Exception ex)
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "KreditorSaldoOverNul"), ex);
-            }
-            value = nameValueCollection["DageForBogføringsperiode"];
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "DageForBogføringsperiode"));
-            }
-            try
-            {
-                DageForBogføringsperiode = int.Parse(value);
-            }
-            catch (Exception ex)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "DageForBogføringsperiode"), ex);
+                throw new IntranetRepositoryException(ex.Message, ex);
             }
         }
 

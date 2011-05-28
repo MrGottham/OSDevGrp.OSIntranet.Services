@@ -10,7 +10,6 @@
         CantFindObjectById,
         IllegalValue,
         CantAutoMapType,
-        MissingApplicationSetting,
         ErrorInCommandHandlerWithReturnValue,
         BalanceLineDateToOld,
         BalanceLineDateIsForwardInTime,
