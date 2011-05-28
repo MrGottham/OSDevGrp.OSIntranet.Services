@@ -158,10 +158,6 @@
     <value>Værdien '{0}' er invalid for '{1}'.</value>
     <comment>{0} = Værdi, {1} = Navn på egenskab.</comment>
   </data>
-  <data name="MissingApplicationSetting" xml:space="preserve">
-    <value>'{0}' er ikke angivet under AppSettings i applikationskonfigurationsfilen.</value>
-    <comment>{0} = Nøglenavn på applikationsværdien.</comment>
-  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Fejl i repository metode '{0}': {1}</value>
     <comment>{0} = Navn på metode, {1} = Fejlbesked.</comment>

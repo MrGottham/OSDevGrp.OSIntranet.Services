@@ -89,21 +89,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
-        /// Tester, at ExceptionMessage for MissingApplicationSetting hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForMissingApplicationSettingHentes()
-        {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MissingApplicationSetting, "DebitorSaldoOverNul");
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at ExceptionMessage for ErrorInCommandHandlerWithReturnValue hentes.
         /// </summary>
         [Test]

@@ -54,6 +54,12 @@
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.dll</HintPath>
     </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Repositories">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Repositories.dll</HintPath>
+    </Reference>
+    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface">
+      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface.dll</HintPath>
+    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Wcf">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll</HintPath>
     </Reference>

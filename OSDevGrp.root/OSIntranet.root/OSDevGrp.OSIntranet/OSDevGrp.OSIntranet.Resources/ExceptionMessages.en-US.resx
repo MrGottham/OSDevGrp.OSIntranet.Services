@@ -158,10 +158,6 @@
     <value>Illegal value '{0}' for '{1}'.</value>
     <comment>{0} = Value, {1} = Name of property.</comment>
   </data>
-  <data name="MissingApplicationSetting" xml:space="preserve">
-    <value>'{0}' are missing in the AppSettings in the application configuration file.</value>
-    <comment>{0} = Key name of application setting.</comment>
-  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Error in repository method '{0}': {1}</value>
     <comment>{0} = Method name, {1} = Error message.</comment>
