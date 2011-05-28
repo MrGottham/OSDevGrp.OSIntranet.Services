@@ -595,15 +595,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -617,15 +612,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new FirmaView(), null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new FirmaView(), null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -639,15 +629,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new FirmaView(), new List<Adressegruppe>(), null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new FirmaView(), new List<Adressegruppe>(), null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -660,35 +645,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            try
-            {
-                var firmaView = new FirmaView
-                                    {
-                                        Nummer = 1,
-                                        Navn = "DSI DATA A/S",
-                                        Adressegruppe = new AdressegruppeView
-                                                            {
-                                                                Nummer = 3
-                                                            }
-                                    };
-                var adressegrupper = new List<Adressegruppe>
-                                         {
-                                             new Adressegruppe(1, "Familie", 1),
-                                             new Adressegruppe(2, "Venner og veninder", 2)
-                                         };
-                var betalingsbetingelser = new List<Betalingsbetingelse>
-                                               {
-                                                   new Betalingsbetingelse(1, "Kontant"),
-                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
-                                               };
-                method.Invoke(repository, new object[] { firmaView, adressegrupper, betalingsbetingelser });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            var firmaView = new FirmaView
+                                {
+                                    Nummer = 1,
+                                    Navn = "DSI DATA A/S",
+                                    Adressegruppe = new AdressegruppeView
+                                                        {
+                                                            Nummer = 3
+                                                        }
+                                };
+            var adressegrupper = new List<Adressegruppe>
+                                     {
+                                         new Adressegruppe(1, "Familie", 1),
+                                         new Adressegruppe(2, "Venner og veninder", 2)
+                                     };
+            var betalingsbetingelser = new List<Betalingsbetingelse>
+                                           {
+                                               new Betalingsbetingelse(1, "Kontant"),
+                                               new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                           };
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {firmaView, adressegrupper, betalingsbetingelser})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -702,38 +681,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapFirma", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                var firmaView = new FirmaView
-                                    {
-                                        Nummer = 1,
-                                        Navn = "DSI DATA A/S",
-                                        Adressegruppe = new AdressegruppeView
-                                                            {
-                                                                Nummer = 1
-                                                            },
-                                        Betalingsbetingelse = new BetalingsbetingelseView
-                                                                  {
-                                                                      Nummer = 3
-                                                                  }
-                                    };
-                var adressegrupper = new List<Adressegruppe>
-                                         {
-                                             new Adressegruppe(1, "Familie", 1),
-                                             new Adressegruppe(2, "Venner og veninder", 2)
-                                         };
-                var betalingsbetingelser = new List<Betalingsbetingelse>
-                                               {
-                                                   new Betalingsbetingelse(1, "Kontant"),
-                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
-                                               };
-                method.Invoke(repository, new object[] { firmaView, adressegrupper, betalingsbetingelser });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            var firmaView = new FirmaView
+                                {
+                                    Nummer = 1,
+                                    Navn = "DSI DATA A/S",
+                                    Adressegruppe = new AdressegruppeView
+                                                        {
+                                                            Nummer = 1
+                                                        },
+                                    Betalingsbetingelse = new BetalingsbetingelseView
+                                                              {
+                                                                  Nummer = 3
+                                                              }
+                                };
+            var adressegrupper = new List<Adressegruppe>
+                                     {
+                                         new Adressegruppe(1, "Familie", 1),
+                                         new Adressegruppe(2, "Venner og veninder", 2)
+                                     };
+            var betalingsbetingelser = new List<Betalingsbetingelse>
+                                           {
+                                               new Betalingsbetingelse(1, "Kontant"),
+                                               new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                           };
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {firmaView, adressegrupper, betalingsbetingelser})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -747,15 +721,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null, null, null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {null, null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -769,15 +738,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new PersonView(), null, null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new PersonView(), null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -791,15 +755,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new PersonView(), new List<Firma>(), null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new PersonView(), new List<Firma>(), null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -813,15 +772,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new PersonView(), new List<Firma>(), new List<Adressegruppe>(), null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[] {new PersonView(), new List<Firma>(), new List<Adressegruppe>(), null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -835,34 +791,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                var personView = new PersonView
+            var personView = new PersonView
+                                 {
+                                     Nummer = 1,
+                                     Navn = "Ole Sørensen",
+                                     Adressegruppe = new AdressegruppeView
+                                                         {
+                                                             Nummer = 3
+                                                         }
+                                 };
+            var adressegrupper = new List<Adressegruppe>
                                      {
-                                         Nummer = 1,
-                                         Navn = "Ole Sørensen",
-                                         Adressegruppe = new AdressegruppeView
-                                                             {
-                                                                 Nummer = 3
-                                                             }
+                                         new Adressegruppe(1, "Familie", 1),
+                                         new Adressegruppe(2, "Venner og veninder", 2)
                                      };
-                var adressegrupper = new List<Adressegruppe>
-                                         {
-                                             new Adressegruppe(1, "Familie", 1),
-                                             new Adressegruppe(2, "Venner og veninder", 2)
-                                         };
-                var betalingsbetingelser = new List<Betalingsbetingelse>
-                                               {
-                                                   new Betalingsbetingelse(1, "Kontant"),
-                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
-                                               };
-                method.Invoke(repository, new object[] {personView, new List<Firma>(), adressegrupper, betalingsbetingelser});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            var betalingsbetingelser = new List<Betalingsbetingelse>
+                                           {
+                                               new Betalingsbetingelse(1, "Kontant"),
+                                               new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                           };
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[] {personView, new List<Firma>(), adressegrupper, betalingsbetingelser})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -876,38 +829,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                var personView = new PersonView
+            var personView = new PersonView
+                                 {
+                                     Nummer = 1,
+                                     Navn = "Ole Sørensen",
+                                     Adressegruppe = new AdressegruppeView
+                                                         {
+                                                             Nummer = 1
+                                                         },
+                                     Betalingsbetingelse = new BetalingsbetingelseView
+                                                               {
+                                                                   Nummer = 3
+                                                               }
+                                 };
+            var adressegrupper = new List<Adressegruppe>
                                      {
-                                         Nummer = 1,
-                                         Navn = "Ole Sørensen",
-                                         Adressegruppe = new AdressegruppeView
-                                                             {
-                                                                 Nummer = 1
-                                                             },
-                                         Betalingsbetingelse = new BetalingsbetingelseView
-                                                                   {
-                                                                       Nummer = 3
-                                                                   }
+                                         new Adressegruppe(1, "Familie", 1),
+                                         new Adressegruppe(2, "Venner og veninder", 2)
                                      };
-                var adressegrupper = new List<Adressegruppe>
-                                         {
-                                             new Adressegruppe(1, "Familie", 1),
-                                             new Adressegruppe(2, "Venner og veninder", 2)
-                                         };
-                var betalingsbetingelser = new List<Betalingsbetingelse>
-                                               {
-                                                   new Betalingsbetingelse(1, "Kontant"),
-                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
-                                               };
-                method.Invoke(repository, new object[] { personView, new List<Firma>(), adressegrupper, betalingsbetingelser });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            var betalingsbetingelser = new List<Betalingsbetingelse>
+                                           {
+                                               new Betalingsbetingelse(1, "Kontant"),
+                                               new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                           };
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[] {personView, new List<Firma>(), adressegrupper, betalingsbetingelser})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -921,42 +871,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPerson", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                var personView = new PersonView
+            var personView = new PersonView
+                                 {
+                                     Nummer = 1,
+                                     Navn = "Ole Sørensen",
+                                     Adressegruppe = new AdressegruppeView
+                                                         {
+                                                             Nummer = 1
+                                                         },
+                                     Betalingsbetingelse = new BetalingsbetingelseView
+                                                               {
+                                                                   Nummer = 2
+                                                               },
+                                     Firma = new AdressereferenceView
+                                                 {
+                                                     Nummer = 48
+                                                 }
+                                 };
+            var adressegrupper = new List<Adressegruppe>
                                      {
-                                         Nummer = 1,
-                                         Navn = "Ole Sørensen",
-                                         Adressegruppe = new AdressegruppeView
-                                                             {
-                                                                 Nummer = 1
-                                                             },
-                                         Betalingsbetingelse = new BetalingsbetingelseView
-                                                                   {
-                                                                       Nummer = 2
-                                                                   },
-                                         Firma = new AdressereferenceView
-                                         {
-                                             Nummer = 48
-                                         }
+                                         new Adressegruppe(1, "Familie", 1),
+                                         new Adressegruppe(2, "Venner og veninder", 2)
                                      };
-                var adressegrupper = new List<Adressegruppe>
-                                         {
-                                             new Adressegruppe(1, "Familie", 1),
-                                             new Adressegruppe(2, "Venner og veninder", 2)
-                                         };
-                var betalingsbetingelser = new List<Betalingsbetingelse>
-                                               {
-                                                   new Betalingsbetingelse(1, "Kontant"),
-                                                   new Betalingsbetingelse(2, "Netto + 8 dage"),
-                                               };
-                method.Invoke(repository, new object[] { personView, new List<Firma>(), adressegrupper, betalingsbetingelser });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            var betalingsbetingelser = new List<Betalingsbetingelse>
+                                           {
+                                               new Betalingsbetingelse(1, "Kontant"),
+                                               new Betalingsbetingelse(2, "Netto + 8 dage"),
+                                           };
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[] {personView, new List<Firma>(), adressegrupper, betalingsbetingelser})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -970,15 +917,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapPostnummer", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -992,15 +933,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new AdresseRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapAdressegruppe", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1012,17 +947,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new AdresseRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapBetalingsbetingelse", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapBetalingsbetingelse",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
