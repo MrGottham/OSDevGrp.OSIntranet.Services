@@ -685,17 +685,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static, null, new [] {typeof (RegnskabListeView)}, null);
+            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static,
+                                                        null, new[] {typeof (RegnskabListeView)}, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -716,15 +711,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                       typeof (Func<int, AdresseBase>)
                                                                   }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null, null, null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {null, null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -745,15 +735,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                       typeof (Func<int, AdresseBase>)
                                                                   }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {new RegnskabView(), null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new RegnskabView(), null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -774,15 +759,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                       typeof (Func<int, AdresseBase>)
                                                                   }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new RegnskabView(), new List<Kontogruppe>(), null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository, new object[] {new RegnskabView(), new List<Kontogruppe>(), null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -802,15 +783,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Kontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            var m = method;
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => m.Invoke(repository, new object[] {null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
             method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
                                                     null,
                                                     new[]
@@ -819,15 +796,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                             typeof (IEnumerable<Kontogruppe>)
                                                         }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -847,15 +819,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Kontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -875,15 +842,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Kontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -903,15 +865,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Kontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), new KontoListeView(), null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            var m = method;
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    m.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), new KontoListeView(), null}))
+                    .InnerException, Is.TypeOf(typeof (ArgumentNullException)));
             method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
                                                     null,
                                                     new[]
@@ -920,15 +879,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                             typeof (IEnumerable<Kontogruppe>)
                                                         }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), new KontoView(), null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), new KontoView(), null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -948,21 +903,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Kontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository,
-                              new object[]
-                                  {
-                                      new Regnskab(1, "Ole Sørensen"),
-                                      new KontoListeView {Kontogruppe = new KontogruppeView {Nummer = 1}},
-                                      new List<Kontogruppe>()
-                                  });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[]
+                                      {
+                                          new Regnskab(1, "Ole Sørensen"),
+                                          new KontoListeView {Kontogruppe = new KontogruppeView {Nummer = 1}},
+                                          new List<Kontogruppe>()
+                                      })).InnerException,
+                Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -977,15 +928,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var method = repository.GetType().GetMethod("MapKreditoplysninger",
                                                         BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1005,15 +950,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Budgetkontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            var m = method;
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => m.Invoke(repository, new object[] {null, null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
             method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
                                                     null,
                                                     new[]
@@ -1022,15 +962,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                             typeof (IEnumerable<Budgetkontogruppe>)
                                                         }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1050,15 +985,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Budgetkontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1078,15 +1008,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Budgetkontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new Regnskab(1, "Ole Sørensen"), null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1106,16 +1031,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Budgetkontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository,
-                              new object[] {new Regnskab(1, "Ole Sørensen"), new BudgetkontoListeView(), null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            var m = method;
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    m.Invoke(repository,
+                             new object[] {new Regnskab(1, "Ole Sørensen"), new BudgetkontoListeView(), null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
             method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
                                                     null,
                                                     new[]
@@ -1124,16 +1046,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                             typeof (IEnumerable<Budgetkontogruppe>)
                                                         }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository,
-                              new object[] {new Regnskab(1, "Ole Sørensen"), new BudgetkontoView(), null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[] {new Regnskab(1, "Ole Sørensen"), new BudgetkontoView(), null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1153,21 +1071,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                                                 typeof (IEnumerable<Budgetkontogruppe>)
                                                             }, null);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository,
-                              new object[]
-                                  {
-                                      new Regnskab(1, "Ole Sørensen"),
-                                      new BudgetkontoListeView {Budgetkontogruppe = new BudgetkontogruppeView {Nummer = 1}}
-                                      , new List<Budgetkontogruppe>()
-                                  });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[]
+                                      {
+                                          new Regnskab(1, "Ole Sørensen"),
+                                          new BudgetkontoListeView
+                                              {Budgetkontogruppe = new BudgetkontogruppeView {Nummer = 1}},
+                                          new List<Budgetkontogruppe>()
+                                      })).InnerException,
+                Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -1179,17 +1094,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapBudgetoplysninger", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapBudgetoplysninger",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1201,17 +1111,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapBogføringslinje",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {null, null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {null, null, null, null})).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1225,15 +1131,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new FinansstyringRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] {new BogføringslinjeView(), null, null, null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => method.Invoke(repository, new object[] {new BogføringslinjeView(), null, null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1247,15 +1148,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new FinansstyringRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { new BogføringslinjeView(), new List<Konto>(), null, null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository, new object[] {new BogføringslinjeView(), new List<Konto>(), null, null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1267,36 +1164,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapBogføringslinje",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                var view = new BogføringslinjeView
-                               {
-                                   Løbenummer = 1,
-                                   Dato = new DateTime(2011, 4, 1),
-                                   Konto = new KontoListeView
-                                               {
-                                                   Kontonummer = "DANKORT"
-                                               },
-                                   Tekst = "Test",
-                                   Budgetkonto = new BudgetkontoListeView
-                                                     {
-                                                         Kontonummer = "1000"
-                                                     },
-                                   Debit = 1000M,
-                                   Adresse = new AdressereferenceView
+            var view = new BogføringslinjeView
+                           {
+                               Løbenummer = 1,
+                               Dato = new DateTime(2011, 4, 1),
+                               Konto = new KontoListeView
+                                           {
+                                               Kontonummer = "DANKORT"
+                                           },
+                               Tekst = "Test",
+                               Budgetkonto = new BudgetkontoListeView
                                                  {
-                                                     Nummer = 1
-                                                 }
-                               };
-                method.Invoke(repository, new object[] {view, new List<Konto>(), new List<Budgetkonto>(), null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+                                                     Kontonummer = "1000"
+                                                 },
+                               Debit = 1000M,
+                               Adresse = new AdressereferenceView
+                                             {
+                                                 Nummer = 1
+                                             }
+                           };
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository, new object[] {view, new List<Konto>(), new List<Budgetkonto>(), null})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -1308,40 +1202,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapBogføringslinje",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                var view = new BogføringslinjeView
-                {
-                    Løbenummer = 1,
-                    Dato = new DateTime(2011, 4, 1),
-                    Konto = new KontoListeView
-                    {
-                        Kontonummer = "DANKORT"
-                    },
-                    Tekst = "Test",
-                    Budgetkonto = new BudgetkontoListeView
-                    {
-                        Kontonummer = "1000"
-                    },
-                    Debit = 1000M,
-                    Adresse = new AdressereferenceView
-                    {
-                        Nummer = 1
-                    }
-                };
+            var view = new BogføringslinjeView
+                           {
+                               Løbenummer = 1,
+                               Dato = new DateTime(2011, 4, 1),
+                               Konto = new KontoListeView
+                                           {
+                                               Kontonummer = "DANKORT"
+                                           },
+                               Tekst = "Test",
+                               Budgetkonto = new BudgetkontoListeView
+                                                 {
+                                                     Kontonummer = "1000"
+                                                 },
+                               Debit = 1000M,
+                               Adresse = new AdressereferenceView
+                                             {
+                                                 Nummer = 1
+                                             }
+                           };
 
-                var regnskab = new Regnskab(1, "Ole Sørensen");
-                var kontogruppe = new Kontogruppe(1, "Bankkonti", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-                var kontoDankort = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
-                method.Invoke(repository, new object[] {view, new List<Konto> {kontoDankort}, new List<Budgetkonto>(), null});
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            var regnskab = new Regnskab(1, "Ole Sørensen");
+            var kontogruppe = new Kontogruppe(1, "Bankkonti", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
+            var kontoDankort = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[] {view, new List<Konto> {kontoDankort}, new List<Budgetkonto>(), null})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -1353,47 +1245,45 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapBogføringslinje",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                var view = new BogføringslinjeView
-                {
-                    Løbenummer = 1,
-                    Dato = new DateTime(2011, 4, 1),
-                    Konto = new KontoListeView
-                    {
-                        Kontonummer = "DANKORT"
-                    },
-                    Tekst = "Test",
-                    Budgetkonto = new BudgetkontoListeView
-                    {
-                        Kontonummer = "1000"
-                    },
-                    Debit = 1000M,
-                    Adresse = new AdressereferenceView
-                    {
-                        Nummer = 1
-                    }
-                };
+            var view = new BogføringslinjeView
+                           {
+                               Løbenummer = 1,
+                               Dato = new DateTime(2011, 4, 1),
+                               Konto = new KontoListeView
+                                           {
+                                               Kontonummer = "DANKORT"
+                                           },
+                               Tekst = "Test",
+                               Budgetkonto = new BudgetkontoListeView
+                                                 {
+                                                     Kontonummer = "1000"
+                                                 },
+                               Debit = 1000M,
+                               Adresse = new AdressereferenceView
+                                             {
+                                                 Nummer = 1
+                                             }
+                           };
 
-                var regnskab = new Regnskab(1, "Ole Sørensen");
-                var kontogruppe = new Kontogruppe(1, "Bankkonti", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-                var kontoDankort = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
-                var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
-                var budgetkontoIndtægter = new Budgetkonto(regnskab, "1000", "Indtægter", budgetkontogruppe);
-                var callback = new Func<int, AdresseBase>(m => null);
-                method.Invoke(repository, new object[]
-                                              {
-                                                  view, new List<Konto> {kontoDankort},
-                                                  new List<Budgetkonto> {budgetkontoIndtægter}, callback
-                                              });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            var regnskab = new Regnskab(1, "Ole Sørensen");
+            var kontogruppe = new Kontogruppe(1, "Bankkonti", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
+            var kontoDankort = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
+            var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
+            var budgetkontoIndtægter = new Budgetkonto(regnskab, "1000", "Indtægter", budgetkontogruppe);
+            var callback = new Func<int, AdresseBase>(m => null);
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () =>
+                    method.Invoke(repository,
+                                  new object[]
+                                      {
+                                          view, new List<Konto> {kontoDankort},
+                                          new List<Budgetkonto> {budgetkontoIndtægter}, callback
+                                      })).InnerException,
+                Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -1437,17 +1327,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapKontogruppeType", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapKontogruppeType",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { -1 });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(IntranetRepositoryException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {-1})).
+                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
         }
 
         /// <summary>
@@ -1461,15 +1346,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new FinansstyringRepository(channelFactory);
             var method = repository.GetType().GetMethod("MapKontogruppe", BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -1481,17 +1360,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
 
             var repository = new FinansstyringRepository(channelFactory);
-            var method = repository.GetType().GetMethod("MapBudgetkontogruppe", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = repository.GetType().GetMethod("MapBudgetkontogruppe",
+                                                        BindingFlags.NonPublic | BindingFlags.Static);
             Assert.That(method, Is.Not.Null);
-            try
-            {
-                method.Invoke(repository, new object[] { null });
-            }
-            catch (TargetInvocationException ex)
-            {
-                Assert.That(ex.InnerException, Is.Not.Null);
-                Assert.That(ex.InnerException, Is.TypeOf(typeof(ArgumentNullException)));
-            }
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
+                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
