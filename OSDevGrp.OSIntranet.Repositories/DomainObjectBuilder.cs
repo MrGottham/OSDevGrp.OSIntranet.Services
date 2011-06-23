@@ -6,6 +6,7 @@ using AutoMapper;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
@@ -19,6 +20,13 @@ namespace OSDevGrp.OSIntranet.Repositories
     public class DomainObjectBuilder : IDomainObjectBuilder
     {
         #region Private variables
+
+        private Func<int, AdresseBase> _getAdresseBaseCallback;
+        private Func<int, Adressegruppe> _getAdressegruppeCallback;
+        private Func<int, Betalingsbetingelse> _getBetalingsbetingelseCallback;
+        private Func<int, Kontogruppe> _getKontogruppeCallback;
+        private Func<int, Budgetkontogruppe> _getBudgetkontogruppeCallback;
+        private Func<int, Brevhoved> _getBrevhovedCallback;
 
         private readonly List<AdresseBase> _adresser = new List<AdresseBase>();
         private readonly List<Adressegruppe> _adressegrupper = new List<Adressegruppe>();
@@ -202,7 +210,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             get
             {
-                throw new NotImplementedException();
+                return _getAdresseBaseCallback;
             }
             set
             {
@@ -217,7 +225,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             get
             {
-                throw new NotImplementedException();
+                return _getAdressegruppeCallback;
             }
             set
             {
@@ -232,7 +240,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             get
             {
-                throw new NotImplementedException();
+                return _getBetalingsbetingelseCallback;
             }
             set
             {
@@ -273,7 +281,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <summary>
         /// Callbackmetode, som domæneobjektbyggeren benytter til at hente et givent brevhoved.
         /// </summary>
-        public Func<int, CommonLibrary.Domain.Fælles.Brevhoved> GetBrevhovedCallback
+        public Func<int, Brevhoved> GetBrevhovedCallback
         {
             get
             {
