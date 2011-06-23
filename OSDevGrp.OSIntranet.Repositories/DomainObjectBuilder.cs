@@ -196,6 +196,96 @@ namespace OSDevGrp.OSIntranet.Repositories
         #region IDomainObjectBuilder Members
 
         /// <summary>
+        /// Callbackmetode, som domæneobjekbyggeren benytter til at hente en given adresse.
+        /// </summary>
+        public Func<int, AdresseBase> GetAdresseBaseCallback
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given adressegruppe.
+        /// </summary>
+        public Func<int, Adressegruppe> GetAdressegruppeCallback
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given betalingsbetingelse.
+        /// </summary>
+        public Func<int, Betalingsbetingelse> GetBetalingsbetingelseCallback
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given kontogruppe.
+        /// </summary>
+        public Func<int, Kontogruppe> GetKontogruppeCallback
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given gruppe til budgetkonti.
+        /// </summary>
+        public Func<int, Budgetkontogruppe> GetBudgetkontogruppeCallback
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente et givent brevhoved.
+        /// </summary>
+        public Func<int, CommonLibrary.Domain.Fælles.Brevhoved> GetBrevhovedCallback
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
         /// Sætter adresser til brug ved bygning af domæneobjekter.
         /// </summary>
         /// <param name="adresser">Adresser til brug ved bygning af domæneobjekter.</param>
