@@ -214,7 +214,11 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             set
             {
-                throw new NotImplementedException();
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _getAdresseBaseCallback = value;
             }
         }
 
@@ -229,7 +233,11 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             set
             {
-                throw new NotImplementedException();
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _getAdressegruppeCallback = value;
             }
         }
 
@@ -244,7 +252,11 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             set
             {
-                throw new NotImplementedException();
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _getBetalingsbetingelseCallback = value;
             }
         }
 
@@ -255,11 +267,15 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             get
             {
-                throw new NotImplementedException();
+                return _getKontogruppeCallback;
             }
             set
             {
-                throw new NotImplementedException();
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _getKontogruppeCallback = value;
             }
         }
 
@@ -270,11 +286,15 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             get
             {
-                throw new NotImplementedException();
+                return _getBudgetkontogruppeCallback;
             }
             set
             {
-                throw new NotImplementedException();
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _getBudgetkontogruppeCallback = value;
             }
         }
 
@@ -285,11 +305,15 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             get
             {
-                throw new NotImplementedException();
+                return _getBrevhovedCallback;
             }
             set
             {
-                throw new NotImplementedException();
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _getBrevhovedCallback = value;
             }
         }
 
