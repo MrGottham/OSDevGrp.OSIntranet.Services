@@ -29,13 +29,84 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at GetAdresseBaseCallback kaster en ArgumentNullException, hvis callbackmetoden er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetAdresseBaseCallbackKasterArgumentNullExceptionHvisCallbackMethodErNull()
+        {
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetAdresseBaseCallback = null);
+        }
+
+        /// <summary>
+        /// Tester, at GetAdressegruppeCallback kaster en ArgumentNullException, hvis callbackmetoden er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetAdressegruppeCallbackKasterArgumentNullExceptionHvisCallbackMethodErNull()
+        {
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetAdressegruppeCallback = null);
+        }
+
+        /// <summary>
+        /// Tester, at GetBetalingsbetingelseCallback kaster en ArgumentNullException, hvis callbackmetoden er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetBetalingsbetingelseCallbackKasterArgumentNullExceptionHvisCallbackMethodErNull()
+        {
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetBetalingsbetingelseCallback = null);
+        }
+
+        /// <summary>
+        /// Tester, at GetKontogruppeCallback kaster en ArgumentNullException, hvis callbackmetoden er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetKontogruppeCallbackKasterArgumentNullExceptionHvisCallbackMethodErNull()
+        {
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetKontogruppeCallback = null);
+        }
+
+        /// <summary>
+        /// Tester, at GetBudgetkontogruppeCallback kaster en ArgumentNullException, hvis callbackmetoden er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetBudgetkontogruppeCallbackKasterArgumentNullExceptionHvisCallbackMethodErNull()
+        {
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetBudgetkontogruppeCallback = null);
+        }
+
+        /// <summary>
+        /// Tester, at GetBrevhovedCallback kaster en ArgumentNullException, hvis callbackmetoden er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetBrevhovedCallbackKasterArgumentNullExceptionHvisCallbackMethodErNull()
+        {
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetBrevhovedCallback = null);
+        }
+
+        /// <summary>
         /// Tester, at SætAdresser kaster en ArgumentNullException, hvis adresser er null.
         /// </summary>
         [Test]
         public void TestAtSætAdresserKasterArgumentNullExceptionHvisAdressegrupperErNull()
         {
-            var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.SætAdresser(null));
@@ -47,8 +118,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtSætAdressegrupperKasterArgumentNullExceptionHvisAdressegrupperErNull()
         {
-            var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.SætAdressegrupper(null));
@@ -60,8 +130,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtSætBetalingsbetingelserKasterArgumentNullExceptionHvisBetalingsbetingelserErNull()
         {
-            var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.SætBetalingsbetingelser(null));
@@ -73,8 +142,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBuildKasterArgumentNullExceptionHvisObjectErNull()
         {
-            var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.Build<PersonView, Person>(null));
@@ -89,7 +157,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
             fixture.Inject<FirmaView>(null);
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, Postnummer>(fixture.CreateAnonymous<PersonView>()));
@@ -122,7 +190,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                    Navn = firmaer.ElementAt(0).Navn
                                });
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -183,7 +251,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                    Navn = firmaer.ElementAt(0).Navn
                                });
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -221,7 +289,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                    Navn = firmaer.ElementAt(0).Navn
                                });
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -259,7 +327,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                    Navn = fixture.CreateAnonymous<string>()
                                });
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -297,7 +365,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                    Navn = firmaer.ElementAt(0).Navn
                                });
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -332,7 +400,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                });
             fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -387,7 +455,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                });
             fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -419,7 +487,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                });
             fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -451,7 +519,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                });
             fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
             fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             domainObjectBuilder.SætAdressegrupper(adressegrupper);
@@ -470,7 +538,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerPostnummerFraPostnummerView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateAnonymous<PostnummerView>();
@@ -491,7 +559,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfPostnumre()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<PostnummerView>(3);
@@ -507,7 +575,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerAdressegruppeFraAdressegruppeView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateAnonymous<AdressegruppeView>();
@@ -526,7 +594,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfAdressegrupper()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<AdressegruppeView>(3);
@@ -542,7 +610,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerBetalingsbetingelseFraBetalingsbetingelseView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateAnonymous<BetalingsbetingelseView>();
@@ -560,7 +628,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfBetalingsbetingelser()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<BetalingsbetingelseView>(3);
@@ -576,7 +644,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerKontogruppeSomAktiverFraKontogruppeView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             fixture.Inject(DataAccess.Contracts.Enums.KontogruppeType.Aktiver);
@@ -596,7 +664,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerKontogruppeSomPassiverFraKontogruppeView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             fixture.Inject(DataAccess.Contracts.Enums.KontogruppeType.Passiver);
@@ -616,10 +684,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildKasterIntranetRepositoryExceptionHvisTypenForKontogruppenIkkeErKendt()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            fixture.Inject((DataAccess.Contracts.Enums.KontogruppeType) 100);
+            fixture.Inject((DataAccess.Contracts.Enums.KontogruppeType)100);
             var view = fixture.CreateAnonymous<KontogruppeView>();
             Assert.Throws<IntranetRepositoryException>(
                 () => domainObjectBuilder.Build<KontogruppeView, Kontogruppe>(view));
@@ -632,7 +700,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfKontogrupper()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<KontogruppeView>(3);
@@ -648,7 +716,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerBudgetkontogruppeFraBudgetkontogruppeView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateAnonymous<BudgetkontogruppeView>();
@@ -666,7 +734,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfBudgetkontogrupper()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<BudgetkontogruppeView>(3);
@@ -682,7 +750,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerRegnskabFraRegnskabListeView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateAnonymous<RegnskabListeView>();
@@ -703,7 +771,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfRegnskaberFraListeView()
         {
             var fixture = new Fixture();
-            var domainObjectBuilder = fixture.CreateAnonymous<DomainObjectBuilder>();
+            var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<RegnskabListeView>(3);
