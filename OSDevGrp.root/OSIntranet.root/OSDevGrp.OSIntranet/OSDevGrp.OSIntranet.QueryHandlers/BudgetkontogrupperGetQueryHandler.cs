@@ -58,7 +58,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
                 throw new ArgumentNullException("query");
             }
             var budgetkontogrupper = _finansstyringRepository.BudgetkontogruppeGetAll();
-            return _objectMapper.Map<IList<Budgetkontogruppe>, IEnumerable<BudgetkontogruppeView>>(budgetkontogrupper);
+            return
+                _objectMapper.Map<IEnumerable<Budgetkontogruppe>, IEnumerable<BudgetkontogruppeView>>(budgetkontogrupper);
         }
 
         #endregion

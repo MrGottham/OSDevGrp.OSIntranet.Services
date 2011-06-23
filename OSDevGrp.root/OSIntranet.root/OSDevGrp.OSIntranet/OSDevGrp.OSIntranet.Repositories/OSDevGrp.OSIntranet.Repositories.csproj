@@ -42,6 +42,9 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper">
+      <HintPath>..\External references\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
     </Reference>
@@ -72,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdresseRepository.cs" />
+    <Compile Include="DomainObjectBuilder.cs" />
     <Compile Include="FinansstyringRepository.cs" />
     <Compile Include="KonfigurationRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
