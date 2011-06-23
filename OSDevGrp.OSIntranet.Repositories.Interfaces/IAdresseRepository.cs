@@ -12,24 +12,24 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// Henter alle adresser.
         /// </summary>
         /// <returns>Liste af adresser.</returns>
-        IList<AdresseBase> AdresseGetAll();
+        IEnumerable<AdresseBase> AdresseGetAll();
 
         /// <summary>
         /// Henter alle postnumre.
         /// </summary>
         /// <returns>Liste af postnumre.</returns>
-        IList<Postnummer> PostnummerGetAll();
+        IEnumerable<Postnummer> PostnummerGetAll();
 
         /// <summary>
         /// Henter alle adressegrupper.
         /// </summary>
         /// <returns>Liste af adressegrupper.</returns>
-        IList<Adressegruppe> AdressegruppeGetAll();
+        IEnumerable<Adressegruppe> AdressegruppeGetAll();
 
         /// <summary>
         /// Henter alle betalingsbetingelser.
         /// </summary>
         /// <returns>Liste af betalingsbetingelser.</returns>
-        IList<Betalingsbetingelse> BetalingsbetingelseGetAll();
+        IEnumerable<Betalingsbetingelse> BetalingsbetingelseGetAll();
     }
 }

@@ -14,7 +14,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// Henter en liste af regnskaber.
         /// </summary>
         /// <returns>Liste af regnskaber.</returns>
-        IList<Regnskab> RegnskabslisteGet();
+        IEnumerable<Regnskab> RegnskabslisteGet();
 
         /// <summary>
         /// Henter et givent regnskab.
@@ -35,13 +35,13 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// Henter alle kontogrupper.
         /// </summary>
         /// <returns>Liste af kontogrupper.</returns>
-        IList<Kontogruppe> KontogruppeGetAll();
+        IEnumerable<Kontogruppe> KontogruppeGetAll();
 
         /// <summary>
         /// Henter alle grupper til budgetkonti.
         /// </summary>
         /// <returns>Liste af grupper til budgetkonti.</returns>
-        IList<Budgetkontogruppe> BudgetkontogruppeGetAll();
+        IEnumerable<Budgetkontogruppe> BudgetkontogruppeGetAll();
 
         /// <summary>
         /// Tilføjer en bogføringslinje.

@@ -30,6 +30,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         #region Private variables
 
         private readonly IChannelFactory _channelFactory;
+        private readonly IDomainObjectBuilder _domainObjectBuilder;
 
         #endregion
 
@@ -39,13 +40,19 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Danner repository til adressekartoteket.
         /// </summary>
         /// <param name="channelFactory">Implementering af en ChannelFactory.</param>
-        public AdresseRepository(IChannelFactory channelFactory)
+        /// <param name="domainObjectBuilder">Implementering af domæneobjekt bygger.</param>
+        public AdresseRepository(IChannelFactory channelFactory, IDomainObjectBuilder domainObjectBuilder)
         {
             if (channelFactory == null)
             {
                 throw new ArgumentNullException("channelFactory");
             }
+            if (domainObjectBuilder == null)
+            {
+                throw new ArgumentNullException("domainObjectBuilder");
+            }
             _channelFactory = channelFactory;
+            _domainObjectBuilder = domainObjectBuilder;
         }
 
         #endregion
@@ -56,7 +63,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter alle adresser.
         /// </summary>
         /// <returns>Liste af adresser.</returns>
-        public IList<AdresseBase> AdresseGetAll()
+        public IEnumerable<AdresseBase> AdresseGetAll()
         {
             var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
@@ -64,28 +71,31 @@ namespace OSDevGrp.OSIntranet.Repositories
                 // Henter alle adressegrupper.
                 var adressegruppeQuery = new AdressegruppeGetAllQuery();
                 var adressegruppeViews = channel.AdressegruppeGetAll(adressegruppeQuery);
+                var adressegrupper =
+                    _domainObjectBuilder.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
+                        adressegruppeViews);
+                _domainObjectBuilder.SætAdressegrupper(adressegrupper);
                 // Henter alle betalingsbetingelser.
                 var betalingsbetingelseQuery = new BetalingsbetingelseGetAllQuery();
                 var betalingsbetingelseViews = channel.BetalingsbetingelseGetAll(betalingsbetingelseQuery);
+                var betalingsbetingelser =
+                    _domainObjectBuilder.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
+                        betalingsbetingelseViews);
+                _domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
                 // Henter alle firmaadresser.
                 var firmaQuery = new FirmaGetAllQuery();
                 var firmaViews = channel.FirmaGetAll(firmaQuery);
+                var firmaer = _domainObjectBuilder.Build<IEnumerable<FirmaView>, IEnumerable<AdresseBase>>(firmaViews);
+                _domainObjectBuilder.SætAdresser(firmaer);
                 // Henter alle personadresser.
                 var personQuery = new PersonGetAllQuery();
                 var personViews = channel.PersonGetAll(personQuery);
+                var personer =
+                    _domainObjectBuilder.Build<IEnumerable<PersonView>, IEnumerable<AdresseBase>>(personViews);
                 // Mapper views til adresser.
                 var adresser = new List<AdresseBase>();
-                adresser.AddRange(
-                    firmaViews.Select(
-                        firmaView =>
-                        MapFirma(firmaView, adressegruppeViews.Select(MapAdressegruppe).ToList(),
-                                 betalingsbetingelseViews.Select(MapBetalingsbetingelse).ToList())).ToList());
-                adresser.AddRange(
-                    personViews.Select(
-                        personView =>
-                        MapPerson(personView, adresser.OfType<Firma>().ToList(),
-                                  adressegruppeViews.Select(MapAdressegruppe).ToList(),
-                                  betalingsbetingelseViews.Select(MapBetalingsbetingelse).ToList())).ToList());
+                adresser.AddRange(firmaer);
+                adresser.AddRange(personer);
                 return adresser.OrderBy(m => m, new AdresseComparer()).ToList();
             }
             catch (IntranetRepositoryException)
@@ -112,14 +122,14 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter alle postnumre.
         /// </summary>
         /// <returns>Liste af postnumre.</returns>
-        public IList<Postnummer> PostnummerGetAll()
+        public IEnumerable<Postnummer> PostnummerGetAll()
         {
             var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new PostnummerGetAllQuery();
                 var postnummerViews = channel.PostnummerGetAll(query);
-                return postnummerViews.Select(MapPostnummer).ToList();
+                return _domainObjectBuilder.Build<IEnumerable<PostnummerView>, IEnumerable<Postnummer>>(postnummerViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -145,14 +155,16 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter alle adressegrupper.
         /// </summary>
         /// <returns>Liste af adressegrupper.</returns>
-        public IList<Adressegruppe> AdressegruppeGetAll()
+        public IEnumerable<Adressegruppe> AdressegruppeGetAll()
         {
             var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new AdressegruppeGetAllQuery();
                 var adressegruppeViews = channel.AdressegruppeGetAll(query);
-                return adressegruppeViews.Select(MapAdressegruppe).ToList();
+                return
+                    _domainObjectBuilder.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
+                        adressegruppeViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -178,14 +190,16 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter alle betalingsbetingelser.
         /// </summary>
         /// <returns>Liste af betalingsbetingelser.</returns>
-        public IList<Betalingsbetingelse> BetalingsbetingelseGetAll()
+        public IEnumerable<Betalingsbetingelse> BetalingsbetingelseGetAll()
         {
             var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new BetalingsbetingelseGetAllQuery();
                 var betalingsbetingelseViews = channel.BetalingsbetingelseGetAll(query);
-                return betalingsbetingelseViews.Select(MapBetalingsbetingelse).ToList();
+                return
+                    _domainObjectBuilder.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
+                        betalingsbetingelseViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -205,193 +219,6 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 ChannelTools.CloseChannel(channel);
             }
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Mapper et firmaview til et firma.
-        /// </summary>
-        /// <param name="firmaView">Firmaview.</param>
-        /// <param name="adressegrupper">Adressegrupper.</param>
-        /// <param name="betalingsbetingelser">Betalingsbetingelser.</param>
-        /// <returns>Firma.</returns>
-        private static Firma MapFirma(FirmaView firmaView, IEnumerable<Adressegruppe> adressegrupper, IEnumerable<Betalingsbetingelse> betalingsbetingelser)
-        {
-            if (firmaView == null)
-            {
-                throw new ArgumentNullException("firmaView");
-            }
-            if (adressegrupper == null)
-            {
-                throw new ArgumentNullException("adressegrupper");
-            }
-            if (betalingsbetingelser == null)
-            {
-                throw new ArgumentNullException("betalingsbetingelser");
-            }
-            Adressegruppe adressegruppe;
-            try
-            {
-                adressegruppe = adressegrupper.Single(m => m.Nummer == firmaView.Adressegruppe.Nummer);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe),
-                                                 firmaView.Adressegruppe.Nummer), ex);
-            }
-            var firma = new Firma(firmaView.Nummer, firmaView.Navn, adressegruppe);
-            firma.SætAdresseoplysninger(firmaView.Adresse1, firmaView.Adresse2, firmaView.PostnummerBy);
-            firma.SætTelefon(firmaView.Telefon1, firmaView.Telefon2, firmaView.Telefax);
-            firma.SætBekendtskab(firmaView.Bekendtskab);
-            firma.SætMailadresse(firmaView.Mailadresse);
-            firma.SætWebadresse(firmaView.Webadresse);
-            if (firmaView.Betalingsbetingelse != null)
-            {
-                Betalingsbetingelse betalingsbetingelse;
-                try
-                {
-                    betalingsbetingelse =
-                        betalingsbetingelser.Single(m => m.Nummer == firmaView.Betalingsbetingelse.Nummer);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    throw new IntranetRepositoryException(
-                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse),
-                                                     firmaView.Betalingsbetingelse.Nummer), ex);
-                }
-                firma.SætBetalingsbetingelse(betalingsbetingelse);
-            }
-            firma.SætUdlånsfrist(firmaView.Udlånsfrist);
-            firma.SætFilofaxAdresselabel(firmaView.FilofaxAdresselabel);
-            return firma;
-        }
-
-        /// <summary>
-        /// Mapper et personview til en person.
-        /// </summary>
-        /// <param name="personView">Personview.</param>
-        /// <param name="firmaer">Firmaer.</param>
-        /// <param name="adressegrupper">Adressegrupper.</param>
-        /// <param name="betalingsbetingelser">Betalingsbetingelser.</param>
-        /// <returns>Person.</returns>
-        private static Person MapPerson(PersonView personView, IEnumerable<Firma> firmaer, IEnumerable<Adressegruppe> adressegrupper, IEnumerable<Betalingsbetingelse> betalingsbetingelser)
-        {
-            if (personView == null)
-            {
-                throw new ArgumentNullException("personView");
-            }
-            if (firmaer == null)
-            {
-                throw new ArgumentNullException("firmaer");
-            }
-            if (adressegrupper == null)
-            {
-                throw new ArgumentNullException("adressegrupper");
-            }
-            if (betalingsbetingelser == null)
-            {
-                throw new ArgumentNullException("betalingsbetingelser");
-            }
-            Adressegruppe adressegruppe;
-            try
-            {
-                adressegruppe = adressegrupper.Single(m => m.Nummer == personView.Adressegruppe.Nummer);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Adressegruppe),
-                                                 personView.Adressegruppe.Nummer), ex);
-            }
-            var person = new Person(personView.Nummer, personView.Navn, adressegruppe);
-
-            person.SætAdresseoplysninger(personView.Adresse1, personView.Adresse2, personView.PostnummerBy);
-            person.SætTelefon(personView.Telefon, personView.Mobil);
-            person.SætFødselsdato(personView.Fødselsdato);
-            person.SætBekendtskab(personView.Bekendtskab);
-            person.SætMailadresse(personView.Mailadresse);
-            person.SætWebadresse(personView.Webadresse);
-            if (personView.Betalingsbetingelse != null)
-            {
-                Betalingsbetingelse betalingsbetingelse;
-                try
-                {
-                    betalingsbetingelse =
-                        betalingsbetingelser.Single(m => m.Nummer == personView.Betalingsbetingelse.Nummer);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    throw new IntranetRepositoryException(
-                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse),
-                                                     personView.Betalingsbetingelse.Nummer), ex);
-                }
-                person.SætBetalingsbetingelse(betalingsbetingelse);
-            }
-            person.SætUdlånsfrist(personView.Udlånsfrist);
-            person.SætFilofaxAdresselabel(personView.FilofaxAdresselabel);
-            if (personView.Firma != null)
-            {
-                Firma firma;
-                try
-                {
-                    firma = firmaer.Single(m => m.Nummer == personView.Firma.Nummer);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    throw new IntranetRepositoryException(
-                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma),
-                                                     personView.Firma.Nummer), ex);
-                }
-                firma.TilføjPerson(person);
-            }
-            return person;
-        }
-
-        /// <summary>
-        /// Mapper et postnummerview til et postnummer.
-        /// </summary>
-        /// <param name="postnummerView">Postnummerview.</param>
-        /// <returns>Postnummer.</returns>
-        private static Postnummer MapPostnummer(PostnummerView postnummerView)
-        {
-            if (postnummerView == null)
-            {
-                throw new ArgumentNullException("postnummerView");
-            }
-            return new Postnummer(postnummerView.Landekode, postnummerView.Postnummer, postnummerView.Bynavn);
-        }
-
-        /// <summary>
-        /// Mapper et adressegruppeview til en adressegruppe.
-        /// </summary>
-        /// <param name="adressegruppeView">Adressegruppeview.</param>
-        /// <returns>Adressegruppe.</returns>
-        private static Adressegruppe MapAdressegruppe(AdressegruppeView adressegruppeView)
-        {
-            if (adressegruppeView == null)
-            {
-                throw new ArgumentNullException("adressegruppeView");
-            }
-            return new Adressegruppe(adressegruppeView.Nummer, adressegruppeView.Navn,
-                                     adressegruppeView.AdressegruppeOswebdb);
-        }
-
-        /// <summary>
-        /// Mapper et betalingsbetingelseview til en betalingsbetingelse.
-        /// </summary>
-        /// <param name="betalingsbetingelseView">Betalingsbetingelseview.</param>
-        /// <returns>Betalingsbetingelse.</returns>
-        private static Betalingsbetingelse MapBetalingsbetingelse(TabelView betalingsbetingelseView)
-        {
-            if (betalingsbetingelseView == null)
-            {
-                throw new ArgumentNullException("betalingsbetingelseView");
-            }
-            return new Betalingsbetingelse(betalingsbetingelseView.Nummer, betalingsbetingelseView.Navn);
         }
 
         #endregion

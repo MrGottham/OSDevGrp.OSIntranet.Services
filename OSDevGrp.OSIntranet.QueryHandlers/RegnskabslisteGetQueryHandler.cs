@@ -58,7 +58,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
                 throw new ArgumentNullException("query");
             }
             var regnskaber = _finansstyringRepository.RegnskabslisteGet();
-            return _objectMapper.Map<IList<Regnskab>, IEnumerable<RegnskabslisteView>>(regnskaber);
+            return _objectMapper.Map<IEnumerable<Regnskab>, IEnumerable<RegnskabslisteView>>(regnskaber);
         }
 
         #endregion

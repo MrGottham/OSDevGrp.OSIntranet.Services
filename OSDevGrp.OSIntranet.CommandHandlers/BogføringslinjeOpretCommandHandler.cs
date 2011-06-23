@@ -160,7 +160,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             }
             try
             {
-                konto = regnskab.Konti.OfType<Konto>().Single(m => m.Kontonummer == command.Kontonummer);
+                konto = regnskab.Konti.OfType<Konto>().Single(m => m.Kontonummer.CompareTo(command.Kontonummer) == 0);
             }
             catch (InvalidOperationException ex)
             {
@@ -179,9 +179,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 {
                     budgetkonto = regnskab.Konti
                         .OfType<Budgetkonto>()
-                        .Single(m => m.Kontonummer == command.Budgetkontonummer);
+                        .Single(m => m.Kontonummer.CompareTo(command.Budgetkontonummer) == 0);
                 }
-                catch (Exception ex)
+                catch (InvalidOperationException ex)
                 {
                     throw new IntranetRepositoryException(
                         Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto),
@@ -212,7 +212,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 adressekonto = adresser.Single(m => m.Nummer == command.Adressekonto);
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
                 throw new IntranetRepositoryException(
                     Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase),

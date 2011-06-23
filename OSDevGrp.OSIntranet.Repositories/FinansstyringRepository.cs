@@ -31,6 +31,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         #region Private variables
 
         private readonly IChannelFactory _channelFactory;
+        private readonly IDomainObjectBuilder _domainObjectBuilder;
 
         #endregion
 
@@ -40,13 +41,19 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Danner repository til finansstyring.
         /// </summary>
         /// <param name="channelFactory">Implementering af en ChannelFactory.</param>
-        public FinansstyringRepository(IChannelFactory channelFactory)
+        /// <param name="domainObjectBuilder">Implementering af domæneobjekt bygger.</param>
+        public FinansstyringRepository(IChannelFactory channelFactory, IDomainObjectBuilder domainObjectBuilder)
         {
             if (channelFactory == null)
             {
                 throw new ArgumentNullException("channelFactory");
             }
+            if (domainObjectBuilder == null)
+            {
+                throw new ArgumentNullException("domainObjectBuilder");
+            }
             _channelFactory = channelFactory;
+            _domainObjectBuilder = domainObjectBuilder;
         }
 
         #endregion
@@ -57,14 +64,14 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter en liste af regnskaber.
         /// </summary>
         /// <returns>Liste af regnskaber.</returns>
-        public IList<Regnskab> RegnskabslisteGet()
+        public IEnumerable<Regnskab> RegnskabslisteGet()
         {
             var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
                 var regnskabQuery = new RegnskabGetAllQuery();
                 var regnskabViews = channel.RegnskabGetAll(regnskabQuery);
-                return regnskabViews.Select(MapRegnskab).ToList();
+                return _domainObjectBuilder.Build<IEnumerable<RegnskabListeView>, IEnumerable<Regnskab>>(regnskabViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -147,14 +154,15 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter alle kontogrupper.
         /// </summary>
         /// <returns>Liste af kontogrupper.</returns>
-        public IList<Kontogruppe> KontogruppeGetAll()
+        public IEnumerable<Kontogruppe> KontogruppeGetAll()
         {
             var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new KontogruppeGetAllQuery();
                 var kontogruppeViews = channel.KontogruppeGetAll(query);
-                return kontogruppeViews.Select(MapKontogruppe).ToList();
+                return
+                    _domainObjectBuilder.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(kontogruppeViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -180,14 +188,16 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter alle grupper til budgetkonti.
         /// </summary>
         /// <returns>Liste af grupper til budgetkonti.</returns>
-        public IList<Budgetkontogruppe> BudgetkontogruppeGetAll()
+        public IEnumerable<Budgetkontogruppe> BudgetkontogruppeGetAll()
         {
             var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
                 var query = new BudgetkontogruppeGetAllQuery();
                 var budgetkontogruppeViews = channel.BudgetkontogruppeGetAll(query);
-                return budgetkontogruppeViews.Select(MapBudgetkontogruppe).ToList();
+                return
+                    _domainObjectBuilder.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
+                        budgetkontogruppeViews);
             }
             catch (IntranetRepositoryException)
             {

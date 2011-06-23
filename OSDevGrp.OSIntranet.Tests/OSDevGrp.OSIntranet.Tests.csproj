@@ -85,6 +85,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll</HintPath>
     </Reference>
+    <Reference Include="Ploeh.AutoFixture">
+      <HintPath>..\External references\Ploeh.AutoFixture.dll</HintPath>
+    </Reference>
     <Reference Include="Rhino.Mocks">
       <HintPath>..\External references\Rhino.Mocks.dll</HintPath>
     </Reference>
@@ -164,6 +167,7 @@
     <Compile Include="Unittests\QueryHandlers\KreditorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
+    <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />

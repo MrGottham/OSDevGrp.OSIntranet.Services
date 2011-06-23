@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External references", "Exte
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll
 		External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll = External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll
+		External references\Ploeh.AutoFixture.dll = External references\Ploeh.AutoFixture.dll
 		External references\Rhino.Mocks.dll = External references\Rhino.Mocks.dll
 	EndProjectSection
 EndProject
