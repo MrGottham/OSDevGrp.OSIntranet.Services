@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 
 namespace OSDevGrp.OSIntranet.Repositories.Interfaces
 {
@@ -8,6 +11,60 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
     /// </summary>
     public interface IDomainObjectBuilder
     {
+        /// <summary>
+        /// Callbackmetode, som domæneobjekbyggeren benytter til at hente en given adresse.
+        /// </summary>
+        Func<int, AdresseBase> GetAdresseBaseCallback
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given adressegruppe.
+        /// </summary>
+        Func<int, Adressegruppe> GetAdressegruppeCallback
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given betalingsbetingelse.
+        /// </summary>
+        Func<int, Betalingsbetingelse> GetBetalingsbetingelseCallback
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given kontogruppe.
+        /// </summary>
+        Func<int, Kontogruppe> GetKontogruppeCallback
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given gruppe til budgetkonti.
+        /// </summary>
+        Func<int, Budgetkontogruppe> GetBudgetkontogruppeCallback
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente et givent brevhoved.
+        /// </summary>
+        Func<int, Brevhoved> GetBrevhovedCallback
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Sætter adresser til brug ved bygning af domæneobjekter.
         /// </summary>
