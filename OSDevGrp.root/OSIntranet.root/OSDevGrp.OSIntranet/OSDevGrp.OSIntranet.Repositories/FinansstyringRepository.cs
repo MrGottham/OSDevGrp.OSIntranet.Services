@@ -120,15 +120,20 @@ namespace OSDevGrp.OSIntranet.Repositories
                                             Regnskabsnummer = nummer
                                         };
                 var regnskabView = channel.RegnskabGetByNummer(regnskabQuery);
+
                 // Hent alle kontogrupper.
                 var kontogruppeQuery = new KontogruppeGetAllQuery();
                 var kontogruppeViews = channel.KontogruppeGetAll(kontogruppeQuery);
+                var kontogrupper = _domainObjectBuilder
+                    .Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(kontogruppeViews);
+                
                 // Hent alle budgetkontogrupper.
                 var budgetgruppeQuery = new BudgetkontogruppeGetAllQuery();
                 var budgetgruppeViews = channel.BudgetkontogruppeGetAll(budgetgruppeQuery);
+
+                
                 // Mapning og returnering af regnskab.)
-                return MapRegnskab(regnskabView, kontogruppeViews.Select(MapKontogruppe).ToList(),
-                                   budgetgruppeViews.Select(MapBudgetkontogruppe), callback);
+                return MapRegnskab(regnskabView, kontogrupper, budgetgruppeViews.Select(MapBudgetkontogruppe), callback);
             }
             catch (IntranetRepositoryException)
             {
@@ -280,20 +285,6 @@ namespace OSDevGrp.OSIntranet.Repositories
         #endregion
 
         #region Private methods
-
-        /// <summary>
-        /// Mapper et regnskabslisteview til et regnskab.
-        /// </summary>
-        /// <param name="regnskabListeView">Regnskabslisteview.</param>
-        /// <returns>Regnskab.</returns>
-        private static Regnskab MapRegnskab(RegnskabListeView regnskabListeView)
-        {
-            if (regnskabListeView == null)
-            {
-                throw new ArgumentNullException("regnskabListeView");
-            }
-            return new Regnskab(regnskabListeView.Nummer, regnskabListeView.Navn);
-        }
 
         /// <summary>
         /// Mapper et regnskabsview til et regnskab.
@@ -576,42 +567,6 @@ namespace OSDevGrp.OSIntranet.Repositories
                                                                                    bogføringslinjeView.Adresse.Nummer));
             }
             adresse.TilføjBogføringslinje(bogføringslinje);
-        }
-
-        /// <summary>
-        /// Mapper et kontogruppeview til en kontogruppe.
-        /// </summary>
-        /// <param name="kontogruppeView">Kontogruppeview.</param>
-        /// <returns>Kontogruppe.</returns>
-        private static Kontogruppe MapKontogruppe(KontogruppeView kontogruppeView)
-        {
-            if (kontogruppeView == null)
-            {
-                throw new ArgumentNullException("kontogruppeView");
-            }
-            return new Kontogruppe(kontogruppeView.Nummer, kontogruppeView.Navn, MapKontogruppeType(kontogruppeView.KontogruppeType));
-        }
-
-        /// <summary>
-        /// Mapper et kontogruppetypeview til en kontogruppetype.
-        /// </summary>
-        /// <param name="kontogruppeType">Kontogruppetypeview.</param>
-        /// <returns>Kontogruppetype.</returns>
-        private static CommonLibrary.Domain.Enums.KontogruppeType MapKontogruppeType(DataAccess.Contracts.Enums.KontogruppeType kontogruppeType)
-        {
-            switch (kontogruppeType)
-            {
-                case DataAccess.Contracts.Enums.KontogruppeType.Aktiver:
-                    return CommonLibrary.Domain.Enums.KontogruppeType.Aktiver;
-
-                case DataAccess.Contracts.Enums.KontogruppeType.Passiver:
-                    return CommonLibrary.Domain.Enums.KontogruppeType.Passiver;
-
-                default:
-                    throw new IntranetRepositoryException(
-                        Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, kontogruppeType,
-                                                     "KontogruppeType", MethodBase.GetCurrentMethod().Name));
-            }
         }
 
         /// <summary>
