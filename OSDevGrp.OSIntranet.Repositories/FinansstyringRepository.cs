@@ -128,12 +128,13 @@ namespace OSDevGrp.OSIntranet.Repositories
                     .Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(kontogruppeViews);
                 
                 // Hent alle budgetkontogrupper.
-                var budgetgruppeQuery = new BudgetkontogruppeGetAllQuery();
-                var budgetgruppeViews = channel.BudgetkontogruppeGetAll(budgetgruppeQuery);
-
+                var budgetkontogruppeQuery = new BudgetkontogruppeGetAllQuery();
+                var budgetkontogruppeViews = channel.BudgetkontogruppeGetAll(budgetkontogruppeQuery);
+                var budgetkontogrupper = _domainObjectBuilder
+                    .Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(budgetkontogruppeViews);
                 
-                // Mapning og returnering af regnskab.)
-                return MapRegnskab(regnskabView, kontogrupper, budgetgruppeViews.Select(MapBudgetkontogruppe), callback);
+                // Mapning og returnering af regnskab.))
+                return MapRegnskab(regnskabView, kontogrupper, budgetkontogrupper, callback);
             }
             catch (IntranetRepositoryException)
             {
@@ -567,20 +568,6 @@ namespace OSDevGrp.OSIntranet.Repositories
                                                                                    bogføringslinjeView.Adresse.Nummer));
             }
             adresse.TilføjBogføringslinje(bogføringslinje);
-        }
-
-        /// <summary>
-        /// Mapper et budgetkontogruppeview til en gruppe af budgetkonti.
-        /// </summary>
-        /// <param name="budgetkontogruppeView">Budgetkontogruppeview.</param>
-        /// <returns>Gruppe af budgetkonti.</returns>
-        private static Budgetkontogruppe MapBudgetkontogruppe(TabelView budgetkontogruppeView)
-        {
-            if (budgetkontogruppeView == null)
-            {
-                throw new ArgumentNullException("budgetkontogruppeView");
-            }
-            return new Budgetkontogruppe(budgetkontogruppeView.Nummer, budgetkontogruppeView.Navn);
         }
 
         #endregion

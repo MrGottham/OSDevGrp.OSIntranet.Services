@@ -167,25 +167,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
-                .Return(fixture.CreateAnonymous<RegnskabView>()).Repeat.Any();
+                .Return(fixture.CreateAnonymous<RegnskabView>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
-                .Return(fixture.CreateMany<KontogruppeView>(3)).Repeat.Any();
+                .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
-                .Return(fixture.CreateMany<BudgetkontogruppeView>(3)).Repeat.Any();
-            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+                .Return(fixture.CreateMany<BudgetkontogruppeView>(3));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
-                .Return(service).Repeat.Any();
+                .Return(service);
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
                 m =>
                 m.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(
                     Arg<IEnumerable<KontogruppeView>>.Is.NotNull))
-                .Return(fixture.CreateMany<Kontogruppe>(3))
-                .Repeat.Any();
+                .Return(fixture.CreateMany<Kontogruppe>(3));
+            domainObjectBuilder.Expect(
+                m =>
+                m.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
+                    Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull))
+                .Return(fixture.CreateMany<Budgetkontogruppe>(3));
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
             var regnskab = repository.RegnskabGet(1);
@@ -195,6 +199,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 m =>
                 m.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(
                     Arg<IEnumerable<KontogruppeView>>.Is.NotNull));
+            domainObjectBuilder.AssertWasCalled(
+                m =>
+                m.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
+                    Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull));
 
             /*
             var person = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Familie (Ole)", 1));
@@ -1280,25 +1288,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                           new List<Budgetkonto> {budgetkontoIndtægter}, callback
                                       })).InnerException,
                 Is.TypeOf(typeof (IntranetRepositoryException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBudgetkontogruppe kaster en ArgumentNullException, hvis budgetkontogruppeviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBudgetkontogruppeKasterArgumentNullExceptionHvisBudgetkontogruppeViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBudgetkontogruppe",
-                                                        BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
     }
 }
