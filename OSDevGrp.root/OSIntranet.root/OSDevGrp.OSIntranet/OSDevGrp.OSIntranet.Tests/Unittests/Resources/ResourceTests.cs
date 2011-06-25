@@ -225,6 +225,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for NoRegistrationForDelegate hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForNoRegistrationForDelegateHentes()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(typeof(Func<int, Kontogruppe>));
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate,
+                                                            fixture.CreateAnonymous<Type>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]

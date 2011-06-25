@@ -18,6 +18,7 @@
         BalanceLineValueBelowZero,
         BalanceLineValueMissing,
         AccountIsOverdrawn,
-        BudgetAccountIsOverdrawn
+        BudgetAccountIsOverdrawn,
+        NoRegistrationForDelegate
     }
 }

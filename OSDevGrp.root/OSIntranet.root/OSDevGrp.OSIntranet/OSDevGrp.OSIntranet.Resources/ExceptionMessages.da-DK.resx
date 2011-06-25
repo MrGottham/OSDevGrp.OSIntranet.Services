@@ -158,6 +158,10 @@
     <value>Værdien '{0}' er invalid for '{1}'.</value>
     <comment>{0} = Værdi, {1} = Navn på egenskab.</comment>
   </data>
+  <data name="NoRegistrationForDelegate" xml:space="preserve">
+    <value>Ingen metode registreret for delegaten '{0}'.</value>
+    <comment>{0} = Delegate.</comment>
+  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Fejl i repository metode '{0}': {1}</value>
     <comment>{0} = Navn på metode, {1} = Fejlbesked.</comment>

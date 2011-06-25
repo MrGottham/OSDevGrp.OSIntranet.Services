@@ -158,6 +158,10 @@
     <value>Illegal value '{0}' for '{1}'.</value>
     <comment>{0} = Value, {1} = Name of property.</comment>
   </data>
+  <data name="NoRegistrationForDelegate" xml:space="preserve">
+    <value>No method for the delegate '{0}' registered.</value>
+    <comment>{0} = Delegate.</comment>
+  </data>
   <data name="RepositoryError" xml:space="preserve">
     <value>Error in repository method '{0}': {1}</value>
     <comment>{0} = Method name, {1} = Error message.</comment>

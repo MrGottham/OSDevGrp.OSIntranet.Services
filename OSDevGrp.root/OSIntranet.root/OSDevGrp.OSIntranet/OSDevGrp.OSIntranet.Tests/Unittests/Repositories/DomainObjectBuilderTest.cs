@@ -109,7 +109,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.SætAdresser(null));
+            Assert.Throws<NotImplementedException>(() => domainObjectBuilder.SætAdresser(null));
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.SætAdressegrupper(null));
+            Assert.Throws<NotImplementedException>(() => domainObjectBuilder.SætAdressegrupper(null));
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.SætBetalingsbetingelser(null));
+            Assert.Throws<NotImplementedException>(() => domainObjectBuilder.SætBetalingsbetingelser(null));
         }
 
         /// <summary>
@@ -193,9 +193,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
-            domainObjectBuilder.SætAdresser(firmaer);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer => firmaer.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<PersonView>();
             var person = (Person) domainObjectBuilder.Build<PersonView, AdresseBase>(view);
@@ -222,6 +222,79 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(person.Firma.Nummer, Is.EqualTo(view.Firma.Nummer));
             Assert.That(person.Bogføringslinjer, Is.Not.Null);
             Assert.That(person.Bogføringslinjer.Count(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af person, hvis GetAdressegruppeCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfPersonHvisGetAdressegruppeCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            var firmaer = fixture.CreateMany<Firma>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = firmaer.ElementAt(0).Nummer,
+                                   Navn = firmaer.ElementAt(0).Navn
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<PersonView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af person, hvis GetAdressegruppeCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfPersonHvisGetAdressegruppeCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            var firmaer = fixture.CreateMany<Firma>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = firmaer.ElementAt(0).Nummer,
+                                   Navn = firmaer.ElementAt(0).Navn
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer =>
+                                                                {
+                                                                    throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                                });
+
+            var view = fixture.CreateAnonymous<PersonView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
         }
 
         /// <summary>
@@ -254,9 +327,83 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
-            domainObjectBuilder.SætAdresser(firmaer);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<PersonView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af person, hvis GetBetalingsbetingelseCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfPersonHvisGetBetalingsbetingelseCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            var firmaer = fixture.CreateMany<Firma>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = firmaer.ElementAt(0).Nummer,
+                                   Navn = firmaer.ElementAt(0).Navn
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<PersonView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af person, hvis GetBetalingsbetingelseCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfPersonHvisGetBetalingsbetingelseCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            var firmaer = fixture.CreateMany<Firma>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = firmaer.ElementAt(0).Nummer,
+                                   Navn = firmaer.ElementAt(0).Navn
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer =>
+                                                                      {
+                                                                          throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                                      });
 
             var view = fixture.CreateAnonymous<PersonView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
@@ -292,9 +439,86 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
-            domainObjectBuilder.SætAdresser(firmaer);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<PersonView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af person, hvis GetAdresseBaseCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfPersonHvisGetAdresseBaseCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            var firmaer = fixture.CreateMany<Firma>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = firmaer.ElementAt(0).Nummer,
+                                   Navn = firmaer.ElementAt(0).Navn
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<PersonView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af person, hvis GetAdresseBaseCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfPersonHvisGetAdresseBaseCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            var firmaer = fixture.CreateMany<Firma>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = firmaer.ElementAt(0).Nummer,
+                                   Navn = firmaer.ElementAt(0).Navn
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer =>
+                                                              {
+                                                                  throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                              });
 
             var view = fixture.CreateAnonymous<PersonView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
@@ -330,9 +554,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
-            domainObjectBuilder.SætAdresser(firmaer);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer => firmaer.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<PersonView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, AdresseBase>(view));
@@ -368,12 +592,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
-            domainObjectBuilder.SætAdresser(firmaer);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer => firmaer.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateMany<PersonView>(3);
-            var personer = domainObjectBuilder.Build<IEnumerable<PersonView>, IEnumerable<AdresseBase>>(view);
+            var personer = domainObjectBuilder.BuildMany<PersonView, AdresseBase>(view);
             Assert.That(personer, Is.Not.Null);
             Assert.That(personer.Count(), Is.EqualTo(3));
         }
@@ -403,8 +627,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<FirmaView>();
             var firma = (Firma) domainObjectBuilder.Build<FirmaView, AdresseBase>(view);
@@ -434,6 +658,69 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af firma, hvis GetAdressegruppeCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfFirmaHvisGetAdressegruppeCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<FirmaView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<FirmaView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af firma, hvis GetAdressegruppeCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfFirmaHvisGetAdressegruppeCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer =>
+                                                                {
+                                                                    throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                                });
+
+            var view = fixture.CreateAnonymous<FirmaView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<FirmaView, AdresseBase>(view));
+        }
+
+        /// <summary>
         /// Tester, at Build kaster en IntranetRepositoryException ved bygning af firma, hvis adressegruppen ikke findes.
         /// </summary>
         [Test]
@@ -458,8 +745,73 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<FirmaView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<FirmaView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af firma, hvis GetBetalingsbetingelseCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfFirmaHvisGetBetalingsbetingelseCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<FirmaView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<FirmaView, AdresseBase>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af firma, hvis GetBetalingsbetingelseCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfFirmaHvisGetBetalingsbetingelseCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
+            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
+            fixture.Inject(new AdressegruppeView
+                               {
+                                   Nummer = adressegrupper.ElementAt(0).Nummer,
+                                   Navn = adressegrupper.ElementAt(0).Navn,
+                                   AdressegruppeOswebdb = adressegrupper.ElementAt(0).AdressegruppeOswebdb
+                               });
+            fixture.Inject(new BetalingsbetingelseView
+                               {
+                                   Nummer = betalingsbetingelser.ElementAt(0).Nummer,
+                                   Navn = betalingsbetingelser.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<PersonView>>(new List<PersonView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer =>
+                                                                      {
+                                                                          throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                                      });
 
             var view = fixture.CreateAnonymous<FirmaView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<FirmaView, AdresseBase>(view));
@@ -490,8 +842,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<FirmaView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<FirmaView, AdresseBase>(view));
@@ -522,11 +874,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            domainObjectBuilder.SætAdressegrupper(adressegrupper);
-            domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
+            domainObjectBuilder.GetAdressegruppeCallback = (nummer => adressegrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBetalingsbetingelseCallback = (nummer => betalingsbetingelser.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateMany<FirmaView>(3);
-            var firmaer = domainObjectBuilder.Build<IEnumerable<FirmaView>, IEnumerable<AdresseBase>>(view);
+            var firmaer = domainObjectBuilder.BuildMany<FirmaView, AdresseBase>(view);
             Assert.That(firmaer, Is.Not.Null);
             Assert.That(firmaer.Count(), Is.EqualTo(3));
         }
@@ -563,7 +915,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<PostnummerView>(3);
-            var postnumre = domainObjectBuilder.Build<IEnumerable<PostnummerView>, IEnumerable<Postnummer>>(view);
+            var postnumre = domainObjectBuilder.BuildMany<PostnummerView, Postnummer>(view);
             Assert.That(postnumre, Is.Not.Null);
             Assert.That(postnumre.Count(), Is.EqualTo(3));
         }
@@ -598,7 +950,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<AdressegruppeView>(3);
-            var adressegrupper = domainObjectBuilder.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(view);
+            var adressegrupper = domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(view);
             Assert.That(adressegrupper, Is.Not.Null);
             Assert.That(adressegrupper.Count(), Is.EqualTo(3));
         }
@@ -632,9 +984,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<BetalingsbetingelseView>(3);
-            var betalingsbetingelser = domainObjectBuilder.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(view);
+            var betalingsbetingelser = domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(view);
             Assert.That(betalingsbetingelser, Is.Not.Null);
             Assert.That(betalingsbetingelser.Count(), Is.EqualTo(3));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger regnskab fra et listeview.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerRegnskabFraRegnskabListeView()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<RegnskabListeView>();
+            var regnskab = domainObjectBuilder.Build<RegnskabListeView, Regnskab>(view);
+            Assert.That(regnskab, Is.Not.Null);
+            Assert.That(regnskab.Nummer, Is.EqualTo(view.Nummer));
+            Assert.That(regnskab.Navn, Is.Not.Null);
+            Assert.That(regnskab.Navn, Is.EqualTo(view.Navn));
+            Assert.That(regnskab.Brevhoved, Is.Null);
+            Assert.That(regnskab.Konti, Is.Not.Null);
+            Assert.That(regnskab.Konti.Count(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger en liste af regnskaber fra et listeview.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfRegnskaberFraListeView()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateMany<RegnskabListeView>(3);
+            var regnskaber = domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(view);
+            Assert.That(regnskaber, Is.Not.Null);
+            Assert.That(regnskaber.Count(), Is.EqualTo(3));
         }
 
         /// <summary>
@@ -689,8 +1078,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             fixture.Inject((DataAccess.Contracts.Enums.KontogruppeType)100);
             var view = fixture.CreateAnonymous<KontogruppeView>();
-            Assert.Throws<IntranetRepositoryException>(
-                () => domainObjectBuilder.Build<KontogruppeView, Kontogruppe>(view));
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontogruppeView, Kontogruppe>(view));
         }
 
         /// <summary>
@@ -704,7 +1092,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<KontogruppeView>(3);
-            var kontogrupper = domainObjectBuilder.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(view);
+            var kontogrupper = domainObjectBuilder.BuildMany<KontogruppeView, Kontogruppe>(view);
             Assert.That(kontogrupper, Is.Not.Null);
             Assert.That(kontogrupper.Count(), Is.EqualTo(3));
         }
@@ -738,46 +1126,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             var view = fixture.CreateMany<BudgetkontogruppeView>(3);
-            var budgetkontogrupper = domainObjectBuilder.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(view);
+            var budgetkontogrupper = domainObjectBuilder.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(view);
             Assert.That(budgetkontogrupper, Is.Not.Null);
             Assert.That(budgetkontogrupper.Count(), Is.EqualTo(3));
-        }
-
-        /// <summary>
-        /// Tester, at Build bygger regnskab fra et listeview.
-        /// </summary>
-        [Test]
-        public void TestAtBuildByggerRegnskabFraRegnskabListeView()
-        {
-            var fixture = new Fixture();
-            var domainObjectBuilder = new DomainObjectBuilder();
-            Assert.That(domainObjectBuilder, Is.Not.Null);
-
-            var view = fixture.CreateAnonymous<RegnskabListeView>();
-            var regnskab = domainObjectBuilder.Build<RegnskabListeView, Regnskab>(view);
-            Assert.That(regnskab, Is.Not.Null);
-            Assert.That(regnskab.Nummer, Is.EqualTo(view.Nummer));
-            Assert.That(regnskab.Navn, Is.Not.Null);
-            Assert.That(regnskab.Navn, Is.EqualTo(view.Navn));
-            Assert.That(regnskab.Brevhoved, Is.Null);
-            Assert.That(regnskab.Konti, Is.Not.Null);
-            Assert.That(regnskab.Konti.Count(), Is.EqualTo(0));
-        }
-
-        /// <summary>
-        /// Tester, at Build bygger en liste af regnskaber fra et listeview.
-        /// </summary>
-        [Test]
-        public void TestAtBuildByggerListeAfRegnskaberFraListeView()
-        {
-            var fixture = new Fixture();
-            var domainObjectBuilder = new DomainObjectBuilder();
-            Assert.That(domainObjectBuilder, Is.Not.Null);
-
-            var view = fixture.CreateMany<RegnskabListeView>(3);
-            var regnskaber = domainObjectBuilder.Build<IEnumerable<RegnskabListeView>, IEnumerable<Regnskab>>(view);
-            Assert.That(regnskaber, Is.Not.Null);
-            Assert.That(regnskaber.Count(), Is.EqualTo(3));
         }
     }
 }
