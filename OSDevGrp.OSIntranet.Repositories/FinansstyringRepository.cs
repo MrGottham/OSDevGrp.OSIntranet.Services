@@ -71,7 +71,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 var regnskabQuery = new RegnskabGetAllQuery();
                 var regnskabViews = channel.RegnskabGetAll(regnskabQuery);
-                return _domainObjectBuilder.Build<IEnumerable<RegnskabListeView>, IEnumerable<Regnskab>>(regnskabViews);
+                return _domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(regnskabViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -120,21 +120,17 @@ namespace OSDevGrp.OSIntranet.Repositories
                                             Regnskabsnummer = nummer
                                         };
                 var regnskabView = channel.RegnskabGetByNummer(regnskabQuery);
-
                 // Hent alle kontogrupper.
                 var kontogruppeQuery = new KontogruppeGetAllQuery();
                 var kontogruppeViews = channel.KontogruppeGetAll(kontogruppeQuery);
-                var kontogrupper = _domainObjectBuilder
-                    .Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(kontogruppeViews);
-                
                 // Hent alle budgetkontogrupper.
                 var budgetkontogruppeQuery = new BudgetkontogruppeGetAllQuery();
                 var budgetkontogruppeViews = channel.BudgetkontogruppeGetAll(budgetkontogruppeQuery);
-                var budgetkontogrupper = _domainObjectBuilder
-                    .Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(budgetkontogruppeViews);
-                
                 // Mapning og returnering af regnskab.))
-                return MapRegnskab(regnskabView, kontogrupper, budgetkontogrupper, callback);
+                return MapRegnskab(regnskabView,
+                                   _domainObjectBuilder.BuildMany<KontogruppeView, Kontogruppe>(kontogruppeViews),
+                                   _domainObjectBuilder.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(
+                                       budgetkontogruppeViews), callback);
             }
             catch (IntranetRepositoryException)
             {
@@ -167,8 +163,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 var query = new KontogruppeGetAllQuery();
                 var kontogruppeViews = channel.KontogruppeGetAll(query);
-                return
-                    _domainObjectBuilder.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(kontogruppeViews);
+                return _domainObjectBuilder.BuildMany<KontogruppeView, Kontogruppe>(kontogruppeViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -201,9 +196,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 var query = new BudgetkontogruppeGetAllQuery();
                 var budgetkontogruppeViews = channel.BudgetkontogruppeGetAll(query);
-                return
-                    _domainObjectBuilder.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
-                        budgetkontogruppeViews);
+                return _domainObjectBuilder.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(budgetkontogruppeViews);
             }
             catch (IntranetRepositoryException)
             {

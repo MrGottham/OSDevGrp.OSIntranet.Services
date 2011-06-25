@@ -91,5 +91,14 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// <param name="source">Objektet, hvorfra domæneobjektet skal bygges.</param>
         /// <returns>Domæneobjekt.</returns>
         TDomainObject Build<TSource, TDomainObject>(TSource source);
+
+        /// <summary>
+        /// Bygger flere instansere af et objekt i domænemodellen.
+        /// </summary>
+        /// <typeparam name="TSource">Typen på objekterne, hvorfra domæneobjekter skal bygges.</typeparam>
+        /// <typeparam name="TDomainObject">Typen på domæneobjekterne.</typeparam>
+        /// <param name="sources">Objekter, hvorfra domæneobjekter skal bygges.</param>
+        /// <returns>Domæneobjekter.</returns>
+        IEnumerable<TDomainObject> BuildMany<TSource, TDomainObject>(IEnumerable<TSource> sources);
     }
 }

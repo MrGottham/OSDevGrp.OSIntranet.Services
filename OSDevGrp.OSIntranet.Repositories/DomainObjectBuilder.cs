@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
@@ -28,10 +27,6 @@ namespace OSDevGrp.OSIntranet.Repositories
         private Func<int, Budgetkontogruppe> _getBudgetkontogruppeCallback;
         private Func<int, Brevhoved> _getBrevhovedCallback;
 
-        private readonly List<AdresseBase> _adresser = new List<AdresseBase>();
-        private readonly List<Adressegruppe> _adressegrupper = new List<Adressegruppe>();
-        private readonly List<Betalingsbetingelse> _betalingsbetingelser = new List<Betalingsbetingelse>();
-
         #endregion
 
         #region Constructor
@@ -44,15 +39,22 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<PersonView, AdresseBase>()
                 .ConvertUsing(s =>
                                   {
+                                      if (GetAdressegruppeCallback == null)
+                                      {
+                                          throw new IntranetRepositoryException(
+                                              Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate,
+                                                                           "GetAdressegruppeCallback"));
+                                      }
                                       Adressegruppe adressegruppe;
                                       try
                                       {
-                                          lock (_adressegrupper)
-                                          {
-                                              adressegruppe = _adressegrupper.Single(m => m.Nummer == s.Adressegruppe.Nummer);
-                                          }
+                                          adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
                                       }
-                                      catch (InvalidOperationException ex)
+                                      catch (IntranetRepositoryException)
+                                      {
+                                          throw;
+                                      }
+                                      catch (Exception ex)
                                       {
                                           throw new IntranetRepositoryException(
                                               Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
@@ -68,16 +70,24 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       person.SætWebadresse(s.Webadresse);
                                       if (s.Betalingsbetingelse != null)
                                       {
+                                          if (GetBetalingsbetingelseCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(
+                                                  Resource.GetExceptionMessage(
+                                                      ExceptionMessage.NoRegistrationForDelegate,
+                                                      "GetBetalingsbetingelseCallback"));
+                                          }
                                           Betalingsbetingelse betalingsbetingelse;
                                           try
                                           {
-                                              lock (_betalingsbetingelser)
-                                              {
-                                                  betalingsbetingelse = _betalingsbetingelser
-                                                      .Single(m => m.Nummer == s.Betalingsbetingelse.Nummer);
-                                              }
+                                              betalingsbetingelse =
+                                                  GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
                                           }
-                                          catch (InvalidOperationException ex)
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
                                           {
                                               throw new IntranetRepositoryException(
                                                   Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
@@ -90,15 +100,23 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       person.SætFilofaxAdresselabel(s.FilofaxAdresselabel);
                                       if (s.Firma != null)
                                       {
+                                          if (GetAdresseBaseCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(
+                                                  Resource.GetExceptionMessage(
+                                                      ExceptionMessage.NoRegistrationForDelegate,
+                                                      "GetAdresseBaseCallback"));
+                                          }
                                           Firma firma;
                                           try
                                           {
-                                              lock (_adresser)
-                                              {
-                                                  firma = _adresser.OfType<Firma>().Single(m => m.Nummer == s.Firma.Nummer);
-                                              }
+                                              firma = (Firma) GetAdresseBaseCallback(s.Firma.Nummer);
                                           }
-                                          catch (InvalidOperationException ex)
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
                                           {
                                               throw new IntranetRepositoryException(
                                                   Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
@@ -112,15 +130,22 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<FirmaView, AdresseBase>()
                 .ConvertUsing(s =>
                                   {
+                                      if (GetAdressegruppeCallback == null)
+                                      {
+                                          throw new IntranetRepositoryException(
+                                              Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate,
+                                                                           "GetAdressegruppeCallback"));
+                                      }
                                       Adressegruppe adressegruppe;
                                       try
                                       {
-                                          lock (_adressegrupper)
-                                          {
-                                              adressegruppe = _adressegrupper.Single(m => m.Nummer == s.Adressegruppe.Nummer);
-                                          }
+                                          adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
                                       }
-                                      catch (InvalidOperationException ex)
+                                      catch (IntranetRepositoryException)
+                                      {
+                                          throw;
+                                      }
+                                      catch (Exception ex)
                                       {
                                           throw new IntranetRepositoryException(
                                               Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
@@ -135,16 +160,24 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       firma.SætWebadresse(s.Webadresse);
                                       if (s.Betalingsbetingelse != null)
                                       {
+                                          if (GetBetalingsbetingelseCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(
+                                                  Resource.GetExceptionMessage(
+                                                      ExceptionMessage.NoRegistrationForDelegate,
+                                                      "GetBetalingsbetingelseCallback"));
+                                          }
                                           Betalingsbetingelse betalingsbetingelse;
                                           try
                                           {
-                                              lock (_betalingsbetingelser)
-                                              {
-                                                  betalingsbetingelse = _betalingsbetingelser
-                                                      .Single(m => m.Nummer == s.Betalingsbetingelse.Nummer);
-                                              }
+                                              betalingsbetingelse =
+                                                  GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
                                           }
-                                          catch (InvalidOperationException ex)
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
                                           {
                                               throw new IntranetRepositoryException(
                                                   Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
@@ -166,6 +199,9 @@ namespace OSDevGrp.OSIntranet.Repositories
 
             Mapper.CreateMap<BetalingsbetingelseView, Betalingsbetingelse>()
                 .ConvertUsing(s => new Betalingsbetingelse(s.Nummer, s.Navn));
+
+            Mapper.CreateMap<RegnskabListeView, Regnskab>()
+                .ConvertUsing(s => new Regnskab(s.Nummer, s.Navn));
 
             Mapper.CreateMap<KontogruppeView, Kontogruppe>()
                 .ConvertUsing(s =>
@@ -192,9 +228,6 @@ namespace OSDevGrp.OSIntranet.Repositories
 
             Mapper.CreateMap<BudgetkontogruppeView, Budgetkontogruppe>()
                 .ConvertUsing(s => new Budgetkontogruppe(s.Nummer, s.Navn));
-
-            Mapper.CreateMap<RegnskabListeView, Regnskab>()
-                .ConvertUsing(s => new Regnskab(s.Nummer, s.Navn));
 
             Mapper.AssertConfigurationIsValid();
         }
@@ -323,15 +356,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="adresser">Adresser til brug ved bygning af domæneobjekter.</param>
         public void SætAdresser(IEnumerable<AdresseBase> adresser)
         {
-            if (adresser == null)
-            {
-                throw new ArgumentNullException("adresser");
-            }
-            lock (_adresser)
-            {
-                _adresser.Clear();
-                _adresser.AddRange(adresser);
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -340,15 +365,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="adressegrupper">Adressegrupper til brug ved bygning af domæneobjekter.</param>
         public void SætAdressegrupper(IEnumerable<Adressegruppe> adressegrupper)
         {
-            if (adressegrupper == null)
-            {
-                throw new ArgumentNullException("adressegrupper");
-            }
-            lock (_adressegrupper)
-            {
-                _adressegrupper.Clear();
-                _adressegrupper.AddRange(adressegrupper);
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -357,15 +374,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="betalingsbetingelser">Betalingsbetingelser til brug ved bygning af domæneobjekter.</param>
         public void SætBetalingsbetingelser(IEnumerable<Betalingsbetingelse> betalingsbetingelser)
         {
-            if (betalingsbetingelser == null)
-            {
-                throw new ArgumentNullException("betalingsbetingelser");
-            }
-            lock (_betalingsbetingelser)
-            {
-                _betalingsbetingelser.Clear();
-                _betalingsbetingelser.AddRange(betalingsbetingelser);
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -395,6 +404,18 @@ namespace OSDevGrp.OSIntranet.Repositories
                     Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
                                                  ex.Message), ex);
             }
+        }
+
+        /// <summary>
+        /// Bygger flere instansere af et objekt i domænemodellen.
+        /// </summary>
+        /// <typeparam name="TSource">Typen på objekterne, hvorfra domæneobjekter skal bygges.</typeparam>
+        /// <typeparam name="TDomainObject">Typen på domæneobjekterne.</typeparam>
+        /// <param name="sources">Objekter, hvorfra domæneobjekter skal bygges.</param>
+        /// <returns>Domæneobjekter.</returns>
+        public IEnumerable<TDomainObject> BuildMany<TSource, TDomainObject>(IEnumerable<TSource> sources)
+        {
+            return Build<IEnumerable<TSource>, IEnumerable<TDomainObject>>(sources);
         }
 
         #endregion

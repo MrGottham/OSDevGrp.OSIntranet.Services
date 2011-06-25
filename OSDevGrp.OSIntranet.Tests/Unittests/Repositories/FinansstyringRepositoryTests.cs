@@ -64,9 +64,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
-                m =>
-                m.Build<IEnumerable<RegnskabListeView>, IEnumerable<Regnskab>>(
-                    Arg<IEnumerable<RegnskabListeView>>.Is.NotNull)).Return(fixture.CreateMany<Regnskab>(3));
+                m => m.BuildMany<RegnskabListeView, Regnskab>(Arg<IEnumerable<RegnskabListeView>>.Is.NotNull)).Return(
+                    fixture.CreateMany<Regnskab>(3));
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
             var regnskaber = repository.RegnskabslisteGet();
@@ -74,9 +73,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskaber.Count(), Is.EqualTo(3));
 
             domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<RegnskabListeView>, IEnumerable<Regnskab>>(
-                    Arg<IEnumerable<RegnskabListeView>>.Is.NotNull));
+                m => m.BuildMany<RegnskabListeView, Regnskab>(Arg<IEnumerable<RegnskabListeView>>.Is.NotNull));
         }
 
         /// <summary>
@@ -165,14 +162,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject<IEnumerable<BudgetkontoView>>(new List<BudgetkontoView>());
 
             var mocker = new MockRepository();
-            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] {typeof (ICommunicationObject)});
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
                 .Return(fixture.CreateAnonymous<RegnskabView>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<BudgetkontogruppeView>(3));
-            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
@@ -181,14 +178,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
-                m =>
-                m.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(
-                    Arg<IEnumerable<KontogruppeView>>.Is.NotNull))
-                .Return(fixture.CreateMany<Kontogruppe>(3));
+                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull)).Return(
+                    fixture.CreateMany<Kontogruppe>(3));
             domainObjectBuilder.Expect(
                 m =>
-                m.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
-                    Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull))
+                m.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull))
                 .Return(fixture.CreateMany<Budgetkontogruppe>(3));
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
@@ -196,13 +190,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab, Is.Not.Null);
 
             domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(
-                    Arg<IEnumerable<KontogruppeView>>.Is.NotNull));
+                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull));
             domainObjectBuilder.AssertWasCalled(
                 m =>
-                m.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
-                    Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull));
+                m.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull));
 
             /*
             var person = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Familie (Ole)", 1));
@@ -324,9 +315,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
-                m =>
-                m.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(
-                    Arg<IEnumerable<KontogruppeView>>.Is.NotNull)).Return(fixture.CreateMany<Kontogruppe>(3));
+                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull)).Return(
+                    fixture.CreateMany<Kontogruppe>(3));
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
             var kontogrupper = repository.KontogruppeGetAll();
@@ -334,9 +324,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(kontogrupper.Count(), Is.EqualTo(3));
 
             domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(
-                    Arg<IEnumerable<KontogruppeView>>.Is.NotNull));
+                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull));
         }
 
         /// <summary>
@@ -423,10 +411,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
 
             var mocker = new MockRepository();
-            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] {typeof (ICommunicationObject)});
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<BudgetkontogruppeView>(3));
-            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
@@ -436,8 +424,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
                 m =>
-                m.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
-                    Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull)).Return(fixture.CreateMany<Budgetkontogruppe>(3));
+                m.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull))
+                .Return(fixture.CreateMany<Budgetkontogruppe>(3));
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
             var budgetkontogrupper = repository.BudgetkontogruppeGetAll();
@@ -446,8 +434,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             domainObjectBuilder.AssertWasCalled(
                 m =>
-                m.Build<IEnumerable<BudgetkontogruppeView>, IEnumerable<Budgetkontogruppe>>(
-                    Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull));
+                m.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull));
         }
 
         /// <summary>

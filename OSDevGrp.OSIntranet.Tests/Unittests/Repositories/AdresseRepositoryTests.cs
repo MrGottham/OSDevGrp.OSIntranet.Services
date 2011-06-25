@@ -69,20 +69,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(service);
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-            domainObjectBuilder.Expect(
-                m =>
-                m.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
-                    Arg<IEnumerable<AdressegruppeView>>.Is.NotNull)).Return(fixture.CreateMany<Adressegruppe>(3));
-            domainObjectBuilder.Expect(
-                m =>
-                m.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
-                    Arg<IEnumerable<BetalingsbetingelseView>>.Is.NotNull)).Return(
-                        fixture.CreateMany<Betalingsbetingelse>(3));
-            domainObjectBuilder.Expect(
-                m => m.Build<IEnumerable<FirmaView>, IEnumerable<AdresseBase>>(Arg<IEnumerable<FirmaView>>.Is.NotNull)).
-                Return(fixture.CreateMany<Firma>());
-            domainObjectBuilder.Expect(
-                m => m.Build<IEnumerable<PersonView>, IEnumerable<AdresseBase>>(Arg<IEnumerable<PersonView>>.Is.NotNull))
+            domainObjectBuilder.Expect(m =>
+                                       m.BuildMany<AdressegruppeView, Adressegruppe>(
+                                           Arg<IEnumerable<AdressegruppeView>>.Is.NotNull))
+                .Return(fixture.CreateMany<Adressegruppe>(3));
+            domainObjectBuilder.Expect(m =>
+                                       m.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
+                                           Arg<IEnumerable<BetalingsbetingelseView>>.Is.NotNull))
+                .Return(fixture.CreateMany<Betalingsbetingelse>(3));
+            domainObjectBuilder.Expect(m =>
+                                       m.BuildMany<FirmaView, AdresseBase>(Arg<IEnumerable<FirmaView>>.Is.NotNull))
+                .Return(fixture.CreateMany<Firma>());
+            domainObjectBuilder.Expect(m =>
+                                       m.BuildMany<PersonView, AdresseBase>(Arg<IEnumerable<PersonView>>.Is.NotNull))
                 .Return(fixture.CreateMany<Person>());
 
             var repository = new AdresseRepository(channelFactory, domainObjectBuilder);
@@ -90,22 +89,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(adresser, Is.Not.Null);
             Assert.That(adresser.Count(), Is.EqualTo(6));
 
-            domainObjectBuilder.AssertWasCalled(m => m.SætAdressegrupper(Arg<IEnumerable<Adressegruppe>>.Is.NotNull));
-            domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
-                    Arg<IEnumerable<AdressegruppeView>>.Is.NotNull));
-            domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
-                    Arg<IEnumerable<BetalingsbetingelseView>>.Is.NotNull));
-            domainObjectBuilder.AssertWasCalled(
-                m => m.SætBetalingsbetingelser(Arg<IEnumerable<Betalingsbetingelse>>.Is.NotNull));
-            domainObjectBuilder.AssertWasCalled(
-                m => m.Build<IEnumerable<FirmaView>, IEnumerable<AdresseBase>>(Arg<IEnumerable<FirmaView>>.Is.NotNull));
-            domainObjectBuilder.AssertWasCalled(m => m.SætAdresser(Arg<IEnumerable<AdresseBase>>.Is.NotNull));
-            domainObjectBuilder.AssertWasCalled(
-                m => m.Build<IEnumerable<PersonView>, IEnumerable<AdresseBase>>(Arg<IEnumerable<PersonView>>.Is.NotNull));
+            domainObjectBuilder.AssertWasCalled(m =>
+                                                m.BuildMany<AdressegruppeView, Adressegruppe>(
+                                                    Arg<IEnumerable<AdressegruppeView>>.Is.NotNull));
+            domainObjectBuilder.AssertWasCalled(m =>
+                                                m.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
+                                                    Arg<IEnumerable<BetalingsbetingelseView>>.Is.NotNull));
+            domainObjectBuilder.AssertWasCalled(m =>
+                                                m.BuildMany<FirmaView, AdresseBase>(
+                                                    Arg<IEnumerable<FirmaView>>.Is.NotNull));
+            domainObjectBuilder.AssertWasCalled(m =>
+                                                m.BuildMany<PersonView, AdresseBase>(
+                                                    Arg<IEnumerable<PersonView>>.Is.NotNull));
         }
 
         /// <summary>
@@ -210,10 +205,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
 
             var mocker = new MockRepository();
-            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
             service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<PostnummerView>(3));
-            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
@@ -222,9 +217,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
-                m =>
-                m.Build<IEnumerable<PostnummerView>, IEnumerable<Postnummer>>(
-                    Arg<IEnumerable<PostnummerView>>.Is.NotNull)).Return(fixture.CreateMany<Postnummer>(3));
+                m => m.BuildMany<PostnummerView, Postnummer>(Arg<IEnumerable<PostnummerView>>.Is.NotNull)).Return(
+                    fixture.CreateMany<Postnummer>(3));
 
             var repository = new AdresseRepository(channelFactory, domainObjectBuilder);
             var postnumre = repository.PostnummerGetAll();
@@ -232,9 +226,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(postnumre.Count(), Is.EqualTo(3));
 
             domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<PostnummerView>, IEnumerable<Postnummer>>(
-                    Arg<IEnumerable<PostnummerView>>.Is.NotNull));
+                m => m.BuildMany<PostnummerView, Postnummer>(Arg<IEnumerable<PostnummerView>>.Is.NotNull));
         }
 
         /// <summary>
@@ -321,10 +313,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
 
             var mocker = new MockRepository();
-            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
             service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<AdressegruppeView>(3));
-            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
@@ -333,9 +325,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
-                m =>
-                m.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
-                    Arg<IEnumerable<AdressegruppeView>>.Is.NotNull)).Return(fixture.CreateMany<Adressegruppe>(3));
+                m => m.BuildMany<AdressegruppeView, Adressegruppe>(Arg<IEnumerable<AdressegruppeView>>.Is.NotNull)).
+                Return(fixture.CreateMany<Adressegruppe>(3));
 
             var repository = new AdresseRepository(channelFactory, domainObjectBuilder);
             var adressegrupper = repository.AdressegruppeGetAll();
@@ -343,9 +334,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(adressegrupper.Count(), Is.EqualTo(3));
 
             domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
-                    Arg<IEnumerable<AdressegruppeView>>.Is.NotNull));
+                m => m.BuildMany<AdressegruppeView, Adressegruppe>(Arg<IEnumerable<AdressegruppeView>>.Is.NotNull));
         }
 
         /// <summary>
@@ -432,10 +421,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
 
             var mocker = new MockRepository();
-            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
+            var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] {typeof (ICommunicationObject)});
             service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<BetalingsbetingelseView>(2));
-            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
@@ -445,7 +434,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
                 m =>
-                m.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
+                m.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
                     Arg<IEnumerable<BetalingsbetingelseView>>.Is.NotNull)).Return(
                         fixture.CreateMany<Betalingsbetingelse>(2));
 
@@ -456,7 +445,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             domainObjectBuilder.AssertWasCalled(
                 m =>
-                m.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
+                m.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
                     Arg<IEnumerable<BetalingsbetingelseView>>.Is.NotNull));
         }
 

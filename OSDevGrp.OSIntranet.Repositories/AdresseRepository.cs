@@ -71,31 +71,22 @@ namespace OSDevGrp.OSIntranet.Repositories
                 // Henter alle adressegrupper.
                 var adressegruppeQuery = new AdressegruppeGetAllQuery();
                 var adressegruppeViews = channel.AdressegruppeGetAll(adressegruppeQuery);
-                var adressegrupper =
-                    _domainObjectBuilder.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
-                        adressegruppeViews);
-                _domainObjectBuilder.SætAdressegrupper(adressegrupper);
                 // Henter alle betalingsbetingelser.
                 var betalingsbetingelseQuery = new BetalingsbetingelseGetAllQuery();
                 var betalingsbetingelseViews = channel.BetalingsbetingelseGetAll(betalingsbetingelseQuery);
-                var betalingsbetingelser =
-                    _domainObjectBuilder.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
-                        betalingsbetingelseViews);
-                _domainObjectBuilder.SætBetalingsbetingelser(betalingsbetingelser);
                 // Henter alle firmaadresser.
                 var firmaQuery = new FirmaGetAllQuery();
                 var firmaViews = channel.FirmaGetAll(firmaQuery);
-                var firmaer = _domainObjectBuilder.Build<IEnumerable<FirmaView>, IEnumerable<AdresseBase>>(firmaViews);
-                _domainObjectBuilder.SætAdresser(firmaer);
                 // Henter alle personadresser.
                 var personQuery = new PersonGetAllQuery();
                 var personViews = channel.PersonGetAll(personQuery);
-                var personer =
-                    _domainObjectBuilder.Build<IEnumerable<PersonView>, IEnumerable<AdresseBase>>(personViews);
                 // Mapper views til adresser.
                 var adresser = new List<AdresseBase>();
-                adresser.AddRange(firmaer);
-                adresser.AddRange(personer);
+                _domainObjectBuilder.SætAdressegrupper(_domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(adressegruppeViews));
+                _domainObjectBuilder.SætBetalingsbetingelser(_domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(betalingsbetingelseViews));
+                _domainObjectBuilder.SætAdresser(adresser);
+                adresser.AddRange(_domainObjectBuilder.BuildMany<FirmaView, AdresseBase>(firmaViews));
+                adresser.AddRange(_domainObjectBuilder.BuildMany<PersonView, AdresseBase>(personViews));
                 return adresser.OrderBy(m => m, new AdresseComparer()).ToList();
             }
             catch (IntranetRepositoryException)
@@ -129,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 var query = new PostnummerGetAllQuery();
                 var postnummerViews = channel.PostnummerGetAll(query);
-                return _domainObjectBuilder.Build<IEnumerable<PostnummerView>, IEnumerable<Postnummer>>(postnummerViews);
+                return _domainObjectBuilder.BuildMany<PostnummerView, Postnummer>(postnummerViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -162,9 +153,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 var query = new AdressegruppeGetAllQuery();
                 var adressegruppeViews = channel.AdressegruppeGetAll(query);
-                return
-                    _domainObjectBuilder.Build<IEnumerable<AdressegruppeView>, IEnumerable<Adressegruppe>>(
-                        adressegruppeViews);
+                return _domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(adressegruppeViews);
             }
             catch (IntranetRepositoryException)
             {
@@ -198,7 +187,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                 var query = new BetalingsbetingelseGetAllQuery();
                 var betalingsbetingelseViews = channel.BetalingsbetingelseGetAll(query);
                 return
-                    _domainObjectBuilder.Build<IEnumerable<BetalingsbetingelseView>, IEnumerable<Betalingsbetingelse>>(
+                    _domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
                         betalingsbetingelseViews);
             }
             catch (IntranetRepositoryException)
