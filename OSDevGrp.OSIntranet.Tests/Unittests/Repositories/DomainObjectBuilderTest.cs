@@ -4,6 +4,7 @@ using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories;
@@ -62,6 +63,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetBetalingsbetingelseCallback = null);
+        }
+
+        /// <summary>
+        /// Tester, at GetRegnskabCallback kaster en ArgumentNullException, hvis callbackmetoden er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetRegnskabCallbackKasterArgumentNullExceptionHvisCallbackMethodErNull()
+        {
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => domainObjectBuilder.GetRegnskabCallback = null);
         }
 
         /// <summary>
@@ -563,7 +576,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
-        /// Tester, at Build bygger en liste af firmaer fra et view.
+        /// Tester, at Build bygger en liste af personer fra et view.
         /// </summary>
         [Test]
         public void TestAtBuildByggerListeAfPersoner()
@@ -1024,6 +1037,822 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var regnskaber = domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(view);
             Assert.That(regnskaber, Is.Not.Null);
             Assert.That(regnskaber.Count(), Is.EqualTo(3));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger regnskab fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerRegnskabFraRegnskabView()
+        {
+            var fixture = new Fixture();
+            var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new BrevhovedView
+                               {
+                                   Nummer = brevhoveder.ElementAt(0).Nummer,
+                                   Navn = brevhoveder.ElementAt(0).Navn,
+                                   Linje1 = brevhoveder.ElementAt(0).Linje1,
+                                   Linje2 = brevhoveder.ElementAt(0).Linje2,
+                                   Linje3 = brevhoveder.ElementAt(0).Linje3,
+                                   Linje4 = brevhoveder.ElementAt(0).Linje4,
+                                   Linje5 = brevhoveder.ElementAt(0).Linje5,
+                                   Linje6 = brevhoveder.ElementAt(0).Linje6,
+                                   Linje7 = brevhoveder.ElementAt(0).Linje7,
+                                   CvrNr = brevhoveder.ElementAt(0).CvrNr
+                               });
+            fixture.Inject<IEnumerable<KontoView>>(new List<KontoView>());
+            fixture.Inject<IEnumerable<BudgetkontoView>>(new List<BudgetkontoView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<RegnskabView>();
+            var regnskab = domainObjectBuilder.Build<RegnskabView, Regnskab>(view);
+            Assert.That(regnskab, Is.Not.Null);
+            Assert.That(regnskab.Nummer, Is.EqualTo(view.Nummer));
+            Assert.That(regnskab.Navn, Is.Not.Null);
+            Assert.That(regnskab.Navn, Is.EqualTo(view.Navn));
+            Assert.That(regnskab.Brevhoved, Is.Not.Null);
+            Assert.That(regnskab.Brevhoved.Nummer, Is.EqualTo(view.Brevhoved.Nummer));
+            Assert.That(regnskab.Konti, Is.Not.Null);
+            Assert.That(regnskab.Konti.Count(), Is.EqualTo(0));
+            Assert.That(regnskab.Konti, Is.Not.Null);
+            Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(3));
+            Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(3));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af regnskab, hvis GetBrevhovedCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfRegnskabHvisGetBrevhovedCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KontoView>>(new List<KontoView>());
+            fixture.Inject<IEnumerable<BudgetkontoView>>(new List<BudgetkontoView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<RegnskabView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<RegnskabView, Regnskab>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af regnskab, hvis GetBrevhovedCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfRegnskabHvisGetBrevhovedCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KontoView>>(new List<KontoView>());
+            fixture.Inject<IEnumerable<BudgetkontoView>>(new List<BudgetkontoView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetBrevhovedCallback = (nummer =>
+                                                            {
+                                                                throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                            });
+
+            var view = fixture.CreateAnonymous<RegnskabView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<RegnskabView, Regnskab>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af regnskab, hvis brevhovedet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfRegnskabHvisBrevhovedIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new BrevhovedView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>(),
+                                   Linje1 = fixture.CreateAnonymous<string>(),
+                                   Linje2 = fixture.CreateAnonymous<string>(),
+                                   Linje3 = fixture.CreateAnonymous<string>(),
+                                   Linje4 = fixture.CreateAnonymous<string>(),
+                                   Linje5 = fixture.CreateAnonymous<string>(),
+                                   Linje6 = fixture.CreateAnonymous<string>(),
+                                   Linje7 = fixture.CreateAnonymous<string>(),
+                                   CvrNr = fixture.CreateAnonymous<string>()
+                               });
+            fixture.Inject<IEnumerable<KontoView>>(new List<KontoView>());
+            fixture.Inject<IEnumerable<BudgetkontoView>>(new List<BudgetkontoView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<RegnskabView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<RegnskabView, Regnskab>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger konto fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerKontoFraKontoView()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = kontogrupper.ElementAt(0).Nummer,
+                                   Navn = kontogrupper.ElementAt(0).Navn,
+                                   KontogruppeType = fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(fixture.CreateMany<KreditoplysningerView>(24));
+            fixture.Inject(fixture.CreateMany<BogføringslinjeView>(250));
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetKontogruppeCallback = (nummer => kontogrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<KontoView>();
+            var konto = domainObjectBuilder.Build<KontoView, Konto>(view);
+            Assert.That(konto, Is.Not.Null);
+            Assert.That(konto.Regnskab, Is.Not.Null);
+            Assert.That(konto.Regnskab.Nummer, Is.EqualTo(view.Regnskab.Nummer));
+            Assert.That(konto.Kontonummer, Is.Not.Null);
+            Assert.That(konto.Kontonummer, Is.EqualTo(view.Kontonummer));
+            Assert.That(konto.Kontonavn, Is.Not.Null);
+            Assert.That(konto.Kontonavn, Is.EqualTo(view.Kontonavn));
+            Assert.That(konto.Beskrivelse, Is.EqualTo(view.Beskrivelse));
+            Assert.That(konto.Note, Is.EqualTo(view.Note));
+            Assert.That(konto.Kontogruppe, Is.Not.Null);
+            Assert.That(konto.Kontogruppe.Nummer, Is.EqualTo(view.Kontogruppe.Nummer));
+            Assert.That(konto.Kreditoplysninger, Is.Not.Null);
+            Assert.That(konto.Kreditoplysninger.Count(), Is.EqualTo(24));
+            Assert.That(konto.Bogføringslinjer, Is.Not.Null);
+            Assert.That(konto.Bogføringslinjer.Count(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af konto, hvis GetRegnskabCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfKontoHvisGetRegnskabCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(new List<KreditoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<KontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontoView, Konto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af konto, hvis GetRegnskabCallback  kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfKontoHvisGetRegnskabCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(new List<KreditoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer =>
+                                                           {
+                                                               throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                           });
+
+            var view = fixture.CreateAnonymous<KontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontoView, Konto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af konto, hvis regnskabet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfKontoHvisRegnskabIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>(),
+                               });
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(new List<KreditoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<KontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontoView, Konto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af konto, hvis GetKontogruppeCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfKontoHvisGetKontogruppeCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(new List<KreditoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<KontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontoView, Konto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af konto, hvis GetKontogruppeCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfKontoHvisGetKontogruppeCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(new List<KreditoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetKontogruppeCallback = (nummer =>
+                                                              {
+                                                                  throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                              });
+
+            var view = fixture.CreateAnonymous<KontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontoView, Konto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af konto, hvis kontogruppe ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfKontoHvisKontogruppeIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>(),
+                                   KontogruppeType = fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(new List<KreditoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetKontogruppeCallback = (nummer => kontogrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<KontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontoView, Konto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger kreditoplysninger fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerKreditoplysningerFraKreditoplysningerView()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<KreditoplysningerView>();
+            var kreditoplysninger = domainObjectBuilder.Build<KreditoplysningerView, Kreditoplysninger>(view);
+            Assert.That(kreditoplysninger, Is.Not.Null);
+            Assert.That(kreditoplysninger.Konto, Is.Null);
+            Assert.That(kreditoplysninger.År, Is.EqualTo(view.År));
+            Assert.That(kreditoplysninger.Måned, Is.EqualTo(view.Måned));
+            Assert.That(kreditoplysninger.Kredit, Is.EqualTo(view.Kredit));
+        }
+
+        /// <summary>
+        /// Tester ,at Build bygger liste af kreditoplysninger fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfKreditoplysninger()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateMany<KreditoplysningerView>(24);
+            var kreditoplysninger = domainObjectBuilder.BuildMany<KreditoplysningerView, Kreditoplysninger>(view);
+            Assert.That(kreditoplysninger, Is.Not.Null);
+            Assert.That(kreditoplysninger.Count(), Is.EqualTo(24));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger budgetkonto fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerBudgetkontoFraBudgetkontoView()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var budgetkontogrupper = fixture.CreateMany<Budgetkontogruppe>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkontogrupper.ElementAt(0).Nummer,
+                                   Navn = budgetkontogrupper.ElementAt(0).Navn,
+                               });
+            fixture.Inject(fixture.CreateMany<BudgetoplysningerView>(24));
+            fixture.Inject(fixture.CreateMany<BogføringslinjeView>(250));
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBudgetkontogruppeCallback = (nummer => budgetkontogrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BudgetkontoView>();
+            var budgetkonto = domainObjectBuilder.Build<BudgetkontoView, Budgetkonto>(view);
+            Assert.That(budgetkonto, Is.Not.Null);
+            Assert.That(budgetkonto.Regnskab, Is.Not.Null);
+            Assert.That(budgetkonto.Regnskab.Nummer, Is.EqualTo(view.Regnskab.Nummer));
+            Assert.That(budgetkonto.Kontonummer, Is.Not.Null);
+            Assert.That(budgetkonto.Kontonummer, Is.EqualTo(view.Kontonummer));
+            Assert.That(budgetkonto.Kontonavn, Is.Not.Null);
+            Assert.That(budgetkonto.Kontonavn, Is.EqualTo(view.Kontonavn));
+            Assert.That(budgetkonto.Beskrivelse, Is.EqualTo(view.Beskrivelse));
+            Assert.That(budgetkonto.Note, Is.EqualTo(view.Note));
+            Assert.That(budgetkonto.Budgetkontogruppe, Is.Not.Null);
+            Assert.That(budgetkonto.Budgetkontogruppe.Nummer, Is.EqualTo(view.Budgetkontogruppe.Nummer));
+            Assert.That(budgetkonto.Budgetoplysninger, Is.Not.Null);
+            Assert.That(budgetkonto.Budgetoplysninger.Count(), Is.EqualTo(24));
+            Assert.That(budgetkonto.Bogføringslinjer, Is.Not.Null);
+            Assert.That(budgetkonto.Bogføringslinjer.Count(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af budgetkonto, hvis GetRegnskabCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBudgetkontoHvisGetRegnskabCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<BudgetoplysningerView>>(new List<BudgetoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<BudgetkontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BudgetkontoView, Budgetkonto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af budgetkonto, hvis GetRegnskabCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBudgetkontoHvisGetRegnskabCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<BudgetoplysningerView>>(new List<BudgetoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer =>
+                                                           {
+                                                               throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                           });
+
+            var view = fixture.CreateAnonymous<BudgetkontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BudgetkontoView, Budgetkonto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af budgetkonto, hvis regnskabet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBudgetkontoHvisRegnskabIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>(),
+                               });
+            fixture.Inject<IEnumerable<BudgetoplysningerView>>(new List<BudgetoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BudgetkontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BudgetkontoView, Budgetkonto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af budgetkonto, hvis GetBudgetkontogruppeCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBudgetkontoHvisGetBudgetkontogruppeCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<BudgetoplysningerView>>(new List<BudgetoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BudgetkontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BudgetkontoView, Budgetkonto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af budgetkonto, hvis GetBudgetkontogruppeCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBudgetkontoHvisGetBudgetkontogruppeCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject<IEnumerable<BudgetoplysningerView>>(new List<BudgetoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBudgetkontogruppeCallback = (nummer =>
+                                                                    {
+                                                                        throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                                    });
+
+            var view = fixture.CreateAnonymous<BudgetkontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BudgetkontoView, Budgetkonto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af budgetkonto, hvis gruppen til budgetkontoen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBudgetkontoHvisBudgetkontogruppeIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var budgetkontogrupper = fixture.CreateMany<Budgetkontogruppe>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
+            fixture.Inject<IEnumerable<BudgetoplysningerView>>(new List<BudgetoplysningerView>());
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBudgetkontogruppeCallback = (nummer => budgetkontogrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BudgetkontoView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BudgetkontoView, Budgetkonto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger budgetoplysninger fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerBudgetoplysningerFraKreditoplysningerView()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<BudgetoplysningerView>();
+            var budgetoplysninger = domainObjectBuilder.Build<BudgetoplysningerView, Budgetoplysninger>(view);
+            Assert.That(budgetoplysninger, Is.Not.Null);
+            Assert.That(budgetoplysninger.Budgetkonto, Is.Null);
+            Assert.That(budgetoplysninger.År, Is.EqualTo(view.År));
+            Assert.That(budgetoplysninger.Måned, Is.EqualTo(view.Måned));
+            Assert.That(budgetoplysninger.Indtægter, Is.EqualTo(view.Indtægter));
+            Assert.That(budgetoplysninger.Udgifter, Is.EqualTo(view.Udgifter));
+        }
+
+        /// <summary>
+        /// Tester ,at Build bygger liste af budgetoplysninger fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfBudgetoplysninger()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateMany<BudgetoplysningerView>(24);
+            var budgetoplysninger = domainObjectBuilder.BuildMany<BudgetoplysningerView, Budgetoplysninger>(view);
+            Assert.That(budgetoplysninger, Is.Not.Null);
+            Assert.That(budgetoplysninger.Count(), Is.EqualTo(24));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger bogføringslinje fra et view
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerBogføringslinjeFraBogføringslinjeView()
+        {
+            var fixture = new Fixture();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = adresser.ElementAt(0).Nummer,
+                                   Navn = adresser.ElementAt(0).Navn
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer => adresser.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            var bogføringslinje = domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view);
+            Assert.That(bogføringslinje, Is.Not.Null);
+            Assert.That(bogføringslinje.Løbenummer, Is.EqualTo(view.Løbenummer));
+            Assert.That(bogføringslinje.Dato, Is.EqualTo(view.Dato));
+            Assert.That(bogføringslinje.Bilag, Is.EqualTo(view.Bilag));
+            Assert.That(bogføringslinje.Konto, Is.Null);
+            Assert.That(bogføringslinje.Tekst, Is.EqualTo(view.Tekst));
+            Assert.That(bogføringslinje.Budgetkonto, Is.Null);
+            Assert.That(bogføringslinje.Debit, Is.EqualTo(view.Debit));
+            Assert.That(bogføringslinje.Kredit, Is.EqualTo(view.Kredit));
+            Assert.That(bogføringslinje.Adresse, Is.Not.Null);
+            Assert.That(bogføringslinje.Adresse.Nummer, Is.EqualTo(view.Adresse.Nummer));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis GetRegnskabCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisGetRegnskabCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis GetRegnskabCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisGetRegnskabCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer =>
+                                                           {
+                                                               throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                           });
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis regnskabet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisRegnskabIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis kontoen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisKontoIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var konto = fixture.CreateAnonymous<Konto>();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            regnskaber.ElementAt(0).TilføjKonto(konto);
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn
+                               });
+            fixture.Inject(new KontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = fixture.CreateAnonymous<string>(),
+                                   Kontonavn = fixture.CreateAnonymous<string>(),
+                                   Beskrivelse = fixture.CreateAnonymous<string>(),
+                                   Note = fixture.CreateAnonymous<string>(),
+                                   Kontogruppe = fixture.CreateAnonymous<KontogruppeView>()
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis budgetkontoen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisBudgetkontoIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var konto = fixture.CreateAnonymous<Konto>();
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            regnskaber.ElementAt(0).TilføjKonto(konto);
+            regnskaber.ElementAt(0).TilføjKonto(budgetkonto);
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = konto.Kontogruppe.Nummer,
+                                   Navn = konto.Kontogruppe.Navn,
+                                   KontogruppeType = fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(new KontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = konto.Kontonummer,
+                                   Kontonavn = konto.Kontonavn,
+                                   Beskrivelse = konto.Beskrivelse,
+                                   Note = konto.Note,
+                                   Kontogruppe = fixture.CreateAnonymous<KontogruppeView>()
+                               });
+            fixture.Inject(new BudgetkontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = konto.Kontonummer,
+                                   Kontonavn = konto.Kontonavn,
+                                   Beskrivelse = konto.Beskrivelse,
+                                   Note = konto.Note,
+                                   Budgetkontogruppe = fixture.CreateAnonymous<BudgetkontogruppeView>()
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis GetAdresseBaseCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisGetAdresseBaseCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis GetAdresseBaseCallback kaster IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisGetAdresseBaseCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer =>
+                                                              {
+                                                                  throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                              });
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis adressen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisAdresseBaseIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer => adresser.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<BogføringslinjeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger liste af bogføringslinje fra et view
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfBogføringslinje()
+        {
+            var fixture = new Fixture();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = adresser.ElementAt(0).Nummer,
+                                   Navn = adresser.ElementAt(0).Navn
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetAdresseBaseCallback = (nummer => adresser.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateMany<BogføringslinjeView>(250);
+            var bogføringslinjer = domainObjectBuilder.BuildMany<BogføringslinjeView, Bogføringslinje>(view);
+            Assert.That(bogføringslinjer, Is.Not.Null);
+            Assert.That(bogføringslinjer.Count(), Is.EqualTo(250));
         }
 
         /// <summary>
