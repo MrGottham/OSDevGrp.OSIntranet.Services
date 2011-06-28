@@ -424,6 +424,23 @@ namespace OSDevGrp.OSIntranet.Repositories
                                               Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
                                                                            typeof (Konto), s.Konto.Kontonummer), ex);
                                       }
+                                      Budgetkonto budgetkonto = null;
+                                      if (s.Budgetkonto != null && string.IsNullOrEmpty(s.Budgetkonto.Kontonummer) == false)
+                                      {
+                                          try
+                                          {
+                                              budgetkonto = regnskab.Konti
+                                                  .OfType<Budgetkonto>()
+                                                  .Single(m => m.Kontonummer.CompareTo(s.Budgetkonto.Kontonummer) == 0);
+                                          }
+                                          catch (InvalidOperationException ex)
+                                          {
+                                              throw new IntranetRepositoryException(
+                                                  Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
+                                                                               typeof (Budgetkonto),
+                                                                               s.Budgetkonto.Kontonummer), ex);
+                                          }
+                                      }
 
 
 

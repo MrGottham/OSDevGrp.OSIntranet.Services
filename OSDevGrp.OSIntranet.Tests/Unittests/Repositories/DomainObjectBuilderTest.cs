@@ -1760,10 +1760,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(new BudgetkontoListeView
                                {
                                    Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
-                                   Kontonummer = konto.Kontonummer,
-                                   Kontonavn = konto.Kontonavn,
-                                   Beskrivelse = konto.Beskrivelse,
-                                   Note = konto.Note,
+                                   Kontonummer = fixture.CreateAnonymous<string>(),
+                                   Kontonavn = fixture.CreateAnonymous<string>(),
+                                   Beskrivelse = fixture.CreateAnonymous<string>(),
+                                   Note = fixture.CreateAnonymous<string>(),
                                    Budgetkontogruppe = fixture.CreateAnonymous<BudgetkontogruppeView>()
                                });
             var domainObjectBuilder = new DomainObjectBuilder();
