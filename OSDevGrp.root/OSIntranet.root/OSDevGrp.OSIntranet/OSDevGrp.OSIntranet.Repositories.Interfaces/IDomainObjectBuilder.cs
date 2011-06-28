@@ -39,6 +39,15 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         }
 
         /// <summary>
+        /// Callbackmetode, som domæneobjektbyggeren benytter til at hente et givent regnskab.
+        /// </summary>
+        Func<int, Regnskab> GetRegnskabCallback
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Callbackmetode, som domæneobjektbyggeren benytter til at hente en given kontogruppe.
         /// </summary>
         Func<int, Kontogruppe> GetKontogruppeCallback
