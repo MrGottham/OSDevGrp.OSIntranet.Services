@@ -1,4 +1,5 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
@@ -45,6 +46,20 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 return _finansstyringRepository;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Henter en given gruppe til budgetkonti.
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af gruppen til budgetkonti.</param>
+        /// <returns>Gruppe til budgetkonti.</returns>
+        public virtual Budgetkontogruppe BudgetkontogruppeGetByNummer(int nummer)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
