@@ -53,7 +53,10 @@
     <Compile Include="Adressekartotek\AdresselisteHelper.cs" />
     <Compile Include="Adressekartotek\BetalingsbetingelselisteHelper.cs" />
     <Compile Include="DomainObjectListHelper.cs" />
+    <Compile Include="Finansstyring\BudgetkontogruppelisteHelper.cs" />
+    <Compile Include="Finansstyring\KontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\RegnskabslisteHelper.cs" />
+    <Compile Include="Fælles\BrevhovedlisteHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
