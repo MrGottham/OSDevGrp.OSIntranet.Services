@@ -144,6 +144,11 @@
     <Compile Include="Unittests\Contracts\Views\KreditorViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TelefonlisteViewTests.cs" />
+    <Compile Include="Unittests\Domain\Adressekartotek\AdressegruppelisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Adressekartotek\AdresselisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Adressekartotek\BetalingsbetingelselisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\DomainObjectListHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetBusinessExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
@@ -187,6 +192,14 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Contracts\OSDevGrp.OSIntranet.Contracts.csproj">
       <Project>{776EB809-1060-4037-A993-2B3E74DF779D}</Project>
       <Name>OSDevGrp.OSIntranet.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Domain.Interfaces\OSDevGrp.OSIntranet.Domain.Interfaces.csproj">
+      <Project>{14E268A0-B79F-4EF0-B299-5B2D34BF93AB}</Project>
+      <Name>OSDevGrp.OSIntranet.Domain.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Domain\OSDevGrp.OSIntranet.Domain.csproj">
+      <Project>{B02149C7-DBE2-42CA-AA67-AF18B3D1D321}</Project>
+      <Name>OSDevGrp.OSIntranet.Domain</Name>
     </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Infrastructure.Interfaces\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj">
       <Project>{E510F652-6E85-402E-9EFF-474841121181}</Project>

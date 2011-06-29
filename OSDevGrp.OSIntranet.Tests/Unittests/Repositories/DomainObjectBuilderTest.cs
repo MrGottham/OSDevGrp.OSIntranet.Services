@@ -114,42 +114,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
-        /// Tester, at SætAdresser kaster en ArgumentNullException, hvis adresser er null.
-        /// </summary>
-        [Test]
-        public void TestAtSætAdresserKasterArgumentNullExceptionHvisAdressegrupperErNull()
-        {
-            var domainObjectBuilder = new DomainObjectBuilder();
-            Assert.That(domainObjectBuilder, Is.Not.Null);
-
-            Assert.Throws<NotImplementedException>(() => domainObjectBuilder.SætAdresser(null));
-        }
-
-        /// <summary>
-        /// Tester, at SætAdressegrupper kaster en ArgumentNullException, hvis adressegrupper er null.
-        /// </summary>
-        [Test]
-        public void TestAtSætAdressegrupperKasterArgumentNullExceptionHvisAdressegrupperErNull()
-        {
-            var domainObjectBuilder = new DomainObjectBuilder();
-            Assert.That(domainObjectBuilder, Is.Not.Null);
-
-            Assert.Throws<NotImplementedException>(() => domainObjectBuilder.SætAdressegrupper(null));
-        }
-
-        /// <summary>
-        /// Tester, at SætBetalingsbetingelser kaster en ArgumentNullException, hvis betalingsbetingelser er null.
-        /// </summary>
-        [Test]
-        public void TestAtSætBetalingsbetingelserKasterArgumentNullExceptionHvisBetalingsbetingelserErNull()
-        {
-            var domainObjectBuilder = new DomainObjectBuilder();
-            Assert.That(domainObjectBuilder, Is.Not.Null);
-
-            Assert.Throws<NotImplementedException>(() => domainObjectBuilder.SætBetalingsbetingelser(null));
-        }
-
-        /// <summary>
         /// Tester, at Build kaster en ArgumentNullException, hvis objektet er null.
         /// </summary>
         [Test]
@@ -1046,7 +1010,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerRegnskabFraRegnskabView()
         {
             var fixture = new Fixture();
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+            var budgetkontogrupper = fixture.CreateMany<Budgetkontogruppe>(3).ToList();
             var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = 1,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            fixture.Inject(fixture.CreateMany<KreditoplysningerView>(24));
+            fixture.Inject(fixture.CreateMany<BudgetoplysningerView>(24));
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = kontogrupper.ElementAt(0).Nummer,
+                                   Navn = kontogrupper.ElementAt(0).Navn
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkontogrupper.ElementAt(0).Nummer,
+                                   Navn = budgetkontogrupper.ElementAt(0).Navn
+                               });
             fixture.Inject(new BrevhovedView
                                {
                                    Nummer = brevhoveder.ElementAt(0).Nummer,
@@ -1060,11 +1044,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                                    Linje7 = brevhoveder.ElementAt(0).Linje7,
                                    CvrNr = brevhoveder.ElementAt(0).CvrNr
                                });
-            fixture.Inject<IEnumerable<KontoView>>(new List<KontoView>());
-            fixture.Inject<IEnumerable<BudgetkontoView>>(new List<BudgetkontoView>());
+            fixture.Inject(new RegnskabView
+                               {
+                                   Nummer = fixture.CreateAnonymous<RegnskabListeView>().Nummer,
+                                   Navn = fixture.CreateAnonymous<RegnskabListeView>().Navn,
+                                   Konti = fixture.CreateMany<KontoView>(3),
+                                   Budgetkonti = fixture.CreateMany<BudgetkontoView>(3),
+                                   Brevhoved = fixture.CreateAnonymous<BrevhovedView>()
+                               });
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
+            domainObjectBuilder.GetKontogruppeCallback = (nummer => kontogrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBudgetkontogruppeCallback = (nummer => budgetkontogrupper.Single(m => m.Nummer == nummer));
             domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<RegnskabView>();
@@ -1075,8 +1067,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab.Navn, Is.EqualTo(view.Navn));
             Assert.That(regnskab.Brevhoved, Is.Not.Null);
             Assert.That(regnskab.Brevhoved.Nummer, Is.EqualTo(view.Brevhoved.Nummer));
-            Assert.That(regnskab.Konti, Is.Not.Null);
-            Assert.That(regnskab.Konti.Count(), Is.EqualTo(0));
             Assert.That(regnskab.Konti, Is.Not.Null);
             Assert.That(regnskab.Konti.OfType<Konto>().Count(), Is.EqualTo(3));
             Assert.That(regnskab.Konti.OfType<Budgetkonto>().Count(), Is.EqualTo(3));
@@ -1149,6 +1139,68 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var view = fixture.CreateAnonymous<RegnskabView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<RegnskabView, Regnskab>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger liste af regnskab fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfRegnskaber()
+        {
+            var fixture = new Fixture();
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+            var budgetkontogrupper = fixture.CreateMany<Budgetkontogruppe>(3).ToList();
+            var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = 1,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            fixture.Inject(fixture.CreateMany<KreditoplysningerView>(24));
+            fixture.Inject(fixture.CreateMany<BudgetoplysningerView>(24));
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = kontogrupper.ElementAt(0).Nummer,
+                                   Navn = kontogrupper.ElementAt(0).Navn
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkontogrupper.ElementAt(0).Nummer,
+                                   Navn = budgetkontogrupper.ElementAt(0).Navn
+                               });
+            fixture.Inject(new BrevhovedView
+                               {
+                                   Nummer = brevhoveder.ElementAt(0).Nummer,
+                                   Navn = brevhoveder.ElementAt(0).Navn,
+                                   Linje1 = brevhoveder.ElementAt(0).Linje1,
+                                   Linje2 = brevhoveder.ElementAt(0).Linje2,
+                                   Linje3 = brevhoveder.ElementAt(0).Linje3,
+                                   Linje4 = brevhoveder.ElementAt(0).Linje4,
+                                   Linje5 = brevhoveder.ElementAt(0).Linje5,
+                                   Linje6 = brevhoveder.ElementAt(0).Linje6,
+                                   Linje7 = brevhoveder.ElementAt(0).Linje7,
+                                   CvrNr = brevhoveder.ElementAt(0).CvrNr
+                               });
+            fixture.Inject(new RegnskabView
+                               {
+                                   Nummer = fixture.CreateAnonymous<RegnskabListeView>().Nummer,
+                                   Navn = fixture.CreateAnonymous<RegnskabListeView>().Navn,
+                                   Konti = fixture.CreateMany<KontoView>(3),
+                                   Budgetkonti = fixture.CreateMany<BudgetkontoView>(3),
+                                   Brevhoved = fixture.CreateAnonymous<BrevhovedView>()
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetKontogruppeCallback = (nummer => kontogrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBudgetkontogruppeCallback = (nummer => budgetkontogrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateMany<RegnskabView>(1);
+            var regnskaber = domainObjectBuilder.BuildMany<RegnskabView, Regnskab>(view);
+            Assert.That(regnskaber, Is.Not.Null);
+            Assert.That(regnskaber.Count(), Is.EqualTo(1));
         }
 
         /// <summary>
@@ -1341,6 +1393,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var view = fixture.CreateAnonymous<KontoView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<KontoView, Konto>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger liste af konti fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfKonti()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = kontogrupper.ElementAt(0).Nummer,
+                                   Navn = kontogrupper.ElementAt(0).Navn,
+                                   KontogruppeType =
+                                       fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(fixture.CreateMany<KreditoplysningerView>(24));
+            fixture.Inject(fixture.CreateMany<BogføringslinjeView>(250));
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetKontogruppeCallback = (nummer => kontogrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateMany<KontoView>(3);
+            var konti = domainObjectBuilder.BuildMany<KontoView, Konto>(view);
+            Assert.That(konti, Is.Not.Null);
+            Assert.That(konti.Count(), Is.EqualTo(3));
         }
 
         /// <summary>
@@ -1569,6 +1656,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at Build bygger liste af budgetkonti fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfBudgetkonti()
+        {
+            var fixture = new Fixture();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var budgetkontogrupper = fixture.CreateMany<Budgetkontogruppe>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn,
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkontogrupper.ElementAt(0).Nummer,
+                                   Navn = budgetkontogrupper.ElementAt(0).Navn,
+                               });
+            fixture.Inject(fixture.CreateMany<BudgetoplysningerView>(24));
+            fixture.Inject(fixture.CreateMany<BogføringslinjeView>(250));
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBudgetkontogruppeCallback = (nummer => budgetkontogrupper.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateMany<BudgetkontoView>(3);
+            var budgetkonti = domainObjectBuilder.BuildMany<BudgetkontoView, Budgetkonto>(view);
+            Assert.That(budgetkonti, Is.Not.Null);
+            Assert.That(budgetkonti.Count(), Is.EqualTo(3));
+        }
+
+        /// <summary>
         /// Tester, at Build bygger budgetoplysninger fra et view.
         /// </summary>
         [Test]
@@ -1611,7 +1731,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerBogføringslinjeFraBogføringslinjeView()
         {
             var fixture = new Fixture();
+            var konto = fixture.CreateAnonymous<Konto>();
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            regnskaber.ElementAt(0).TilføjKonto(konto);
+            regnskaber.ElementAt(0).TilføjKonto(budgetkonto);
             var adresser = fixture.CreateMany<Person>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = konto.Kontogruppe.Nummer,
+                                   Navn = konto.Kontogruppe.Navn,
+                                   KontogruppeType = fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(new KontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = konto.Kontonummer,
+                                   Kontonavn = konto.Kontonavn,
+                                   Beskrivelse = konto.Beskrivelse,
+                                   Note = konto.Note,
+                                   Kontogruppe = fixture.CreateAnonymous<KontogruppeView>()
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkonto.Budgetkontogruppe.Nummer,
+                                   Navn = budgetkonto.Budgetkontogruppe.Navn
+                               });
+            fixture.Inject(new BudgetkontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = budgetkonto.Kontonummer,
+                                   Kontonavn = budgetkonto.Kontonavn,
+                                   Beskrivelse = budgetkonto.Beskrivelse,
+                                   Note = budgetkonto.Note,
+                                   Budgetkontogruppe = fixture.CreateAnonymous<BudgetkontogruppeView>()
+                               });
             fixture.Inject(new AdressereferenceView
                                {
                                    Nummer = adresser.ElementAt(0).Nummer,
@@ -1620,6 +1779,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
             domainObjectBuilder.GetAdresseBaseCallback = (nummer => adresser.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<BogføringslinjeView>();
@@ -1628,9 +1788,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(bogføringslinje.Løbenummer, Is.EqualTo(view.Løbenummer));
             Assert.That(bogføringslinje.Dato, Is.EqualTo(view.Dato));
             Assert.That(bogføringslinje.Bilag, Is.EqualTo(view.Bilag));
-            Assert.That(bogføringslinje.Konto, Is.Null);
+            Assert.That(bogføringslinje.Konto, Is.Not.Null);
+            Assert.That(bogføringslinje.Konto.Kontonummer, Is.Not.Null);
+            Assert.That(bogføringslinje.Konto.Kontonummer, Is.EqualTo(konto.Kontonummer));
             Assert.That(bogføringslinje.Tekst, Is.EqualTo(view.Tekst));
-            Assert.That(bogføringslinje.Budgetkonto, Is.Null);
+            Assert.That(bogføringslinje.Budgetkonto, Is.Not.Null);
+            Assert.That(bogføringslinje.Budgetkonto, Is.Not.Null);
+            Assert.That(bogføringslinje.Budgetkonto.Kontonummer, Is.Not.Null);
+            Assert.That(bogføringslinje.Budgetkonto.Kontonummer, Is.EqualTo(budgetkonto.Kontonummer));
             Assert.That(bogføringslinje.Debit, Is.EqualTo(view.Debit));
             Assert.That(bogføringslinje.Kredit, Is.EqualTo(view.Kredit));
             Assert.That(bogføringslinje.Adresse, Is.Not.Null);
@@ -1775,7 +1940,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
         }
 
-
         /// <summary>
         /// Tester, at Build kaster en IntranetRepositoryException ved bygning af bogføringslinje, hvis GetAdresseBaseCallback ikke er registreret.
         /// </summary>
@@ -1783,8 +1947,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisGetAdresseBaseCallbackIkkeErRegistreret()
         {
             var fixture = new Fixture();
+            var konto = fixture.CreateAnonymous<Konto>();
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            regnskaber.ElementAt(0).TilføjKonto(konto);
+            regnskaber.ElementAt(0).TilføjKonto(budgetkonto);
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = konto.Kontogruppe.Nummer,
+                                   Navn = konto.Kontogruppe.Navn,
+                                   KontogruppeType = fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(new KontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = konto.Kontonummer,
+                                   Kontonavn = konto.Kontonavn,
+                                   Beskrivelse = konto.Beskrivelse,
+                                   Note = konto.Note,
+                                   Kontogruppe = fixture.CreateAnonymous<KontogruppeView>()
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkonto.Budgetkontogruppe.Nummer,
+                                   Navn = budgetkonto.Budgetkontogruppe.Navn
+                               });
+            fixture.Inject(new BudgetkontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = budgetkonto.Kontonummer,
+                                   Kontonavn = budgetkonto.Kontonavn,
+                                   Beskrivelse = budgetkonto.Beskrivelse,
+                                   Note = budgetkonto.Note,
+                                   Budgetkontogruppe = fixture.CreateAnonymous<BudgetkontogruppeView>()
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = fixture.CreateAnonymous<int>(),
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<BogføringslinjeView>();
             Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<BogføringslinjeView, Bogføringslinje>(view));
@@ -1797,9 +2007,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisGetAdresseBaseCallbackKasterIntranetRepositoryException()
         {
             var fixture = new Fixture();
+            var konto = fixture.CreateAnonymous<Konto>();
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            regnskaber.ElementAt(0).TilføjKonto(konto);
+            regnskaber.ElementAt(0).TilføjKonto(budgetkonto);
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = konto.Kontogruppe.Nummer,
+                                   Navn = konto.Kontogruppe.Navn,
+                                   KontogruppeType = fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(new KontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = konto.Kontonummer,
+                                   Kontonavn = konto.Kontonavn,
+                                   Beskrivelse = konto.Beskrivelse,
+                                   Note = konto.Note,
+                                   Kontogruppe = fixture.CreateAnonymous<KontogruppeView>()
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkonto.Budgetkontogruppe.Nummer,
+                                   Navn = budgetkonto.Budgetkontogruppe.Navn
+                               });
+            fixture.Inject(new BudgetkontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = budgetkonto.Kontonummer,
+                                   Kontonavn = budgetkonto.Kontonavn,
+                                   Beskrivelse = budgetkonto.Beskrivelse,
+                                   Note = budgetkonto.Note,
+                                   Budgetkontogruppe = fixture.CreateAnonymous<BudgetkontogruppeView>()
+                               });
+            fixture.Inject(new AdressereferenceView
+                               {
+                                   Nummer = fixture.CreateAnonymous<int>(),
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
             domainObjectBuilder.GetAdresseBaseCallback = (nummer =>
                                                               {
                                                                   throw fixture.CreateAnonymous<IntranetRepositoryException>();
@@ -1816,7 +2071,47 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfBogføringslinjeHvisAdresseBaseIkkeFindes()
         {
             var fixture = new Fixture();
+            var konto = fixture.CreateAnonymous<Konto>();
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            regnskaber.ElementAt(0).TilføjKonto(konto);
+            regnskaber.ElementAt(0).TilføjKonto(budgetkonto);
             var adresser = fixture.CreateMany<Person>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = konto.Kontogruppe.Nummer,
+                                   Navn = konto.Kontogruppe.Navn,
+                                   KontogruppeType =
+                                       fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(new KontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = konto.Kontonummer,
+                                   Kontonavn = konto.Kontonavn,
+                                   Beskrivelse = konto.Beskrivelse,
+                                   Note = konto.Note,
+                                   Kontogruppe = fixture.CreateAnonymous<KontogruppeView>()
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkonto.Budgetkontogruppe.Nummer,
+                                   Navn = budgetkonto.Budgetkontogruppe.Navn
+                               });
+            fixture.Inject(new BudgetkontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = budgetkonto.Kontonummer,
+                                   Kontonavn = budgetkonto.Kontonavn,
+                                   Beskrivelse = budgetkonto.Beskrivelse,
+                                   Note = budgetkonto.Note,
+                                   Budgetkontogruppe = fixture.CreateAnonymous<BudgetkontogruppeView>()
+                               });
             fixture.Inject(new AdressereferenceView
                                {
                                    Nummer = -1,
@@ -1825,6 +2120,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
             domainObjectBuilder.GetAdresseBaseCallback = (nummer => adresser.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<BogføringslinjeView>();
@@ -1838,7 +2134,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfBogføringslinje()
         {
             var fixture = new Fixture();
+            var konto = fixture.CreateAnonymous<Konto>();
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            regnskaber.ElementAt(0).TilføjKonto(konto);
+            regnskaber.ElementAt(0).TilføjKonto(budgetkonto);
             var adresser = fixture.CreateMany<Person>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = regnskaber.ElementAt(0).Nummer,
+                                   Navn = regnskaber.ElementAt(0).Navn
+                               });
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = konto.Kontogruppe.Nummer,
+                                   Navn = konto.Kontogruppe.Navn,
+                                   KontogruppeType = fixture.CreateAnonymous<DataAccess.Contracts.Enums.KontogruppeType>()
+                               });
+            fixture.Inject(new KontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = konto.Kontonummer,
+                                   Kontonavn = konto.Kontonavn,
+                                   Beskrivelse = konto.Beskrivelse,
+                                   Note = konto.Note,
+                                   Kontogruppe = fixture.CreateAnonymous<KontogruppeView>()
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkonto.Budgetkontogruppe.Nummer,
+                                   Navn = budgetkonto.Budgetkontogruppe.Navn
+                               });
+            fixture.Inject(new BudgetkontoListeView
+                               {
+                                   Regnskab = fixture.CreateAnonymous<RegnskabListeView>(),
+                                   Kontonummer = budgetkonto.Kontonummer,
+                                   Kontonavn = budgetkonto.Kontonavn,
+                                   Beskrivelse = budgetkonto.Beskrivelse,
+                                   Note = budgetkonto.Note,
+                                   Budgetkontogruppe = fixture.CreateAnonymous<BudgetkontogruppeView>()
+                               });
             fixture.Inject(new AdressereferenceView
                                {
                                    Nummer = adresser.ElementAt(0).Nummer,
@@ -1847,6 +2182,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
+            domainObjectBuilder.GetRegnskabCallback = (nummer => regnskaber.Single(m => m.Nummer == nummer));
             domainObjectBuilder.GetAdresseBaseCallback = (nummer => adresser.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateMany<BogføringslinjeView>(250);
@@ -1958,6 +2294,48 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var budgetkontogrupper = domainObjectBuilder.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(view);
             Assert.That(budgetkontogrupper, Is.Not.Null);
             Assert.That(budgetkontogrupper.Count(), Is.EqualTo(3));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger brevhoved fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerBrevhovedFraBrevhovedView()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<BrevhovedView>();
+            var brevhoved = domainObjectBuilder.Build<BrevhovedView, Brevhoved>(view);
+            Assert.That(brevhoved, Is.Not.Null);
+            Assert.That(brevhoved.Nummer, Is.EqualTo(view.Nummer));
+            Assert.That(brevhoved.Navn, Is.Not.Null);
+            Assert.That(brevhoved.Navn, Is.EqualTo(view.Navn));
+            Assert.That(brevhoved.Linje1, Is.EqualTo(view.Linje1));
+            Assert.That(brevhoved.Linje2, Is.EqualTo(view.Linje2));
+            Assert.That(brevhoved.Linje3, Is.EqualTo(view.Linje3));
+            Assert.That(brevhoved.Linje4, Is.EqualTo(view.Linje4));
+            Assert.That(brevhoved.Linje5, Is.EqualTo(view.Linje5));
+            Assert.That(brevhoved.Linje6, Is.EqualTo(view.Linje6));
+            Assert.That(brevhoved.Linje7, Is.EqualTo(view.Linje7));
+            Assert.That(brevhoved.CvrNr, Is.EqualTo(view.CvrNr));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger liste af brevhoveder fra et view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfBrevhoveder()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateMany<BrevhovedView>(3);
+            var brevhoveder = domainObjectBuilder.BuildMany<BrevhovedView, Brevhoved>(view);
+            Assert.That(brevhoveder, Is.Not.Null);
+            Assert.That(brevhoveder.Count(), Is.EqualTo(3));
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.ServiceModel;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Commands;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
@@ -152,6 +151,66 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at RegnskabGet kaster en ArgumentNullException, hvis callbackmetoden til at hente et givent brevhoved er null.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabGetKasterArgumentNullExceptionHvisGetBrevhovedCallbackErNull()
+        {
+            var fixture = new Fixture();
+
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(fixture.CreateMany<KontogruppeView>(3));
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(fixture.CreateMany<BudgetkontogruppeView>(3));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
+
+            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
+            Assert.Throws<ArgumentNullException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), null, null));
+        }
+
+        /// <summary>
+        /// Tester, at RegnskabGet kaster en ArgumentNullException, hvis callbackmetoden til at hente en given adresse er null.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabGetKasterArgumentNullExceptionHvisGetAdresseCallbackErNull()
+        {
+            var fixture = new Fixture();
+
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
+                .Return(fixture.CreateMany<KontogruppeView>(3));
+            service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
+                .Return(fixture.CreateMany<BudgetkontogruppeView>(3));
+            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
+
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+
+            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
+            Assert.Throws<ArgumentNullException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
+        }
+
+        /// <summary>
         /// Tester, at RegnskabGet henter et givent regnskab.
         /// </summary>
         [Test]
@@ -232,8 +291,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
         }
 
         /// <summary>
@@ -261,8 +322,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
         }
 
         /// <summary>
@@ -290,8 +353,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(-1));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
         }
 
         /// <summary>
@@ -315,8 +380,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
-                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull)).Return(
-                    fixture.CreateMany<Kontogruppe>(3));
+                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull))
+                .Return(fixture.CreateMany<Kontogruppe>(3));
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
             var kontogrupper = repository.KontogruppeGetAll();
@@ -518,10 +583,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBogføringslinjeAddKasterEnArgumentNullExceptionHvisKontoErNull()
         {
+            var fixture = new Fixture();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<ArgumentNullException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, null, null, null, 0M, 0M, null));
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, null,
+                                              fixture.CreateAnonymous<string>(), null,
+                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                                              null));
         }
 
         /// <summary>
@@ -530,13 +602,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBogføringslinjeAddKasterEnArgumentNullExceptionHvisTekstErNull()
         {
+            var fixture = new Fixture();
+
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskab = new Regnskab(1, "Ole Sørensen");
-            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
-            Assert.Throws<ArgumentNullException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, null, null, 0M, 0M, null));
+            var konto = fixture.CreateAnonymous<Konto>();
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto, null, null,
+                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                                              null));
         }
 
         /// <summary>
@@ -545,6 +621,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBogføringslinjeAddKalderServicemetode()
         {
+            var fixture = new Fixture();
+
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
@@ -557,11 +635,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskab = new Regnskab(1, "Ole Sørensen");
-            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
-            repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null);
-            service.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything));
+            var konto = fixture.CreateAnonymous<Konto>();
+            repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
+                                          fixture.CreateAnonymous<string>(), null, fixture.CreateAnonymous<decimal>(),
+                                          fixture.CreateAnonymous<decimal>(), null);
+            service.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.NotNull));
         }
 
         /// <summary>
@@ -570,10 +648,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBogføringslinjeAddKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
         {
+            var fixture = new Fixture();
+
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
-                .Throw(new IntranetRepositoryException("Test"));
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -584,10 +664,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskab = new Regnskab(1, "Ole Sørensen");
-            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
-            Assert.Throws<IntranetRepositoryException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null));
+            var konto = fixture.CreateAnonymous<Konto>();
+            Assert.Throws<IntranetRepositoryException>(
+                () =>
+                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
+                                              fixture.CreateAnonymous<string>(), null,
+                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                                              null));
         }
 
         /// <summary>
@@ -596,10 +679,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBogføringslinjeAddKasterIntranetRepositoryExceptionVedFaultException()
         {
+            var fixture = new Fixture();
+
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
-                .Throw(new FaultException("Test"));
+                .Throw(fixture.CreateAnonymous<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -610,10 +695,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskab = new Regnskab(1, "Ole Sørensen");
-            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
-            Assert.Throws<IntranetRepositoryException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null));
+            var konto = fixture.CreateAnonymous<Konto>();
+            Assert.Throws<IntranetRepositoryException>(
+                () =>
+                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
+                                              fixture.CreateAnonymous<string>(), null,
+                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                                              null));
         }
 
         /// <summary>
@@ -622,10 +710,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtBogføringslinjeAddKasterIntranetRepositoryExceptionVedException()
         {
+            var fixture = new Fixture();
+
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
-                .Throw(new Exception("Test"));
+                .Throw(fixture.CreateAnonymous<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -636,645 +726,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskab = new Regnskab(1, "Ole Sørensen");
-            var bankkonti = new Kontogruppe(1, "Bankkonto", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-            var dankort = new Konto(regnskab, "DANKORT", "Dankort", bankkonti);
-            Assert.Throws<IntranetRepositoryException>(() => repository.BogføringslinjeAdd(new DateTime(2011, 4, 1), null, dankort, "Test", null, 0M, 0M, null));
-        }
-
-        /// <summary>
-        /// Tester, at MapRegnskab kaster en ArgumentNullException, hvis regnskabsviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapRegnskabKasterArgumentNullExceptionHvisRegnskabViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null, new[]
-                                                                  {
-                                                                      typeof (RegnskabView),
-                                                                      typeof (IEnumerable<Kontogruppe>),
-                                                                      typeof (IEnumerable<Budgetkontogruppe>),
-                                                                      typeof (Func<int, AdresseBase>)
-                                                                  }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {null, null, null, null})).InnerException,
-                Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapRegnskab kaster en ArgumentNullException, hvis kontogrupper er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapRegnskabKasterArgumentNullExceptionHvisKontogrupperErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null, new[]
-                                                                  {
-                                                                      typeof (RegnskabView),
-                                                                      typeof (IEnumerable<Kontogruppe>),
-                                                                      typeof (IEnumerable<Budgetkontogruppe>),
-                                                                      typeof (Func<int, AdresseBase>)
-                                                                  }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {new RegnskabView(), null, null, null})).InnerException,
-                Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapRegnskab kaster en ArgumentNullException, hvis grupper af budgetkonti er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapRegnskabKasterArgumentNullExceptionHvisBudgetkontogrupperErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapRegnskab", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null, new[]
-                                                                  {
-                                                                      typeof (RegnskabView),
-                                                                      typeof (IEnumerable<Kontogruppe>),
-                                                                      typeof (IEnumerable<Budgetkontogruppe>),
-                                                                      typeof (Func<int, AdresseBase>)
-                                                                  }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository, new object[] {new RegnskabView(), new List<Kontogruppe>(), null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapKonto kaster en ArgumentNullException, hvis regnskab er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapKontoKasterArgumentNullExceptionHvisRengskabErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (KontoListeView),
-                                                                typeof (IEnumerable<Kontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            var m = method;
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => m.Invoke(repository, new object[] {null, null, null})).InnerException,
-                Is.TypeOf(typeof (ArgumentNullException)));
-            method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                    null,
-                                                    new[]
-                                                        {
-                                                            typeof (Regnskab), typeof (KontoView),
-                                                            typeof (IEnumerable<Kontogruppe>)
-                                                        }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {null, null, null})).InnerException,
-                Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapKonto kaster en ArgumentNullException, hvis kontolisteviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapKontoKasterArgumentNullExceptionHvisKontoListeViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (KontoListeView),
-                                                                typeof (IEnumerable<Kontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapKonto kaster en ArgumentNullException, hvis kontoviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapKontoKasterArgumentNullExceptionHvisKontoViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (KontoView),
-                                                                typeof (IEnumerable<Kontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapKonto kaster en ArgumentNullException, hvis kontogrupper er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapKontoKasterArgumentNullExceptionHvisKontogrupperErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (KontoListeView),
-                                                                typeof (IEnumerable<Kontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            var m = method;
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    m.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), new KontoListeView(), null}))
-                    .InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                    null,
-                                                    new[]
-                                                        {
-                                                            typeof (Regnskab), typeof (KontoView),
-                                                            typeof (IEnumerable<Kontogruppe>)
-                                                        }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), new KontoView(), null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapKonto kaster en IntranetRepositoryException, hvis kontogruppen ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtMapKontoKasterIntranetRepositoryExceptionHvisKontogruppeIkkeFindes()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapKonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (KontoListeView),
-                                                                typeof (IEnumerable<Kontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository,
-                                  new object[]
-                                      {
-                                          new Regnskab(1, "Ole Sørensen"),
-                                          new KontoListeView {Kontogruppe = new KontogruppeView {Nummer = 1}},
-                                          new List<Kontogruppe>()
-                                      })).InnerException,
-                Is.TypeOf(typeof (IntranetRepositoryException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapKreditoplysninger kaster en ArgumentNullException, hvis kreditoplysningsviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapKreditoplysningerKasterArgumentNullExceptionHvisKontogrupperErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapKreditoplysninger",
-                                                        BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBudgetkonto kaster en ArgumentNullException, hvis regnskab er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBudgetkontoKasterArgumentNullExceptionHvisRengskabErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (BudgetkontoListeView),
-                                                                typeof (IEnumerable<Budgetkontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            var m = method;
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(() => m.Invoke(repository, new object[] {null, null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                    null,
-                                                    new[]
-                                                        {
-                                                            typeof (Regnskab), typeof (BudgetkontoView),
-                                                            typeof (IEnumerable<Budgetkontogruppe>)
-                                                        }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {null, null, null})).InnerException,
-                Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBudgetkonto kaster en ArgumentNullException, hvis budgetkontolisteviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBudgetkontoKasterArgumentNullExceptionHvisBudgetkontoListeViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (BudgetkontoListeView),
-                                                                typeof (IEnumerable<Budgetkontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBudgetkonto kaster en ArgumentNullException, hvis budgetkontoviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBudgetkontoKasterArgumentNullExceptionHvisBudgetkontoViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (BudgetkontoView),
-                                                                typeof (IEnumerable<Budgetkontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {new Regnskab(1, "Ole Sørensen"), null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBudgetkonto kaster en ArgumentNullException, hvis grupper af budgetkonti er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBudgetkontoKasterArgumentNullExceptionHvisBudgetkontogrupperErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (BudgetkontoListeView),
-                                                                typeof (IEnumerable<Budgetkontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            var m = method;
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    m.Invoke(repository,
-                             new object[] {new Regnskab(1, "Ole Sørensen"), new BudgetkontoListeView(), null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-            method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                    null,
-                                                    new[]
-                                                        {
-                                                            typeof (Regnskab), typeof (BudgetkontoView),
-                                                            typeof (IEnumerable<Budgetkontogruppe>)
-                                                        }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository,
-                                  new object[] {new Regnskab(1, "Ole Sørensen"), new BudgetkontoView(), null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBudgetkonto kaster en IntranetRepositoryException, hvis budgetkontogruppen ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtMapBudgetkontoKasterIntranetRepositoryExceptionHvisBudgetkontogruppeIkkeFindes()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBudgetkonto", BindingFlags.NonPublic | BindingFlags.Static,
-                                                        null,
-                                                        new[]
-                                                            {
-                                                                typeof (Regnskab), typeof (BudgetkontoListeView),
-                                                                typeof (IEnumerable<Budgetkontogruppe>)
-                                                            }, null);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository,
-                                  new object[]
-                                      {
-                                          new Regnskab(1, "Ole Sørensen"),
-                                          new BudgetkontoListeView
-                                              {Budgetkontogruppe = new BudgetkontogruppeView {Nummer = 1}},
-                                          new List<Budgetkontogruppe>()
-                                      })).InnerException,
-                Is.TypeOf(typeof (IntranetRepositoryException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBudgetoplysninger kaster en ArgumentNullException, hvis budgetoplysningsviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBudgetoplysningerKasterArgumentNullExceptionHvisBudgetoplysningViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBudgetoplysninger",
-                                                        BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(() => method.Invoke(repository, new object[] {null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBogføringslinje kaster en ArgumentNullException, hvis bogføringslinjeviewet er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBogføringslinjeKasterArgumentNullExceptionHvisBogføringslinjeViewErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBogføringslinje",
-                                                        BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {null, null, null, null})).InnerException,
-                Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBogføringslinje kaster en ArgumentNullException, hvis konti er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBogføringslinjeKasterArgumentNullExceptionHvisKontiErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => method.Invoke(repository, new object[] {new BogføringslinjeView(), null, null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBogføringslinje kaster en ArgumentNullException, hvis budgetkonti er null.
-        /// </summary>
-        [Test]
-        public void TestAtMapBogføringslinjeKasterArgumentNullExceptionHvisBudgetkontiErNull()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBogføringslinje", BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository, new object[] {new BogføringslinjeView(), new List<Konto>(), null, null})).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBogføringslinje kaster en IntranetRepositoryException, hvis konto ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtMapBogføringslinjeKasterIntranetRepositoryExceptionHvisKontoIkkeFindes()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBogføringslinje",
-                                                        BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            var view = new BogføringslinjeView
-                           {
-                               Løbenummer = 1,
-                               Dato = new DateTime(2011, 4, 1),
-                               Konto = new KontoListeView
-                                           {
-                                               Kontonummer = "DANKORT"
-                                           },
-                               Tekst = "Test",
-                               Budgetkonto = new BudgetkontoListeView
-                                                 {
-                                                     Kontonummer = "1000"
-                                                 },
-                               Debit = 1000M,
-                               Adresse = new AdressereferenceView
-                                             {
-                                                 Nummer = 1
-                                             }
-                           };
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository, new object[] {view, new List<Konto>(), new List<Budgetkonto>(), null})).
-                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBogføringslinje kaster en IntranetRepositoryException, hvis budgetkonto ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtMapBogføringslinjeKasterIntranetRepositoryExceptionHvisBudgetkontoIkkeFindes()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBogføringslinje",
-                                                        BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            var view = new BogføringslinjeView
-                           {
-                               Løbenummer = 1,
-                               Dato = new DateTime(2011, 4, 1),
-                               Konto = new KontoListeView
-                                           {
-                                               Kontonummer = "DANKORT"
-                                           },
-                               Tekst = "Test",
-                               Budgetkonto = new BudgetkontoListeView
-                                                 {
-                                                     Kontonummer = "1000"
-                                                 },
-                               Debit = 1000M,
-                               Adresse = new AdressereferenceView
-                                             {
-                                                 Nummer = 1
-                                             }
-                           };
-
-            var regnskab = new Regnskab(1, "Ole Sørensen");
-            var kontogruppe = new Kontogruppe(1, "Bankkonti", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-            var kontoDankort = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository,
-                                  new object[] {view, new List<Konto> {kontoDankort}, new List<Budgetkonto>(), null})).
-                    InnerException, Is.TypeOf(typeof (IntranetRepositoryException)));
-        }
-
-        /// <summary>
-        /// Tester, at MapBogføringslinje kaster en IntranetRepositoryException, hvis adressen ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtMapBogføringslinjeKasterIntranetRepositoryExceptionHvisAdresseIkkeFindes()
-        {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var method = repository.GetType().GetMethod("MapBogføringslinje",
-                                                        BindingFlags.NonPublic | BindingFlags.Static);
-            Assert.That(method, Is.Not.Null);
-            var view = new BogføringslinjeView
-                           {
-                               Løbenummer = 1,
-                               Dato = new DateTime(2011, 4, 1),
-                               Konto = new KontoListeView
-                                           {
-                                               Kontonummer = "DANKORT"
-                                           },
-                               Tekst = "Test",
-                               Budgetkonto = new BudgetkontoListeView
-                                                 {
-                                                     Kontonummer = "1000"
-                                                 },
-                               Debit = 1000M,
-                               Adresse = new AdressereferenceView
-                                             {
-                                                 Nummer = 1
-                                             }
-                           };
-
-            var regnskab = new Regnskab(1, "Ole Sørensen");
-            var kontogruppe = new Kontogruppe(1, "Bankkonti", CommonLibrary.Domain.Enums.KontogruppeType.Aktiver);
-            var kontoDankort = new Konto(regnskab, "DANKORT", "Dankort", kontogruppe);
-            var budgetkontogruppe = new Budgetkontogruppe(1, "Indtægter");
-            var budgetkontoIndtægter = new Budgetkonto(regnskab, "1000", "Indtægter", budgetkontogruppe);
-            var callback = new Func<int, AdresseBase>(m => null);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () =>
-                    method.Invoke(repository,
-                                  new object[]
-                                      {
-                                          view, new List<Konto> {kontoDankort},
-                                          new List<Budgetkonto> {budgetkontoIndtægter}, callback
-                                      })).InnerException,
-                Is.TypeOf(typeof (IntranetRepositoryException)));
+            var konto = fixture.CreateAnonymous<Konto>();
+            Assert.Throws<IntranetRepositoryException>(
+                () =>
+                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
+                                              fixture.CreateAnonymous<string>(), null,
+                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                                              null));
         }
     }
 }

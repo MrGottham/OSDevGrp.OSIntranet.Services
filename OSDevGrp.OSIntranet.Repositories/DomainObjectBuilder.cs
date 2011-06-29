@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Resources;
@@ -28,6 +29,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         private Func<int, Kontogruppe> _getKontogruppeCallback;
         private Func<int, Budgetkontogruppe> _getBudgetkontogruppeCallback;
         private Func<int, Brevhoved> _getBrevhovedCallback;
+        private readonly IList<Regnskab> _regnskaber = new List<Regnskab>();
 
         #endregion
 
@@ -235,6 +237,18 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           regnskab.SætBrevhoved(brevhoved);
                                       }
+                                      _regnskaber.Add(regnskab);
+                                      var regnskabslisteHelper = new RegnskabslisteHelper(_regnskaber);
+                                      GetRegnskabCallback = regnskabslisteHelper.GetById;
+                                      foreach (var konto in BuildMany<KontoView, Konto>(s.Konti))
+                                      {
+                                          regnskab.TilføjKonto(konto);
+                                      }
+                                      foreach (var budgetkonto in BuildMany<BudgetkontoView, Budgetkonto>(s.Budgetkonti))
+                                      {
+                                          regnskab.TilføjKonto(budgetkonto);
+                                      }
+                                      BuildMany<BogføringslinjeView, Bogføringslinje>(s.Konti.SelectMany(m => m.Bogføringslinjer));
                                       return regnskab;
                                   });
 
@@ -358,32 +372,6 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<BudgetoplysningerView, Budgetoplysninger>()
                 .ConvertUsing(s => new Budgetoplysninger(s.År, s.Måned, s.Indtægter, s.Udgifter));
 
-            Mapper.CreateMap<KontogruppeView, Kontogruppe>()
-                .ConvertUsing(s =>
-                                  {
-                                      var kontogruppe = new Kontogruppe(s.Nummer, s.Navn, KontogruppeType.Aktiver);
-                                      switch (s.KontogruppeType)
-                                      {
-                                          case DataAccess.Contracts.Enums.KontogruppeType.Aktiver:
-                                              kontogruppe.SætKontogruppeType(KontogruppeType.Aktiver);
-                                              break;
-
-                                          case DataAccess.Contracts.Enums.KontogruppeType.Passiver:
-                                              kontogruppe.SætKontogruppeType(KontogruppeType.Passiver);
-                                              break;
-
-                                          default:
-                                              throw new IntranetRepositoryException(
-                                                  Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue,
-                                                                               s.KontogruppeType, "KontogruppeType",
-                                                                               MethodBase.GetCurrentMethod().Name));
-                                      }
-                                      return kontogruppe;
-                                  });
-
-            Mapper.CreateMap<BudgetkontogruppeView, Budgetkontogruppe>()
-                .ConvertUsing(s => new Budgetkontogruppe(s.Nummer, s.Navn));
-
             Mapper.CreateMap<BogføringslinjeView, Bogføringslinje>()
                 .ConvertUsing(s =>
                                   {
@@ -441,12 +429,6 @@ namespace OSDevGrp.OSIntranet.Repositories
                                                                                s.Budgetkonto.Kontonummer), ex);
                                           }
                                       }
-
-
-
-
-
-
                                       AdresseBase adresse = null;
                                       if (s.Adresse != null && s.Adresse.Nummer != 0)
                                       {
@@ -473,8 +455,12 @@ namespace OSDevGrp.OSIntranet.Repositories
                                                   ex);
                                           }
                                       }
-                                      var bogføringslinje = new Bogføringslinje(s.Løbenummer, s.Dato, s.Bilag, s.Tekst,
-                                                                                s.Debit, s.Kredit);
+                                      var bogføringslinje = new Bogføringslinje(s.Løbenummer, s.Dato, s.Bilag, s.Tekst, s.Debit, s.Kredit);
+                                      konto.TilføjBogføringslinje(bogføringslinje);
+                                      if (budgetkonto != null)
+                                      {
+                                          budgetkonto.TilføjBogføringslinje(bogføringslinje);
+                                      }
                                       if (adresse != null)
                                       {
                                           adresse.TilføjBogføringslinje(bogføringslinje);
@@ -482,6 +468,46 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       return bogføringslinje;
                                   });
 
+            Mapper.CreateMap<KontogruppeView, Kontogruppe>()
+                .ConvertUsing(s =>
+                                  {
+                                      var kontogruppe = new Kontogruppe(s.Nummer, s.Navn, KontogruppeType.Aktiver);
+                                      switch (s.KontogruppeType)
+                                      {
+                                          case DataAccess.Contracts.Enums.KontogruppeType.Aktiver:
+                                              kontogruppe.SætKontogruppeType(KontogruppeType.Aktiver);
+                                              break;
+
+                                          case DataAccess.Contracts.Enums.KontogruppeType.Passiver:
+                                              kontogruppe.SætKontogruppeType(KontogruppeType.Passiver);
+                                              break;
+
+                                          default:
+                                              throw new IntranetRepositoryException(
+                                                  Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue,
+                                                                               s.KontogruppeType, "KontogruppeType",
+                                                                               MethodBase.GetCurrentMethod().Name));
+                                      }
+                                      return kontogruppe;
+                                  });
+
+            Mapper.CreateMap<BudgetkontogruppeView, Budgetkontogruppe>()
+                .ConvertUsing(s => new Budgetkontogruppe(s.Nummer, s.Navn));
+
+            Mapper.CreateMap<BrevhovedView, Brevhoved>()
+                .ConvertUsing(s =>
+                                  {
+                                      var brevhoved = new Brevhoved(s.Nummer, s.Navn);
+                                      brevhoved.SætLinje1(s.Linje1);
+                                      brevhoved.SætLinje2(s.Linje2);
+                                      brevhoved.SætLinje3(s.Linje3);
+                                      brevhoved.SætLinje4(s.Linje4);
+                                      brevhoved.SætLinje5(s.Linje5);
+                                      brevhoved.SætLinje6(s.Linje6);
+                                      brevhoved.SætLinje7(s.Linje7);
+                                      brevhoved.SætCvrNr(s.CvrNr);
+                                      return brevhoved;
+                                  });
             Mapper.AssertConfigurationIsValid();
         }
 
@@ -620,33 +646,6 @@ namespace OSDevGrp.OSIntranet.Repositories
                 }
                 _getBrevhovedCallback = value;
             }
-        }
-
-        /// <summary>
-        /// Sætter adresser til brug ved bygning af domæneobjekter.
-        /// </summary>
-        /// <param name="adresser">Adresser til brug ved bygning af domæneobjekter.</param>
-        public void SætAdresser(IEnumerable<AdresseBase> adresser)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Sætter adressegrupper til brug ved bygning af domæneobjekter.
-        /// </summary>
-        /// <param name="adressegrupper">Adressegrupper til brug ved bygning af domæneobjekter.</param>
-        public void SætAdressegrupper(IEnumerable<Adressegruppe> adressegrupper)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Sætter betalingsbetingelser til brug ved bygning af domæneobjekter.
-        /// </summary>
-        /// <param name="betalingsbetingelser">Betalingsbetingelser til brug ved bygning af domæneobjekter.</param>
-        public void SætBetalingsbetingelser(IEnumerable<Betalingsbetingelse> betalingsbetingelser)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
