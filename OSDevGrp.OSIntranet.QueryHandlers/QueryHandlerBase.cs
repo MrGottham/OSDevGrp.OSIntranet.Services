@@ -41,7 +41,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <typeparam name="TView">Typen på viewet, der skal mappes til.</typeparam>
         /// <param name="domainObject">Domæneobjektet, der skal mappes.</param>
         /// <returns>View.</returns>
-        public TView Map<TDomainObject, TView>(TDomainObject domainObject)
+        public virtual TView Map<TDomainObject, TView>(TDomainObject domainObject)
         {
             if (Equals(domainObject, null))
             {
@@ -57,7 +57,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <typeparam name="TView">Typen på views, der skal mappes til.</typeparam>
         /// <param name="domainObjects">Domæneobjekter, der skal mappes.</param>
         /// <returns>Views.</returns>
-        public IEnumerable<TView> MapMany<TDomainObject, TView>(IEnumerable<TDomainObject> domainObjects)
+        public virtual IEnumerable<TView> MapMany<TDomainObject, TView>(IEnumerable<TDomainObject> domainObjects)
         {
             if (Equals(domainObjects, null))
             {

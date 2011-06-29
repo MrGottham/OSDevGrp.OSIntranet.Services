@@ -1,4 +1,5 @@
-﻿using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+﻿using System;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
@@ -39,6 +40,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var queryHandler = new MyFællesElementQueryHandler(fællesRepository, objectMapper);
             Assert.That(queryHandler, Is.Not.Null);
             Assert.That(queryHandler.Repository, Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis repository til fælles elementer er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
+        {
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            Assert.Throws<ArgumentNullException>(() => new MyFællesElementQueryHandler(null, objectMapper));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis objectmapperen er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
+        {
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            Assert.Throws<ArgumentNullException>(() => new MyFællesElementQueryHandler(fællesRepository, null));
         }
     }
 }
