@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
@@ -237,15 +238,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
-                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull)).Return(
-                    fixture.CreateMany<Kontogruppe>(3));
+                m => m.BuildMany<KontogruppeView, Kontogruppe>(Arg<IEnumerable<KontogruppeView>>.Is.NotNull))
+                .Return(fixture.CreateMany<Kontogruppe>(3));
             domainObjectBuilder.Expect(
                 m =>
                 m.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull))
                 .Return(fixture.CreateMany<Budgetkontogruppe>(3));
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskab = repository.RegnskabGet(1);
+            var regnskab = repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback);
             Assert.That(regnskab, Is.Not.Null);
 
             domainObjectBuilder.AssertWasCalled(
@@ -253,17 +257,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             domainObjectBuilder.AssertWasCalled(
                 m =>
                 m.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull));
-
-            /*
-            var person = new Person(1, "Ole Sørensen", new Adressegruppe(1, "Familie (Ole)", 1));
-            regnskab = repository.RegnskabGet(1, nummer => person);
-            Assert.That(regnskab, Is.Not.Null);
-
-            domainObjectBuilder.AssertWasCalled(
-                m =>
-                m.Build<IEnumerable<KontogruppeView>, IEnumerable<Kontogruppe>>(
-                    Arg<IEnumerable<KontogruppeView>>.Is.NotNull));
-            */
         }
 
         /// <summary>
@@ -292,9 +285,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback));
         }
 
         /// <summary>
@@ -323,9 +317,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback));
         }
 
         /// <summary>
@@ -354,9 +349,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback));
         }
 
         /// <summary>

@@ -166,7 +166,46 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 throw new ArgumentNullException("getBrevhovedCallback");
             }
-            throw new NotImplementedException();
+            if (getAdresseCallback == null)
+            {
+                throw new ArgumentNullException("getAdresseCallback");
+            }
+            var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
+            try
+            {
+                // Hent regnskabet.
+                var regnskabQuery = new RegnskabGetByNummerQuery
+                                        {
+                                            Regnskabsnummer = nummer
+                                        };
+                var regnskabView = channel.RegnskabGetByNummer(regnskabQuery);
+                // Hent alle kontogrupper.
+                var kontogruppeQuery = new KontogruppeGetAllQuery();
+                var kontogruppeViews = channel.KontogruppeGetAll(kontogruppeQuery);
+                // Hent alle budgetkontogrupper.
+                var budgetkontogruppeQuery = new BudgetkontogruppeGetAllQuery();
+                var budgetkontogruppeViews = channel.BudgetkontogruppeGetAll(budgetkontogruppeQuery);
+                // Mapning af regnskab.
+                throw new NotImplementedException();
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (FaultException ex)
+            {
+                throw new IntranetRepositoryException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(channel);
+            }
         }
 
         /// <summary>
