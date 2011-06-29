@@ -39,7 +39,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <summary>
         /// Repository til finansstyring.
         /// </summary>
-        public IFinansstyringRepository Repository
+        public virtual IFinansstyringRepository Repository
         {
             get
             {

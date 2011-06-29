@@ -39,7 +39,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <summary>
         /// Repository til fælles elementer i domænet.
         /// </summary>
-        public IFællesRepository Repository
+        public virtual IFællesRepository Repository
         {
             get
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
@@ -39,12 +40,26 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <summary>
         /// Repository til adresser.
         /// </summary>
-        public IAdresseRepository Repository
+        public virtual IAdresseRepository Repository
         {
             get
             {
                 return _adresseRepository;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Henter og returnerer en given betalingsbetingelse.
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af betalingsbetingelsen.</param>
+        /// <returns>Betalingsbetingelse.</returns>
+        public virtual Betalingsbetingelse BetalingsbetingelseGetByNummer(int nummer)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
