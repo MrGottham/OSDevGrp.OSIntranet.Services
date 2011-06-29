@@ -5,6 +5,7 @@ using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Commands;
@@ -150,6 +151,22 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 ChannelTools.CloseChannel(channel);
             }
+        }
+
+        /// <summary>
+        /// Henter et givent regnskab.
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af regnskabet.</param>
+        /// <param name="getBrevhovedCallback">Callbackmetode til at hente et givent brevhoved.</param>
+        /// <param name="getAdresseCallback">Callbackmetode til at hente en given adresse.</param>
+        /// <returns>Regnskab.</returns>
+        public Regnskab RegnskabGet(int nummer, Func<int, Brevhoved> getBrevhovedCallback, Func<int, AdresseBase> getAdresseCallback)
+        {
+            if (getBrevhovedCallback == null)
+            {
+                throw new ArgumentNullException("getBrevhovedCallback");
+            }
+            throw new NotImplementedException();
         }
 
         /// <summary>

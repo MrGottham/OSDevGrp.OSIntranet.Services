@@ -10,6 +10,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Resources;
@@ -82,9 +83,17 @@ namespace OSDevGrp.OSIntranet.Repositories
                 var personViews = channel.PersonGetAll(personQuery);
                 // Mapper views til adresser.
                 var adresser = new List<AdresseBase>();
-                _domainObjectBuilder.SætAdressegrupper(_domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(adressegruppeViews));
-                _domainObjectBuilder.SætBetalingsbetingelser(_domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(betalingsbetingelseViews));
-                _domainObjectBuilder.SætAdresser(adresser);
+                var adressegruppelisteHelper =
+                    new AdressegruppelisteHelper(
+                        _domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(adressegruppeViews));
+                var betalingsbetingelselisteHelper =
+                    new BetalingsbetingelselisteHelper(
+                        _domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
+                            betalingsbetingelseViews));
+                var adresselisteHelper = new AdresselisteHelper(adresser);
+                _domainObjectBuilder.GetAdressegruppeCallback = adressegruppelisteHelper.GetById;
+                _domainObjectBuilder.GetBetalingsbetingelseCallback = betalingsbetingelselisteHelper.GetById;
+                _domainObjectBuilder.GetAdresseBaseCallback = adresselisteHelper.GetById;
                 adresser.AddRange(_domainObjectBuilder.BuildMany<FirmaView, AdresseBase>(firmaViews));
                 adresser.AddRange(_domainObjectBuilder.BuildMany<PersonView, AdresseBase>(personViews));
                 return adresser.OrderBy(m => m, new AdresseComparer()).ToList();

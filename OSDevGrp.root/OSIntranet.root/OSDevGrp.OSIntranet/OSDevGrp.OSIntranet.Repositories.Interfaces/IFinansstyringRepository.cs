@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 
 namespace OSDevGrp.OSIntranet.Repositories.Interfaces
 {
@@ -30,6 +31,15 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
         /// <returns>Regnskab.</returns>
         Regnskab RegnskabGet(int nummer, Func<int, AdresseBase> callback);
+
+        /// <summary>
+        /// Henter et givent regnskab.
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af regnskabet.</param>
+        /// <param name="getBrevhovedCallback">Callbackmetode til at hente et givent brevhoved.</param>
+        /// <param name="getAdresseCallback">Callbackmetode til at hente en given adresse.</param>
+        /// <returns>Regnskab.</returns>
+        Regnskab RegnskabGet(int nummer, Func<int, Brevhoved> getBrevhovedCallback, Func<int, AdresseBase> getAdresseCallback);
 
         /// <summary>
         /// Henter alle kontogrupper.
