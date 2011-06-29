@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         /// Tester, at konstruktøren kaster en ArgumentNullException, hvis repository til fælles elementer er null.
         /// </summary>
         [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
+        public void TestAtConstructorKasterArgumentNullExceptionHvisFællesRepositoryErNull()
         {
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             Assert.Throws<ArgumentNullException>(() => new MyFællesElementQueryHandler(null, objectMapper));
