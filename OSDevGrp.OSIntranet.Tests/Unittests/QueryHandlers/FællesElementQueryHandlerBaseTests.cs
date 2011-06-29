@@ -1,0 +1,44 @@
+﻿using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.QueryHandlers;
+using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using NUnit.Framework;
+using Rhino.Mocks;
+
+namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
+{
+    /// <summary>
+    /// Tester basisklasse for en QueryHandler til fælles elementer i domænet, såsom brevhoved.
+    /// </summary>
+    [TestFixture]
+    public class FællesElementQueryHandlerBaseTests
+    {
+        /// <summary>
+        /// Egen klasse til test af basisklasse for en QueryHandler til fælles elementer i domænet, såsom brevhoved.
+        /// </summary>
+        private class MyFællesElementQueryHandler : FællesElementQueryHandlerBase
+        {
+            /// <summary>
+            /// Danner egen klasse til test af basisklasse for en QueryHandler til fælles elementer i domænet, såsom brevhoved.
+            /// </summary>
+            /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
+            /// <param name="objectMapper">Implementering af objectmapper.</param>
+            public MyFællesElementQueryHandler(IFællesRepository fællesRepository, IObjectMapper objectMapper)
+                : base(fællesRepository, objectMapper)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren initierer FinansstyringQueryHandlerBase.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorInitiererFinansstyringQueryHandlerBase()
+        {
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var queryHandler = new MyFællesElementQueryHandler(fællesRepository, objectMapper);
+            Assert.That(queryHandler, Is.Not.Null);
+            Assert.That(queryHandler.Repository, Is.Not.Null);
+        }
+    }
+}
