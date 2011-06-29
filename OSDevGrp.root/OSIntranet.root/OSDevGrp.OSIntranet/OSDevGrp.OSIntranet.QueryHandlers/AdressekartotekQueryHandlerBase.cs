@@ -1,5 +1,6 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
@@ -59,7 +60,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <returns>Betalingsbetingelse.</returns>
         public virtual Betalingsbetingelse BetalingsbetingelseGetByNummer(int nummer)
         {
-            throw new NotImplementedException();
+            var betalingsbetingelselisteHelper = new BetalingsbetingelselisteHelper(Repository.BetalingsbetingelseGetAll());
+            return betalingsbetingelselisteHelper.GetById(nummer);
         }
 
         #endregion
