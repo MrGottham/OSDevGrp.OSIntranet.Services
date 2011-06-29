@@ -101,6 +101,7 @@
   <ItemGroup>
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
+    <Compile Include="Integrationstests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -148,7 +149,10 @@
     <Compile Include="Unittests\Domain\Adressekartotek\AdresselisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\BetalingsbetingelselisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\DomainObjectListHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Finansstyring\BudgetkontogruppelisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Fælles\BrevhovedlisteHelperTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetBusinessExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
@@ -174,6 +178,7 @@
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
+    <Compile Include="Unittests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
     <Compile Include="Unittests\Resources\ResourceTests.cs" />
