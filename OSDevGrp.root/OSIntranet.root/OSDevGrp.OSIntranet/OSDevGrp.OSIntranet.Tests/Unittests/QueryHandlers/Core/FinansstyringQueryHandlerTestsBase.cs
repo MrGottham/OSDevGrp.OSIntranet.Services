@@ -10,7 +10,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using Rhino.Mocks;
 
-namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
+namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 {
     /// <summary>
     /// Basisklasse til test af QueryHandlers for finansstyring.

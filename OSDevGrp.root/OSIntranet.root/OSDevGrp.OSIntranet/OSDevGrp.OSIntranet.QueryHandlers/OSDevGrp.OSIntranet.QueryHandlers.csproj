@@ -52,7 +52,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdressekartotekQueryHandlerBase.cs" />
+    <Compile Include="Core\AdressekartotekQueryHandlerBase.cs" />
     <Compile Include="AdressekontolisteGetQueryHandler.cs" />
     <Compile Include="AdressekontoGetQueryHandler.cs" />
     <Compile Include="AdressekontoQueryHandlerBase.cs" />
@@ -63,7 +63,7 @@
     <Compile Include="BudgetkontoGetQueryHandler.cs" />
     <Compile Include="DebitorGetQueryHandler.cs" />
     <Compile Include="DebitorlisteGetQueryHandler.cs" />
-    <Compile Include="FinansstyringQueryHandlerBase.cs" />
+    <Compile Include="Core\FinansstyringQueryHandlerBase.cs" />
     <Compile Include="FællesElementQueryHandlerBase.cs" />
     <Compile Include="KontoGetQueryHandler.cs" />
     <Compile Include="KontogrupperGetQueryHandler.cs" />

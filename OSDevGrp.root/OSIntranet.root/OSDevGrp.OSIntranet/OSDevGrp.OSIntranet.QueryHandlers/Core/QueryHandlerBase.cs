@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 
-namespace OSDevGrp.OSIntranet.QueryHandlers
+namespace OSDevGrp.OSIntranet.QueryHandlers.Core
 {
     /// <summary>
     /// Basisklasse for en QueryHandler.
