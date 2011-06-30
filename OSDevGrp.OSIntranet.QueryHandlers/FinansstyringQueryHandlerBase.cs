@@ -1,5 +1,6 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
@@ -53,13 +54,25 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         #region Methods
 
         /// <summary>
-        /// Henter en given gruppe til budgetkonti.
+        /// Henter og returnerer en given kontogruppe.
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af kontogruppen.</param>
+        /// <returns>Kontogruppe.</returns>
+        public virtual Kontogruppe KontogruppeGetByNummer(int nummer)
+        {
+            var kontogruppelisteHelper = new KontogruppelisteHelper(Repository.KontogruppeGetAll());
+            return kontogruppelisteHelper.GetById(nummer);
+        }
+
+        /// <summary>
+        /// Henter og returnerer en given gruppe til budgetkonti.
         /// </summary>
         /// <param name="nummer">Unik identifikation af gruppen til budgetkonti.</param>
         /// <returns>Gruppe til budgetkonti.</returns>
         public virtual Budgetkontogruppe BudgetkontogruppeGetByNummer(int nummer)
         {
-            throw new NotImplementedException();
+            var budgetkontogruppelisteHelper = new BudgetkontogruppelisteHelper(Repository.BudgetkontogruppeGetAll());
+            return budgetkontogruppelisteHelper.GetById(nummer);
         }
 
         #endregion

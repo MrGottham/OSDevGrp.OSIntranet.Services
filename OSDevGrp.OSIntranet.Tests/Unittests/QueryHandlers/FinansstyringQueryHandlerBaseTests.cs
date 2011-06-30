@@ -67,6 +67,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         }
 
         /// <summary>
+        /// Tester, at KontogruppeGetByNummer henter en given kontogruppe.
+        /// </summary>
+        [Test]
+        public void TestAtKontogruppeGetByNummerHenterKontogruppe()
+        {
+            var fixture = new Fixture();
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(m => m.KontogruppeGetAll())
+                .Return(kontogrupper);
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var queryHandler = new MyFinansstyringQueryHandler(finansstyringRepository, objectMapper);
+            Assert.That(queryHandler, Is.Not.Null);
+
+            var kontogruppe = queryHandler.KontogruppeGetByNummer(kontogrupper.ElementAt(1).Nummer);
+            Assert.That(kontogruppe, Is.Not.Null);
+            Assert.That(kontogruppe.Nummer, Is.EqualTo(kontogrupper.ElementAt(1).Nummer));
+        }
+
+        /// <summary>
+        /// Tester, at KontogruppeGetByNummer kaster en IntranetRepositoryException, hvis kontogruppen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtKontogruppeGetByNummerKasterIntranetRepositoryExceptionHvisKontogruppeIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(m => m.KontogruppeGetAll())
+                .Return(kontogrupper);
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var queryHandler = new MyFinansstyringQueryHandler(finansstyringRepository, objectMapper);
+            Assert.That(queryHandler, Is.Not.Null);
+
+            Assert.Throws<IntranetRepositoryException>(() => queryHandler.KontogruppeGetByNummer(-1));
+        }
+
+        /// <summary>
         /// Tester, at BudgetkontogruppeGetByNummer henter en given gruppe til budgetkonti.
         /// </summary>
         [Test]
