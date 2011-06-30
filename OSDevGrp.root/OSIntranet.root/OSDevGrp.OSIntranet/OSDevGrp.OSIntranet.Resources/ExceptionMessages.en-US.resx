@@ -150,6 +150,10 @@
     <value>Unabled to find an instance of the type '{0}' with the unique identification '{1}'.</value>
     <comment>{0} = Name of type, {1} = Unique identification.</comment>
   </data>
+  <data name="ErrorInCommandHandlerWithoutReturnValue" xml:space="preserve">
+    <value>Error in the commandhandler which handle the command '{0}': {1}</value>
+    <comment>{0} = Type of command, {1} = Error message.</comment>
+  </data>
   <data name="ErrorInCommandHandlerWithReturnValue" xml:space="preserve">
     <value>Error in the commandhandler which handle the command '{0}' and return '{1}': {2}</value>
     <comment>{0} = Type of command, {1} = Type of return value, {2} = Error message.</comment>
