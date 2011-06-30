@@ -1,7 +1,15 @@
 ﻿using System;
+using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
+using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 {
@@ -9,17 +17,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     /// Tester QueryHandler til håndtering af forespørgelsen: DebitorGetQueryHandler.
     /// </summary>
     [TestFixture]
-    public class DebitorGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
+    public class DebitorGetQueryHandlerTests
     {
         /// <summary>
-        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis objectmapperen er null.
+        /// Tester, at Query kaster en ArgumentNullExcpetion, hvis query er null.
         /// </summary>
         [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
+        public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
         {
-            var adresseRepository = GetAdresseRepository();
-            var finansstyringRepositoruy = GetFinansstyringRepository();
-            Assert.Throws<ArgumentNullException>(() => new DebitorGetQueryHandler(adresseRepository, finansstyringRepositoruy, null));
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(objectMapper);
+            var queryHandler = fixture.CreateAnonymous<DebitorGetQueryHandler>();
+            Assert.That(queryHandler, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
         }
 
         /// <summary>
@@ -28,35 +48,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryHenterDebitor()
         {
-            var adresseRepository = GetAdresseRepository();
-            var finansstyringRepositoruy = GetFinansstyringRepository();
-            var objectMapper = GetObjectMapper();
-            var queryHandler = new DebitorGetQueryHandler(adresseRepository, finansstyringRepositoruy, objectMapper);
+            var fixture = new Fixture();
+            var personer = fixture.CreateMany<Person>(25).ToList();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepository.Expect(m => m.AdresseGetAll())
+                .Return(personer);
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepository.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            objectMapper.Expect(m => m.Map<AdresseBase, DebitorView>(Arg<AdresseBase>.Is.NotNull))
+                .Return(fixture.CreateAnonymous<DebitorView>());
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(objectMapper);
+            var queryHandler = fixture.CreateAnonymous<DebitorGetQueryHandler>();
+            Assert.That(queryHandler, Is.Not.Null);
+
             var query = new DebitorGetQuery
                             {
-                                Regnskabsnummer = 1,
-                                StatusDato = new DateTime(2011, 3, 15),
-                                Nummer = 2
+                                Regnskabsnummer = fixture.CreateAnonymous<int>(),
+                                StatusDato = fixture.CreateAnonymous<DateTime>(),
+                                Nummer = personer.ElementAt(3).Nummer
                             };
             var debitor = queryHandler.Query(query);
             Assert.That(debitor, Is.Not.Null);
-            Assert.That(debitor.Nummer, Is.EqualTo(2));
-            Assert.That(debitor.Navn, Is.Not.Null);
-            Assert.That(debitor.Navn, Is.EqualTo("Bente Susanne Rasmussen"));
-            Assert.That(debitor.Saldo, Is.EqualTo(1000M));
-        }
-
-        /// <summary>
-        /// Tester, at Query kaster en ArgumentNullExcpetion, hvis query er null.
-        /// </summary>
-        [Test]
-        public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
-        {
-            var adresseRepository = GetAdresseRepository();
-            var finansstyringRepositoruy = GetFinansstyringRepository();
-            var objectMapper = GetObjectMapper();
-            var queryHandler = new DebitorGetQueryHandler(adresseRepository, finansstyringRepositoruy, objectMapper);
-            Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
         }
     }
 }

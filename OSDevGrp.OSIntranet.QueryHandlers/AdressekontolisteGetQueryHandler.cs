@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
@@ -12,30 +14,20 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// <summary>
     /// QueryHandler til håndtering af forespørgelsen: AdressekontolisteGetQuery.
     /// </summary>
-    public class AdressekontolisteGetQueryHandler :AdressekontoQueryHandlerBase, IQueryHandler<AdressekontolisteGetQuery, IEnumerable<AdressekontolisteView>>
+    public class AdressekontolisteGetQueryHandler : RegnskabQueryHandlerBase, IQueryHandler<AdressekontolisteGetQuery, IEnumerable<AdressekontolisteView>>
     {
-        #region Private variables
-
-        private readonly IObjectMapper _objectMapper;
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
         /// Danner QueryHandler til håndtering af forespørgelsen: AdressekontolisteGetQuery.
         /// </summary>
-        /// <param name="adresseRepository">Implementering af repository til adresser.</param>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
+        /// <param name="adresseRepository">Implementering af repository til adresser.</param>
+        /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        public AdressekontolisteGetQueryHandler(IAdresseRepository adresseRepository, IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper)
-            : base(adresseRepository, finansstyringRepository)
+        public AdressekontolisteGetQueryHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
+            : base(finansstyringRepository, adresseRepository, fællesRepository, objectMapper)
         {
-            if (objectMapper == null)
-            {
-                throw new ArgumentNullException("objectMapper");
-            }
-            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -53,8 +45,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("query");
             }
-            var adressekonti = AdressekontoGetAllByRegnskabsnummer(query.Regnskabsnummer, query.StatusDato);
-            return _objectMapper.Map<IEnumerable<AdresseBase>, IEnumerable<AdressekontolisteView>>(adressekonti);
+
+            var adressekonti = AdressekontoGetAllByRegnskab(query.Regnskabsnummer).ToList();
+            adressekonti.ForEach(m => m.Calculate(query.StatusDato));
+
+            return MapMany<AdresseBase, AdressekontolisteView>(adressekonti);
         }
 
         #endregion

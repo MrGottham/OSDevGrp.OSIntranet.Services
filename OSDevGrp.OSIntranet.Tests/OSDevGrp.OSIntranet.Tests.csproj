@@ -167,7 +167,6 @@
     <Compile Include="Unittests\QueryHandlers\Core\AdressekartotekQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontolisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\AdressekontoQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BetalingsbetingelserGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BogføringerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontogrupperGetQueryHandlerTests.cs" />
