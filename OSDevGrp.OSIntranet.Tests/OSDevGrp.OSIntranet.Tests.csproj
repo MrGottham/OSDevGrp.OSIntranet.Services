@@ -106,6 +106,7 @@
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unittests\CommandHandlers\BogføringslinjeOpretCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\CommandHandlerBaseExtensionsTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetRepositoryFaultTests.cs" />
@@ -177,7 +178,7 @@
     <Compile Include="Unittests\QueryHandlers\KontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KreditorGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KreditorlisteGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\QueryHandlerBaseTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\Core\QueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
