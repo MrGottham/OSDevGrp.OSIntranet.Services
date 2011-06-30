@@ -58,6 +58,7 @@
     <Compile Include="Core\CommandHandlerBaseExtensions.cs" />
     <Compile Include="Core\FinansstyringCommandHandlerBase.cs" />
     <Compile Include="Core\FællesElementCommandHandlerBase.cs" />
+    <Compile Include="Core\RegnskabCommandHandlerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
