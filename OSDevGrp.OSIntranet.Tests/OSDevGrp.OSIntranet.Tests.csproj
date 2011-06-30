@@ -153,6 +153,7 @@
     <Compile Include="Unittests\Domain\Adressekartotek\AdressegruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\AdresselisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\BetalingsbetingelselisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Comparers\AdressekontoSaldoComparerTests.cs" />
     <Compile Include="Unittests\Domain\DomainObjectListHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\BudgetkontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />

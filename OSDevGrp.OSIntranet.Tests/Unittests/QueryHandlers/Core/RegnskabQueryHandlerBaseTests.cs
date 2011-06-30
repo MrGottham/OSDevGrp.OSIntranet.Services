@@ -587,5 +587,109 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
                 queryHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer,
                                                                 fixture.CreateAnonymous<int>()));
         }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAllWithValueByRegnskabAndStatusDato henter alle adressekonti med saldo over nul fra et givent regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetAllWithValueByRegnskabAndStatusDatoHenterAdressekontiMedSaldoOverNulFraRegnskab()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new DateTime(2010, 12, 31));
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            0M, fixture.CreateAnonymous<decimal>()));
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(
+                m =>
+                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
+                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1));
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepository.Expect(m => m.AdresseGetAll())
+                .Return(adresser);
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepository.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            var queryHandler = new MyQueryHandler(finansstyringRepository, adresseRepository, fællesRepository,
+                                                  objectMapper);
+            Assert.That(queryHandler, Is.Not.Null);
+
+            var adressekonti =
+                queryHandler.AdressekontoGetAllWithValueByRegnskabAndStatusDato(regnskaber.ElementAt(1).Nummer,
+                                                                                fixture.CreateAnonymous<DateTime>(),
+                                                                                true);
+            Assert.That(adressekonti, Is.Not.Null);
+            Assert.That(adressekonti.Count(), Is.EqualTo(2));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAllWithValueByRegnskabAndStatusDato henter alle adressekonti med saldo under nul fra et givent regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetAllWithValueByRegnskabAndStatusDatoHenterAdressekontiMedSaldoUnderNulFraRegnskab()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new DateTime(2010, 12, 31));
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            0M, fixture.CreateAnonymous<decimal>()));
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(
+                m =>
+                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
+                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1));
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepository.Expect(m => m.AdresseGetAll())
+                .Return(adresser);
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepository.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            var queryHandler = new MyQueryHandler(finansstyringRepository, adresseRepository, fællesRepository,
+                                                  objectMapper);
+            Assert.That(queryHandler, Is.Not.Null);
+
+            var adressekonti =
+                queryHandler.AdressekontoGetAllWithValueByRegnskabAndStatusDato(regnskaber.ElementAt(1).Nummer,
+                                                                                fixture.CreateAnonymous<DateTime>(),
+                                                                                false);
+            Assert.That(adressekonti, Is.Not.Null);
+            Assert.That(adressekonti.Count(), Is.EqualTo(1));
+        }
     }
 }

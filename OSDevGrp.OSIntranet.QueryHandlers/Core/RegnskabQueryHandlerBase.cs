@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Comparers;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.Domain.Comparers;
 using OSDevGrp.OSIntranet.Domain.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -187,6 +188,34 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         {
             var adresselisteHelper = new AdresselisteHelper(AdressekontoGetAllByRegnskab(regnskabsnummer));
             return adresselisteHelper.GetById(nummer);
+        }
+
+        /// <summary>
+        /// Henter og returnerer alle adressekonti med en saldo pr. en given statusdato.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+        /// <param name="statusDato">Statusdato.</param>
+        /// <param name="overNul">Angivelse af, om saldo skal være større end eller mindre end 0.</param>
+        /// <returns>Adressekonti med saldo.</returns>
+        public virtual IEnumerable<AdresseBase> AdressekontoGetAllWithValueByRegnskabAndStatusDato(int regnskabsnummer, DateTime statusDato, bool overNul)
+        {
+            var adresser = AdressekontoGetAllByRegnskab(regnskabsnummer);
+            foreach (ICalculatable calculatable in adresser)
+            {
+                calculatable.Calculate(statusDato);
+            }
+            var comparer = new AdressekontoSaldoComparer();
+            if (overNul)
+            {
+                return adresser
+                    .Where(m => m.SaldoPrStatusdato > 0M)
+                    .OrderByDescending(m => m, comparer)
+                    .ToList();
+            }
+            return adresser
+                .Where(m => m.SaldoPrStatusdato < 0M)
+                .OrderByDescending(m => m, comparer)
+                .ToList();
         }
 
         #endregion
