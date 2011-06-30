@@ -106,7 +106,10 @@
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unittests\CommandHandlers\BogføringslinjeOpretCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Core\AdressekartotekCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\CommandHandlerBaseExtensionsTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Core\FinansstyringCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetRepositoryFaultTests.cs" />
