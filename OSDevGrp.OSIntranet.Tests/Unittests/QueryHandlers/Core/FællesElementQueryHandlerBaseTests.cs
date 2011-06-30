@@ -3,13 +3,13 @@ using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.QueryHandlers;
+using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
-namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
+namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 {
     /// <summary>
     /// Tester basisklasse for en QueryHandler til fælles elementer i domænet, såsom brevhoved.
