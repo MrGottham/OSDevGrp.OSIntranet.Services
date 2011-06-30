@@ -55,7 +55,6 @@
     <Compile Include="Core\AdressekartotekQueryHandlerBase.cs" />
     <Compile Include="AdressekontolisteGetQueryHandler.cs" />
     <Compile Include="AdressekontoGetQueryHandler.cs" />
-    <Compile Include="AdressekontoQueryHandlerBase.cs" />
     <Compile Include="BetalingsbetingelserGetQueryHandler.cs" />
     <Compile Include="BogføringerGetQueryHandler.cs" />
     <Compile Include="BudgetkontogrupperGetQueryHandler.cs" />
