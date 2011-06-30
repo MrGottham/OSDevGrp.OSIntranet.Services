@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
@@ -28,10 +29,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<AdresseBase, TelefonlisteView>()
                 .ConvertUsing(s =>
                                   {
-                                      if (s == null)
-                                      {
-                                          return null;
-                                      }
                                       var mapper = new ObjectMapper();
                                       if (s is Person)
                                       {
@@ -59,23 +56,19 @@ namespace OSDevGrp.OSIntranet.Infrastructure
 
             Mapper.CreateMap<AdresseBase, AdressekontolisteView>()
                 .ConvertUsing(s =>
-                {
-                    if (s == null)
-                    {
-                        return null;
-                    }
-                    var mapper = new ObjectMapper();
-                    if (s is Person)
-                    {
-                        return mapper.Map<Person, AdressekontolisteView>(s as Person);
-                    }
-                    if (s is Firma)
-                    {
-                        return mapper.Map<Firma, AdressekontolisteView>(s as Firma);
-                    }
-                    throw new IntranetSystemException(
-                        Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
-                });
+                                  {
+                                      var mapper = new ObjectMapper();
+                                      if (s is Person)
+                                      {
+                                          return mapper.Map<Person, AdressekontolisteView>(s as Person);
+                                      }
+                                      if (s is Firma)
+                                      {
+                                          return mapper.Map<Firma, AdressekontolisteView>(s as Firma);
+                                      }
+                                      throw new IntranetSystemException(
+                                          Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                                  });
 
             Mapper.CreateMap<Person, AdressekontolisteView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -93,23 +86,19 @@ namespace OSDevGrp.OSIntranet.Infrastructure
 
             Mapper.CreateMap<AdresseBase, AdressekontoView>()
                 .ConvertUsing(s =>
-                {
-                    if (s == null)
-                    {
-                        return null;
-                    }
-                    var mapper = new ObjectMapper();
-                    if (s is Person)
-                    {
-                        return mapper.Map<Person, AdressekontoView>(s as Person);
-                    }
-                    if (s is Firma)
-                    {
-                        return mapper.Map<Firma, AdressekontoView>(s as Firma);
-                    }
-                    throw new IntranetSystemException(
-                        Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
-                });
+                                  {
+                                      var mapper = new ObjectMapper();
+                                      if (s is Person)
+                                      {
+                                          return mapper.Map<Person, AdressekontoView>(s as Person);
+                                      }
+                                      if (s is Firma)
+                                      {
+                                          return mapper.Map<Firma, AdressekontoView>(s as Firma);
+                                      }
+                                      throw new IntranetSystemException(
+                                          Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                                  });
 
             Mapper.CreateMap<Person, AdressekontoView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -120,7 +109,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
                 .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                .ForMember(x => x.Betalingsbetingelse, opt => opt.MapFrom(s => s.Betalingsbetingelse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
             Mapper.CreateMap<Firma, AdressekontoView>()
@@ -132,16 +125,16 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
                 .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                .ForMember(x => x.Betalingsbetingelse, opt => opt.MapFrom(s => s.Betalingsbetingelse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
             Mapper.CreateMap<AdresseBase, DebitorlisteView>()
                 .ConvertUsing(s =>
                                   {
-                                      if (s == null)
-                                      {
-                                          return null;
-                                      }
                                       var mapper = new ObjectMapper();
                                       if (s is Person)
                                       {
@@ -172,10 +165,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<AdresseBase, DebitorView>()
                 .ConvertUsing(s =>
                                   {
-                                      if (s == null)
-                                      {
-                                          return null;
-                                      }
                                       var mapper = new ObjectMapper();
                                       if (s is Person)
                                       {
@@ -198,7 +187,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
                 .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                .ForMember(x => x.Betalingsbetingelse, opt => opt.MapFrom(s => s.Betalingsbetingelse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
             Mapper.CreateMap<Firma, DebitorView>()
@@ -210,16 +203,16 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
                 .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                .ForMember(x => x.Betalingsbetingelse, opt => opt.MapFrom(s => s.Betalingsbetingelse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
             Mapper.CreateMap<AdresseBase, KreditorlisteView>()
                 .ConvertUsing(s =>
                                   {
-                                      if (s == null)
-                                      {
-                                          return null;
-                                      }
                                       var mapper = new ObjectMapper();
                                       if (s is Person)
                                       {
@@ -250,10 +243,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<AdresseBase, KreditorView>()
                 .ConvertUsing(s =>
                                   {
-                                      if (s == null)
-                                      {
-                                          return null;
-                                      }
                                       var mapper = new ObjectMapper();
                                       if (s is Person)
                                       {
@@ -276,7 +265,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
                 .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                .ForMember(x => x.Betalingsbetingelse, opt => opt.MapFrom(s => s.Betalingsbetingelse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
             Mapper.CreateMap<Firma, KreditorView>()
@@ -288,7 +281,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
                 .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
                 .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                .ForMember(x => x.Betalingsbetingelse, opt => opt.MapFrom(s => s.Betalingsbetingelse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
             Mapper.CreateMap<Betalingsbetingelse, BetalingsbetingelseView>()
@@ -359,8 +356,16 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<Bogføringslinje, BogføringslinjeView>()
                 .ForMember(x => x.Løbenr, opt => opt.MapFrom(s => s.Løbenummer))
                 .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Konto))
-                .ForMember(x => x.Budgetkonto, opt => opt.MapFrom(s => s.Budgetkonto))
-                .ForMember(x => x.Adressekonto, opt => opt.MapFrom(s => s.Adresse))
+                .ForMember(x => x.Budgetkonto, opt =>
+                                                   {
+                                                       opt.Condition(s => s.Budgetkonto != null);
+                                                       opt.MapFrom(s => s.Budgetkonto);
+                                                   })
+                .ForMember(x => x.Adressekonto, opt =>
+                                                    {
+                                                        opt.Condition(s => s.Adresse != null);
+                                                        opt.MapFrom(s => s.Adresse);
+                                                    })
                 .ForMember(x => x.Dato, opt => opt.MapFrom(s => s.Dato))
                 .ForMember(x => x.Bilag, opt => opt.MapFrom(s => s.Bilag))
                 .ForMember(x => x.Tekst, opt => opt.MapFrom(s => s.Tekst))
@@ -389,6 +394,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         public TDestination Map<TSource, TDestination>(TSource source)
         {
+            if (Equals(source, null))
+            {
+                throw new ArgumentNullException("source");
+            }
             return Mapper.Map<TSource, TDestination>(source);
         }
 

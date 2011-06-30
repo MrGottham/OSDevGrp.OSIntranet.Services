@@ -59,7 +59,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         #region Methods
 
         /// <summary>
-        /// Henter en given adresse.
+        /// Henter og returnerer en given adresse.
         /// </summary>
         /// <param name="nummer">Unik identifikation af adressen.</param>
         /// <returns>Adresse.</returns>
@@ -70,7 +70,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         }
 
         /// <summary>
-        /// Henter alle personer.
+        /// Henter og returnerer alle personer.
         /// </summary>
         /// <returns>Alle personer.</returns>
         public virtual IEnumerable<Person> PersonGetAll()
@@ -80,7 +80,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         }
 
         /// <summary>
-        /// Henter en given person.
+        /// Henter og returnerer en given person.
         /// </summary>
         /// <param name="nummer">Unik identifikation af personen.</param>
         /// <returns>Person.</returns>
@@ -99,7 +99,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         }
 
         /// <summary>
-        /// Henter alle firmaer.
+        /// Henter og returnerer alle firmaer.
         /// </summary>
         /// <returns>Alle firmaer.</returns>
         public virtual IEnumerable<Firma> FirmaGetAll()
@@ -109,7 +109,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         }
 
         /// <summary>
-        /// Henter et givent firma.
+        /// Henter og returnerer et givent firma.
         /// </summary>
         /// <param name="nummer">Unik identifikation af firmaet.</param>
         /// <returns>Firma.</returns>
