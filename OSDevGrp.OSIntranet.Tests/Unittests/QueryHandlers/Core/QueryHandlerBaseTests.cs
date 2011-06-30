@@ -4,12 +4,12 @@ using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
-using OSDevGrp.OSIntranet.QueryHandlers;
+using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
-namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
+namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 {
     /// <summary>
     /// Tester basisklasse for en QueryHandler.

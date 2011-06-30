@@ -9,7 +9,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Resources;
 
-namespace OSDevGrp.OSIntranet.QueryHandlers
+namespace OSDevGrp.OSIntranet.QueryHandlers.Core
 {
     /// <summary>
     /// Basisklasse for en QueryHandler til adressekartoteket.

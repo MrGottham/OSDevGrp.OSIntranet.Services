@@ -4,7 +4,7 @@ using OSDevGrp.OSIntranet.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
-namespace OSDevGrp.OSIntranet.QueryHandlers
+namespace OSDevGrp.OSIntranet.QueryHandlers.Core
 {
     /// <summary>
     /// Basisklasse for en QueryHandler til finansstyring.

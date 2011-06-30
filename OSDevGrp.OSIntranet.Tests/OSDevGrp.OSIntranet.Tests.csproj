@@ -159,7 +159,7 @@
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\AdressekartotekQueryHandlerBaseTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\Core\AdressekartotekQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontolisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoQueryHandlerBaseTests.cs" />
@@ -171,7 +171,7 @@
     <Compile Include="Unittests\QueryHandlers\DebitorGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FinansstyringQueryHandlerBaseTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\FinansstyringQueryHandlerTestsBase.cs" />
+    <Compile Include="Unittests\QueryHandlers\Core\FinansstyringQueryHandlerTestsBase.cs" />
     <Compile Include="Unittests\QueryHandlers\FællesElementQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontogrupperGetQueryHandlerTests.cs" />
