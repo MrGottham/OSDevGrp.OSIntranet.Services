@@ -10,6 +10,7 @@
         CantFindObjectById,
         IllegalValue,
         CantAutoMapType,
+        ErrorInCommandHandlerWithoutReturnValue,
         ErrorInCommandHandlerWithReturnValue,
         BalanceLineDateToOld,
         BalanceLineDateIsForwardInTime,

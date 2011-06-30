@@ -110,6 +110,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for ErrorInCommandHandlerWithoutReturnValue hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForErrorInCommandHandlerWithoutReturnValueHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue,
+                                                            fixture.CreateAnonymous<string>(),
+                                                            fixture.CreateAnonymous<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ExceptionMessage for ErrorInCommandHandlerWithReturnValue hentes.
         /// </summary>
         [Test]
