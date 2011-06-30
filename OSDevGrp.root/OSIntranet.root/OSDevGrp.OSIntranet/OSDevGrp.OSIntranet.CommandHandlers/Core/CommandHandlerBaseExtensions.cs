@@ -1,9 +1,9 @@
-﻿namespace OSDevGrp.OSIntranet.CommandHandlers
+﻿namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 {
     /// <summary>
     /// Extensions til basisklassen CommandHandlerBase.
     /// </summary>
-    public class CommandHandlerBaseExtensions
+    public static class CommandHandlerBaseExtensions
     {
     }
 }

@@ -64,7 +64,7 @@
     <Compile Include="DebitorGetQueryHandler.cs" />
     <Compile Include="DebitorlisteGetQueryHandler.cs" />
     <Compile Include="Core\FinansstyringQueryHandlerBase.cs" />
-    <Compile Include="FællesElementQueryHandlerBase.cs" />
+    <Compile Include="Core\FællesElementQueryHandlerBase.cs" />
     <Compile Include="KontoGetQueryHandler.cs" />
     <Compile Include="KontogrupperGetQueryHandler.cs" />
     <Compile Include="KontoplanGetQueryHandler.cs" />
