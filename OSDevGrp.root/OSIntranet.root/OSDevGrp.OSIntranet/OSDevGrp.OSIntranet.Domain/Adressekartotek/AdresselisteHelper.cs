@@ -26,6 +26,21 @@ namespace OSDevGrp.OSIntranet.Domain.Adressekartotek
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Adresser.
+        /// </summary>
+        public IEnumerable<AdresseBase> Adresser
+        {
+            get
+            {
+                return DomainObjetcs;
+            }
+        }
+
+        #endregion
+
         #region IDomainObjectListHelper<AdresseBase,int> Members
 
         /// <summary>

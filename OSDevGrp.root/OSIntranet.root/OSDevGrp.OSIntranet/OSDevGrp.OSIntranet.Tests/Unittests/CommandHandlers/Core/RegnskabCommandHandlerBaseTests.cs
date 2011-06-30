@@ -149,10 +149,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Tester, at KontoGetAllByRegnskab henter et givent regnskab.
+        /// Tester, at KontoGetAllByRegnskab henter alle konti i et givent regnskab.
         /// </summary>
         [Test]
-        public void TestAtKontoGetAllByRegnskabHenterRegnskab()
+        public void TestAtKontoGetAllByRegnskabHenterKontiFraRegnskab()
         {
             var fixture = new Fixture();
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
@@ -289,10 +289,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Tester, at BudgetkontoGetAllByRegnskab henter et givent regnskab.
+        /// Tester, at BudgetkontoGetAllByRegnskab henter alle budgetkonti i et givent regnskab.
         /// </summary>
         [Test]
-        public void TestAtBudgetkontoGetAllByRegnskabHenterRegnskab()
+        public void TestAtBudgetkontoGetAllByRegnskabBudgetkontiFraRegnskab()
         {
             var fixture = new Fixture();
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
@@ -427,6 +427,166 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 () =>
                 commandHandler.BudgetkontoGetByRegnskabAndKontonummer(regnskaber.ElementAt(1).Nummer,
                                                                       fixture.CreateAnonymous<string>()));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetAllByRegnskab henter alle adressekonti fra et givent regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetAllByRegnskabHenterAdressekontiFraRegnskab()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new DateTime(2010, 12, 31));
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            0M, fixture.CreateAnonymous<decimal>()));
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(
+                m =>
+                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
+                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1));
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepository.Expect(m => m.AdresseGetAll())
+                .Return(adresser);
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepository.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
+                                                      objectMapper);
+            Assert.That(commandHandler, Is.Not.Null);
+
+            var adressekonti = commandHandler.AdressekontoGetAllByRegnskab(regnskaber.ElementAt(1).Nummer);
+            Assert.That(adressekonti, Is.Not.Null);
+            Assert.That(adressekonti.Count(), Is.EqualTo(3));
+
+            finansstyringRepository.AssertWasCalled(
+                m =>
+                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
+                              Arg<Func<int, AdresseBase>>.Is.NotNull));
+            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetByRegnskabAndNummer henter en given adressekonto fra et givent regnskab.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetByRegnskabAndNummerHenterAdressekontoFraRegnskab()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new DateTime(2010, 12, 31));
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            0M, fixture.CreateAnonymous<decimal>()));
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(
+                m =>
+                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
+                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1));
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepository.Expect(m => m.AdresseGetAll())
+                .Return(adresser);
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepository.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
+                                                      objectMapper);
+            Assert.That(commandHandler, Is.Not.Null);
+
+            var adressekonto = commandHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer,
+                                                                                 adresser.ElementAt(1).Nummer);
+            Assert.That(adressekonto, Is.Not.Null);
+            Assert.That(adressekonto.Nummer, Is.EqualTo(adresser.ElementAt(1).Nummer));
+            Assert.That(adressekonto.Navn, Is.Not.Null);
+            Assert.That(adressekonto.Navn, Is.EqualTo(adresser.ElementAt(1).Navn));
+            Assert.That(adressekonto.Bogføringslinjer, Is.Not.Null);
+            Assert.That(adressekonto.Bogføringslinjer.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
+        /// Tester, at AdressekontoGetByRegnskabAndNummer kaster en IntranetRepositoryException, hvis adressekontoen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtAdressekontoGetByRegnskabAndNummerHenterKasterIntranetRepositoryExceptionHvisAdressekontoIkkeFindes()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new DateTime(2010, 12, 31));
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                                            fixture.CreateAnonymous<DateTime>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            fixture.CreateAnonymous<string>(),
+                                                                            0M, fixture.CreateAnonymous<decimal>()));
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(
+                m =>
+                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
+                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1));
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepository.Expect(m => m.AdresseGetAll())
+                .Return(adresser);
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepository.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
+                                                      objectMapper);
+            Assert.That(commandHandler, Is.Not.Null);
+
+            Assert.Throws<IntranetRepositoryException>(
+                () =>
+                commandHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer,
+                                                                  fixture.CreateAnonymous<int>()));
         }
     }
 }
