@@ -14,6 +14,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Adressekartotek
     public class AdresselisteHelperTests
     {
         /// <summary>
+        /// Tester, at konstruktøren initierer AdresselisteHelper.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorInitiererAdresselisteHelper()
+        {
+            var fixture = new Fixture();
+            var adresser = fixture.CreateMany<Person>(3).ToList();
+            var adresselisteHelper = new AdresselisteHelper(adresser);
+            Assert.That(adresselisteHelper, Is.Not.Null);
+            Assert.That(adresselisteHelper.Adresser, Is.Not.Null);
+            Assert.That(adresselisteHelper.Adresser.Count(), Is.EqualTo(adresser.Count()));
+        }
+
+        /// <summary>
         /// Tester, at GetById henter og returnerer en given adresse.
         /// </summary>
         [Test]

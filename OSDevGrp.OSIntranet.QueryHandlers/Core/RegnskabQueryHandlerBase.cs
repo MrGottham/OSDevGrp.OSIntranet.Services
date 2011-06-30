@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Comparers;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Domain.Adressekartotek;
@@ -161,6 +162,31 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
                     Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto), kontonummer),
                     ex);
             }
+        }
+
+        /// <summary>
+        /// Henter og returnerer alle adressekonti i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+        /// <returns>Alle adressekonti i et givent regnskab.</returns>
+        public virtual IEnumerable<AdresseBase> AdressekontoGetAllByRegnskab(int regnskabsnummer)
+        {
+            var brevhovedlisteHelper = new BrevhovedlisteHelper(FællesRepository.BrevhovedGetAll());
+            var adresselisteHelper = new AdresselisteHelper(AdresseRepository.AdresseGetAll());
+            Repository.RegnskabGet(regnskabsnummer, brevhovedlisteHelper.GetById, adresselisteHelper.GetById);
+            return adresselisteHelper.Adresser;
+        }
+
+        /// <summary>
+        /// Henter og returnerer en given adressekonto i et givent regnskab.
+        /// </summary>
+        /// <param name="regnskabsnummer">Regnskabsnummer.</param>
+        /// <param name="nummer">Unik identifikation af adressekontoen.</param>
+        /// <returns>Adressekonto.</returns>
+        public virtual AdresseBase AdressekontoGetByRegnskabAndNummer(int regnskabsnummer, int nummer)
+        {
+            var adresselisteHelper = new AdresselisteHelper(AdressekontoGetAllByRegnskab(regnskabsnummer));
+            return adresselisteHelper.GetById(nummer);
         }
 
         #endregion
