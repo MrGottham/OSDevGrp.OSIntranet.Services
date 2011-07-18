@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System.Runtime.Serialization;
-using OSDevGrp.OSIntranet.Contracts.Queries;
+﻿using OSDevGrp.OSIntranet.Contracts.Queries;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
 {
@@ -17,8 +16,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         [Test]
         public void TestAtQueryKanInitieres()
         {
-            var query = new KontogrupperGetQuery();
-            Assert.That(query, Is.Not.Null);
+            var fixture = new Fixture();
+            var query = fixture.CreateAnonymous<KontogrupperGetQuery>();
+            DataContractTestHelper.TestAtContractErInitieret(query);
         }
 
         /// <summary>
@@ -27,20 +27,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         [Test]
         public void TestAtQueryKanSerialiseres()
         {
-            var query = new KontogrupperGetQuery();
-            Assert.That(query, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(query.GetType());
-                serializer.WriteObject(memoryStream, query);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            var query = fixture.CreateAnonymous<KontogrupperGetQuery>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(query);
         }
     }
 }

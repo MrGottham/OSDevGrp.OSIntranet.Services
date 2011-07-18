@@ -1,13 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Serialization;
-using OSDevGrp.OSIntranet.Contracts.Queries;
+﻿using OSDevGrp.OSIntranet.Contracts.Queries;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
 {
     /// <summary>
-    /// Tester datakontrakt til forespørgelse efter en debitor.
+    /// Tester datakontrakt til forespørgelse efter en adressekonto.
     /// </summary>
     [TestFixture]
     public class AdressekontoGetQueryTests
@@ -18,17 +16,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         [Test]
         public void TestAtQueryKanInitieres()
         {
-            var statusDato = new DateTime(2011, 3, 15);
-            var query = new AdressekontoGetQuery
-                            {
-                                Regnskabsnummer = 1,
-                                StatusDato = statusDato,
-                                Nummer = 1
-                            };
-            Assert.That(query, Is.Not.Null);
-            Assert.That(query.Regnskabsnummer, Is.EqualTo(1));
-            Assert.That(query.StatusDato, Is.EqualTo(statusDato));
-            Assert.That(query.Nummer, Is.EqualTo(1));
+            var fixture = new Fixture();
+            var query = fixture.CreateAnonymous<AdressekontoGetQuery>();
+            DataContractTestHelper.TestAtContractErInitieret(query);
         }
 
         /// <summary>
@@ -37,26 +27,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         [Test]
         public void TestAtQueryKanSerialiseres()
         {
-            var statusDato = new DateTime(2011, 3, 15);
-            var query = new AdressekontoGetQuery
-                            {
-                                Regnskabsnummer = 1,
-                                StatusDato = statusDato,
-                                Nummer = 1
-                            };
-            Assert.That(query, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(query.GetType());
-                serializer.WriteObject(memoryStream, query);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            var query = fixture.CreateAnonymous<AdressekontoGetQuery>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(query);
         }
     }
 }
