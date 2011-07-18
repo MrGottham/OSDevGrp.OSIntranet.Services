@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Serialization;
-using OSDevGrp.OSIntranet.Contracts.Queries;
+﻿using OSDevGrp.OSIntranet.Contracts.Queries;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
 {
@@ -18,15 +16,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         [Test]
         public void TestAtQueryKanInitieres()
         {
-            var statusDato = new DateTime(2010, 10, 31);
-            var query = new DebitorlisteGetQuery
-                            {
-                                Regnskabsnummer = 1,
-                                StatusDato = statusDato
-                            };
-            Assert.That(query, Is.Not.Null);
-            Assert.That(query.Regnskabsnummer, Is.EqualTo(1));
-            Assert.That(query.StatusDato, Is.EqualTo(statusDato));
+            var fixture = new Fixture();
+            var query = fixture.CreateAnonymous<DebitorlisteGetQuery>();
+            DataContractTestHelper.TestAtContractErInitieret(query);
         }
 
         /// <summary>
@@ -35,25 +27,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         [Test]
         public void TestAtQueryKanSerialiseres()
         {
-            var statusDato = new DateTime(2010, 10, 31);
-            var query = new DebitorlisteGetQuery
-                            {
-                                Regnskabsnummer = 1,
-                                StatusDato = statusDato
-                            };
-            Assert.That(query, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(query.GetType());
-                serializer.WriteObject(memoryStream, query);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            var query = fixture.CreateAnonymous<DebitorlisteGetQuery>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(query);
         }
     }
 }

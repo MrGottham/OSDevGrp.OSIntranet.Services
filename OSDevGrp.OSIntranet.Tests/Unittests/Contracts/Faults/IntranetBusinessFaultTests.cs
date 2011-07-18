@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System.Runtime.Serialization;
-using OSDevGrp.OSIntranet.Contracts.Faults;
+﻿using OSDevGrp.OSIntranet.Contracts.Faults;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Faults
 {
@@ -17,16 +16,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Faults
         [Test]
         public void TestAtFaultKanInitieres()
         {
-            var fault = new IntranetBusinessFault
-                            {
-                                Message = "Test",
-                                ExceptionMessages = "Test -> Test"
-                            };
-            Assert.That(fault, Is.Not.Null);
-            Assert.That(fault.Message, Is.Not.Null);
-            Assert.That(fault.Message, Is.EqualTo("Test"));
-            Assert.That(fault.ExceptionMessages, Is.Not.Null);
-            Assert.That(fault.ExceptionMessages, Is.EqualTo("Test -> Test"));
+            var fixture = new Fixture();
+            var fault = fixture.CreateAnonymous<IntranetBusinessFault>();
+            DataContractTestHelper.TestAtContractErInitieret(fault);
         }
 
         /// <summary>
@@ -35,24 +27,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Faults
         [Test]
         public void TestAtFaultKanSerialiseres()
         {
-            var fault = new IntranetBusinessFault
-                            {
-                                Message = "Test",
-                                ExceptionMessages = "Test -> Test"
-                            };
-            Assert.That(fault, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(fault.GetType());
-                serializer.WriteObject(memoryStream, fault);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            var fault = fixture.CreateAnonymous<IntranetBusinessFault>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(fault);
         }
     }
 }
