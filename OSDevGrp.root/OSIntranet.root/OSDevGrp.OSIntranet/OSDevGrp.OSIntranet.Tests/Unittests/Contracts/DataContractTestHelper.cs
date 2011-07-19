@@ -74,6 +74,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts
                     Assert.That(value, Is.EqualTo(target.GetType().GetProperty(property.Name).GetValue(target, null)));
                     continue;
                 }
+                if (value is System.String)
+                {
+                    Assert.That(value, Is.EqualTo(target.GetType().GetProperty(property.Name).GetValue(target, null)));
+                    continue;
+                }
+                if (property.PropertyType.IsClass)
+                {
+                    CompareContracts(value, target.GetType().GetProperty(property.Name).GetValue(target, null));
+                    continue;
+                }
 
                 Assert.Fail(string.Format("Can't compare value for the type: {0}", property.PropertyType));
             }
