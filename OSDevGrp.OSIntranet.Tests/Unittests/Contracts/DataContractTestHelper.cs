@@ -55,18 +55,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts
         }
 
         /// <summary>
-        /// Sammenligner værdier i to datakontrakter.
+        /// Sammenligner værdier i to objekter.
         /// </summary>
-        /// <typeparam name="TContract">Typen på datakontrakterne.</typeparam>
         /// <param name="source">Source.</param>
         /// <param name="target">Target.</param>
-        private static void CompareContracts<TContract>(TContract source, TContract target)
+        private static void CompareContracts(object source, object target)
         {
+            Assert.That(source, Is.Not.Null);
+            Assert.That(target, Is.Not.Null);
+
             var properties = source.GetType().GetProperties();
             foreach (var property in properties)
             {
                 var value = property.GetValue(source, null);
-                Assert.That(value, Is.EqualTo(target.GetType().GetProperty(property.Name).GetValue(target, null)));
+
+                if (property.PropertyType.IsValueType)
+                {
+                    Assert.That(value, Is.EqualTo(target.GetType().GetProperty(property.Name).GetValue(target, null)));
+                    continue;
+                }
+
+                Assert.Fail(string.Format("Can't compare value for the type: {0}", property.PropertyType));
             }
         }
     }
