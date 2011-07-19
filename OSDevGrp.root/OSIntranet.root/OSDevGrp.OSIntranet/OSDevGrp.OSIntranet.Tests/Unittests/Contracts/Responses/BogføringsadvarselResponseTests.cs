@@ -1,8 +1,9 @@
-﻿using System.IO;
-using System.Runtime.Serialization;
-using NUnit.Framework;
+﻿using System.Collections.Generic;
+using System.Linq;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
 {
@@ -18,17 +19,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
         [Test]
         public void TestAtResponseKanInitieres()
         {
-            var response = new BogføringsadvarselResponse
-                               {
-                                   Advarsel = "Budgettet på budgetkontoen er overtrukket.",
-                                   Konto = new BudgetkontoView(),
-                                   Beløb = 1500M
-                               };
-            Assert.That(response, Is.Not.Null);
-            Assert.That(response.Advarsel, Is.Not.Null);
-            Assert.That(response.Advarsel, Is.EqualTo("Budgettet på budgetkontoen er overtrukket."));
-            Assert.That(response.Konto, Is.Not.Null);
-            Assert.That(response.Beløb, Is.EqualTo(1500M));
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
+            fixture.Inject<KontoBaseView>(fixture.CreateAnonymous<KontoView>());
+            var query = fixture.CreateAnonymous<BogføringsadvarselResponse>();
+            DataContractTestHelper.TestAtContractErInitieret(query);
         }
 
         /// <summary>
@@ -37,25 +32,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
         [Test]
         public void TestAtResponseKanSerialiseres()
         {
-            var response = new BogføringsadvarselResponse
-                               {
-                                   Advarsel = "Budgettet på budgetkontoen er overtrukket.",
-                                   Konto = new BudgetkontoView(),
-                                   Beløb = 1500M
-                               };
-            Assert.That(response, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(response.GetType());
-                serializer.WriteObject(memoryStream, response);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
+            fixture.Inject<KontoBaseView>(fixture.CreateAnonymous<KontoView>());
+            var query = fixture.CreateAnonymous<BogføringsadvarselResponse>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(query);
         }
     }
 }

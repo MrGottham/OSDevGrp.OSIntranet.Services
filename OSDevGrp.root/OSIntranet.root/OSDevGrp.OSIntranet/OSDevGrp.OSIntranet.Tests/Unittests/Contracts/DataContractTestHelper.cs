@@ -48,14 +48,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts
                 Assert.That(result, Is.Not.Null);
 
                 // Test deserialiseret resultat.
-                var properties = contract.GetType().GetProperties();
-                foreach (var property in properties)
-                {
-                    var value = property.GetValue(contract, null);
-                    Assert.That(value, Is.EqualTo(result.GetType().GetProperty(property.Name).GetValue(result, null)));
-                }
+                CompareContracts(contract, result);
 
                 memoryStream.Close();
+            }
+        }
+
+        /// <summary>
+        /// Sammenligner værdier i to datakontrakter.
+        /// </summary>
+        /// <typeparam name="TContract">Typen på datakontrakterne.</typeparam>
+        /// <param name="source">Source.</param>
+        /// <param name="target">Target.</param>
+        private static void CompareContracts<TContract>(TContract source, TContract target)
+        {
+            var properties = source.GetType().GetProperties();
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(source, null);
+                Assert.That(value, Is.EqualTo(target.GetType().GetProperty(property.Name).GetValue(target, null)));
             }
         }
     }
