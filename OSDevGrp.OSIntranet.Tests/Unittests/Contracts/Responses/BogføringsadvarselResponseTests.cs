@@ -22,8 +22,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
             var fixture = new Fixture();
             fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
             fixture.Inject<KontoBaseView>(fixture.CreateAnonymous<KontoView>());
-            var query = fixture.CreateAnonymous<BogføringsadvarselResponse>();
-            DataContractTestHelper.TestAtContractErInitieret(query);
+            var response = fixture.CreateAnonymous<BogføringsadvarselResponse>();
+            DataContractTestHelper.TestAtContractErInitieret(response);
         }
 
         /// <summary>
@@ -35,8 +35,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
             var fixture = new Fixture();
             fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
             fixture.Inject<KontoBaseView>(fixture.CreateAnonymous<KontoView>());
-            var query = fixture.CreateAnonymous<BogføringsadvarselResponse>();
-            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(query);
+            var response = fixture.CreateAnonymous<BogføringsadvarselResponse>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(response);
         }
     }
 }
