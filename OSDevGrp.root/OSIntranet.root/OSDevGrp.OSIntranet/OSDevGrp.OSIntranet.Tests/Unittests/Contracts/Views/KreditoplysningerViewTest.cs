@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System.Runtime.Serialization;
-using OSDevGrp.OSIntranet.Contracts.Views;
+﻿using OSDevGrp.OSIntranet.Contracts.Views;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {
@@ -17,16 +16,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         [Test]
         public void TestAtViewKanInitieres()
         {
-            var view = new KreditoplysningerView
-                           {
-                               År = 2010,
-                               Måned = 10,
-                               Kredit = 15000M
-                           };
-            Assert.That(view, Is.Not.Null);
-            Assert.That(view.År, Is.EqualTo(2010));
-            Assert.That(view.Måned, Is.EqualTo(10));
-            Assert.That(view.Kredit, Is.EqualTo(15000M));
+            var fixture = new Fixture();
+            var view = fixture.CreateAnonymous<KreditoplysningerView>();
+            DataContractTestHelper.TestAtContractErInitieret(view);
         }
 
         /// <summary>
@@ -35,25 +27,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         [Test]
         public void TestAtViewKanSerialiseres()
         {
-            var view = new KreditoplysningerView
-                           {
-                               År = 2010,
-                               Måned = 10,
-                               Kredit = 15000M
-                           };
-            Assert.That(view, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(view.GetType());
-                serializer.WriteObject(memoryStream, view);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            var view = fixture.CreateAnonymous<KreditoplysningerView>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(view);
         }
     }
 }

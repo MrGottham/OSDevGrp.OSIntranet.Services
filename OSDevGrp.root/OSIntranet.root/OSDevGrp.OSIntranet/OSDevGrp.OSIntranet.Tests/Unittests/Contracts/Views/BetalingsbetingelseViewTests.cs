@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System.Runtime.Serialization;
-using OSDevGrp.OSIntranet.Contracts.Views;
+﻿using OSDevGrp.OSIntranet.Contracts.Views;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {
@@ -17,15 +16,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         [Test]
         public void TestAtViewKanInitieres()
         {
-            var view = new BetalingsbetingelseView
-                           {
-                               Nummer = 1,
-                               Navn = "Kontant",
-                           };
-            Assert.That(view, Is.Not.Null);
-            Assert.That(view.Nummer, Is.EqualTo(1));
-            Assert.That(view.Navn, Is.Not.Null);
-            Assert.That(view.Navn, Is.EqualTo("Kontant"));
+            var fixture = new Fixture();
+            var view = fixture.CreateAnonymous<BetalingsbetingelseView>();
+            DataContractTestHelper.TestAtContractErInitieret(view);
         }
 
         /// <summary>
@@ -34,24 +27,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         [Test]
         public void TestAtViewKanSerialiseres()
         {
-            var view = new BetalingsbetingelseView
-                           {
-                               Nummer = 1,
-                               Navn = "Kontant",
-                           };
-            Assert.That(view, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(view.GetType());
-                serializer.WriteObject(memoryStream, view);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            var view = fixture.CreateAnonymous<BetalingsbetingelseView>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(view);
         }
     }
 }

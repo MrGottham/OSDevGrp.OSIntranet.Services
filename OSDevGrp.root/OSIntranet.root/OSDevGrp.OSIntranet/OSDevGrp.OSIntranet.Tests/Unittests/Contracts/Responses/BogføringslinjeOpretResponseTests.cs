@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Contracts.Views;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
 {
@@ -19,18 +19,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
         [Test]
         public void TestAtResponseKanInitieres()
         {
-            var response = new BogføringslinjeOpretResponse
-                               {
-                                   Advarsler = new List<BogføringsadvarselResponse>
-                                                   {
-                                                       new BogføringsadvarselResponse(),
-                                                       new BogføringsadvarselResponse(),
-                                                       new BogføringsadvarselResponse()
-                                                   }
-                               };
-            Assert.That(response, Is.Not.Null);
-            Assert.That(response.Advarsler, Is.Not.Null);
-            Assert.That(response.Advarsler.Count(), Is.EqualTo(3));
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
+            fixture.Inject<KontoBaseView>(fixture.CreateAnonymous<KontoView>());
+            fixture.Inject<IEnumerable<BogføringsadvarselResponse>>(fixture.CreateMany<BogføringsadvarselResponse>(3).ToList());
+            var response = fixture.CreateAnonymous<BogføringslinjeOpretResponse>();
+            DataContractTestHelper.TestAtContractErInitieret(response);
         }
 
         /// <summary>
@@ -39,28 +33,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
         [Test]
         public void TestAtResponseKanSerialiseres()
         {
-            var response = new BogføringslinjeOpretResponse
-                               {
-                                   Advarsler = new List<BogføringsadvarselResponse>
-                                                   {
-                                                       new BogføringsadvarselResponse(),
-                                                       new BogføringsadvarselResponse(),
-                                                       new BogføringsadvarselResponse()
-                                                   }
-                               };
-            Assert.That(response, Is.Not.Null);
-            var memoryStream = new MemoryStream();
-            try
-            {
-                var serializer = new DataContractSerializer(response.GetType());
-                serializer.WriteObject(memoryStream, response);
-                memoryStream.Flush();
-                Assert.That(memoryStream.Length, Is.GreaterThan(0));
-            }
-            finally
-            {
-                memoryStream.Close();
-            }
+            var fixture = new Fixture();
+            fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
+            fixture.Inject<KontoBaseView>(fixture.CreateAnonymous<KontoView>());
+            fixture.Inject<IEnumerable<BogføringsadvarselResponse>>(fixture.CreateMany<BogføringsadvarselResponse>(3).ToList());
+            var response = fixture.CreateAnonymous<BogføringslinjeOpretResponse>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(response);
         }
     }
 }
