@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
-using NUnit.Framework;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -20,6 +22,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     public class RegnskabslisteGetQueryHandlerTests
     {
         /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis repository til fælles elementer i domænet er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisFællesRepositoryErNull()
+        {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject<IFællesRepository>(null);
+            fixture.Inject(objectMapper);
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(() => fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>())
+                    .InnerException, Is.TypeOf(typeof (ArgumentNullException)));
+        }
+
+        /// <summary>
         /// Tester, at Query kaster ArgumentNullException, hvis Query er null.
         /// </summary>
         [Test]
@@ -28,9 +49,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var fixture = new Fixture();
 
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
 
             fixture.Inject(finansstyringRepository);
+            fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
             var queryHandler = fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
@@ -49,6 +72,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(m => m.RegnskabslisteGet())
                 .Return(fixture.CreateMany<Regnskab>(3));
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepository.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3));
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(
                 m =>
@@ -56,6 +82,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 .Return(fixture.CreateMany<RegnskabslisteView>(3));
 
             fixture.Inject(finansstyringRepository);
+            fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
             var queryHandler = fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
@@ -67,6 +94,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             Assert.That(regnskaber, Is.Not.Null);
             Assert.That(regnskaber.Count(), Is.EqualTo(3));
 
+            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
             finansstyringRepository.AssertWasCalled(m => m.RegnskabslisteGet());
             objectMapper.AssertWasCalled(
                 m =>

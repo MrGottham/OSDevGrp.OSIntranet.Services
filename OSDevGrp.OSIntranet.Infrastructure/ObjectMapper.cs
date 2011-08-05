@@ -3,6 +3,7 @@ using AutoMapper;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
@@ -294,7 +295,8 @@ namespace OSDevGrp.OSIntranet.Infrastructure
 
             Mapper.CreateMap<Regnskab, RegnskabslisteView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.Brevhoved, opt => opt.MapFrom(s => s.Brevhoved));
 
             Mapper.CreateMap<Konto, KontoplanView>()
                 .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
@@ -381,6 +383,22 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<Budgetkontogruppe, BudgetkontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
+
+            Mapper.CreateMap<Brevhoved, BrevhovedreferenceView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
+
+            Mapper.CreateMap<Brevhoved, BrevhovedView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.Linje1, opt => opt.MapFrom(s => s.Linje1))
+                .ForMember(x => x.Linje2, opt => opt.MapFrom(s => s.Linje2))
+                .ForMember(x => x.Linje3, opt => opt.MapFrom(s => s.Linje3))
+                .ForMember(x => x.Linje4, opt => opt.MapFrom(s => s.Linje4))
+                .ForMember(x => x.Linje5, opt => opt.MapFrom(s => s.Linje5))
+                .ForMember(x => x.Linje6, opt => opt.MapFrom(s => s.Linje6))
+                .ForMember(x => x.Linje7, opt => opt.MapFrom(s => s.Linje7))
+                .ForMember(x => x.CvrNr, opt => opt.MapFrom(s => s.CvrNr));
 
             Mapper.AssertConfigurationIsValid();
         }

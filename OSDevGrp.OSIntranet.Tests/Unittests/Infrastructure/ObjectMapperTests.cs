@@ -552,6 +552,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(regnskabslisteView.Nummer, Is.EqualTo(regnskab.Nummer));
             Assert.That(regnskabslisteView.Navn, Is.Not.Null);
             Assert.That(regnskabslisteView.Navn, Is.EqualTo(regnskab.Navn));
+            Assert.That(regnskabslisteView.Brevhoved, Is.Not.Null);
+            Assert.That(regnskabslisteView.Brevhoved.Nummer, Is.EqualTo(regnskab.Brevhoved.Nummer));
+            Assert.That(regnskabslisteView.Brevhoved.Navn, Is.Not.Null);
+            Assert.That(regnskabslisteView.Brevhoved.Navn, Is.EqualTo(regnskab.Brevhoved.Navn));
         }
 
         /// <summary>
@@ -885,6 +889,52 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(budgetkontogruppeView.Nummer, Is.EqualTo(budgetkontogruppe.Nummer));
             Assert.That(budgetkontogruppeView.Navn, Is.Not.Null);
             Assert.That(budgetkontogruppeView.Navn, Is.EqualTo(budgetkontogruppe.Navn));
+        }
+
+        /// <summary>
+        /// Tester, at et brevhoved kan mappes til et view for en reference til et brevhoved.
+        /// </summary>
+        [Test]
+        public void TestAtBrevhovedKanMappesTilBrevhovedreferenceView()
+        {
+            var fixture = new Fixture();
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var brevhoved = fixture.CreateAnonymous<Brevhoved>();
+            var brevhovedreferenceView = objectMapper.Map<Brevhoved, BrevhovedreferenceView>(brevhoved);
+            Assert.That(brevhovedreferenceView, Is.Not.Null);
+            Assert.That(brevhovedreferenceView.Nummer, Is.EqualTo(brevhoved.Nummer));
+            Assert.That(brevhovedreferenceView.Navn, Is.Not.Null);
+            Assert.That(brevhovedreferenceView.Navn, Is.EqualTo(brevhoved.Navn));
+        }
+
+        /// <summary>
+        /// Tester, at et brevhoved kan mappes til et brevhovedview.
+        /// </summary>
+        [Test]
+        public void TestAtBrevhovedKanMappesTilBrevhovedView()
+        {
+            var fixture = new Fixture();
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var brevhoved = fixture.CreateAnonymous<Brevhoved>();
+            var brevhovedView = objectMapper.Map<Brevhoved, BrevhovedView>(brevhoved);
+            Assert.That(brevhovedView, Is.Not.Null);
+            Assert.That(brevhovedView.Nummer, Is.EqualTo(brevhoved.Nummer));
+            Assert.That(brevhovedView.Navn, Is.Not.Null);
+            Assert.That(brevhovedView.Navn, Is.EqualTo(brevhoved.Navn));
+            Assert.That(brevhovedView.Linje1, Is.EqualTo(brevhoved.Linje1));
+            Assert.That(brevhovedView.Linje2, Is.EqualTo(brevhoved.Linje2));
+            Assert.That(brevhovedView.Linje3, Is.EqualTo(brevhoved.Linje3));
+            Assert.That(brevhovedView.Linje4, Is.EqualTo(brevhoved.Linje4));
+            Assert.That(brevhovedView.Linje5, Is.EqualTo(brevhoved.Linje5));
+            Assert.That(brevhovedView.Linje6, Is.EqualTo(brevhoved.Linje6));
+            Assert.That(brevhovedView.Linje7, Is.EqualTo(brevhoved.Linje7));
+            Assert.That(brevhovedView.CvrNr, Is.EqualTo(brevhoved.CvrNr));
         }
     }
 }

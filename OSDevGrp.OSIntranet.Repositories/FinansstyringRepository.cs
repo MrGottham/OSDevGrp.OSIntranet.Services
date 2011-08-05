@@ -72,7 +72,13 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 var regnskabQuery = new RegnskabGetAllQuery();
                 var regnskabViews = channel.RegnskabGetAll(regnskabQuery);
-                return _domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(regnskabViews);
+
+                var regnskaber = _domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(regnskabViews);
+                foreach (var regnskab in regnskaber)
+                {
+//                    var regnskabView = channel.RegnskabGetByNummer()
+                }
+                return regnskaber;
             }
             catch (IntranetRepositoryException)
             {
