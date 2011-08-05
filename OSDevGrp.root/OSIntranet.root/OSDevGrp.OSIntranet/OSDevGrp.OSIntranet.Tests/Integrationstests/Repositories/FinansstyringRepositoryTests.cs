@@ -92,7 +92,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
         public void TestAtBogføringslinjeAddTilføjerBogføringslinjer()
         {
             // Hent regnskab og find nødvendige konti.
-            var regnskab = _finansstyringRepository.RegnskabGet(1);
+            var adresselisteHelper = new AdresselisteHelper(_adresseRepository.AdresseGetAll());
+            var brevhovedlisteHelper = new BrevhovedlisteHelper(_fællesRepository.BrevhovedGetAll());
+            var regnskab = _finansstyringRepository.RegnskabGet(1, brevhovedlisteHelper.GetById,
+                                                                adresselisteHelper.GetById);
             var kontoDankort = regnskab.Konti.OfType<Konto>().Single(m => m.Kontonummer == "DANKORT");
             var budgetkontoØvrigeUdgifter = regnskab.Konti.OfType<Budgetkonto>().Single(m => m.Kontonummer == "8990");
             var bogføringer = budgetkontoØvrigeUdgifter.Bogføringslinjer.Count();
@@ -104,7 +107,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
                                                         budgetkontoØvrigeUdgifter, 0M, 5000M, null);
 
             // Genindlæs regnskab og find nødvendige konti.
-            regnskab = _finansstyringRepository.RegnskabGet(regnskab.Nummer);
+            regnskab = _finansstyringRepository.RegnskabGet(1, brevhovedlisteHelper.GetById, adresselisteHelper.GetById);
             budgetkontoØvrigeUdgifter = regnskab.Konti.OfType<Budgetkonto>().Single(m => m.Kontonummer == "8990");
             Assert.That(budgetkontoØvrigeUdgifter.Bogføringslinjer.Count(), Is.EqualTo(bogføringer + 2));
         }

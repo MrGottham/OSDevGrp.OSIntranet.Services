@@ -22,13 +22,6 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// Henter et givent regnskab.
         /// </summary>
         /// <param name="nummer">Unik identifikation af regnskabet.</param>
-        /// <returns>Regnskab.</returns>
-        Regnskab RegnskabGet(int nummer);
-
-        /// <summary>
-        /// Henter et givent regnskab.
-        /// </summary>
-        /// <param name="nummer">Unik identifikation af regnskabet.</param>
         /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
         /// <returns>Regnskab.</returns>
         Regnskab RegnskabGet(int nummer, Func<int, AdresseBase> callback);

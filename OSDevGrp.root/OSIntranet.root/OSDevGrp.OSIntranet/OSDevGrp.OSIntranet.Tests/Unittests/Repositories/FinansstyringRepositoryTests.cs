@@ -189,29 +189,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
-        /// Tester at GetRegnskab fra nummer kaster en NotImplementedException.
-        /// </summary>
-        [Test]
-        public void TestAtGetRegnskabFraNummerKasterNotImplementedException()
-        {
-            var fixture = new Fixture();
-
-            var mocker = new MockRepository();
-            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
-            Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
-            mocker.ReplayAll();
-
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
-                .Return(service);
-
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
-
-            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<NotImplementedException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>()));
-        }
-
-        /// <summary>
         /// Tester at GetRegnskab fra nummer og med callback kaster en NotImplementedException.
         /// </summary>
         [Test]
