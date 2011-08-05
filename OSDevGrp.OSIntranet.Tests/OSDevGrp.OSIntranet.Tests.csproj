@@ -181,7 +181,6 @@
     <Compile Include="Unittests\QueryHandlers\DebitorGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FinansstyringQueryHandlerBaseTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\FinansstyringQueryHandlerTestsBase.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FællesElementQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontogrupperGetQueryHandlerTests.cs" />
