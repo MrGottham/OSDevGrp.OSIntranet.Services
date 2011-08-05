@@ -679,6 +679,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
+            service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.NotNull))
+                .Return(fixture.CreateAnonymous<BogføringslinjeView>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -690,9 +692,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
             var konto = fixture.CreateAnonymous<Konto>();
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var adressekonto = fixture.CreateAnonymous<Person>();
             repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
-                                          fixture.CreateAnonymous<string>(), null, fixture.CreateAnonymous<decimal>(),
-                                          fixture.CreateAnonymous<decimal>(), null);
+                                          fixture.CreateAnonymous<string>(), budgetkonto,
+                                          fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                                          adressekonto);
+
+            Assert.That(konto.Bogføringslinjer.Count(), Is.EqualTo(1));
+            Assert.That(budgetkonto.Bogføringslinjer.Count(), Is.EqualTo(1));
+            Assert.That(adressekonto.Bogføringslinjer.Count(), Is.EqualTo(1));
+
             service.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.NotNull));
         }
 

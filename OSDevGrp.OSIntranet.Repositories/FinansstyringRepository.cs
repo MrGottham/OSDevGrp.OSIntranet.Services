@@ -257,6 +257,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
+                // Udførelse af kommando.
                 var command = new BogføringslinjeAddCommand
                                   {
                                       Regnskabsnummer = konto.Regnskab.Nummer,
@@ -269,7 +270,21 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       Kredit = kredit,
                                       AdresseId = adressekonto == null ? 0 : adressekonto.Nummer
                                   };
-                channel.BogføringslinjeAdd(command);
+                var result = channel.BogføringslinjeAdd(command);
+                // Behandling af resultat.
+                var bogføringslinje = new Bogføringslinje(result.Løbenummer, result.Dato, result.Bilag, result.Tekst,
+                                                          result.Debit, result.Kredit);
+                konto.TilføjBogføringslinje(bogføringslinje);
+                if (budgetkonto != null)
+                {
+                     budgetkonto.TilføjBogføringslinje(bogføringslinje);
+                }
+                if (adressekonto != null)
+                {
+                    adressekonto.TilføjBogføringslinje(bogføringslinje);
+                }
+
+                // TODO: Find ud af calculering af bogføringslinje.
             }
             catch (IntranetRepositoryException)
             {
