@@ -120,6 +120,7 @@
     <Compile Include="Unittests\Contracts\Queries\AdressekontoGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BetalingsbetingelserGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BogføringerGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\BrevhovederGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontogrupperGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoplanGetQueryTests.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\BrevhovederGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\AdressekartotekQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontolisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />

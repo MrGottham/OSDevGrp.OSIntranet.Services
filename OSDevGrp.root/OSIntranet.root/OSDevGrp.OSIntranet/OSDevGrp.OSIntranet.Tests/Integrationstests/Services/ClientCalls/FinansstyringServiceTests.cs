@@ -455,5 +455,25 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 ChannelTools.CloseChannel(client);
             }
         }
+
+        /// <summary>
+        /// Tester, at brevhoveder kan hentes.
+        /// </summary>
+        [Test]
+        public void TestAtBrevhovederKanHentes()
+        {
+            var client = _channelFactory.CreateChannel<IFinansstyringService>(ClientEndpointName);
+            try
+            {
+                var query = new BrevhovederGetQuery();
+                var result = client.BrevhovederGet(query);
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Count(), Is.GreaterThan(0));
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
     }
 }

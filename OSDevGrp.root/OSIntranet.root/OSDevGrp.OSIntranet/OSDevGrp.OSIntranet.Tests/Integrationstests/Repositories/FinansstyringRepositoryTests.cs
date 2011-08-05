@@ -42,7 +42,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
         [Test]
         public void TestAtRegnskabslisteGetHenterRegnskaber()
         {
-            var regnskaber = _finansstyringRepository.RegnskabslisteGet();
+            var brevhovedlisteHelper = new BrevhovedlisteHelper(_fællesRepository.BrevhovedGetAll());
+            var regnskaber = _finansstyringRepository.RegnskabslisteGet(brevhovedlisteHelper.GetById);
             Assert.That(regnskaber, Is.Not.Null);
             Assert.That(regnskaber.Count(), Is.GreaterThan(0));
         }

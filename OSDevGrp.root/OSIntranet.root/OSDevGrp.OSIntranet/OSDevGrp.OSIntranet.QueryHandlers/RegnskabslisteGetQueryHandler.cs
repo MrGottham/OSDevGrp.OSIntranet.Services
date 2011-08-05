@@ -58,7 +58,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
 
             var brevhovedlisteHelper = new BrevhovedlisteHelper(_fællesRepository.BrevhovedGetAll());
 
-            var regnskaber = Repository.RegnskabslisteGet();
+            var regnskaber = Repository.RegnskabslisteGet(brevhovedlisteHelper.GetById);
 
             return MapMany<Regnskab, RegnskabslisteView>(regnskaber);
         }

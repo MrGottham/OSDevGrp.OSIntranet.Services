@@ -61,6 +61,7 @@
     <Compile Include="Queries\AdressekontolisteGetQuery.cs" />
     <Compile Include="Queries\AdressekontoGetQuery.cs" />
     <Compile Include="Queries\BogføringerGetQuery.cs" />
+    <Compile Include="Queries\BrevhovederGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoGetQuery.cs" />
     <Compile Include="Queries\BudgetkontogrupperGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoplanGetQuery.cs" />

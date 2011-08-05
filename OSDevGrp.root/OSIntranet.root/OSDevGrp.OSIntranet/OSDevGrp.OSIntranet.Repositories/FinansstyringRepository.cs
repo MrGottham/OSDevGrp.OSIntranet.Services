@@ -64,21 +64,23 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <summary>
         /// Henter en liste af regnskaber.
         /// </summary>
+        /// <param name="getBrevhovedCallback">Callbackmetode til at hente et givent brevhoved.</param>
         /// <returns>Liste af regnskaber.</returns>
-        public IEnumerable<Regnskab> RegnskabslisteGet()
+        public IEnumerable<Regnskab> RegnskabslisteGet(Func<int, Brevhoved> getBrevhovedCallback)
         {
+            if (getBrevhovedCallback == null)
+            {
+                throw new ArgumentNullException("getBrevhovedCallback");
+            }
             var channel = _channelFactory.CreateChannel<IFinansstyringRepositoryService>(EndpointConfigurationName);
             try
             {
+                // Hent alle regnskaber.
                 var regnskabQuery = new RegnskabGetAllQuery();
                 var regnskabViews = channel.RegnskabGetAll(regnskabQuery);
-
-                var regnskaber = _domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(regnskabViews);
-                foreach (var regnskab in regnskaber)
-                {
-//                    var regnskabView = channel.RegnskabGetByNummer()
-                }
-                return regnskaber;
+                // Mapning af regnskaber.
+                _domainObjectBuilder.GetBrevhovedCallback = getBrevhovedCallback;
+                return _domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(regnskabViews);
             }
             catch (IntranetRepositoryException)
             {
