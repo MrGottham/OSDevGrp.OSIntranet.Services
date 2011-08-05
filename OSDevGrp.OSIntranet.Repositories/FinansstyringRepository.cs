@@ -106,17 +106,6 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter et givent regnskab.
         /// </summary>
         /// <param name="nummer">Unik identifikation af regnskabet.</param>
-        /// <param name="callback">Callbackmetode til at hente adressen for bogføringslinjer.</param>
-        /// <returns>Regnskab.</returns>
-        public Regnskab RegnskabGet(int nummer, Func<int, AdresseBase> callback)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Henter et givent regnskab.
-        /// </summary>
-        /// <param name="nummer">Unik identifikation af regnskabet.</param>
         /// <param name="getBrevhovedCallback">Callbackmetode til at hente et givent brevhoved.</param>
         /// <param name="getAdresseCallback">Callbackmetode til at hente en given adresse.</param>
         /// <returns>Regnskab.</returns>
