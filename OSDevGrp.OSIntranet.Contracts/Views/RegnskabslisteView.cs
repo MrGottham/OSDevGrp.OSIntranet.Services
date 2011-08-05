@@ -8,5 +8,6 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     [DataContract(Name = "Regnskabsliste", Namespace = SoapNamespaces.IntranetNamespace)]
     public class RegnskabslisteView : TabelView
     {
+        // TODO: Add BrevhovedView.
     }
 }
