@@ -131,7 +131,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.EqualTo(kreditorer.Count));
 
+            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
             konfigurationRepository.AssertWasCalled(m => m.KreditorSaldoOverNul);
+            objectMapper.AssertWasCalled(
+                m =>
+                m.Map<IEnumerable<AdresseBase>, IEnumerable<KreditorlisteView>>(Arg<IEnumerable<AdresseBase>>.Is.NotNull));
         }
     }
 }

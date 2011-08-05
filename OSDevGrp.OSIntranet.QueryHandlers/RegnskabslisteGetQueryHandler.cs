@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
@@ -12,15 +13,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// <summary>
     /// QueryHandler til håndtering af forespørgelsen: RegnskabslisteGetQuery.
     /// </summary>
-    public class RegnskabslisteGetQueryHandler : IQueryHandler<RegnskabslisteGetQuery, IEnumerable<RegnskabslisteView>>
+    public class RegnskabslisteGetQueryHandler : FinansstyringQueryHandlerBase, IQueryHandler<RegnskabslisteGetQuery, IEnumerable<RegnskabslisteView>>
     {
-        #region Private variables
-
-        private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly IObjectMapper _objectMapper;
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
@@ -29,17 +23,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
         public RegnskabslisteGetQueryHandler(IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper)
+            : base(finansstyringRepository, objectMapper)
         {
-            if (finansstyringRepository == null)
-            {
-                throw new ArgumentNullException("finansstyringRepository");
-            }
-            if (objectMapper == null)
-            {
-                throw new ArgumentNullException("objectMapper");
-            }
-            _finansstyringRepository = finansstyringRepository;
-            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -57,8 +42,10 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("query");
             }
-            var regnskaber = _finansstyringRepository.RegnskabslisteGet();
-            return _objectMapper.Map<IEnumerable<Regnskab>, IEnumerable<RegnskabslisteView>>(regnskaber);
+
+            var regnskaber = Repository.RegnskabslisteGet();
+
+            return MapMany<Regnskab, RegnskabslisteView>(regnskaber);
         }
 
         #endregion

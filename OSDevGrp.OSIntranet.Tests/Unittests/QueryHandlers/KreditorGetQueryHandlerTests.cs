@@ -77,6 +77,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                             };
             var kreditor = queryHandler.Query(query);
             Assert.That(kreditor, Is.Not.Null);
+            
+            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
+            objectMapper.AssertWasCalled(m => m.Map<AdresseBase, KreditorView>(Arg<AdresseBase>.Is.NotNull));
         }
     }
 }

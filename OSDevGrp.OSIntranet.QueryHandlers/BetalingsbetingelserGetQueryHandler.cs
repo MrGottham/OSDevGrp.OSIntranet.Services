@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
@@ -12,15 +13,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// <summary>
     /// QueryHandler til håndtering af forespørgelsen: BetalingsbetingelserGetQuery.
     /// </summary>
-    public class BetalingsbetingelserGetQueryHandler : IQueryHandler<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>
+    public class BetalingsbetingelserGetQueryHandler : AdressekartotekQueryHandlerBase, IQueryHandler<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>
     {
-        #region Private variables
-
-        private readonly IAdresseRepository _adresseRepository;
-        private readonly IObjectMapper _objectMapper;
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
@@ -29,17 +23,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <param name="adresseRepository">Implementering af repository til adresser.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
         public BetalingsbetingelserGetQueryHandler(IAdresseRepository adresseRepository, IObjectMapper objectMapper)
+            : base(adresseRepository, objectMapper)
         {
-            if (adresseRepository == null)
-            {
-                throw new ArgumentNullException("adresseRepository");
-            }
-            if (objectMapper == null)
-            {
-                throw new ArgumentNullException("objectMapper");
-            }
-            _adresseRepository = adresseRepository;
-            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -57,8 +42,10 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("query");
             }
-            var betalingsbetingelser = _adresseRepository.BetalingsbetingelseGetAll();
-            return _objectMapper.Map<IEnumerable<Betalingsbetingelse>, IEnumerable<BetalingsbetingelseView>>(betalingsbetingelser);
+        
+            var betalingsbetingelser = Repository.BetalingsbetingelseGetAll();
+            
+            return MapMany<Betalingsbetingelse, BetalingsbetingelseView>(betalingsbetingelser);
         }
 
         #endregion

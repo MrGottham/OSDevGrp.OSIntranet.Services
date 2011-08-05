@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     /// Tester QueryHandler til håndtering af forespørgelsen: DebitorlisteGetQuery.
     /// </summary>
     [TestFixture]
-    public class DebitorlisteGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
+    public class DebitorlisteGetQueryHandlerTests
     {
         /// <summary>
         /// Tester, at konstruktøren kaster en ArgumentNullException, hvis konfigurationsrepositoryet er null.
@@ -131,7 +131,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.EqualTo(debitorer.Count));
 
+            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
             konfigurationRepository.AssertWasCalled(m => m.DebitorSaldoOverNul);
+            objectMapper.Expect(
+                m =>
+                m.Map<IEnumerable<AdresseBase>, IEnumerable<DebitorlisteView>>(Arg<IEnumerable<AdresseBase>>.Is.NotNull));
         }
     }
 }

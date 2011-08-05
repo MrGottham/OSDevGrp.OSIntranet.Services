@@ -77,6 +77,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                             };
             var adressekonto = queryHandler.Query(query);
             Assert.That(adressekonto, Is.Not.Null);
+
+            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
+            objectMapper.AssertWasCalled(m => m.Map<AdresseBase, AdressekontoView>(Arg<AdresseBase>.Is.NotNull));
         }
     }
 }

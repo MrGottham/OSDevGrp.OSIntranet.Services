@@ -79,24 +79,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts
                     Assert.That(value, Is.EqualTo(target.GetType().GetProperty(property.Name).GetValue(target, null)));
                     continue;
                 }
-                if (property.PropertyType.IsClass)
-                {
-                    if (value == null)
-                    {
-                        Assert.That(value, Is.EqualTo(target.GetType().GetProperty(property.Name).GetValue(target, null)));
-                        continue;
-                    }
-                    CompareContracts(value, target.GetType().GetProperty(property.Name).GetValue(target, null));
-                    continue;
-                }
                 if (property.PropertyType.IsGenericType)
                 {
                     var targetType = target.GetType().GetProperty(property.Name).PropertyType;
                     Assert.That(property.PropertyType.FullName, Is.EqualTo(targetType.FullName));
                     continue;
                 }
-                
-                Assert.Fail(string.Format("Can't compare value for the type: {0}", property.PropertyType));
+                CompareContracts(value, target.GetType().GetProperty(property.Name).GetValue(target, null));
             }
         }
     }

@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
@@ -12,15 +13,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// <summary>
     /// QueryHandler til håndtering af forespørgelsen: BudgetkontogrupperGetQuery.
     /// </summary>
-    public class BudgetkontogrupperGetQueryHandler : IQueryHandler<BudgetkontogrupperGetQuery, IEnumerable<BudgetkontogruppeView>>
+    public class BudgetkontogrupperGetQueryHandler : FinansstyringQueryHandlerBase, IQueryHandler<BudgetkontogrupperGetQuery, IEnumerable<BudgetkontogruppeView>>
     {
-        #region Private variables
-
-        private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly IObjectMapper _objectMapper;
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
@@ -29,17 +23,8 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
         public BudgetkontogrupperGetQueryHandler(IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper)
+            : base(finansstyringRepository, objectMapper)
         {
-            if (finansstyringRepository == null)
-            {
-                throw new ArgumentNullException("finansstyringRepository");
-            }
-            if (objectMapper == null)
-            {
-                throw new ArgumentNullException("objectMapper");
-            }
-            _finansstyringRepository = finansstyringRepository;
-            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -57,9 +42,10 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("query");
             }
-            var budgetkontogrupper = _finansstyringRepository.BudgetkontogruppeGetAll();
-            return
-                _objectMapper.Map<IEnumerable<Budgetkontogruppe>, IEnumerable<BudgetkontogruppeView>>(budgetkontogrupper);
+            
+            var budgetkontogrupper = Repository.BudgetkontogruppeGetAll();
+
+            return MapMany<Budgetkontogruppe, BudgetkontogruppeView>(budgetkontogrupper);
         }
 
         #endregion

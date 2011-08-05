@@ -175,7 +175,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             var brevhovedlisteHelper = new BrevhovedlisteHelper(FællesRepository.BrevhovedGetAll());
             var adresselisteHelper = new AdresselisteHelper(AdresseRepository.AdresseGetAll());
             Repository.RegnskabGet(regnskabsnummer, brevhovedlisteHelper.GetById, adresselisteHelper.GetById);
-            return adresselisteHelper.Adresser;
+            return adresselisteHelper.Adresser.ToList();
         }
 
         /// <summary>
