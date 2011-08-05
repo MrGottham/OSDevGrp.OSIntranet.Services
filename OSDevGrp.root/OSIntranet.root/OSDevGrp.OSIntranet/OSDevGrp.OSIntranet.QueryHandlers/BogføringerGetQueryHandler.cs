@@ -7,25 +7,16 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
-using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
     /// <summary>
     /// QueryHandler til håndtering af forespørgelsen: BogføringerGetQuery.
     /// </summary>
-    public class BogføringerGetQueryHandler : IQueryHandler<BogføringerGetQuery, IEnumerable<BogføringslinjeView>>
+    public class BogføringerGetQueryHandler : RegnskabQueryHandlerBase, IQueryHandler<BogføringerGetQuery, IEnumerable<BogføringslinjeView>>
     {
-        #region Private variables
-
-        private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly IAdresseRepository _adresseRepository;
-        private readonly IObjectMapper _objectMapper;
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
@@ -33,24 +24,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="adresseRepository">Implementering af repository til adresser.</param>
+        /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        public BogføringerGetQueryHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IObjectMapper objectMapper)
+        public BogføringerGetQueryHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
+            : base(finansstyringRepository, adresseRepository, fællesRepository, objectMapper)
         {
-            if (finansstyringRepository == null)
-            {
-                throw new ArgumentNullException("finansstyringRepository");
-            }
-            if (adresseRepository == null)
-            {
-                throw new ArgumentNullException("adresseRepository");
-            }
-            if (objectMapper == null)
-            {
-                throw new ArgumentNullException("objectMapper");
-            }
-            _finansstyringRepository = finansstyringRepository;
-            _adresseRepository = adresseRepository;
-            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -68,27 +46,18 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("query");
             }
-            var adresser = _adresseRepository.AdresseGetAll();
-            var regnskab = _finansstyringRepository.RegnskabGet(query.Regnskabsnummer, nummer =>
-                                                                                           {
-                                                                                               var adresse = adresser.SingleOrDefault(m => m.Nummer == nummer);
-                                                                                               if (adresse == null)
-                                                                                               {
-                                                                                                   var message = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, "AdresseBase", nummer);
-                                                                                                   throw new IntranetRepositoryException(message);
-                                                                                               }
-                                                                                               return adresse;
-                                                                                           });
+
+            var konti = KontoGetAllByRegnskab(query.Regnskabsnummer);
 
             var bogføringslinjeComparer = new BogføringslinjeComparer();
-            var bogføringslinjer = regnskab.Konti.OfType<Konto>()
+            var bogføringslinjer = konti.OfType<Konto>()
                 .SelectMany(m => m.Bogføringslinjer)
                 .OrderByDescending(m => m, bogføringslinjeComparer)
                 .Where(m => m.Dato.CompareTo(query.StatusDato) <= 0)
                 .Take(query.Linjer)
                 .ToList();
 
-            return bogføringslinjer.Select(bogføringslinje => _objectMapper.Map<Bogføringslinje, BogføringslinjeView>(bogføringslinje)).ToList();
+            return bogføringslinjer.Select(Map<Bogføringslinje, BogføringslinjeView>).ToList();
         }
 
         #endregion

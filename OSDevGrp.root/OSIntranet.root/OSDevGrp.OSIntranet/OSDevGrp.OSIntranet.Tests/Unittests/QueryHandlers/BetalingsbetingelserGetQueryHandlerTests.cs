@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
+using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 {
@@ -10,24 +17,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     /// Tester QueryHandler til håndtering af forespørgelsen: BetalingsbetingelserGetQuery.
     /// </summary>
     [TestFixture]
-    public class BetalingsbetingelserGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
+    public class BetalingsbetingelserGetQueryHandlerTests
     {
         /// <summary>
-        /// Test, at konstruktøren kaster en ArgumentNullException, hvis adresserepository er null.
+        /// Tester, at Query kaster ArgumentNullException, hvis Query er null.
         /// </summary>
         [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisAdresseRepositoryErNull()
+        public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new BetalingsbetingelserGetQueryHandler(null, null));
-        }
+            var fixture = new Fixture();
 
-        /// <summary>
-        /// Test, at konstruktøren kaster en ArgumentNullException, hvis objectmapperen er null.
-        /// </summary>
-        [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BetalingsbetingelserGetQueryHandler(GetAdresseRepository(), null));
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(adresseRepository);
+            fixture.Inject(objectMapper);
+            var queryHandler = fixture.CreateAnonymous<BetalingsbetingelserGetQueryHandler>();
+            Assert.That(queryHandler, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
         }
 
         /// <summary>
@@ -36,21 +44,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryHenterBetalingsbetingelser()
         {
-            var queryHandler = new BetalingsbetingelserGetQueryHandler(GetAdresseRepository(), GetObjectMapper());
+            var fixture = new Fixture();
+
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepository.Expect(m => m.BetalingsbetingelseGetAll())
+                .Return(fixture.CreateMany<Betalingsbetingelse>(2));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            objectMapper.Expect(
+                m =>
+                m.Map<IEnumerable<Betalingsbetingelse>, IEnumerable<BetalingsbetingelseView>>(
+                    Arg<IEnumerable<Betalingsbetingelse>>.Is.NotNull))
+                .Return(fixture.CreateMany<BetalingsbetingelseView>(2));
+
+            fixture.Inject(adresseRepository);
+            fixture.Inject(objectMapper);
+            var queryHandler = fixture.CreateAnonymous<BetalingsbetingelserGetQueryHandler>();
+            Assert.That(queryHandler, Is.Not.Null);
+
             var query = new BetalingsbetingelserGetQuery();
             var betalingsbetingelser = queryHandler.Query(query);
             Assert.That(betalingsbetingelser, Is.Not.Null);
             Assert.That(betalingsbetingelser.Count(), Is.EqualTo(2));
-        }
 
-        /// <summary>
-        /// Tester, at Query kaster ArgumentNullException, hvis Query er null.
-        /// </summary>
-        [Test]
-        public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
-        {
-            var queryHandler = new BetalingsbetingelserGetQueryHandler(GetAdresseRepository(), GetObjectMapper());
-            Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
+            adresseRepository.AssertWasCalled(m => m.BetalingsbetingelseGetAll());
+            objectMapper.AssertWasCalled(
+                m =>
+                m.Map<IEnumerable<Betalingsbetingelse>, IEnumerable<BetalingsbetingelseView>>(
+                    Arg<IEnumerable<Betalingsbetingelse>>.Is.NotNull));
         }
     }
 }

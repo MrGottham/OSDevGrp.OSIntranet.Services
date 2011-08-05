@@ -80,6 +80,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var adressekonti = queryHandler.Query(query);
             Assert.That(adressekonti, Is.Not.Null);
             Assert.That(adressekonti.Count(), Is.EqualTo(25));
+
+            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
+            objectMapper.AssertWasCalled(
+                m =>
+                m.Map<IEnumerable<AdresseBase>, IEnumerable<AdressekontolisteView>>(
+                    Arg<IEnumerable<AdresseBase>>.Is.NotNull));
         }
     }
 }

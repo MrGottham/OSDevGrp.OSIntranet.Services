@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 {
@@ -10,24 +17,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     /// Tester QueryHandler til håndtering af forespørgelsen: RegnskabslisteGetQuery.
     /// </summary>
     [TestFixture]
-    public class RegnskabslisteGetQueryHandlerTests : FinansstyringQueryHandlerTestsBase
+    public class RegnskabslisteGetQueryHandlerTests
     {
         /// <summary>
-        /// Test, at konstruktøren kaster en ArgumentNullException, hvis repository for finansstyring er null.
+        /// Tester, at Query kaster ArgumentNullException, hvis Query er null.
         /// </summary>
         [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
+        public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new RegnskabslisteGetQueryHandler(null, null));
-        }
+            var fixture = new Fixture();
 
-        /// <summary>
-        /// Test, at konstruktøren kaster en ArgumentNullException, hvis objectmapper er null.
-        /// </summary>
-        [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new RegnskabslisteGetQueryHandler(GetFinansstyringRepository(), null));
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(objectMapper);
+            var queryHandler = fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>();
+            Assert.That(queryHandler, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
         }
 
         /// <summary>
@@ -36,24 +44,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtQueryHenterRegnskaber()
         {
-            var queryHandler = new RegnskabslisteGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepository.Expect(m => m.RegnskabslisteGet())
+                .Return(fixture.CreateMany<Regnskab>(3));
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            objectMapper.Expect(
+                m =>
+                m.Map<IEnumerable<Regnskab>, IEnumerable<RegnskabslisteView>>(Arg<IEnumerable<Regnskab>>.Is.NotNull))
+                .Return(fixture.CreateMany<RegnskabslisteView>(3));
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(objectMapper);
+            var queryHandler = fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>();
+            Assert.That(queryHandler, Is.Not.Null);
+
             var query = new RegnskabslisteGetQuery();
             Assert.That(queryHandler, Is.Not.Null);
             Assert.That(query, Is.Not.Null);
             var regnskaber = queryHandler.Query(query);
             Assert.That(regnskaber, Is.Not.Null);
             Assert.That(regnskaber.Count(), Is.EqualTo(3));
-        }
 
-        /// <summary>
-        /// Tester, at Query kaster ArgumentNullException, hvis Query er null.
-        /// </summary>
-        [Test]
-        public void TestAtQueryKasterArgumentNullExceptionHvisQueryErNull()
-        {
-            var queryHandler = new RegnskabslisteGetQueryHandler(GetFinansstyringRepository(), GetObjectMapper());
-            Assert.That(queryHandler, Is.Not.Null);
-            Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
+            finansstyringRepository.AssertWasCalled(m => m.RegnskabslisteGet());
+            objectMapper.AssertWasCalled(
+                m =>
+                m.Map<IEnumerable<Regnskab>, IEnumerable<RegnskabslisteView>>(Arg<IEnumerable<Regnskab>>.Is.NotNull));
         }
     }
 }
