@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
-using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.Core;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.Domain.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
@@ -18,14 +20,11 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
     /// <summary>
     /// CommandHandler til håndtering af kommandoen: BogføringslinjeOpretCommand.
     /// </summary>
-    public class BogføringslinjeOpretCommandHandler : CommandHandlerNonTransactionalBase, ICommandHandler<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>
+    public class BogføringslinjeOpretCommandHandler : RegnskabCommandHandlerBase, ICommandHandler<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>
     {
         #region Private variables
 
-        private readonly IFinansstyringRepository _finansstyringRepository;
-        private readonly IAdresseRepository _adresseRepository;
         private readonly IKonfigurationRepository _konfigurationRepository;
-        private readonly IObjectMapper _objectMapper;
 
         #endregion
 
@@ -36,30 +35,17 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="adresseRepository">Implementering af repository til adressekartoteket.</param>
+        /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
         /// <param name="konfigurationRepository">Implementering af konfigurationsrepository.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        public BogføringslinjeOpretCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper)
+        public BogføringslinjeOpretCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper)
+            : base(finansstyringRepository, adresseRepository, fællesRepository, objectMapper)
         {
-            if (finansstyringRepository == null)
-            {
-                throw new ArgumentNullException("finansstyringRepository");
-            }
-            if (adresseRepository == null)
-            {
-                throw new ArgumentNullException("adresseRepository");
-            }
             if (konfigurationRepository == null)
             {
                 throw new ArgumentNullException("konfigurationRepository");
             }
-            if (objectMapper == null)
-            {
-                throw new ArgumentNullException("objectMapper");
-            }
-            _finansstyringRepository = finansstyringRepository;
-            _adresseRepository = adresseRepository;
             _konfigurationRepository = konfigurationRepository;
-            _objectMapper = objectMapper;
         }
 
         #endregion
@@ -85,9 +71,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
 
             var bogføringslinje = new Bogføringslinje(int.MaxValue, command.Dato, command.Bilag, command.Tekst,
                                                       command.Debit, command.Kredit);
-            _finansstyringRepository.BogføringslinjeAdd(bogføringslinje.Dato, bogføringslinje.Bilag, konto,
-                                                        bogføringslinje.Tekst, budgetkonto, bogføringslinje.Debit,
-                                                        bogføringslinje.Kredit, adressekonto);
+            Repository.BogføringslinjeAdd(bogføringslinje.Dato, bogføringslinje.Bilag, konto, bogføringslinje.Tekst,
+                                          budgetkonto, bogføringslinje.Debit, bogføringslinje.Kredit, adressekonto);
 
             konto.TilføjBogføringslinje(bogføringslinje);
             konto.Calculate(bogføringslinje.Dato, bogføringslinje.Løbenummer);
@@ -130,17 +115,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="adressekonto">Returnering af adressekonto, hvorpå bogføringslinjen skal bogføres.</param>
         private void EvaluateCommand(BogføringslinjeOpretCommand command, out Konto konto, out Budgetkonto budgetkonto, out AdresseBase adressekonto)
         {
-            var adresser = _adresseRepository.AdresseGetAll();
-            var regnskab = _finansstyringRepository.RegnskabGet(command.Regnskabsnummer, nummer =>
-                                                                                             {
-                                                                                                 var adresse = adresser.SingleOrDefault(m => m.Nummer == nummer);
-                                                                                                 if (adresse == null)
-                                                                                                 {
-                                                                                                     var message = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, "AdresseBase", nummer);
-                                                                                                     throw new IntranetRepositoryException(message);
-                                                                                                 }
-                                                                                                 return adresse;
-                                                                                             });
+            var adresselisteHelper = new AdresselisteHelper(AdresseRepository.AdresseGetAll());
+            var brevhovedlisteHelper = new BrevhovedlisteHelper(FællesRepository.BrevhovedGetAll());
+            var regnskab = Repository.RegnskabGet(command.Regnskabsnummer, brevhovedlisteHelper.GetById,
+                                                  adresselisteHelper.GetById);
             var currentTime = DateTime.Now;
             if (command.Dato.Date < currentTime.AddDays(_konfigurationRepository.DageForBogføringsperiode*-1).Date)
             {
@@ -208,16 +186,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 return;
             }
-            try
-            {
-                adressekonto = adresser.Single(m => m.Nummer == command.Adressekonto);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase),
-                                                 command.Adressekonto), ex);
-            }
+            adressekonto = adresselisteHelper.GetById(command.Adressekonto);
         }
 
         /// <summary>
@@ -234,7 +203,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 var advarsel = new BogføringsadvarselResponse
                                    {
                                        Advarsel = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn),
-                                       Konto = _objectMapper.Map<Konto, KontoView>(konto),
+                                       Konto = ObjectMapper.Map<Konto, KontoView>(konto),
                                        Beløb = Math.Abs(konto.DisponibelPrStatusdato)
                                    };
                 advarsler.Add(advarsel);
@@ -246,7 +215,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                     var advarsel = new BogføringsadvarselResponse
                                        {
                                            Advarsel = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn),
-                                           Konto = _objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto),
+                                           Konto = ObjectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto),
                                            Beløb = Math.Abs(budgetkonto.DisponibelPrStatusdato)
                                        };
                     advarsler.Add(advarsel);

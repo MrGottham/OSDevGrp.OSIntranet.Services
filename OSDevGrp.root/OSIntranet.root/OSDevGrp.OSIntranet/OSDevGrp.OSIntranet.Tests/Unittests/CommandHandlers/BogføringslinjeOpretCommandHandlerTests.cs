@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using OSDevGrp.OSIntranet.CommandHandlers;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
-using OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
@@ -16,43 +18,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
     /// Tester CommandHandler til håndtering af kommandoen: BogføringslinjeOpretCommand.
     /// </summary>
     [TestFixture]
-    public class BogføringslinjeOpretCommandHandlerTests : FinansstyringQueryHandlerTestsBase
+    public class BogføringslinjeOpretCommandHandlerTests
     {
-        /// <summary>
-        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis repository for finansstyring er null.
-        /// </summary>
-        [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(null, null, null, null));
-        }
-
-        /// <summary>
-        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis repository for adressekartoteket er null.
-        /// </summary>
-        [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisAdresseRepositoryErNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), null, null, null));
-        }
-
         /// <summary>
         /// Tester, at konstruktøren kaster en ArgumentNullException, hvis konfigurationsrepository er null.
         /// </summary>
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisKonfigurationRepositoryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), null, null));
-        }
+            var fixture = new Fixture();
 
-        /// <summary>
-        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis objectmapper er null.
-        /// </summary>
-        [Test]
-        public void TestAtConstructorKasterArgumentNullExceptionHvisKonfigurationObjectMapperErNull()
-        {
-            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            Assert.Throws<ArgumentNullException>(() => new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(), GetAdresseRepository(), konfigurationRepository, null));
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject<IKonfigurationRepository>(null);
+            fixture.Inject(objectMapper);
+
+            Assert.That(
+                Assert.Throws<TargetInvocationException>(
+                    () => fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>()).InnerException,
+                Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -61,11 +51,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteTilføjerBogføringslinje()
         {
-            var finansstyringRepository = GetFinansstyringRepository();
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(finansstyringRepository, GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -98,11 +100,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteReturnerAdvarselVedOvertrækkelseAfKonto()
         {
-            var finansstyringRepository = GetFinansstyringRepository();
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(finansstyringRepository, GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -132,11 +146,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteReturnerAdvarselVedOvertrækkelseAfBudgetkonto()
         {
-            var finansstyringRepository = GetFinansstyringRepository();
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(finansstyringRepository, GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -167,10 +193,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterArgumentNullExceptionHvisCommandErNull()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(), konfigurationRepository,
-                                                                        GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             Assert.Throws<ArgumentNullException>(() => commandHandler.Execute(null));
         }
 
@@ -180,10 +219,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetRepositoryExceptionHvisRegnskabIkkeFindes()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = -1,
@@ -205,11 +257,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisBogføringsdatoErForGammel()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -231,11 +295,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisBogføringsdatoErFremmeITiden()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -257,11 +333,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisKontonummerIkkeErAngivet()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -283,11 +371,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetRepositoryExceptionHvisKontoIkkeFindes()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -309,11 +409,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisTekstIkkeErAngivet()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -335,11 +447,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetRepositoryExceptionHvisBudgetkontoIkkeFindes()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -361,11 +485,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisDebitBeløbErUnderNul()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -387,11 +523,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisKreditBeløbErUnderNul()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -413,11 +561,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetBusinessExceptionHvisDebitBeløbOgKreditBeløbErNul()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -439,11 +599,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtExecuteKasterIntranetRepositoryExceptionHvisAdresseIkkeFindes()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            konfigurationRepository.Expect(m => m.DageForBogføringsperiode).Return(30);
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = 1,
@@ -465,10 +637,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestAtHandleExceptionKasterIntranetSystemException()
         {
+            var fixture = new Fixture();
+
+            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var commandHandler = new BogføringslinjeOpretCommandHandler(GetFinansstyringRepository(),
-                                                                        GetAdresseRepository(),
-                                                                        konfigurationRepository, GetObjectMapper());
+            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+
+            fixture.Inject(finansstyringRepository);
+            fixture.Inject(adresseRepository);
+            fixture.Inject(fællesRepository);
+            fixture.Inject(konfigurationRepository);
+            fixture.Inject(objectMapper);
+
+            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+
             Assert.Throws<IntranetSystemException>(() => commandHandler.HandleException(new BogføringslinjeOpretCommand(), new Exception("Test")));
         }
     }
