@@ -121,7 +121,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             kontoDankort.TilføjBogføringslinje(bogføringslinje);
             // Dan mockup af repository.
             var repository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            repository.Expect(m => m.RegnskabslisteGet()).Return(regnskaber);
+            repository.Expect(m => m.RegnskabslisteGet(null)).Return(regnskaber);
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(1))).Return(regnskaber.Single(m => m.Nummer == 1));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(2))).Return(regnskaber.Single(m => m.Nummer == 2));
             repository.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(3))).Return(regnskaber.Single(m => m.Nummer == 3));

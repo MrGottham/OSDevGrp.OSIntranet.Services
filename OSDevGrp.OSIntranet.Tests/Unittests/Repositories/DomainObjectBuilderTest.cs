@@ -973,8 +973,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerRegnskabFraRegnskabListeView()
         {
             var fixture = new Fixture();
+            var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new BrevhovedreferenceView
+                               {
+                                   Nummer = brevhoveder.ElementAt(1).Nummer,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateAnonymous<RegnskabListeView>();
             var regnskab = domainObjectBuilder.Build<RegnskabListeView, Regnskab>(view);
@@ -982,9 +990,67 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(regnskab.Nummer, Is.EqualTo(view.Nummer));
             Assert.That(regnskab.Navn, Is.Not.Null);
             Assert.That(regnskab.Navn, Is.EqualTo(view.Navn));
-            Assert.That(regnskab.Brevhoved, Is.Null);
+            Assert.That(regnskab.Brevhoved, Is.Not.Null);
+            Assert.That(regnskab.Brevhoved.Nummer, Is.EqualTo(regnskab.Brevhoved.Nummer));
+            Assert.That(regnskab.Brevhoved.Navn, Is.Not.Null);
+            Assert.That(regnskab.Brevhoved.Navn, Is.EqualTo(regnskab.Brevhoved.Navn));
             Assert.That(regnskab.Konti, Is.Not.Null);
             Assert.That(regnskab.Konti.Count(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af en liste regnskaber, hvis GetBrevhovedCallback ikke er registreret.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfRegnskabHervisGetBrevhovedCallbackIkkeErRegistreret()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<RegnskabListeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<RegnskabListeView, Regnskab>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af en liste regnskaber, hvis GetBrevhovedCallback kaster en IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfRegnskaberHvisGetBrevhovedCallbackKasterIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetBrevhovedCallback = (nummer =>
+                                                            {
+                                                                throw fixture.CreateAnonymous<IntranetRepositoryException>();
+                                                            });
+
+            var view = fixture.CreateAnonymous<RegnskabListeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<RegnskabListeView, Regnskab>(view));
+        }
+
+        /// <summary>
+        /// Tester, at Build kaster en IntranetRepositoryException ved bygning af en liste af regnskaber, hvis brevhovedet ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtBuildKasterIntranetRepositoryExceptionVedBygningAfRegnskaberHvisBrevhovedIkkeFindes()
+        {
+            var fixture = new Fixture();
+            var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new BrevhovedreferenceView
+                               {
+                                   Nummer = -1,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<RegnskabListeView>();
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<RegnskabListeView, Regnskab>(view));
         }
 
         /// <summary>
@@ -994,8 +1060,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBuildByggerListeAfRegnskaberFraListeView()
         {
             var fixture = new Fixture();
+            var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new BrevhovedreferenceView
+                               {
+                                   Nummer = brevhoveder.ElementAt(1).Nummer,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
 
             var view = fixture.CreateMany<RegnskabListeView>(3);
             var regnskaber = domainObjectBuilder.BuildMany<RegnskabListeView, Regnskab>(view);
@@ -2334,6 +2408,40 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var view = fixture.CreateMany<BrevhovedView>(3);
             var brevhoveder = domainObjectBuilder.BuildMany<BrevhovedView, Brevhoved>(view);
+            Assert.That(brevhoveder, Is.Not.Null);
+            Assert.That(brevhoveder.Count(), Is.EqualTo(3));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger brevhoved fra et reference view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerBrevhovedFraBrevhovedreferenceView()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateAnonymous<BrevhovedreferenceView>();
+            var brevhoved = domainObjectBuilder.Build<BrevhovedreferenceView, Brevhoved>(view);
+            Assert.That(brevhoved, Is.Not.Null);
+            Assert.That(brevhoved.Nummer, Is.EqualTo(view.Nummer));
+            Assert.That(brevhoved.Navn, Is.Not.Null);
+            Assert.That(brevhoved.Navn, Is.EqualTo(view.Navn));
+        }
+
+        /// <summary>
+        /// Tester, at Build bygger liste af brevhoveder fra et reference view.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerListeAfBrevhovedeFraReferencerr()
+        {
+            var fixture = new Fixture();
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            var view = fixture.CreateMany<BrevhovedreferenceView>(3);
+            var brevhoveder = domainObjectBuilder.BuildMany<BrevhovedreferenceView, Brevhoved>(view);
             Assert.That(brevhoveder, Is.Not.Null);
             Assert.That(brevhoveder.Count(), Is.EqualTo(3));
         }

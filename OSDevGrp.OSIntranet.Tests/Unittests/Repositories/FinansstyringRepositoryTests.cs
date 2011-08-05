@@ -44,6 +44,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at RegnskabslisteGet kaster en ArgumentNullException, hvis callbackmetoden til at hente et givent brevhoved er null.
+        /// </summary>
+        [Test]
+        public void TestAtRegnskabslisteGetKasterArgumentNullExceptionHvisGetBrevhovedCallbackErNull()
+        {
+            var mocker = new MockRepository();
+            var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] {typeof (ICommunicationObject)});
+            Expect.Call(((ICommunicationObject) service).State).Return(CommunicationState.Closed).Repeat.Any();
+            mocker.ReplayAll();
+
+            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
+            channelFactory.Expect(m => m.CreateChannel<IFinansstyringRepositoryService>(Arg<string>.Is.Anything))
+                .Return(service);
+
+            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
+
+            var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
+            Assert.Throws<ArgumentNullException>(() => repository.RegnskabslisteGet(null));
+        }
+
+        /// <summary>
         /// Tester, at RegnskabslisteGet henter alle regnskaber.
         /// </summary>
         [Test]
@@ -67,8 +88,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 m => m.BuildMany<RegnskabListeView, Regnskab>(Arg<IEnumerable<RegnskabListeView>>.Is.NotNull))
                 .Return(fixture.CreateMany<Regnskab>(3));
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            Assert.That(getBrevhovedCallback, Is.Not.Null);
+            Assert.That(getBrevhovedCallback(1), Is.Not.Null);
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskaber = repository.RegnskabslisteGet();
+            var regnskaber = repository.RegnskabslisteGet(getBrevhovedCallback);
             Assert.That(regnskaber, Is.Not.Null);
             Assert.That(regnskaber.Count(), Is.EqualTo(3));
 
@@ -97,8 +122,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            Assert.That(getBrevhovedCallback, Is.Not.Null);
+            Assert.That(getBrevhovedCallback(1), Is.Not.Null);
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet());
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet(getBrevhovedCallback));
         }
 
         /// <summary>
@@ -122,8 +151,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            Assert.That(getBrevhovedCallback, Is.Not.Null);
+            Assert.That(getBrevhovedCallback(1), Is.Not.Null);
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet());
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet(getBrevhovedCallback));
         }
 
         /// <summary>
@@ -147,8 +180,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            Assert.That(getBrevhovedCallback, Is.Not.Null);
+            Assert.That(getBrevhovedCallback(1), Is.Not.Null);
+
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet());
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabslisteGet(getBrevhovedCallback));
         }
 
         /// <summary>

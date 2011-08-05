@@ -70,7 +70,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var fixture = new Fixture();
 
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(m => m.RegnskabslisteGet())
+            finansstyringRepository.Expect(m => m.RegnskabslisteGet(Arg<Func<int, Brevhoved>>.Is.NotNull))
                 .Return(fixture.CreateMany<Regnskab>(3));
             var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             fællesRepository.Expect(m => m.BrevhovedGetAll())
@@ -95,7 +95,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             Assert.That(regnskaber.Count(), Is.EqualTo(3));
 
             fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
-            finansstyringRepository.AssertWasCalled(m => m.RegnskabslisteGet());
+            finansstyringRepository.AssertWasCalled(m => m.RegnskabslisteGet(Arg<Func<int, Brevhoved>>.Is.NotNull));
             objectMapper.AssertWasCalled(
                 m =>
                 m.Map<IEnumerable<Regnskab>, IEnumerable<RegnskabslisteView>>(Arg<IEnumerable<Regnskab>>.Is.NotNull));

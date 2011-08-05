@@ -14,8 +14,9 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// <summary>
         /// Henter en liste af regnskaber.
         /// </summary>
+        /// <param name="getBrevhovedCallback">Callbackmetode til at hente et givent brevhoved.</param>
         /// <returns>Liste af regnskaber.</returns>
-        IEnumerable<Regnskab> RegnskabslisteGet();
+        IEnumerable<Regnskab> RegnskabslisteGet(Func<int, Brevhoved> getBrevhovedCallback);
 
         /// <summary>
         /// Henter et givent regnskab.

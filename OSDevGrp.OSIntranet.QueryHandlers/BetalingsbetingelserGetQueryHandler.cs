@@ -18,7 +18,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         #region Constructor
 
         /// <summary>
-        /// QueryHandler til håndtering af forespørgelsen: BetalingsbetingelserGetQuery.
+        /// Danner QueryHandler til håndtering af forespørgelsen: BetalingsbetingelserGetQuery.
         /// </summary>
         /// <param name="adresseRepository">Implementering af repository til adresser.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>

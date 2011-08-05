@@ -205,7 +205,37 @@ namespace OSDevGrp.OSIntranet.Repositories
                 .ConvertUsing(s => new Betalingsbetingelse(s.Nummer, s.Navn));
 
             Mapper.CreateMap<RegnskabListeView, Regnskab>()
-                .ConvertUsing(s => new Regnskab(s.Nummer, s.Navn));
+                .ConvertUsing(s =>
+                                  {
+                                      var regnskab = new Regnskab(s.Nummer, s.Navn);
+                                      if (s.Brevhoved != null && s.Brevhoved.Nummer != 0)
+                                      {
+                                          if (GetBrevhovedCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(
+                                                  Resource.GetExceptionMessage(
+                                                      ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
+                                          }
+                                          Brevhoved brevhoved;
+                                          try
+                                          {
+                                              brevhoved = GetBrevhovedCallback(s.Brevhoved.Nummer);
+                                          }
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(
+                                                  Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
+                                                                               typeof (Brevhoved), s.Brevhoved.Nummer),
+                                                  ex);
+                                          }
+                                          regnskab.SætBrevhoved(brevhoved);
+                                      }
+                                      return regnskab;
+                                  });
 
             Mapper.CreateMap<RegnskabView, Regnskab>()
                 .ConvertUsing(s =>
@@ -508,6 +538,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       brevhoved.SætCvrNr(s.CvrNr);
                                       return brevhoved;
                                   });
+
+            Mapper.CreateMap<BrevhovedreferenceView, Brevhoved>()
+                .ConvertUsing(s => new Brevhoved(s.Nummer, s.Navn));
+
             Mapper.AssertConfigurationIsValid();
         }
 
