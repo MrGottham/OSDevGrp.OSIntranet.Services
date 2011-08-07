@@ -69,6 +69,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             AdresseBase adressekonto;
             EvaluateCommand(command, out konto, out budgetkonto, out adressekonto);
 
+            throw new NotImplementedException();
+
+
+            /*
+
+
+
             var bogføringslinje = new Bogføringslinje(int.MaxValue, command.Dato, command.Bilag, command.Tekst,
                                                       command.Debit, command.Kredit);
             Repository.BogføringslinjeAdd(bogføringslinje.Dato, bogføringslinje.Bilag, konto, bogføringslinje.Tekst,
@@ -88,6 +95,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             }
 
             return CreateResponse(konto, budgetkonto);
+            */
         }
 
         /// <summary>
@@ -98,10 +106,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         [RethrowException(typeof(IntranetRepositoryException), typeof(IntranetBusinessException), typeof(IntranetSystemException))]
         public void HandleException(BogføringslinjeOpretCommand command, Exception exception)
         {
-            throw new IntranetSystemException(
-                Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue,
-                                             typeof (BogføringslinjeOpretCommand), typeof (BogføringslinjeOpretResponse),
-                                             exception.Message));
+            throw this.CreateIntranetSystemExceptionException<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(command, exception);
         }
 
         #endregion
@@ -120,7 +125,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             var regnskab = Repository.RegnskabGet(command.Regnskabsnummer, brevhovedlisteHelper.GetById,
                                                   adresselisteHelper.GetById);
             var currentTime = DateTime.Now;
-            if (command.Dato.Date < currentTime.AddDays(_konfigurationRepository.DageForBogføringsperiode*-1).Date)
+            if (command.Dato.Date < currentTime.AddDays(_konfigurationRepository.DageForBogføringsperiode * -1).Date)
             {
                 throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld,
                                                                                  _konfigurationRepository.
@@ -155,9 +160,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 try
                 {
-                    budgetkonto = regnskab.Konti
-                        .OfType<Budgetkonto>()
-                        .Single(m => m.Kontonummer.CompareTo(command.Budgetkontonummer) == 0);
+                    budgetkonto =
+                        regnskab.Konti.OfType<Budgetkonto>().Single(
+                            m => m.Kontonummer.CompareTo(command.Budgetkontonummer) == 0);
                 }
                 catch (InvalidOperationException ex)
                 {
