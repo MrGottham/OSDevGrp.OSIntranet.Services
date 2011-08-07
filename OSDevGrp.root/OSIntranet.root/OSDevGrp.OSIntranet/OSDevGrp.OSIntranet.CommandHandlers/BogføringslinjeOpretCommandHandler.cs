@@ -69,6 +69,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             AdresseBase adressekonto;
             EvaluateCommand(command, out konto, out budgetkonto, out adressekonto);
 
+            var bogføringslinje = Repository.BogføringslinjeAdd(command.Dato, command.Bilag, konto, command.Tekst,
+                                                                budgetkonto, command.Debit, command.Kredit, adressekonto);
+
             throw new NotImplementedException();
 
 
