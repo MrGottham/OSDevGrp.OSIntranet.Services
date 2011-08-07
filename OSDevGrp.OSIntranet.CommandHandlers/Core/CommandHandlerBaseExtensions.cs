@@ -68,13 +68,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Håndtering af exception.
+        /// Håndterer en kastet exception fra en commandhandler, hvorefter der returneres en IntranetSystemException på baggrund heraf.
         /// </summary>
         /// <typeparam name="TCommand">Typen på kommandoen, som er behandlet af commandhandleren, der kaster exception.</typeparam>
         /// <param name="commandHandler">CommandHandler, der kaster exception.</param>
-        /// <param name="command">Kommando.</param>
+        /// <param name="command">Command.</param>
         /// <param name="exception">Kastet exception.</param>
-        public static void ExceptionHandler<TCommand>(this CommandHandlerBase commandHandler, TCommand command, Exception exception) where TCommand : ICommand
+        /// <returns>IntranetSystemException for den kastede exception.</returns>
+        public static IntranetSystemException CreateIntranetSystemExceptionException<TCommand>(this CommandHandlerBase commandHandler, TCommand command, Exception exception) where TCommand : ICommand
         {
             if (commandHandler == null)
             {
@@ -84,20 +85,22 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             {
                 throw new ArgumentNullException("exception");
             }
-            throw new IntranetSystemException(
-                Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue, typeof (TCommand),
-                                             exception.Message));
+            return
+                new IntranetSystemException(
+                    Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue,
+                                                 typeof (TCommand), exception.Message));
         }
 
         /// <summary>
-        /// Håndtering af exception.
+        /// Håndterer en kastet exception fra en commandhandler, hvorefter der returneres en IntranetSystemException på baggrund heraf.
         /// </summary>
         /// <typeparam name="TCommand">Typen på kommandoen, som er behandlet af commandhandleren, der kaster exception.</typeparam>
         /// <typeparam name="TResponse">Type på svaret, som returneres fra commandhandleren, der kaster exception.</typeparam>
         /// <param name="commandHandler">CommandHandler, der kaster exception.</param>
         /// <param name="command">Kommando.</param>
         /// <param name="exception">Kastet exception.</param>
-        public static void ExceptionHandler<TCommand, TResponse>(this CommandHandlerBase commandHandler, TCommand command, Exception exception) where TCommand : ICommand
+        /// <returns>IntranetSystemException for den kastede exception.</returns>
+        public static IntranetSystemException CreateIntranetSystemExceptionException<TCommand, TResponse>(this CommandHandlerBase commandHandler, TCommand command, Exception exception) where TCommand : ICommand
         {
             if (commandHandler == null)
             {
@@ -107,9 +110,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             {
                 throw new ArgumentNullException("exception");
             }
-            throw new IntranetSystemException(
-                Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, typeof (TCommand),
-                                             typeof (TResponse), exception.Message));
+            return
+                new IntranetSystemException(
+                    Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue,
+                                                 typeof (TCommand), typeof (TResponse), exception.Message));
         }
 
         #endregion

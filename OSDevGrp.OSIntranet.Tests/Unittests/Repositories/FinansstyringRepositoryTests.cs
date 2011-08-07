@@ -694,10 +694,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var konto = fixture.CreateAnonymous<Konto>();
             var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
             var adressekonto = fixture.CreateAnonymous<Person>();
-            repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
-                                          fixture.CreateAnonymous<string>(), budgetkonto,
-                                          fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
-                                          adressekonto);
+            var result = repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
+                                                       fixture.CreateAnonymous<string>(), budgetkonto,
+                                                       fixture.CreateAnonymous<decimal>(),
+                                                       fixture.CreateAnonymous<decimal>(), adressekonto);
+            Assert.That(result, Is.Not.Null);
 
             Assert.That(konto.Bogføringslinjer.Count(), Is.EqualTo(1));
             Assert.That(budgetkonto.Bogføringslinjer.Count(), Is.EqualTo(1));

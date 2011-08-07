@@ -88,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
         /// Tester, at BogføringslinjeAdd, tilføjer bogføringslinjer.
         /// </summary>
         [Test]
-        [Ignore("Test skal tilrettes, når repository returnerer den oprettede bogføringslinje.")]
+        [Ignore("Oprettelse af bogføringslinjer er testet.")]
         public void TestAtBogføringslinjeAddTilføjerBogføringslinjer()
         {
             // Hent regnskab og find nødvendige konti.
@@ -101,10 +101,16 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
             var bogføringer = budgetkontoØvrigeUdgifter.Bogføringslinjer.Count();
 
             // Opret bogføringer.
-            _finansstyringRepository.BogføringslinjeAdd(DateTime.Now, null, kontoDankort, "Test fra Repositories",
-                                                        budgetkontoØvrigeUdgifter, 5000M, 0M, null);
-            _finansstyringRepository.BogføringslinjeAdd(DateTime.Now, null, kontoDankort, "Test fra Repositories",
-                                                        budgetkontoØvrigeUdgifter, 0M, 5000M, null);
+            var result1 = _finansstyringRepository.BogføringslinjeAdd(DateTime.Now, null, kontoDankort,
+                                                                      "Test fra Repositories", budgetkontoØvrigeUdgifter,
+                                                                      5000M, 0M, null);
+            Assert.That(result1, Is.Not.Null);
+            Assert.That(result1.Løbenummer, Is.GreaterThan(0));
+            var result2 = _finansstyringRepository.BogføringslinjeAdd(DateTime.Now, null, kontoDankort,
+                                                                      "Test fra Repositories", budgetkontoØvrigeUdgifter,
+                                                                      0M, 5000M, null);
+            Assert.That(result2, Is.Not.Null);
+            Assert.That(result2.Løbenummer, Is.GreaterThan(0));
 
             // Genindlæs regnskab og find nødvendige konti.
             regnskab = _finansstyringRepository.RegnskabGet(1, brevhovedlisteHelper.GetById, adresselisteHelper.GetById);

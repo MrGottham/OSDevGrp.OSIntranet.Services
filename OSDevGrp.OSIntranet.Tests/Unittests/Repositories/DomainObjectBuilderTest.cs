@@ -1147,6 +1147,70 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         }
 
         /// <summary>
+        /// Tester, at Build bygger regnskab fra samme view flere gange.
+        /// </summary>
+        [Test]
+        public void TestAtBuildByggerRegnskabFraSammeRegnskabViewFlereGange()
+        {
+            var fixture = new Fixture();
+            var kontogrupper = fixture.CreateMany<Kontogruppe>(3).ToList();
+            var budgetkontogrupper = fixture.CreateMany<Budgetkontogruppe>(3).ToList();
+            var brevhoveder = fixture.CreateMany<Brevhoved>(3).ToList();
+            fixture.Inject(new RegnskabListeView
+                               {
+                                   Nummer = 1,
+                                   Navn = fixture.CreateAnonymous<string>()
+                               });
+            fixture.Inject<IEnumerable<BogføringslinjeView>>(new List<BogføringslinjeView>());
+            fixture.Inject(fixture.CreateMany<KreditoplysningerView>(24));
+            fixture.Inject(fixture.CreateMany<BudgetoplysningerView>(24));
+            fixture.Inject(new KontogruppeView
+                               {
+                                   Nummer = kontogrupper.ElementAt(0).Nummer,
+                                   Navn = kontogrupper.ElementAt(0).Navn
+                               });
+            fixture.Inject(new BudgetkontogruppeView
+                               {
+                                   Nummer = budgetkontogrupper.ElementAt(0).Nummer,
+                                   Navn = budgetkontogrupper.ElementAt(0).Navn
+                               });
+            fixture.Inject(new BrevhovedView
+                               {
+                                   Nummer = brevhoveder.ElementAt(0).Nummer,
+                                   Navn = brevhoveder.ElementAt(0).Navn,
+                                   Linje1 = brevhoveder.ElementAt(0).Linje1,
+                                   Linje2 = brevhoveder.ElementAt(0).Linje2,
+                                   Linje3 = brevhoveder.ElementAt(0).Linje3,
+                                   Linje4 = brevhoveder.ElementAt(0).Linje4,
+                                   Linje5 = brevhoveder.ElementAt(0).Linje5,
+                                   Linje6 = brevhoveder.ElementAt(0).Linje6,
+                                   Linje7 = brevhoveder.ElementAt(0).Linje7,
+                                   CvrNr = brevhoveder.ElementAt(0).CvrNr
+                               });
+            fixture.Inject(new RegnskabView
+                               {
+                                   Nummer = fixture.CreateAnonymous<RegnskabListeView>().Nummer,
+                                   Navn = fixture.CreateAnonymous<RegnskabListeView>().Navn,
+                                   Konti = fixture.CreateMany<KontoView>(3),
+                                   Budgetkonti = fixture.CreateMany<BudgetkontoView>(3),
+                                   Brevhoved = fixture.CreateAnonymous<BrevhovedView>()
+                               });
+            var domainObjectBuilder = new DomainObjectBuilder();
+            Assert.That(domainObjectBuilder, Is.Not.Null);
+
+            domainObjectBuilder.GetKontogruppeCallback = (nummer => kontogrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBudgetkontogruppeCallback = (nummer => budgetkontogrupper.Single(m => m.Nummer == nummer));
+            domainObjectBuilder.GetBrevhovedCallback = (nummer => brevhoveder.Single(m => m.Nummer == nummer));
+
+            var view = fixture.CreateAnonymous<RegnskabView>();
+            for (var i = 0; i < 3; i++)
+            {
+                var regnskab = domainObjectBuilder.Build<RegnskabView, Regnskab>(view);
+                Assert.That(regnskab, Is.Not.Null);
+            }
+        }
+
+        /// <summary>
         /// Tester, at Build kaster en IntranetRepositoryException ved bygning af regnskab, hvis GetBrevhovedCallback ikke er registreret.
         /// </summary>
         [Test]

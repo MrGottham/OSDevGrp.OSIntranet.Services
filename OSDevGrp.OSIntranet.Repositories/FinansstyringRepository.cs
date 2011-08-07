@@ -244,7 +244,8 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="debit">Debitbeløb.</param>
         /// <param name="kredit">Kreditbeløb.</param>
         /// <param name="adressekonto">Adressekonto.</param>
-        public void BogføringslinjeAdd(DateTime bogføringstidspunkt, string bilag, Konto konto, string tekst, Budgetkonto budgetkonto, decimal debit, decimal kredit, AdresseBase adressekonto)
+        /// <returns>Oprettet bogføringslinje.</returns>
+        public Bogføringslinje BogføringslinjeAdd(DateTime bogføringstidspunkt, string bilag, Konto konto, string tekst, Budgetkonto budgetkonto, decimal debit, decimal kredit, AdresseBase adressekonto)
         {
             if (konto == null)
             {
@@ -283,8 +284,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     adressekonto.TilføjBogføringslinje(bogføringslinje);
                 }
-
-                // TODO: Find ud af calculering af bogføringslinje.
+                return bogføringslinje;
             }
             catch (IntranetRepositoryException)
             {

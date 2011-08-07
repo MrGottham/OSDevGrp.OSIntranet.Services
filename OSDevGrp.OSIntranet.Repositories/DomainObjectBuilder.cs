@@ -267,6 +267,11 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           regnskab.SætBrevhoved(brevhoved);
                                       }
+                                      var cached = _regnskaber.SingleOrDefault(m => m.Nummer == regnskab.Nummer);
+                                      if (cached != null)
+                                      {
+                                          _regnskaber.Remove(cached);
+                                      }
                                       _regnskaber.Add(regnskab);
                                       var regnskabslisteHelper = new RegnskabslisteHelper(_regnskaber);
                                       GetRegnskabCallback = regnskabslisteHelper.GetById;

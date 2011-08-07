@@ -50,6 +50,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// <param name="debit">Debitbeløb.</param>
         /// <param name="kredit">Kreditbeløb.</param>
         /// <param name="adressekonto">Adressekonto.</param>
-        void BogføringslinjeAdd(DateTime bogføringstidspunkt, string bilag, Konto konto, string tekst, Budgetkonto budgetkonto, decimal debit, decimal kredit, AdresseBase adressekonto);
+        /// <returns>Oprettet bogføringslinje.</returns>
+        Bogføringslinje BogføringslinjeAdd(DateTime bogføringstidspunkt, string bilag, Konto konto, string tekst, Budgetkonto budgetkonto, decimal debit, decimal kredit, AdresseBase adressekonto);
     }
 }

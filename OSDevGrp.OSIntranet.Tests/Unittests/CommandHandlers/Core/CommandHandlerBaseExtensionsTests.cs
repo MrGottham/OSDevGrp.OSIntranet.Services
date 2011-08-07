@@ -149,64 +149,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Tester, ExceptionHandler, der håndterer exception fra commandhandleres uden returværdi, kaster en ArgumentNullException, hvis commandhandler er null.
+        /// Tester, at CreateIntranetSystemExceptionException, der håndterer exception fra commandhandleres uden returværdi, kaster en ArgumentNullException, hvis commandhandler er null.
         /// </summary>
         [Test]
-        public void TestAtExceptionHandlerUdenResponseKasterArgumentNullExceptionHvisCommandHandlerErNull()
-        {
-            Assert.Throws<ArgumentNullException>(
-                () => CommandHandlerBaseExtensions.ExceptionHandler<BogføringslinjeOpretCommand>(null, null, null));
-        }
-
-        /// <summary>
-        /// Tester, ExceptionHandler, der håndterer exception fra commandhandleres uden returværdi, kaster en ArgumentNullException, hvis exception er null.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionHandlerUdenResponseKasterArgumentNullExceptionHvisExceptionErNull()
-        {
-            var fixture = new Fixture();
-
-            var commandHandler = new MyCommandHandler();
-            Assert.That(commandHandler, Is.Not.Null);
-
-            Assert.Throws<ArgumentNullException>(
-                () => commandHandler.ExceptionHandler(fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), null));
-        }
-
-        /// <summary>
-        /// Tester, ExceptionHandler, der håndterer exception fra commandhandleres uden returværdi, kaster en IntranetSystemException.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionHandlerUdenResponseKasterIntranetSystemException()
-        {
-            var fixture = new Fixture();
-
-            var commandHandler = new MyCommandHandler();
-            Assert.That(commandHandler, Is.Not.Null);
-
-            Assert.Throws<IntranetSystemException>(
-                () =>
-                commandHandler.ExceptionHandler(fixture.CreateAnonymous<BogføringslinjeOpretCommand>(),
-                                                fixture.CreateAnonymous<Exception>()));
-        }
-
-        /// <summary>
-        /// Tester, ExceptionHandler, der håndterer exception fra commandhandleres med returværdi, kaster en ArgumentNullException, hvis commandhandler er null.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionHandlerMedResponseKasterArgumentNullExceptionHvisCommandHandlerErNull()
+        public void TestAtCreateIntranetSystemExceptionExceptionUdenResponseKasterArgumentNullExceptionHvisCommandHandlerErNull()
         {
             Assert.Throws<ArgumentNullException>(
                 () =>
-                CommandHandlerBaseExtensions.ExceptionHandler<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>
-                    (null, null, null));
+                CommandHandlerBaseExtensions.CreateIntranetSystemExceptionException<BogføringslinjeOpretCommand>(null,
+                                                                                                                 null,
+                                                                                                                 null));
         }
 
         /// <summary>
-        /// Tester, ExceptionHandler, der håndterer exception fra commandhandleres med returværdi, kaster en ArgumentNullException, hvis exception er null.
+        /// Tester, at CreateIntranetSystemExceptionException, der håndterer exception fra commandhandleres uden returværdi, kaster en ArgumentNullException, hvis exception er null.
         /// </summary>
         [Test]
-        public void TestAtExceptionHandlerMedResponseKasterArgumentNullExceptionHvisExceptionErNull()
+        public void TestAtCreateIntranetSystemExceptionExceptionUdenResponseKasterArgumentNullExceptionHvisExceptionErNull()
         {
             var fixture = new Fixture();
 
@@ -215,26 +174,75 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                commandHandler.ExceptionHandler<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(
+                commandHandler.CreateIntranetSystemExceptionException(
                     fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), null));
         }
 
         /// <summary>
-        /// Tester, ExceptionHandler, der håndterer exception fra commandhandleres med returværdi, kaster en IntranetSystemException.
+        /// Tester, at CreateIntranetSystemExceptionException, der håndterer exception fra commandhandleres uden returværdi, kaster en IntranetSystemException.
         /// </summary>
         [Test]
-        public void TestAtExceptionHandlerMedResponseKasterIntranetSystemException()
+        public void TestAtCreateIntranetSystemExceptionExceptionUdenResponseKasterIntranetSystemException()
         {
             var fixture = new Fixture();
 
             var commandHandler = new MyCommandHandler();
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<IntranetSystemException>(
-                () =>
-                commandHandler.ExceptionHandler<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(
-                    fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), fixture.CreateAnonymous<Exception>()));
+            var result =
+                commandHandler.CreateIntranetSystemExceptionException(
+                    fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), fixture.CreateAnonymous<Exception>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.TypeOf(typeof(IntranetSystemException)));
         }
 
+        /// <summary>
+        /// Tester, at CreateIntranetSystemExceptionException, der håndterer exception fra commandhandleres med returværdi, kaster en ArgumentNullException, hvis commandhandler er null.
+        /// </summary>
+        [Test]
+        public void TestAtCreateIntranetSystemExceptionExceptionMedResponseKasterArgumentNullExceptionHvisCommandHandlerErNull()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                CommandHandlerBaseExtensions.CreateIntranetSystemExceptionException
+                    <BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(null, null, null));
+        }
+
+        /// <summary>
+        /// Tester, at CreateIntranetSystemExceptionException, der håndterer exception fra commandhandleres med returværdi, kaster en ArgumentNullException, hvis exception er null.
+        /// </summary>
+        [Test]
+        public void TestAtCreateIntranetSystemExceptionExceptionMedResponseKasterArgumentNullExceptionHvisExceptionErNull()
+        {
+            var fixture = new Fixture();
+
+            var commandHandler = new MyCommandHandler();
+            Assert.That(commandHandler, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                commandHandler.CreateIntranetSystemExceptionException
+                    <BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(
+                        fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), null));
+        }
+
+        /// <summary>
+        /// Tester, at CreateIntranetSystemExceptionException, der håndterer exception fra commandhandleres med returværdi, kaster en IntranetSystemException.
+        /// </summary>
+        [Test]
+        public void TestAtCreateIntranetSystemExceptionExceptionMedResponseKasterIntranetSystemException()
+        {
+            var fixture = new Fixture();
+
+            var commandHandler = new MyCommandHandler();
+            Assert.That(commandHandler, Is.Not.Null);
+
+            var result =
+                commandHandler.CreateIntranetSystemExceptionException
+                    <BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(
+                        fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), fixture.CreateAnonymous<Exception>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.TypeOf(typeof(IntranetSystemException)));
+        }
     }
 }
