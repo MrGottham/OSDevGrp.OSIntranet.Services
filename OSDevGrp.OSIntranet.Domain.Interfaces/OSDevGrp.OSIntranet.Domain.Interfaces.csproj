@@ -53,6 +53,7 @@
     <Compile Include="Adressekartotek\IAdresselisteHelper.cs" />
     <Compile Include="Adressekartotek\IBetalingsbetingelselisteHelper.cs" />
     <Compile Include="Finansstyring\IBogføringsadvarsel.cs" />
+    <Compile Include="Finansstyring\IBogføringsresultat.cs" />
     <Compile Include="Finansstyring\IBudgetkontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IKontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />

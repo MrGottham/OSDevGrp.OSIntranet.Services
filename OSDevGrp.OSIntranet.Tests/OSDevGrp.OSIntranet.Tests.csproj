@@ -160,6 +160,7 @@
     <Compile Include="Unittests\Domain\Comparers\AdressekontoSaldoComparerTests.cs" />
     <Compile Include="Unittests\Domain\DomainObjectListHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\BogføringsadvarselTests.cs" />
+    <Compile Include="Unittests\Domain\Finansstyring\BogføringsresultatTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\BudgetkontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
