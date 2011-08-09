@@ -63,7 +63,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
         /// Tester, at konstruktøren danner advarsel ved overtræk på kontoen.
         /// </summary>
         [Test]
-        public void TestAtConstructorDannerBogføringsadvarselVedOvertrækPåKontoen()
+        public void TestAtConstructorDannerBogføringsadvarselVedOvertrækPåKonto()
         {
             var fixture = new Fixture();
             fixture.Inject(DateTime.Now);
@@ -98,6 +98,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
             Assert.That(bogføringsadvarsel.Konto, Is.Not.Null);
             Assert.That(bogføringsadvarsel.Konto, Is.EqualTo(konto));
             Assert.That(bogføringsadvarsel.Beløb, Is.EqualTo(3000M));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren danner advarsel ved overtræk på budgetkontoen.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorDannerBogføringsadvarselVedOvertrækPåBudgetkonto()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(DateTime.Now);
+
+            var konto = fixture.CreateAnonymous<Konto>();
+            Assert.That(konto, Is.Not.Null);
+            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.CreateAnonymous<DateTime>().Year,
+                                                                fixture.CreateAnonymous<DateTime>().Month, 50000M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                            fixture.CreateAnonymous<DateTime>(),
+                                                            fixture.CreateAnonymous<string>(),
+                                                            fixture.CreateAnonymous<string>(), 0M, 25000M));
+
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            Assert.That(budgetkonto, Is.Not.Null);
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.CreateAnonymous<DateTime>().Year,
+                                                                      fixture.CreateAnonymous<DateTime>().Month, 0M,
+                                                                      3000M));
+
+            var bogføringslinje = new Bogføringslinje(fixture.CreateAnonymous<int>(),
+                                                      fixture.CreateAnonymous<DateTime>(),
+                                                      fixture.CreateAnonymous<string>(),
+                                                      fixture.CreateAnonymous<string>(), 0M, 5000M);
+            Assert.That(bogføringslinje, Is.Not.Null);
+            konto.TilføjBogføringslinje(bogføringslinje);
+            budgetkonto.TilføjBogføringslinje(bogføringslinje);
+
+            var bogføringsresultat = new Bogføringsresultat(bogføringslinje);
+            Assert.That(bogføringsresultat, Is.Not.Null);
+            Assert.That(bogføringsresultat.Bogføringslinje, Is.Not.Null);
+            Assert.That(bogføringsresultat.Bogføringslinje, Is.EqualTo(bogføringslinje));
+            Assert.That(bogføringsresultat.Advarsler, Is.Not.Null);
+            Assert.That(bogføringsresultat.Advarsler, Is.TypeOf(typeof(List<IBogføringsadvarsel>)));
+            Assert.That(bogføringsresultat.Advarsler.Count(), Is.EqualTo(1));
+
+            var bogføringsadvarsel = bogføringsresultat.Advarsler.ElementAt(0);
+            Assert.That(bogføringsadvarsel, Is.Not.Null);
+            Assert.That(bogføringsadvarsel.Advarsel, Is.Not.Null);
+            Assert.That(bogføringsadvarsel.Konto, Is.Not.Null);
+            Assert.That(bogføringsadvarsel.Konto, Is.EqualTo(budgetkonto));
+            Assert.That(bogføringsadvarsel.Beløb, Is.EqualTo(2000M));
         }
     }
 }
