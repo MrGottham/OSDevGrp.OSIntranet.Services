@@ -19,6 +19,8 @@ namespace OSDevGrp.OSIntranet.Domain.Finansstyring
 
         #endregion
 
+        #region Constructor
+
         /// <summary>
         /// Danner et bogføringsresultat for en bogføringslinje.
         /// </summary>
@@ -44,7 +46,21 @@ namespace OSDevGrp.OSIntranet.Domain.Finansstyring
                                    Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn),
                                    _bogføringslinje.Konto, Math.Abs(_bogføringslinje.Konto.DisponibelPrStatusdato)));
             }
+            if (_bogføringslinje.Budgetkonto == null)
+            {
+                return;
+            }
+            _bogføringslinje.Budgetkonto.Calculate(_bogføringslinje.Dato, _bogføringslinje.Løbenummer);
+            if (_bogføringslinje.Budgetkonto.BudgetPrStatusdato <= 0M && _bogføringslinje.Budgetkonto.DisponibelPrStatusdato <= 0M)
+            {
+                _advarsler.Add(
+                    new Bogføringsadvarsel(Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn),
+                                           _bogføringslinje.Budgetkonto,
+                                           Math.Abs(_bogføringslinje.Budgetkonto.DisponibelPrStatusdato)));
+            }
         }
+
+        #endregion
 
         #region IBogføringsresultat Members
 
