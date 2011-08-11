@@ -7,6 +7,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using AutoMapper;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
 using ObjectMapper = OSDevGrp.OSIntranet.Infrastructure.ObjectMapper;
 
@@ -838,6 +839,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(bogføringslinjeView.Tekst, Is.EqualTo(bogføringslinje.Tekst));
             Assert.That(bogføringslinjeView.Debit, Is.EqualTo(bogføringslinje.Debit));
             Assert.That(bogføringslinjeView.Kredit, Is.EqualTo(bogføringslinje.Kredit));
+        }
+
+        /// <summary>
+        /// Tester, at en bogføringsadvarsel kan mappes til et bogføringsresponse.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringsadvarselKanMappesTilBogføringsadvarselResponse()
+        {
+            var fixture = new Fixture();
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var bogføringsadvarsel = fixture.CreateAnonymous<IBogføringsadvarsel>();
         }
 
         /// <summary>

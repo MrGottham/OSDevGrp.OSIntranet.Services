@@ -4,7 +4,9 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
 using IObjectMapper = OSDevGrp.OSIntranet.Infrastructure.Interfaces.IObjectMapper;
@@ -373,6 +375,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Tekst, opt => opt.MapFrom(s => s.Tekst))
                 .ForMember(x => x.Debit, opt => opt.MapFrom(s => s.Debit))
                 .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.Kredit));
+
+            Mapper.CreateMap<IBogføringsadvarsel, BogføringsadvarselResponse>()
+                .ForMember(x => x.Advarsel, opt => opt.MapFrom(s => s.Advarsel))
+                .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Konto))
+                .ForMember(x => x.Beløb, opt => opt.MapFrom(s => s.Beløb));
 
             Mapper.CreateMap<Kontogruppe, KontogruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
