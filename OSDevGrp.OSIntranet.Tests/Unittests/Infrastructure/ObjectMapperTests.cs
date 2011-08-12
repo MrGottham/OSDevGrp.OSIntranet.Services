@@ -4,10 +4,13 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Enums;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using AutoMapper;
 using NUnit.Framework;
-using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
 using Ploeh.AutoFixture;
 using ObjectMapper = OSDevGrp.OSIntranet.Infrastructure.ObjectMapper;
 
@@ -32,6 +35,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             /// <param name="adressegruppe">Adressegruppe.</param>
             public OtherAddress(int nummer, string navn, Adressegruppe adressegruppe)
                 : base(nummer, navn, adressegruppe)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Kontoklasse, der kan benyttes til test.
+        /// </summary>
+        private class OtherKonto : KontoBase
+        {
+            /// <summary>
+            /// Konstruerer kontoklasse, der kan benyttes til test.
+            /// </summary>
+            /// <param name="regnskab">Regnskab.</param>
+            /// <param name="kontonummer">Kontonummer.</param>
+            /// <param name="kontonavn">Kontonavn.</param>
+            public OtherKonto(Regnskab regnskab, string kontonummer, string kontonavn)
+                : base(regnskab, kontonummer, kontonavn)
             {
             }
         }
@@ -560,6 +580,89 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en konto castet til en basiskonto kan mappes til et basiskontoview.
+        /// </summary>
+        [Test]
+        public void TestAtKontoBaseForKontoKanMappesTilKontoBaseView()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<KontoBase>(fixture.CreateAnonymous<Konto>());
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var kontoBase = fixture.CreateAnonymous<KontoBase>();
+            Assert.That(kontoBase, Is.Not.Null);
+            kontoBase.SætBeskrivelse(fixture.CreateAnonymous<string>());
+            kontoBase.SætNote(fixture.CreateAnonymous<string>());
+
+            var kontoBaseView = objectMapper.Map<KontoBase, KontoBaseView>(kontoBase);
+            Assert.That(kontoBaseView, Is.Not.Null);
+            Assert.That(kontoBaseView.Regnskab, Is.Not.Null);
+            Assert.That(kontoBaseView.Kontonummer, Is.Not.Null);
+            Assert.That(kontoBaseView.Kontonummer, Is.EqualTo(kontoBase.Kontonummer));
+            Assert.That(kontoBaseView.Kontonavn, Is.Not.Null);
+            Assert.That(kontoBaseView.Kontonavn, Is.EqualTo(kontoBase.Kontonavn));
+            Assert.That(kontoBaseView.Beskrivelse, Is.Not.Null);
+            Assert.That(kontoBaseView.Beskrivelse, Is.EqualTo(kontoBase.Beskrivelse));
+            Assert.That(kontoBaseView.Notat, Is.Not.Null);
+            Assert.That(kontoBaseView.Notat, Is.EqualTo(kontoBase.Note));
+        }
+
+        /// <summary>
+        /// Tester, at en budgetkonto castet til en basiskonto kan mappes til et basiskontoview.
+        /// </summary>
+        [Test]
+        public void TestAtKontoBaseForBudgetkontoKanMappesTilKontoBaseView()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<KontoBase>(fixture.CreateAnonymous<Budgetkonto>());
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var kontoBase = fixture.CreateAnonymous<KontoBase>();
+            Assert.That(kontoBase, Is.Not.Null);
+            kontoBase.SætBeskrivelse(fixture.CreateAnonymous<string>());
+            kontoBase.SætNote(fixture.CreateAnonymous<string>());
+
+            var kontoBaseView = objectMapper.Map<KontoBase, KontoBaseView>(kontoBase);
+            Assert.That(kontoBaseView, Is.Not.Null);
+            Assert.That(kontoBaseView.Regnskab, Is.Not.Null);
+            Assert.That(kontoBaseView.Kontonummer, Is.Not.Null);
+            Assert.That(kontoBaseView.Kontonummer, Is.EqualTo(kontoBase.Kontonummer));
+            Assert.That(kontoBaseView.Kontonavn, Is.Not.Null);
+            Assert.That(kontoBaseView.Kontonavn, Is.EqualTo(kontoBase.Kontonavn));
+            Assert.That(kontoBaseView.Beskrivelse, Is.Not.Null);
+            Assert.That(kontoBaseView.Beskrivelse, Is.EqualTo(kontoBase.Beskrivelse));
+            Assert.That(kontoBaseView.Notat, Is.Not.Null);
+            Assert.That(kontoBaseView.Notat, Is.EqualTo(kontoBase.Note));
+        }
+
+        /// <summary>
+        /// Tester, at Map kaster en IntranetSystemException, hvis basiskontoen ikke kan mappes til et basiskontoview.
+        /// </summary>
+        [Test]
+        public void TestAtMapKasterIntranetSystemExceptionHvisKontoBaseIkkeKanMappesTilKontoBaseView()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<KontoBase>(fixture.CreateAnonymous<OtherKonto>());
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var kontoBase = new OtherKonto(fixture.CreateAnonymous<Regnskab>(), fixture.CreateAnonymous<string>(),
+                                           fixture.CreateAnonymous<string>());
+            Assert.That(kontoBase, Is.Not.Null);
+            kontoBase.SætBeskrivelse(fixture.CreateAnonymous<string>());
+            kontoBase.SætNote(fixture.CreateAnonymous<string>());
+
+            Assert.That(
+                Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<KontoBase, KontoBaseView>(kontoBase)).
+                    InnerException, Is.TypeOf(typeof (IntranetSystemException)));
+        }
+
+        /// <summary>
         /// Tester, at en konto kan mappes til et kontoplanview.
         /// </summary>
         [Test]
@@ -842,17 +945,81 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en bogføringsresultat kan mappes til et bogføringslinjeopretresponse.
+        /// </summary>
+        [Test]
+        public void TestAtBogføringsresultatKanMappesTilBogføringslinjeOpretResponse()
+        {
+            var fixture = new Fixture();
+            
+            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            Assert.That(regnskab, Is.Not.Null);
+            fixture.Inject(regnskab);
+            
+            var konto = fixture.CreateAnonymous<Konto>();
+            Assert.That(konto, Is.Not.Null);
+            fixture.Inject(konto);
+            
+            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            Assert.That(budgetkonto, Is.Not.Null);
+            fixture.Inject(budgetkonto);
+
+            var adressekonto = fixture.CreateAnonymous<Person>();
+            Assert.That(adressekonto, Is.Not.Null);
+            fixture.Inject(adressekonto);
+            
+            var bogføringslinje = fixture.CreateAnonymous<Bogføringslinje>();
+            Assert.That(bogføringslinje, Is.Not.Null);
+            konto.TilføjBogføringslinje(bogføringslinje);
+            budgetkonto.TilføjBogføringslinje(bogføringslinje);
+            adressekonto.TilføjBogføringslinje(bogføringslinje);
+            fixture.Inject(bogføringslinje);
+
+            fixture.Inject<IBogføringsresultat>(fixture.CreateAnonymous<Bogføringsresultat>());
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var bogføringsresultat = fixture.CreateAnonymous<Bogføringsresultat>();
+            Assert.That(bogføringsresultat, Is.Not.Null);
+
+            var bogføringslinjeOpretResponse = objectMapper.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(bogføringsresultat);
+            Assert.That(bogføringslinjeOpretResponse, Is.Not.Null);
+            Assert.That(bogføringslinjeOpretResponse.Løbenr, Is.EqualTo(bogføringslinje.Løbenummer));
+            Assert.That(bogføringslinjeOpretResponse.Konto, Is.Not.Null);
+            Assert.That(bogføringslinjeOpretResponse.Budgetkonto, Is.Not.Null);
+            Assert.That(bogføringslinjeOpretResponse.Adressekonto, Is.Not.Null);
+            Assert.That(bogføringslinjeOpretResponse.Dato, Is.EqualTo(bogføringslinje.Dato));
+            Assert.That(bogføringslinjeOpretResponse.Bilag, Is.EqualTo(bogføringslinje.Bilag));
+            Assert.That(bogføringslinjeOpretResponse.Tekst, Is.Not.Null);
+            Assert.That(bogføringslinjeOpretResponse.Tekst, Is.EqualTo(bogføringslinje.Tekst));
+            Assert.That(bogføringslinjeOpretResponse.Debit, Is.EqualTo(bogføringslinje.Debit));
+            Assert.That(bogføringslinjeOpretResponse.Kredit, Is.EqualTo(bogføringslinje.Kredit));
+            Assert.That(bogføringslinjeOpretResponse.Advarsler, Is.Not.Null);
+        }
+
+        /// <summary>
         /// Tester, at en bogføringsadvarsel kan mappes til et bogføringsresponse.
         /// </summary>
         [Test]
         public void TestAtBogføringsadvarselKanMappesTilBogføringsadvarselResponse()
         {
             var fixture = new Fixture();
+            fixture.Inject<KontoBase>(fixture.CreateAnonymous<Konto>());
+            fixture.Inject<IBogføringsadvarsel>(fixture.CreateAnonymous<Bogføringsadvarsel>());
 
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
             var bogføringsadvarsel = fixture.CreateAnonymous<IBogføringsadvarsel>();
+            Assert.That(bogføringsadvarsel, Is.Not.Null);
+
+            var bogføringsadvarselReponse = objectMapper.Map<IBogføringsadvarsel, BogføringsadvarselResponse>(bogføringsadvarsel);
+            Assert.That(bogføringsadvarselReponse, Is.Not.Null);
+            Assert.That(bogføringsadvarselReponse.Advarsel, Is.Not.Null);
+            Assert.That(bogføringsadvarselReponse.Advarsel, Is.EqualTo(bogføringsadvarsel.Advarsel));
+            Assert.That(bogføringsadvarselReponse.Konto, Is.Not.Null);
+            Assert.That(bogføringsadvarselReponse.Beløb, Is.EqualTo(bogføringsadvarsel.Beløb));
         }
 
         /// <summary>

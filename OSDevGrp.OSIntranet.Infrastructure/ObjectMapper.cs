@@ -300,6 +300,22 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
                 .ForMember(x => x.Brevhoved, opt => opt.MapFrom(s => s.Brevhoved));
 
+            Mapper.CreateMap<KontoBase, KontoBaseView>()
+                .ConvertUsing(s =>
+                                  {
+                                      var objectMapper = new ObjectMapper();
+                                      if (s is Konto)
+                                      {
+                                          return objectMapper.Map<Konto, KontoView>(s as Konto);
+                                      }
+                                      if (s is Budgetkonto)
+                                      {
+                                          return objectMapper.Map<Budgetkonto, BudgetkontoView>(s as Budgetkonto);
+                                      }
+                                      throw new IntranetSystemException(
+                                          Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                                  });
+
             Mapper.CreateMap<Konto, KontoplanView>()
                 .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
                 .ForMember(x => x.Kontonummer, opt => opt.MapFrom(s => s.Kontonummer))
@@ -375,6 +391,26 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Tekst, opt => opt.MapFrom(s => s.Tekst))
                 .ForMember(x => x.Debit, opt => opt.MapFrom(s => s.Debit))
                 .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.Kredit));
+
+            Mapper.CreateMap<IBogføringsresultat, BogføringslinjeOpretResponse>()
+                .ForMember(x => x.Løbenr, opt => opt.MapFrom(s => s.Bogføringslinje.Løbenummer))
+                .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Bogføringslinje.Konto))
+                .ForMember(x => x.Budgetkonto, opt =>
+                                                   {
+                                                       opt.Condition(s => s.Bogføringslinje.Budgetkonto != null);
+                                                       opt.MapFrom(s => s.Bogføringslinje.Budgetkonto);
+                                                   })
+                .ForMember(x => x.Adressekonto, opt =>
+                                                    {
+                                                        opt.Condition(s => s.Bogføringslinje.Adresse != null);
+                                                        opt.MapFrom(s => s.Bogføringslinje.Adresse);
+                                                    })
+                .ForMember(x => x.Dato, opt => opt.MapFrom(s => s.Bogføringslinje.Dato))
+                .ForMember(x => x.Bilag, opt => opt.MapFrom(s => s.Bogføringslinje.Bilag))
+                .ForMember(x => x.Tekst, opt => opt.MapFrom(s => s.Bogføringslinje.Tekst))
+                .ForMember(x => x.Debit, opt => opt.MapFrom(s => s.Bogføringslinje.Debit))
+                .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.Bogføringslinje.Kredit))
+                .ForMember(x => x.Advarsler, opt => opt.MapFrom(s => s.Advarsler));
 
             Mapper.CreateMap<IBogføringsadvarsel, BogføringsadvarselResponse>()
                 .ForMember(x => x.Advarsel, opt => opt.MapFrom(s => s.Advarsel))
