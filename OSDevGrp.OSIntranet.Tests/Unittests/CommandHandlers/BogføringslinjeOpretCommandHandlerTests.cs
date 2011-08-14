@@ -6,6 +6,8 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
@@ -105,6 +107,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode)
                 .Return(30);
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            fixture.Inject(fixture.CreateMany<BogføringsadvarselResponse>(3));
+            objectMapper.Expect(
+                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull))
+                .Return(fixture.CreateAnonymous<BogføringslinjeOpretResponse>());
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(adresseRepository);
@@ -141,6 +147,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                                      Arg<decimal>.Is.Equal(command.Debit),
                                      Arg<decimal>.Is.Equal(command.Kredit),
                                      Arg<AdresseBase>.Is.Null));
+            objectMapper.AssertWasCalled(
+                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull));
         }
 
         /// <summary>
@@ -206,6 +214,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             konfigurationRepository.Expect(m => m.DageForBogføringsperiode)
                 .Return(30);
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            fixture.Inject(fixture.CreateMany<BogføringsadvarselResponse>(3));
+            objectMapper.Expect(
+                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull))
+                .Return(fixture.CreateAnonymous<BogføringslinjeOpretResponse>());
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(adresseRepository);
@@ -243,99 +255,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                                      Arg<decimal>.Is.Equal(command.Debit),
                                      Arg<decimal>.Is.Equal(command.Kredit),
                                      Arg<AdresseBase>.Is.NotNull));
-        }
-
-        /// <summary>
-        /// Tester, at Execute returnerer advarsel ved overtrækkelse af konto.
-        /// </summary>
-        [Test]
-        public void TestAtExecuteReturnerAdvarselVedOvertrækkelseAfKonto()
-        {
-            var fixture = new Fixture();
-
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-
-            fixture.Inject(finansstyringRepository);
-            fixture.Inject(adresseRepository);
-            fixture.Inject(fællesRepository);
-            fixture.Inject(konfigurationRepository);
-            fixture.Inject(objectMapper);
-
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
-            Assert.That(commandHandler, Is.Not.Null);
-
-            var command = new BogføringslinjeOpretCommand
-                              {
-                                  Regnskabsnummer = 1,
-                                  Dato = DateTime.Now,
-                                  Kontonummer = "DANKORT",
-                                  Tekst = "Udbetaling",
-                                  Debit = 0M,
-                                  Kredit = 5000M,
-                              };
-            var result = commandHandler.Execute(command);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Advarsler, Is.Not.Null);
-            Assert.That(result.Advarsler.Count(), Is.EqualTo(1));
-
-            var e = result.Advarsler.GetEnumerator();
-            Assert.That(e, Is.Not.Null);
-            Assert.That(e.MoveNext(), Is.True);
-            Assert.That(e.Current.Advarsel, Is.Not.Null);
-            Assert.That(e.Current.Advarsel.Length, Is.GreaterThan(0));
-            Assert.That(e.Current.Konto, Is.Not.Null);
-            Assert.That(e.Current.Beløb, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at Execute returnerer advarsel ved overtrækkelse af budgetkonto.
-        /// </summary>
-        [Test]
-        public void TestAtExecuteReturnerAdvarselVedOvertrækkelseAfBudgetkonto()
-        {
-            var fixture = new Fixture();
-
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var konfigurationRepository = MockRepository.GenerateMock<IKonfigurationRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-
-            fixture.Inject(finansstyringRepository);
-            fixture.Inject(adresseRepository);
-            fixture.Inject(fællesRepository);
-            fixture.Inject(konfigurationRepository);
-            fixture.Inject(objectMapper);
-
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
-            Assert.That(commandHandler, Is.Not.Null);
-
-            var command = new BogføringslinjeOpretCommand
-                              {
-                                  Regnskabsnummer = 1,
-                                  Dato = DateTime.Now,
-                                  Kontonummer = "DANKORT",
-                                  Tekst = "Indkøb",
-                                  Budgetkontonummer = "2000",
-                                  Debit = 0M,
-                                  Kredit = 495M,
-                              };
-            var result = commandHandler.Execute(command);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Advarsler, Is.Not.Null);
-            Assert.That(result.Advarsler.Count(), Is.EqualTo(1));
-
-            var e = result.Advarsler.GetEnumerator();
-            Assert.That(e, Is.Not.Null);
-            Assert.That(e.MoveNext(), Is.True);
-            Assert.That(e.Current.Advarsel, Is.Not.Null);
-            Assert.That(e.Current.Advarsel.Length, Is.GreaterThan(0));
-            Assert.That(e.Current.Konto, Is.Not.Null);
-            Assert.That(e.Current.Beløb, Is.GreaterThan(0));
+            objectMapper.AssertWasCalled(
+                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull));
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
@@ -7,9 +6,10 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
-using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Adressekartotek;
+using OSDevGrp.OSIntranet.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Domain.Fælles;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
@@ -72,33 +72,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             var bogføringslinje = Repository.BogføringslinjeAdd(command.Dato, command.Bilag, konto, command.Tekst,
                                                                 budgetkonto, command.Debit, command.Kredit, adressekonto);
 
-            throw new NotImplementedException();
+            IBogføringsresultat bogføringsresultat = new Bogføringsresultat(bogføringslinje);
 
-
-            /*
-
-
-
-            var bogføringslinje = new Bogføringslinje(int.MaxValue, command.Dato, command.Bilag, command.Tekst,
-                                                      command.Debit, command.Kredit);
-            Repository.BogføringslinjeAdd(bogføringslinje.Dato, bogføringslinje.Bilag, konto, bogføringslinje.Tekst,
-                                          budgetkonto, bogføringslinje.Debit, bogføringslinje.Kredit, adressekonto);
-
-            konto.TilføjBogføringslinje(bogføringslinje);
-            konto.Calculate(bogføringslinje.Dato, bogføringslinje.Løbenummer);
-            if (budgetkonto != null)
-            {
-                budgetkonto.TilføjBogføringslinje(bogføringslinje);
-                budgetkonto.Calculate(bogføringslinje.Dato, bogføringslinje.Løbenummer);
-            }
-            if (adressekonto != null)
-            {
-                adressekonto.TilføjBogføringslinje(bogføringslinje);
-                adressekonto.Calculate(bogføringslinje.Dato, bogføringslinje.Løbenummer);
-            }
-
-            return CreateResponse(konto, budgetkonto);
-            */
+            return ObjectMapper.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(bogføringsresultat);
         }
 
         /// <summary>
@@ -195,45 +171,6 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 return;
             }
             adressekonto = adresselisteHelper.GetById(command.Adressekonto);
-        }
-
-        /// <summary>
-        /// Danner svar for oprettelse af bogføringslinje.
-        /// </summary>
-        /// <param name="konto">Konto.</param>
-        /// <param name="budgetkonto">Budgetkonto.</param>
-        /// <returns>Svar for oprettelse af bogføringslinje.</returns>
-        private BogføringslinjeOpretResponse CreateResponse(Konto konto, Budgetkonto budgetkonto)
-        {
-            var advarsler = new List<BogføringsadvarselResponse>();
-            if (konto.DisponibelPrStatusdato < 0M)
-            {
-                var advarsel = new BogføringsadvarselResponse
-                                   {
-                                       Advarsel = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn),
-                                       Konto = ObjectMapper.Map<Konto, KontoView>(konto),
-                                       Beløb = Math.Abs(konto.DisponibelPrStatusdato)
-                                   };
-                advarsler.Add(advarsel);
-            }
-            if (budgetkonto != null)
-            {
-                if (budgetkonto.BudgetPrStatusdato <= 0M && budgetkonto.DisponibelPrStatusdato < 0M)
-                {
-                    var advarsel = new BogføringsadvarselResponse
-                                       {
-                                           Advarsel = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn),
-                                           Konto = ObjectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto),
-                                           Beløb = Math.Abs(budgetkonto.DisponibelPrStatusdato)
-                                       };
-                    advarsler.Add(advarsel);
-                }
-            }
-            var response = new BogføringslinjeOpretResponse
-                               {
-                                   Advarsler = advarsler
-                               };
-            return response;
         }
     }
 }
