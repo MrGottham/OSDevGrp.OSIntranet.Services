@@ -237,6 +237,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         /// Tester, at bogføringslinjer kan oprettes.
         /// </summary>
         [Test]
+        [Ignore("Oprettelse af bogføringslinjer er testet.")]
         public void TestAtBogføringslinjerKanOprettes()
         {
             var dato = DateTime.Now;
@@ -253,15 +254,16 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
 
             var command = new BogføringslinjeOpretCommand
                               {
-                                  Regnskabsnummer = 1,
+                                  Regnskabsnummer = konto.Regnskab.Nummer,
                                   Dato = dato,
-                                  Kontonummer = "DANKORT",
+                                  Kontonummer = konto.Kontonummer,
                                   Tekst = "Test fra Services",
                                   Budgetkontonummer = "8990",
                                   Debit = 5000M
                               };
             var result = _service.BogføringslinjeOpret(command);
             Assert.That(result, Is.Not.Null);
+            Assert.That(result.Løbenr, Is.GreaterThan(0));
 
             konto = _service.KontoGet(query);
             Assert.That(konto, Is.Not.Null);
@@ -278,6 +280,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                           };
             result = _service.BogføringslinjeOpret(command);
             Assert.That(result, Is.Not.Null);
+            Assert.That(result.Løbenr, Is.GreaterThan(0));
 
             konto = _service.KontoGet(query);
             Assert.That(konto, Is.Not.Null);

@@ -341,6 +341,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         /// Tester, at bogføringslinjer kan oprettes.
         /// </summary>
         [Test]
+        [Ignore("Oprettelse af bogføringslinjer er testet.")]
         public void TestAtBogføringslinjerKanOprettes()
         {
             var client = _channelFactory.CreateChannel<IFinansstyringService>(ClientEndpointName);
@@ -360,15 +361,16 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
 
                 var command = new BogføringslinjeOpretCommand
                                   {
-                                      Regnskabsnummer = 1,
+                                      Regnskabsnummer = konto.Regnskab.Nummer,
                                       Dato = dato,
-                                      Kontonummer = "DANKORT",
+                                      Kontonummer = konto.Kontonummer,
                                       Tekst = "Test fra Services",
                                       Budgetkontonummer = "8990",
                                       Debit = 5000M
                                   };
                 var result = client.BogføringslinjeOpret(command);
                 Assert.That(result, Is.Not.Null);
+                Assert.That(result.Løbenr, Is.GreaterThan(0));
 
                 konto = client.KontoGet(query);
                 Assert.That(konto, Is.Not.Null);
@@ -385,6 +387,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                               };
                 result = client.BogføringslinjeOpret(command);
                 Assert.That(result, Is.Not.Null);
+                Assert.That(result.Løbenr, Is.GreaterThan(0));
 
                 konto = client.KontoGet(query);
                 Assert.That(konto, Is.Not.Null);
