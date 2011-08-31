@@ -30,7 +30,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
                                 Message = exception.Message,
                                 ExceptionMessages = FormatExceptionMessage(exception)
                             };
-            return new FaultException<IntranetRepositoryFault>(fault);
+            return new FaultException<IntranetRepositoryFault>(fault, new FaultReason(exception.Message));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
                                 Message = exception.Message,
                                 ExceptionMessages = FormatExceptionMessage(exception)
                             };
-            return new FaultException<IntranetBusinessFault>(fault);
+            return new FaultException<IntranetBusinessFault>(fault, new FaultReason(exception.Message));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
                                 Message = exception.Message,
                                 ExceptionMessages = FormatExceptionMessage(exception)
                             };
-            return new FaultException<IntranetSystemFault>(fault);
+            return new FaultException<IntranetSystemFault>(fault, new FaultReason(exception.Message));
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
                                 Message = exception.Message,
                                 ExceptionMessages = FormatExceptionMessage(exception)
                             };
-            return new FaultException<IntranetSystemFault>(fault);
+            return new FaultException<IntranetSystemFault>(fault, new FaultReason(exception.Message));
         }
 
         /// <summary>
