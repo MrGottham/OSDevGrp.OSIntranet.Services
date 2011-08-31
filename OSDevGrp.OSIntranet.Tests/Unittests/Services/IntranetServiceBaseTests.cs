@@ -72,6 +72,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var fault = service.GetIntranetRepositoryFault(exception);
             Assert.That(fault, Is.Not.Null);
             Assert.That(fault, Is.TypeOf(typeof(FaultException<IntranetRepositoryFault>)));
+            Assert.That(fault.Reason, Is.Not.Null);
+            Assert.That(fault.Reason, Is.TypeOf(typeof(FaultReason)));
+            Assert.That(fault.Reason.ToString(), Is.EqualTo(exception.Message));
         }
 
         /// <summary>
@@ -98,6 +101,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var fault = service.GetIntranetBusinessFault(exception);
             Assert.That(fault, Is.Not.Null);
             Assert.That(fault, Is.TypeOf(typeof(FaultException<IntranetBusinessFault>)));
+            Assert.That(fault.Reason, Is.Not.Null);
+            Assert.That(fault.Reason, Is.TypeOf(typeof(FaultReason)));
+            Assert.That(fault.Reason.ToString(), Is.EqualTo(exception.Message));
         }
 
         /// <summary>
@@ -124,6 +130,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var fault = service.GetIntranetSystemFault(exception);
             Assert.That(fault, Is.Not.Null);
             Assert.That(fault, Is.TypeOf(typeof(FaultException<IntranetSystemFault>)));
+            Assert.That(fault.Reason, Is.Not.Null);
+            Assert.That(fault.Reason, Is.TypeOf(typeof(FaultReason)));
+            Assert.That(fault.Reason.ToString(), Is.EqualTo(exception.Message));
         }
 
         /// <summary>
@@ -151,6 +160,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var fault = service.GetIntranetSystemFault(exception);
             Assert.That(fault, Is.Not.Null);
             Assert.That(fault, Is.TypeOf(typeof(FaultException<IntranetSystemFault>)));
+            Assert.That(fault.Reason, Is.Not.Null);
+            Assert.That(fault.Reason, Is.TypeOf(typeof(FaultReason)));
+            Assert.That(fault.Reason.ToString(), Is.EqualTo(exception.Message));
         }
 
         /// <summary>
