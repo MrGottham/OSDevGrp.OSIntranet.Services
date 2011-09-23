@@ -116,6 +116,7 @@
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetRepositoryFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\AdressegrupperGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\AdressekontolisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\AdressekontoGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BetalingsbetingelserGetQueryTests.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringsadvarselResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringslinjeOpretResponseTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\AdressegruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontolisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontoViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BetalingsbetingelseViewTests.cs" />
@@ -152,6 +154,7 @@
     <Compile Include="Unittests\Contracts\Views\KreditoplysningerViewTest.cs" />
     <Compile Include="Unittests\Contracts\Views\KreditorlisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KreditorViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\PostnummerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TelefonlisteViewTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\AdressegruppelisteHelperTests.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\AdressegrupperGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BrevhovederGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\AdressekartotekQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontolisteGetQueryHandlerTests.cs" />

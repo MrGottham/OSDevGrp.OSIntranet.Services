@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 
 namespace OSDevGrp.OSIntranet.Services.Implementations
 {
@@ -28,6 +33,70 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
                 throw new ArgumentNullException("queryBus");
             }
             _queryBus = queryBus;
+        }
+
+        #endregion
+
+        #region IAdressekartotekService Members
+
+        /// <summary>
+        /// Henter alle adressegrupper.
+        /// </summary>
+        /// <param name="query">Foresprøgelse efter alle adressegrupper.</param>
+        /// <returns>Liste af adressegrupper.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<AdressegruppeView> AdressegrupperGet(AdressegrupperGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<AdressegrupperGetQuery, IEnumerable<AdressegruppeView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter alle betalingsbetingelser.
+        /// </summary>
+        /// <param name="query">Foresprøgelse efter alle betalingsbetingelser.</param>
+        /// <returns>Liste af betalingsbetingelser.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<BetalingsbetingelseView> BetalingsbetingelserGet(BetalingsbetingelserGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
         }
 
         #endregion

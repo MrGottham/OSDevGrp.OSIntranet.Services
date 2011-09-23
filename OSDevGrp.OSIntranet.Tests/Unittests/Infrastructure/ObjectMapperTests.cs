@@ -537,6 +537,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en adressegruppe kan mappes til et adressegruppeview.
+        /// </summary>
+        [Test]
+        public void TestAtAdressegruppeKanMappesTilAdressegruppeView()
+        {
+            var fixture = new Fixture();
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var adressegruppe = fixture.CreateAnonymous<Adressegruppe>();
+            var adressegruppeView = objectMapper.Map<Adressegruppe, AdressegruppeView>(adressegruppe);
+            Assert.That(adressegruppeView, Is.Not.Null);
+            Assert.That(adressegruppeView.Nummer, Is.EqualTo(adressegruppe.Nummer));
+            Assert.That(adressegruppeView.Navn, Is.Not.Null);
+            Assert.That(adressegruppeView.Navn, Is.EqualTo(adressegruppe.Navn));
+            Assert.That(adressegruppeView.AdressegruppeOswebdb, Is.EqualTo(adressegruppe.AdressegruppeOswebdb));
+        }
+
+        /// <summary>
         /// Tester, at en betalingsbetingelse kan mappes til et betalingsbetingelseview.
         /// </summary>
         [Test]
