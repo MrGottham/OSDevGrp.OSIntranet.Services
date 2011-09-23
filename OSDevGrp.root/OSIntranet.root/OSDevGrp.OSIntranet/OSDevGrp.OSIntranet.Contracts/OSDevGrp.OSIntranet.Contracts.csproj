@@ -79,6 +79,7 @@
     <Compile Include="Services\ICommonService.cs" />
     <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IIntranetService.cs" />
+    <Compile Include="Services\IKalenderService.cs" />
     <Compile Include="SoapNamespaces.cs" />
     <Compile Include="Views\AdressekontolisteView.cs" />
     <Compile Include="Views\AdressekontoView.cs" />

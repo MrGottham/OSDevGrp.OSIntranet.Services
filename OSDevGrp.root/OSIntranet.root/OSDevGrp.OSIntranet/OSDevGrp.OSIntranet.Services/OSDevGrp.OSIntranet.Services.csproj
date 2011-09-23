@@ -84,6 +84,7 @@
     <Compile Include="Implementations\CommonService.cs" />
     <Compile Include="Implementations\FinansstyringService.cs" />
     <Compile Include="Implementations\IntranetServiceBase.cs" />
+    <Compile Include="Implementations\KalenderService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

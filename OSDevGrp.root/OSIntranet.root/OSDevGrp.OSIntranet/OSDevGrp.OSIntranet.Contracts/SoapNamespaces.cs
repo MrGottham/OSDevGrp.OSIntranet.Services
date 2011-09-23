@@ -22,6 +22,11 @@
         public const string FinansstyringServiceName = "FinansstyringService";
 
         /// <summary>
+        /// Navn på service til kaldender.
+        /// </summary>
+        public const string KalenderServiceName = "KalenderService";
+
+        /// <summary>
         /// Navn på service til fælles elementer.
         /// </summary>
         public const string CommonServiceName = "CommonService";

@@ -5,9 +5,9 @@ using OSDevGrp.OSIntranet.Contracts.Services;
 namespace OSDevGrp.OSIntranet.Services.Implementations
 {
     /// <summary>
-    /// Service til fælles elementer.
+    /// Service til kalender.
     /// </summary>
-    public class CommonService : IntranetServiceBase, ICommonService
+    public class KalenderService : IntranetServiceBase, IKalenderService
     {
         #region Private variables
 
@@ -18,10 +18,10 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Constructor
 
         /// <summary>
-        /// Danner service til fælles elementer.
+        /// Danner service til kalender.
         /// </summary>
         /// <param name="queryBus">Implementering af en QueryBus.</param>
-        public CommonService(IQueryBus queryBus)
+        public KalenderService(IQueryBus queryBus)
         {
             if (queryBus == null)
             {
