@@ -198,8 +198,11 @@
     <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
     <Compile Include="Unittests\Resources\ResourceTests.cs" />
+    <Compile Include="Unittests\Services\AdressekartotekServiceTests.cs" />
+    <Compile Include="Unittests\Services\CommonServiceTests.cs" />
     <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />
     <Compile Include="Unittests\Services\IntranetServiceBaseTests.cs" />
+    <Compile Include="Unittests\Services\KalenderServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
