@@ -291,6 +291,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                                            })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
+            Mapper.CreateMap<Adressegruppe, AdressegruppeView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.AdressegruppeOswebdb, opt => opt.MapFrom(s => s.AdressegruppeOswebdb));
+
             Mapper.CreateMap<Betalingsbetingelse, BetalingsbetingelseView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));

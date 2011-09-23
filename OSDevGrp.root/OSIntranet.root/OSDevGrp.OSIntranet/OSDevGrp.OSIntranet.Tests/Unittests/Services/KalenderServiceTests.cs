@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ServiceModel;
+using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Services.Implementations;
 using NUnit.Framework;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 {
@@ -29,6 +31,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             {
                 ChannelTools.CloseChannel(host);
             }
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis QueryBus er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisQueryBusErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Inject<IQueryBus>(null);
+            Assert.Throws<ArgumentNullException>(() => new KalenderService(fixture.CreateAnonymous<IQueryBus>()));
         }
     }
 }

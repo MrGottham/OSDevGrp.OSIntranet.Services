@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\BogføringslinjeOpretCommand.cs" />
+    <Compile Include="Queries\AdressegrupperGetQuery.cs" />
     <Compile Include="Queries\BetalingsbetingelserGetQuery.cs" />
     <Compile Include="Faults\IntranetBusinessFault.cs" />
     <Compile Include="Faults\IntranetSystemFault.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="Services\IKalenderService.cs" />
     <Compile Include="SoapNamespaces.cs" />
+    <Compile Include="Views\AdressegruppeView.cs" />
     <Compile Include="Views\AdressekontolisteView.cs" />
     <Compile Include="Views\AdressekontoView.cs" />
     <Compile Include="Views\BetalingsbetingelseView.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Views\KreditorlisteView.cs" />
     <Compile Include="Views\KreditorView.cs" />
     <Compile Include="Views\MånedsoplysningerView.cs" />
+    <Compile Include="Views\PostnummerView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\SaldoBaseView.cs" />
     <Compile Include="Views\SaldolisteBaseView.cs" />
