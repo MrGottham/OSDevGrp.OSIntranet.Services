@@ -75,6 +75,8 @@
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Responses\BogføringsadvarselResponse.cs" />
     <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
+    <Compile Include="Services\IAdressekartotekService.cs" />
+    <Compile Include="Services\ICommonService.cs" />
     <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="SoapNamespaces.cs" />
