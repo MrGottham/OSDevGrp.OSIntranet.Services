@@ -195,6 +195,7 @@
     <Compile Include="Unittests\QueryHandlers\KreditorGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KreditorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\QueryHandlerBaseTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\PostnumreGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
