@@ -291,6 +291,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                                            })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
+            Mapper.CreateMap<Postnummer, PostnummerView>()
+                .ForMember(x => x.Landekode, opt => opt.MapFrom(s => s.Landekode))
+                .ForMember(x => x.Postnummer, opt => opt.MapFrom(s => s.Postnr))
+                .ForMember(x => x.Bynavn, opt => opt.MapFrom(s => s.By));
+
             Mapper.CreateMap<Adressegruppe, AdressegruppeView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
