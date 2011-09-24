@@ -72,6 +72,7 @@
     <Compile Include="KontoplanGetQueryHandler.cs" />
     <Compile Include="KreditorGetQueryHandler.cs" />
     <Compile Include="KreditorlisteGetQueryHandler.cs" />
+    <Compile Include="PostnumreGetQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\QueryHandlerBase.cs" />
     <Compile Include="RegnskabslisteGetQueryHandler.cs" />
