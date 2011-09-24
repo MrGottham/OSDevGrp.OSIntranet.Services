@@ -73,6 +73,7 @@
     <Compile Include="Queries\KontoplanGetQuery.cs" />
     <Compile Include="Queries\KreditorGetQuery.cs" />
     <Compile Include="Queries\KreditorlisteGetQuery.cs" />
+    <Compile Include="Queries\PostnumreGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Responses\BogføringsadvarselResponse.cs" />
     <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />

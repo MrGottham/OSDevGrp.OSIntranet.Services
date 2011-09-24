@@ -537,6 +537,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at et postnummer kan mappes til et postnummerview.
+        /// </summary>
+        [Test]
+        public void TestAtPostnummerKanMappesTilPostnummerView()
+        {
+            var fixture = new Fixture();
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var postnummer = fixture.CreateAnonymous<Postnummer>();
+            var postnummerView = objectMapper.Map<Postnummer, PostnummerView>(postnummer);
+            Assert.That(postnummerView, Is.Not.Null);
+            Assert.That(postnummerView.Landekode, Is.Not.Null);
+            Assert.That(postnummerView.Landekode, Is.EqualTo(postnummer.Landekode));
+            Assert.That(postnummerView.Postnummer, Is.Not.Null);
+            Assert.That(postnummerView.Postnummer, Is.EqualTo(postnummer.Postnr));
+            Assert.That(postnummerView.Bynavn, Is.Not.Null);
+            Assert.That(postnummerView.Bynavn, Is.EqualTo(postnummer.By));
+        }
+
+        /// <summary>
         /// Tester, at en adressegruppe kan mappes til et adressegruppeview.
         /// </summary>
         [Test]
