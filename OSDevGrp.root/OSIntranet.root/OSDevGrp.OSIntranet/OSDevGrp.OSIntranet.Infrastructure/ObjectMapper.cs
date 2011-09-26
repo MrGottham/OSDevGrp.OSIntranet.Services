@@ -291,6 +291,68 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                                            })
                 .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
+            Mapper.CreateMap<Person, PersonView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
+                .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
+                .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
+                .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
+                .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
+                .ForMember(x => x.Fødselsdato, opt =>
+                                                   {
+                                                       opt.Condition(s => s.Fødselsdato != null);
+                                                       opt.MapFrom(s => s.Fødselsdato);
+                                                   })
+                .ForMember(x => x.Adressegruppe, opt =>
+                                                     {
+                                                         opt.Condition(s => s.Adressegruppe != null);
+                                                         opt.MapFrom(s => s.Adressegruppe);
+                                                     })
+                .ForMember(x => x.Bekendtskab, opt => opt.MapFrom(s => s.Bekendtskab))
+                .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
+                .ForMember(x => x.Web, opt => opt.MapFrom(s => s.Webadresse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
+                .ForMember(x => x.Udlånsfrist, opt => opt.MapFrom(s => s.Udlånsfrist))
+                .ForMember(x => x.Firma, opt =>
+                                             {
+                                                 opt.Condition(s => s.Firma != null);
+                                                 opt.MapFrom(s => s.Firma);
+                                             });
+
+            Mapper.CreateMap<Firma, FirmaView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
+                .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
+                .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
+                .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
+                .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
+                .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
+                .ForMember(x => x.Telefax, opt => opt.MapFrom(s => s.Telefax))
+                .ForMember(x => x.Adressegruppe, opt =>
+                                                     {
+                                                         opt.Condition(s => s.Adressegruppe != null);
+                                                         opt.MapFrom(s => s.Adressegruppe);
+                                                     })
+                .ForMember(x => x.Bekendtskab, opt => opt.MapFrom(s => s.Bekendtskab))
+                .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
+                .ForMember(x => x.Web, opt => opt.MapFrom(s => s.Webadresse))
+                .ForMember(x => x.Betalingsbetingelse, opt =>
+                                                           {
+                                                               opt.Condition(s => s.Betalingsbetingelse != null);
+                                                               opt.MapFrom(s => s.Betalingsbetingelse);
+                                                           })
+                .ForMember(x => x.Udlånsfrist, opt => opt.MapFrom(s => s.Udlånsfrist))
+                .ForMember(x => x.Personer, opt =>
+                                                {
+                                                    opt.Condition(s => s.Personer != null);
+                                                    opt.MapFrom(s => s.Personer);
+                                                });
+
             Mapper.CreateMap<Postnummer, PostnummerView>()
                 .ForMember(x => x.Landekode, opt => opt.MapFrom(s => s.Landekode))
                 .ForMember(x => x.Postnummer, opt => opt.MapFrom(s => s.Postnr))
