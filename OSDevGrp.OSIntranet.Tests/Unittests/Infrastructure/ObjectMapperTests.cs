@@ -537,6 +537,114 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tester, at en person kan mappes til et personview.
+        /// </summary>
+        [Test]
+        public void TestAtPersonMappesTilPersonView()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new DateTime(1975, 08, 21));
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var person = fixture.CreateAnonymous<Person>();
+            person.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
+                                         fixture.CreateAnonymous<string>());
+            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
+            person.SætFødselsdato(fixture.CreateAnonymous<DateTime>());
+            person.SætBekendtskab(fixture.CreateAnonymous<string>());
+            person.SætMailadresse(fixture.CreateAnonymous<string>());
+            person.SætWebadresse(fixture.CreateAnonymous<string>());
+            person.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
+            person.SætUdlånsfrist(fixture.CreateAnonymous<int>());
+
+            var firma = fixture.CreateAnonymous<Firma>();
+            firma.TilføjPerson(person);
+            
+            var personView = objectMapper.Map<Person, PersonView>(person);
+            Assert.That(personView, Is.Not.Null);
+            Assert.That(personView.Nummer, Is.EqualTo(person.Nummer));
+            Assert.That(personView.Navn, Is.Not.Null);
+            Assert.That(personView.Navn, Is.EqualTo(person.Navn));
+            Assert.That(personView.Adresse1, Is.Not.Null);
+            Assert.That(personView.Adresse1, Is.EqualTo(person.Adresse1));
+            Assert.That(personView.Adresse2, Is.Not.Null);
+            Assert.That(personView.Adresse2, Is.EqualTo(person.Adresse2));
+            Assert.That(personView.PostnummerBy, Is.Not.Null);
+            Assert.That(personView.PostnummerBy, Is.EqualTo(person.PostnrBy));
+            Assert.That(personView.PrimærTelefon, Is.Not.Null);
+            Assert.That(personView.PrimærTelefon, Is.EqualTo(person.Telefon));
+            Assert.That(personView.SekundærTelefon, Is.Not.Null);
+            Assert.That(personView.SekundærTelefon, Is.EqualTo(person.Mobil));
+            Assert.That(personView.Fødselsdato, Is.Not.Null);
+            Assert.That(personView.Fødselsdato, Is.EqualTo(person.Fødselsdato));
+            Assert.That(personView.Adressegruppe, Is.Not.Null);
+            Assert.That(personView.Bekendtskab, Is.Not.Null);
+            Assert.That(personView.Bekendtskab, Is.EqualTo(person.Bekendtskab));
+            Assert.That(personView.Mailadresse, Is.Not.Null);
+            Assert.That(personView.Mailadresse, Is.EqualTo(person.Mailadresse));
+            Assert.That(personView.Web, Is.Not.Null);
+            Assert.That(personView.Web, Is.EqualTo(person.Webadresse));
+            Assert.That(personView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(personView.Udlånsfrist, Is.EqualTo(personView.Udlånsfrist));
+            Assert.That(personView.Firma, Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Tester, at et firma kan mappes til et firmaview.
+        /// </summary>
+        [Test]
+        public void TestAtFirmaMappesTilFimraView()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new DateTime(1975, 08, 21));
+
+            var objectMapper = new ObjectMapper();
+            Assert.That(objectMapper, Is.Not.Null);
+
+            var firma = fixture.CreateAnonymous<Firma>();
+            firma.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
+                                         fixture.CreateAnonymous<string>());
+            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
+                             fixture.CreateAnonymous<string>());
+            firma.SætBekendtskab(fixture.CreateAnonymous<string>());
+            firma.SætMailadresse(fixture.CreateAnonymous<string>());
+            firma.SætWebadresse(fixture.CreateAnonymous<string>());
+            firma.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
+            firma.SætUdlånsfrist(fixture.CreateAnonymous<int>());
+            firma.TilføjPerson(fixture.CreateAnonymous<Person>());
+
+            var firmaView = objectMapper.Map<Firma, FirmaView>(firma);
+            Assert.That(firmaView, Is.Not.Null);
+            Assert.That(firmaView.Nummer, Is.EqualTo(firma.Nummer));
+            Assert.That(firmaView.Navn, Is.Not.Null);
+            Assert.That(firmaView.Navn, Is.EqualTo(firma.Navn));
+            Assert.That(firmaView.Adresse1, Is.Not.Null);
+            Assert.That(firmaView.Adresse1, Is.EqualTo(firma.Adresse1));
+            Assert.That(firmaView.Adresse2, Is.Not.Null);
+            Assert.That(firmaView.Adresse2, Is.EqualTo(firma.Adresse2));
+            Assert.That(firmaView.PostnummerBy, Is.Not.Null);
+            Assert.That(firmaView.PostnummerBy, Is.EqualTo(firma.PostnrBy));
+            Assert.That(firmaView.PrimærTelefon, Is.Not.Null);
+            Assert.That(firmaView.PrimærTelefon, Is.EqualTo(firma.Telefon1));
+            Assert.That(firmaView.SekundærTelefon, Is.Not.Null);
+            Assert.That(firmaView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
+            Assert.That(firmaView.Telefax, Is.Not.Null);
+            Assert.That(firmaView.Telefax, Is.EqualTo(firma.Telefax));
+            Assert.That(firmaView.Adressegruppe, Is.Not.Null);
+            Assert.That(firmaView.Bekendtskab, Is.Not.Null);
+            Assert.That(firmaView.Bekendtskab, Is.EqualTo(firma.Bekendtskab));
+            Assert.That(firmaView.Mailadresse, Is.Not.Null);
+            Assert.That(firmaView.Mailadresse, Is.EqualTo(firma.Mailadresse));
+            Assert.That(firmaView.Web, Is.Not.Null);
+            Assert.That(firmaView.Web, Is.EqualTo(firma.Webadresse));
+            Assert.That(firmaView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(firmaView.Udlånsfrist, Is.EqualTo(firmaView.Udlånsfrist));
+            Assert.That(firmaView.Personer, Is.Not.Null);
+        }
+
+        /// <summary>
         /// Tester, at et postnummer kan mappes til et postnummerview.
         /// </summary>
         [Test]

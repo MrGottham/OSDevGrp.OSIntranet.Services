@@ -13,6 +13,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IAdressekartotekService : IIntranetService
     {
         /// <summary>
+        /// Henter alle postnumre.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter alle postnumre.</param>
+        /// <returns>Liste af postnumre.</returns>
+        [OperationContract]
+        [FaultContract(typeof(IntranetFaultBase))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<PostnummerView> PostnumreGet(PostnumreGetQuery query);
+
+        /// <summary>
         /// Henter alle adressegrupper.
         /// </summary>
         /// <param name="query">Foresprøgelse efter alle adressegrupper.</param>
