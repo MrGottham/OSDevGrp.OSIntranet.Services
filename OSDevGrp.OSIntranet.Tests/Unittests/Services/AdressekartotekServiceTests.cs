@@ -51,6 +51,512 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
+        /// Tester, at TelefonlisteGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtTelefonlisteGetKalderQueryBus()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>());
+
+            queryBus.AssertWasCalled(
+                m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at TelefonlisteGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtTelefonlisteGetKasterIntranetRepositoryFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(
+                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at TelefonlisteGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtTelefonlisteGetKasterIntranetBusinessFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetBusinessFault>>(
+                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at TelefonlisteGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtTelefonlisteGetKasterIntranetSystemFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at TelefonlisteGet kaster en IntranetSystemFault ved unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtTelefonlisteGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<Exception>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonlisteGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtPersonlisteGetKalderQueryBus()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>());
+
+            queryBus.AssertWasCalled(
+                m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at PersonlisteGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtPersonlisteGetKasterIntranetRepositoryFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(
+                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonlisteGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtPersonlisteGetKasterIntranetBusinessFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetBusinessFault>>(
+                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonlisteGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtPersonlisteGetKasterIntranetSystemFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonlisteGet kaster en IntranetSystemFault ved unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtPersonlisteGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(
+                m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<Exception>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtPersonGetKalderQueryBus()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>());
+
+            queryBus.AssertWasCalled(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at PersonGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtPersonGetKasterIntranetRepositoryFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(
+                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtPersonGetKasterIntranetBusinessFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetBusinessFault>>(
+                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtPersonGetKasterIntranetSystemFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at PersonGet kaster en IntranetSystemFault ved unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtPersonGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<Exception>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmalisteGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtFirmalisteGetKalderQueryBus()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>());
+
+            queryBus.AssertWasCalled(
+                m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at FirmalisteGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtFirmalisteGetKasterIntranetRepositoryFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(
+                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmalisteGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtFirmalisteGetKasterIntranetBusinessFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetBusinessFault>>(
+                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmalisteGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtFirmalisteGetKasterIntranetSystemFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmalisteGet kaster en IntranetSystemFault ved unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtFirmalisteGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<Exception>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmaGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtFirmaGetKalderQueryBus()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>());
+
+            queryBus.AssertWasCalled(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at FirmaGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtFirmaGetKasterIntranetRepositoryFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(
+                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmaGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtFirmaGetKasterIntranetBusinessFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetBusinessFault>>(
+                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmaGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtFirmaGetKasterIntranetSystemFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at FirmaGet kaster en IntranetSystemFault ved unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtFirmaGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<Exception>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+        }
+
+        /// <summary>
         /// Tester, at PostnumreGet kalder QueryBus.
         /// </summary>
         [Test]
