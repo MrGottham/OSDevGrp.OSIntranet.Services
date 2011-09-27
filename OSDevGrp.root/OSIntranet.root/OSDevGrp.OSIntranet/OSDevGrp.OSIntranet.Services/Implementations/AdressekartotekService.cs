@@ -40,6 +40,156 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region IAdressekartotekService Members
 
         /// <summary>
+        /// Henter en telefonliste.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en telefonliste.</param>
+        /// <returns>Telefonliste.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<TelefonlisteView> TelefonlisteGet(TelefonlisteGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en liste af personer.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af personer.</param>
+        /// <returns>Liste af personer.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<PersonView> PersonlisteGet(PersonlisteGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en given person.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en given person.</param>
+        /// <returns>Person.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public PersonView PersonGet(PersonGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<PersonGetQuery, PersonView>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en liste af firmaer.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter en liste af firmaer.</param>
+        /// <returns>Liste af firmaer.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<FirmaView> FirmalisteGet(FirmalisteGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter et givent firma.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter et givent firma.</param>
+        /// <returns>Firma.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public FirmaView FirmaGet(FirmaGetQuery query)
+        {
+            try
+            {
+                return _queryBus.Query<FirmaGetQuery, FirmaView>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+        }
+
+        /// <summary>
         /// Henter alle postnumre.
         /// </summary>
         /// <param name="query">Forespørgelse efter alle postnumre.</param>
