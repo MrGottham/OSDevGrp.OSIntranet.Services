@@ -58,6 +58,10 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
             }
             set
             {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentNullException("value");
+                }
                 _titel = value;
             }
         }
