@@ -1,8 +1,6 @@
 ﻿using System;
-using OSDevGrp.OSIntranet.Domain.Fælles;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
-using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
 {
@@ -48,6 +46,51 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
             var fixture = new Fixture();
             var nummer = fixture.CreateAnonymous<int>();
             Assert.Throws<ArgumentNullException>(() => new OSIntranet.Domain.Fælles.System(nummer, string.Empty));
+        }
+
+        /// <summary>
+        /// Tester, at Titel kan ændres.
+        /// </summary>
+        [Test]
+        public void TestAtTitelKanÆndres()
+        {
+            var fixture = new Fixture();
+
+            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            Assert.That(system, Is.Not.Null);
+
+            var titel = fixture.CreateAnonymous<string>();
+            system.Titel = titel;
+            Assert.That(system.Titel, Is.Not.Null);
+            Assert.That(system.Titel, Is.EqualTo(titel));
+        }
+
+        /// <summary>
+        /// Tester, at Titel kaster en ArgumentNullException, hvis værdien er null.
+        /// </summary>
+        [Test]
+        public void TestAtTitelKasterArgumentNullExceptionHvisValueErNull()
+        {
+            var fixture = new Fixture();
+
+            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            Assert.That(system, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => system.Titel = null);
+        }
+
+        /// <summary>
+        /// Tester, at Titel kaster en ArgumentNullException, hvis værdien er tom.
+        /// </summary>
+        [Test]
+        public void TestAtTitelKasterArgumentNullExceptionHvisValueErEmpty()
+        {
+            var fixture = new Fixture();
+
+            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            Assert.That(system, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => system.Titel = string.Empty);
         }
     }
 }

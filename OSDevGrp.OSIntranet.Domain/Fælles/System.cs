@@ -1,4 +1,5 @@
-﻿using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+﻿using System;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 
 namespace OSDevGrp.OSIntranet.Domain.Fælles
 {
@@ -14,6 +15,8 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
 
         #endregion
 
+        #region Constructor
+
         /// <summary>
         /// Danner system under OSWEBDB.
         /// </summary>
@@ -21,9 +24,15 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
         /// <param name="titel">Titel på systemet.</param>
         public System(int nummer, string titel)
         {
+            if (string.IsNullOrEmpty(titel))
+            {
+                throw new ArgumentNullException("titel");
+            }
             _nummer = nummer;
             _titel = titel;
         }
+
+        #endregion
 
         #region Properties
 
@@ -49,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
             }
             set
             {
-                throw new global::System.NotImplementedException();
+                _titel = value;
             }
         }
 

@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at container konfiguraiton kan indlæses og typer kan resolves.
         /// </summary>
         [Test]
-        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof(IContainer), typeof(IDomainObjectBuilder), typeof(IObjectMapper), typeof(ICommandBus), typeof(IQueryBus), typeof(IAdresseRepository), typeof(IFinansstyringRepository), typeof(IFællesRepository), typeof(IKonfigurationRepository), typeof(IFinansstyringService))] Type type)
+        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof(IContainer), typeof(IDomainObjectBuilder), typeof(IObjectMapper), typeof(ICommandBus), typeof(IQueryBus), typeof(IAdresseRepository), typeof(IFinansstyringRepository), typeof(IFællesRepository), typeof(IKonfigurationRepository), typeof(IAdressekartotekService), typeof(IFinansstyringService), typeof(ICommonService), typeof(IKalenderService))] Type type)
         {
             var resolvedType = _container.Resolve(type);
             Assert.That(resolvedType, Is.Not.Null);
