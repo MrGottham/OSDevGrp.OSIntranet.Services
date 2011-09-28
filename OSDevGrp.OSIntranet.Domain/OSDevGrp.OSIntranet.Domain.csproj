@@ -60,6 +60,7 @@
     <Compile Include="Finansstyring\KontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\RegnskabslisteHelper.cs" />
     <Compile Include="Fælles\BrevhovedlisteHelper.cs" />
+    <Compile Include="Fælles\System.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

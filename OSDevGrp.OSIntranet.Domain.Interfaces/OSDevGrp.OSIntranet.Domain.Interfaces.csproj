@@ -58,6 +58,7 @@
     <Compile Include="Finansstyring\IKontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />
     <Compile Include="Fælles\IBrevhovedlisteHelper.cs" />
+    <Compile Include="Fælles\ISystem.cs" />
     <Compile Include="IDomainObjectListHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
