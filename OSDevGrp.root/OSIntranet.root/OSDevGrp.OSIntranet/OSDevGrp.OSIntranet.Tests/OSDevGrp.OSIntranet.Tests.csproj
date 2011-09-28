@@ -180,6 +180,7 @@
     <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\BrevhovedlisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\Fælles\SystemTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetBusinessExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
