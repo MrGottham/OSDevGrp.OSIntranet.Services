@@ -60,6 +60,8 @@
     <Compile Include="Fælles\IBrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\ISystem.cs" />
     <Compile Include="IDomainObjectListHelper.cs" />
+    <Compile Include="Kalender\IAftale.cs" />
+    <Compile Include="Kalender\IBruger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
