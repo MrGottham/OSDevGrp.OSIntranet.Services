@@ -18,7 +18,7 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
         #region Constructor
 
         /// <summary>
-        /// Danner system under OSWEBDB.
+        /// Danner et system under OSWEBDB.
         /// </summary>
         /// <param name="nummer">Unik identifikation af systemet.</param>
         /// <param name="titel">Titel på systemet.</param>
