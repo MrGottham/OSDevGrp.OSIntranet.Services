@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         }
 
         /// <summary>
-        /// Tester, at GetById kaster en IntranetRepositoryException, hvis gruppen til brevhovedet ikke findes.
+        /// Tester, at GetById kaster en IntranetRepositoryException, hvis brevhovedet ikke findes.
         /// </summary>
         [Test]
         public void TestAtGetByIdKasterIntranetRepositoryExceptionHvisBrevhovedetIkkeFindes()

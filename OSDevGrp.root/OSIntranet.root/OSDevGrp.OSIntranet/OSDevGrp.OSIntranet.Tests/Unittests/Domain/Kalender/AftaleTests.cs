@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using NUnit.Framework;
@@ -45,6 +47,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             Assert.That(aftale.Emne, Is.Not.Null);
             Assert.That(aftale.Emne, Is.EqualTo(emne));
             Assert.That(aftale.Notat, Is.Null);
+            Assert.That(aftale.Deltagere, Is.Not.Null);
+            Assert.That(aftale.Deltagere.Count(), Is.EqualTo(0));
             Assert.That(aftale.Properties, Is.EqualTo(0));
             Assert.That(aftale.Offentligtgørelse, Is.False);
             Assert.That(aftale.Privat, Is.False);
@@ -389,16 +393,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         }
 
         /// <summary>
-        /// Tester, at Offentligtgørelse kan ændres.
+        /// Tester, at TilføjDeltager tilføjer en deltager.
         /// </summary>
         [Test]
-        public void TestAtOffentligtgørelseÆndres()
+        public void TestAtTilføjDeltagerTilføjerEnDeltager()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<ISystem>());
+            var system = MockRepository.GenerateMock<ISystem>();
+            system.Expect(m => m.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(system);
+            var bruger = MockRepository.GenerateMock<IBruger>();
+            bruger.Expect(m => m.System.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            bruger.Expect(m => m.Id)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(bruger);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
                                       fixture.CreateAnonymous<DateTime>().AddMinutes(15),
                                       fixture.CreateAnonymous<string>()));
 
@@ -406,18 +421,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var aftale = fixture.CreateAnonymous<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            aftale.Offentligtgørelse = true;
-            Assert.That(aftale.Offentligtgørelse, Is.True);
-
-            aftale.Offentligtgørelse = false;
-            Assert.That(aftale.Offentligtgørelse, Is.False);
+            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<Aftale>(),
+                                            fixture.CreateAnonymous<IBruger>());
+            aftale.TilføjDeltager(deltager);
+            Assert.That(aftale.Deltagere, Is.Not.Null);
+            Assert.That(aftale.Deltagere.Count(), Is.EqualTo(1));
         }
 
         /// <summary>
-        /// Tester, at Privat kan ændres.
+        /// Tester, at TilføjDeltager kaster en ArgumentNullException, hvis brugeraftalen er null.
         /// </summary>
         [Test]
-        public void TestAtPrivatÆndres()
+        public void TestAtTilføjDeltagerKasterArgumentNullExceptionHvisBrugeraftaleErNull()
         {
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
@@ -431,11 +446,252 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var aftale = fixture.CreateAnonymous<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            aftale.Privat = true;
-            Assert.That(aftale.Privat, Is.True);
+            Assert.Throws<ArgumentNullException>(() => aftale.TilføjDeltager(null));
+        }
 
-            aftale.Privat = false;
-            Assert.That(aftale.Privat, Is.False);
+        /// <summary>
+        /// Tester, at TilføjDeltager kaster en IntranetSystemException, hvis brugeraftalens system ikke matcher aftalens system.
+        /// </summary>
+        [Test]
+        public void TestAtTilføjDeltagerKasterIntranetSystemExceptionHvisSystemPåBrugeraftaleIkkeMatcherSystemPåAftale()
+        {
+            var fixture = new Fixture();
+            var system = MockRepository.GenerateMock<ISystem>();
+            system.Expect(m => m.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(system);
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
+                                      fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            var invalidSystem = MockRepository.GenerateMock<ISystem>();
+            invalidSystem.Expect(m => m.Nummer)
+                .Return(2);
+            var deltager = new Brugeraftale(invalidSystem, fixture.CreateAnonymous<Aftale>(),
+                                            fixture.CreateAnonymous<Bruger>());
+            Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
+        }
+
+        /// <summary>
+        /// Tester, at TilføjDeltager kaster en IntranetSystemException, hvis brugeraftalens aftalesystem ikke matcher aftalens system.
+        /// </summary>
+        [Test]
+        public void TestAtTilføjDeltagerKasterIntranetSystemExceptionHvisAftaleSystemPåBrugeraftaleIkkeMatcherSystemPåAftale()
+        {
+            var fixture = new Fixture();
+            var system = MockRepository.GenerateMock<ISystem>();
+            system.Expect(m => m.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(system);
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
+                                      fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            var invalidSystem = MockRepository.GenerateMock<ISystem>();
+            invalidSystem.Expect(m => m.Nummer)
+                .Return(2);
+            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(),
+                                            new Aftale(invalidSystem, fixture.CreateAnonymous<int>(),
+                                                       fixture.CreateAnonymous<DateTime>(),
+                                                       fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                                       fixture.CreateAnonymous<string>()),
+                                            fixture.CreateAnonymous<Bruger>());
+            Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
+        }
+
+        /// <summary>
+        /// Tester, at TilføjDeltager kaster en IntranetSystemException, hvis brugeraftalens aftale id ikke matcher aftalens id.
+        /// </summary>
+        [Test]
+        public void TestAtTilføjDeltagerKasterIntranetSystemExceptionHvisAftaleIdPåBrugeraftaleIkkeMatcherIdPåAftale()
+        {
+            var fixture = new Fixture();
+            var system = MockRepository.GenerateMock<ISystem>();
+            system.Expect(m => m.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(system);
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(),
+                                            new Aftale(fixture.CreateAnonymous<ISystem>(), 2,
+                                                       fixture.CreateAnonymous<DateTime>(),
+                                                       fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                                       fixture.CreateAnonymous<string>()),
+                                            fixture.CreateAnonymous<Bruger>());
+            Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
+        }
+
+        /// <summary>
+        /// Tester, at TilføjDeltager kaster en IntranetSystemException, hvis brugeraftalens brugersystem ikke matcher aftalens system.
+        /// </summary>
+        [Test]
+        public void TestAtTilføjDeltagerKasterIntranetSystemExceptionHvisBrugerSystemPåBrugeraftaleIkkeMatcherSystemPåAftale()
+        {
+            var fixture = new Fixture();
+            var system = MockRepository.GenerateMock<ISystem>();
+            system.Expect(m => m.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(system);
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            var invalidBruger = MockRepository.GenerateMock<IBruger>();
+            invalidBruger.Expect(m => m.System.Nummer)
+                .Return(2);
+            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(),
+                                            new Aftale(fixture.CreateAnonymous<ISystem>(), 1,
+                                                       fixture.CreateAnonymous<DateTime>(),
+                                                       fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                                       fixture.CreateAnonymous<string>()), invalidBruger);
+            Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
+        }
+
+        /// <summary>
+        /// Tester, at TilføjDeltager kaster en IntranetBusinessException, hvis brugeraftalen allerede eksisterer.
+        /// </summary>
+        [Test]
+        public void TestAtTilføjDeltagerKasterIntranetBusinessExceptionHvisBrugeraftaleAlleredeEksisterer()
+        {
+            var fixture = new Fixture();
+            var system = MockRepository.GenerateMock<ISystem>();
+            system.Expect(m => m.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(system);
+            var bruger = MockRepository.GenerateMock<IBruger>();
+            bruger.Expect(m => m.System.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            bruger.Expect(m => m.Id)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(bruger);
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<Aftale>(),
+                                            fixture.CreateAnonymous<IBruger>());
+            aftale.TilføjDeltager(deltager);
+            Assert.That(aftale.Deltagere, Is.Not.Null);
+            Assert.That(aftale.Deltagere.Count(), Is.EqualTo(1));
+
+            Assert.Throws<IntranetBusinessException>(() => aftale.TilføjDeltager(deltager));
+        }
+
+        /// <summary>
+        /// Tester, at  FjernDeltager tilføjer en deltager.
+        /// </summary>
+        [Test]
+        public void TestAtFjernDeltagerFjernerEnDeltager()
+        {
+            var fixture = new Fixture();
+            var system = MockRepository.GenerateMock<ISystem>();
+            system.Expect(m => m.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(system);
+            var bruger = MockRepository.GenerateMock<IBruger>();
+            bruger.Expect(m => m.System.Nummer)
+                .Return(1)
+                .Repeat.Any();
+            bruger.Expect(m => m.Id)
+                .Return(1)
+                .Repeat.Any();
+            fixture.Inject(bruger);
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<Aftale>(),
+                                            fixture.CreateAnonymous<IBruger>());
+            aftale.TilføjDeltager(deltager);
+            Assert.That(aftale.Deltagere, Is.Not.Null);
+            Assert.That(aftale.Deltagere.Count(), Is.EqualTo(1));
+
+            aftale.FjernDeltager(deltager);
+            Assert.That(aftale.Deltagere.Count(), Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Tester, at FjernDeltager kaster en ArgumentNullException, hvis brugeraftalen er null.
+        /// </summary>
+        [Test]
+        public void TestAtFjernDeltagerKasterArgumentNullExceptionHvisBrugeraftaleErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<ISystem>());
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
+                                      fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => aftale.FjernDeltager(null));
+        }
+
+        /// <summary>
+        /// Tester, at FjernDeltager kaster en IntranetBusinessException, hvis brugeraftalen ikke findes.
+        /// </summary>
+        [Test]
+        public void TestAtFjernDeltagerKasterIntranetBusinessExceptionHvisBrugeraftaleIkkeFindes()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<ISystem>());
+            fixture.Inject(DateTime.Now);
+            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
+                                      fixture.CreateAnonymous<DateTime>(),
+                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
+                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(MockRepository.GenerateMock<IBrugeraftale>());
+
+            var aftale = fixture.CreateAnonymous<Aftale>();
+            Assert.That(aftale, Is.Not.Null);
+
+            Assert.Throws<IntranetBusinessException>(() => aftale.FjernDeltager(fixture.CreateAnonymous<IBrugeraftale>()));
         }
     }
 }

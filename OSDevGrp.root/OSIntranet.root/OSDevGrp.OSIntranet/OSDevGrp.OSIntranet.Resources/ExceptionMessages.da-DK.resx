@@ -174,4 +174,10 @@
     <value>Uhåndteret switch værdi '{0}' for '{1}' i metode '{2}'.</value>
     <comment>{0} = Værdi, {1} = Navn for switch værdi, {2} = Metodenavn.</comment>
   </data>
+  <data name="UserAppointmentAlreadyExists" xml:space="preserve">
+    <value>Deltageren er allerede booket på aftalen.</value>
+  </data>
+  <data name="UserAppointmentDontExists" xml:space="preserve">
+    <value>Deltageren er ikke booket på aftalen.</value>
+  </data>
 </root>

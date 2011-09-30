@@ -59,9 +59,14 @@
     <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />
     <Compile Include="Fælles\IBrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\ISystem.cs" />
+    <Compile Include="Fælles\ISystemlisteHelper.cs" />
     <Compile Include="IDomainObjectListHelper.cs" />
     <Compile Include="Kalender\IAftale.cs" />
+    <Compile Include="Kalender\IAftaleBase.cs" />
+    <Compile Include="Kalender\IAftalelisteHelper.cs" />
     <Compile Include="Kalender\IBruger.cs" />
+    <Compile Include="Kalender\IBrugeraftale.cs" />
+    <Compile Include="Kalender\IBrugerlisteHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -174,4 +174,10 @@
     <value>Unhandled switch value '{0}' for '{1}' in method '{2}'.</value>
     <comment>{0} = Value, {1} = Name for switch value, {2} = Method name.</comment>
   </data>
+  <data name="UserAppointmentAlreadyExists" xml:space="preserve">
+    <value>The user are already booked on the appointment.</value>
+  </data>
+  <data name="UserAppointmentDontExists" xml:space="preserve">
+    <value>The user are not booked on the appointment.</value>
+  </data>
 </root>
