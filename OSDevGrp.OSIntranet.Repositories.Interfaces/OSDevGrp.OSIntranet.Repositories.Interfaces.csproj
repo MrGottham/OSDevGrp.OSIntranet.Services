@@ -60,6 +60,12 @@
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Domain.Interfaces\OSDevGrp.OSIntranet.Domain.Interfaces.csproj">
+      <Project>{14E268A0-B79F-4EF0-B299-5B2D34BF93AB}</Project>
+      <Name>OSDevGrp.OSIntranet.Domain.Interfaces</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
