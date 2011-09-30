@@ -226,6 +226,7 @@
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
+    <Compile Include="Unittests\Repositories\MySqlClientTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
     <Compile Include="Unittests\Resources\ResourceTests.cs" />
     <Compile Include="Unittests\Services\AdressekartotekServiceTests.cs" />

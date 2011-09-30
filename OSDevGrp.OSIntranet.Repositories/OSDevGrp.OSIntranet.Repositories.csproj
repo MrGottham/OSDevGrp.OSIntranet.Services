@@ -45,6 +45,9 @@
     <Reference Include="AutoMapper">
       <HintPath>..\External references\AutoMapper.dll</HintPath>
     </Reference>
+    <Reference Include="mysql.data">
+      <HintPath>..\External references\mysql.data.dll</HintPath>
+    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
     </Reference>
@@ -71,6 +74,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +83,7 @@
     <Compile Include="FinansstyringRepository.cs" />
     <Compile Include="FællesRepository.cs" />
     <Compile Include="KonfigurationRepository.cs" />
+    <Compile Include="MySqlClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
