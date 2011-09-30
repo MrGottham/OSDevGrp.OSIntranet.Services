@@ -73,6 +73,7 @@
       <HintPath>..\External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel" />
@@ -84,6 +85,7 @@
     <Compile Include="FællesRepository.cs" />
     <Compile Include="KonfigurationRepository.cs" />
     <Compile Include="MySqlClient.cs" />
+    <Compile Include="MySqlDataRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

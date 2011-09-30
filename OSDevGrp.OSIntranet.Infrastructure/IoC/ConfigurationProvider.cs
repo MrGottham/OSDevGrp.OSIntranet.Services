@@ -30,6 +30,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<ICommandBus>().ImplementedBy<CommandBus>().LifeStyle.Transient);
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);
+            container.Register(Component.For<IMySqlClient>().ImplementedBy<MySqlClient>().LifeStyle.Transient);
             container.Register(Component.For<IKonfigurationRepository>().Instance(konfigurationRepository).LifeStyle.Transient);
 
             container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories")
