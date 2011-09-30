@@ -9,6 +9,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Resources;
@@ -546,6 +547,13 @@ namespace OSDevGrp.OSIntranet.Repositories
 
             Mapper.CreateMap<BrevhovedreferenceView, Brevhoved>()
                 .ConvertUsing(s => new Brevhoved(s.Nummer, s.Navn));
+
+
+            Mapper.CreateMap<IMySqlDataRecord, ISystem>()
+                .ConvertUsing(s =>
+                                  {
+                                      throw new NotImplementedException();
+                                  });
 
             Mapper.AssertConfigurationIsValid();
         }
