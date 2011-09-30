@@ -20,6 +20,8 @@
         BalanceLineValueMissing,
         AccountIsOverdrawn,
         BudgetAccountIsOverdrawn,
-        NoRegistrationForDelegate
+        NoRegistrationForDelegate,
+        UserAppointmentAlreadyExists,
+        UserAppointmentDontExists
     }
 }

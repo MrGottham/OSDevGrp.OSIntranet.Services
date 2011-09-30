@@ -61,8 +61,13 @@
     <Compile Include="Finansstyring\RegnskabslisteHelper.cs" />
     <Compile Include="Fælles\BrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\System.cs" />
+    <Compile Include="Fælles\SystemlisteHelper.cs" />
     <Compile Include="Kalender\Aftale.cs" />
+    <Compile Include="Kalender\AftaleBase.cs" />
+    <Compile Include="Kalender\AftalelisteHelper.cs" />
     <Compile Include="Kalender\Bruger.cs" />
+    <Compile Include="Kalender\Brugeraftale.cs" />
+    <Compile Include="Kalender\BrugerlisteHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

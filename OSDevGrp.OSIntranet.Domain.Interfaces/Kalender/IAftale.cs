@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 
 namespace OSDevGrp.OSIntranet.Domain.Interfaces.Kalender
@@ -6,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.Kalender
     /// <summary>
     /// Interface for en kalenderaftale.
     /// </summary>
-    public interface IAftale
+    public interface IAftale : IAftaleBase
     {
         /// <summary>
         /// System under OSWEBDB, som aftalen er tilknyttet.
@@ -61,57 +62,23 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.Kalender
         }
 
         /// <summary>
-        /// Angivelse af offentliggørelse.
+        /// Aftalens deltagere.
         /// </summary>
-        bool Offentligtgørelse
+        IEnumerable<IBrugeraftale> Deltagere
         {
             get;
-            set;
         }
 
         /// <summary>
-        /// Angivelse af privat aftale.
+        /// Tilføjer en deltager til aftalen.
         /// </summary>
-        bool Privat
-        {
-            get;
-            set;
-        }
+        /// <param name="deltager">Brugeraftale for deltageren.</param>
+        void TilføjDeltager(IBrugeraftale deltager);
 
         /// <summary>
-        /// Angivelse af alarm.
+        /// Fjerner en deltager fra aftalen.
         /// </summary>
-        bool Alarm
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Angivelse af, om aftalen er udført.
-        /// </summary>
-        bool Udført
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Angivelse af, at aftalen skal eksporteres.
-        /// </summary>
-        bool Eksporter
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Angivelse af, at aftalen er eksporteret.
-        /// </summary>
-        bool Eksporteret
-        {
-            get;
-            set;
-        }
+        /// <param name="deltager">Brugeraftale for deltageren.</param>
+        void FjernDeltager(IBrugeraftale deltager);
     }
 }
