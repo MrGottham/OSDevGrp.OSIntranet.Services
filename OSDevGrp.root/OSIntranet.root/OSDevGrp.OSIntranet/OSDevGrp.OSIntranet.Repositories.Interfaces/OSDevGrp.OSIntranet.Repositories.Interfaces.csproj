@@ -54,6 +54,7 @@
     <Compile Include="IFællesRepository.cs" />
     <Compile Include="IKonfigurationRepository.cs" />
     <Compile Include="IFinansstyringRepository.cs" />
+    <Compile Include="IMySqlClient.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
