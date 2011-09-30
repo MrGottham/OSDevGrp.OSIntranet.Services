@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Queries;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Resources;
@@ -88,6 +89,15 @@ namespace OSDevGrp.OSIntranet.Repositories
             {
                 ChannelTools.CloseChannel(channel);
             }
+        }
+
+        /// <summary>
+        /// Henter alle systemer under OSWEBDB.
+        /// </summary>
+        /// <returns>Liste af systemer under OSWEBDB.</returns>
+        public IEnumerable<ISystem> SystemerGetAll()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
