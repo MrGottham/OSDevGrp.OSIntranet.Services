@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
+using OSDevGrp.OSIntranet.Resources;
 using MySql.Data.MySqlClient;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProviders
@@ -42,17 +45,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     {
                         while (reader.Read())
                         {
-
-                            // TODO: add new() on where for TDataProxy
-                            // TODO: Implement Read() on IMySqlDataProxy.
-                            var x = new TDataProxy();
-                            //collection.Add();
+                            var dataProxy = new TDataProxy();
+                            dataProxy.MapData(reader, this);
+                            collection.Add(dataProxy);
                         }
                         reader.Dispose();
                     }
                     command.Dispose();
                 }
-                throw new NotImplementedException();
+                return collection;
             }
             finally
             {
@@ -76,7 +77,30 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             _mySqlConnection.Open();
             try
             {
-                throw new NotImplementedException();
+                var queryDataProxy = (IMySqlDataProxy<TId>) new TDataProxy();
+                var sqlQuery = queryDataProxy.GetSqlQueryForId(id);
+                
+                using (var command = _mySqlConnection.CreateCommand())
+                {
+                    command.CommandText = sqlQuery;
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                        {
+                            reader.Dispose();
+                            throw new IntranetRepositoryException(
+                                Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
+                                                             queryDataProxy.GetType().Name, id));
+                        }
+                        var dataProxy = new TDataProxy();
+                        if (reader.Read())
+                        {
+                            dataProxy.MapData(reader, this);
+                        }
+                        reader.Dispose();
+                        return dataProxy;
+                    }
+                }
             }
             finally
             {

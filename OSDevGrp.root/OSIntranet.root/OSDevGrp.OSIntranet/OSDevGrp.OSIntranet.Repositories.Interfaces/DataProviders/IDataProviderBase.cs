@@ -14,7 +14,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
         /// <param name="query">Foresprøgelse efter data.</param>
         /// <returns>Collection indeholdende data.</returns>
-        IEnumerable<TDataProxy> GetCollection<TDataProxy>(string query) where TDataProxy : class, IDataProxyBase;
+        IEnumerable<TDataProxy> GetCollection<TDataProxy>(string query) where TDataProxy : class, IDataProxyBase, new();
 
         /// <summary>
         /// Henter data for en given data proxy i data provideren.
@@ -23,7 +23,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders
         /// <typeparam name="TId">Typen på den unikke identifikation for data i data proxy.</typeparam>
         /// <param name="id">Unik identifikation for data proxy, der skal hentes.</param>
         /// <returns>Data proxy.</returns>
-        TDataProxy Get<TDataProxy, TId>(TId id) where TDataProxy : class, IDataProxyBase;
+        TDataProxy Get<TDataProxy, TId>(TId id) where TDataProxy : class, IDataProxyBase, new();
 
         /// <summary>
         /// Tilføjer data til data provideren.
