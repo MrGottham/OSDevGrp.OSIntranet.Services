@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
@@ -18,6 +19,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// </summary>
         private class MyDataProxy : IDataProxyBase
         {
+            #region IDataProxyBase Members
+
+            /// <summary>
+            /// Mapper data fra en data reader.
+            /// </summary>
+            /// <param name="dataReader">Data reader for data provideren.</param>
+            /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
+            public void MapData(object dataReader, IDataProviderBase dataProvider)
+            {
+                Assert.That(dataReader, Is.Not.Null);
+                Assert.That(dataProvider, Is.Not.Null);
+            }
+
+            #endregion
         }
 
         /// <summary>
@@ -54,7 +69,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>Collection indeholdende data.</returns>
             public override IEnumerable<TDataProxy> GetCollection<TDataProxy>(string query)
             {
-                return _fixture.CreateMany<TDataProxy>(3).ToList();
+                var dataProxies = _fixture.CreateMany<TDataProxy>(3).ToList();
+                foreach (var dataProxy in dataProxies)
+                {
+                    dataProxy.MapData(_fixture, this);
+                }
+                return dataProxies;
             }
 
             /// <summary>
@@ -66,7 +86,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>Data proxy.</returns>
             public override TDataProxy Get<TDataProxy, TId>(TId id)
             {
-                return _fixture.CreateAnonymous<TDataProxy>();
+                var dataProxy = _fixture.CreateAnonymous<TDataProxy>();
+                dataProxy.MapData(_fixture, this);
+                return dataProxy;
             }
 
             /// <summary>
