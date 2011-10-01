@@ -27,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             public int SystemNo
             {
                 get;
-                protected set;
+                private set;
             }
 
             /// <summary>
@@ -36,7 +36,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             public string Title
             {
                 get;
-                protected set;
+                private set;
             }
 
             #region IDataProxyBase Members
@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
             #endregion
 
-            #region IMySqlDataProxy Members
+            #region IMySqlDataProxy<int> Members
 
             /// <summary>
             /// Returnerer SQL foresprøgelse til søgning efter en given data proxy på MySql.
@@ -67,11 +67,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 return string.Format("SELECT SystemNo,Title FROM Systems WHERE SystemNo={0}", id);
             }
-
-            #endregion
-
-            #region IMySqlDataProxy<int> Members
-
 
             #endregion
         }
