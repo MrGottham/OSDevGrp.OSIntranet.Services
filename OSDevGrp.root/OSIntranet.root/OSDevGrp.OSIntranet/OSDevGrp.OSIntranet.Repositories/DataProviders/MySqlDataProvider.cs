@@ -42,6 +42,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     {
                         while (reader.Read())
                         {
+
+                            // TODO: add new() on where for TDataProxy
+                            // TODO: Implement Read() on IMySqlDataProxy.
+                            var x = new TDataProxy();
                             //collection.Add();
                         }
                         reader.Dispose();
