@@ -80,12 +80,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdresseRepository.cs" />
+    <Compile Include="DataProviders\DataProviderBase.cs" />
+    <Compile Include="DataProviders\MySqlDataProvider.cs" />
     <Compile Include="DomainObjectBuilder.cs" />
     <Compile Include="FinansstyringRepository.cs" />
     <Compile Include="FællesRepository.cs" />
     <Compile Include="KonfigurationRepository.cs" />
-    <Compile Include="MySqlClient.cs" />
-    <Compile Include="MySqlDataRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +112,9 @@
       <Project>{EC187CDE-4BB1-4B84-8AAE-1CE461296611}</Project>
       <Name>OSDevGrp.OSIntranet.Resources</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DataProxies\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

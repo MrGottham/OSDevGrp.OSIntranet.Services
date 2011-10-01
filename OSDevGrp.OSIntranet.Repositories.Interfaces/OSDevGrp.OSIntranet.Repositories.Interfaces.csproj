@@ -49,13 +49,15 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataProviders\IMySqlDataProvider.cs" />
+    <Compile Include="DataProxies\IDataProxyBase.cs" />
+    <Compile Include="DataProxies\IMySqlDataProxy.cs" />
     <Compile Include="IAdresseRepository.cs" />
+    <Compile Include="DataProviders\IDataProviderBase.cs" />
     <Compile Include="IDomainObjectBuilder.cs" />
     <Compile Include="IFællesRepository.cs" />
     <Compile Include="IKonfigurationRepository.cs" />
     <Compile Include="IFinansstyringRepository.cs" />
-    <Compile Include="IMySqlClient.cs" />
-    <Compile Include="IMySqlDataRecord.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -68,6 +70,7 @@
       <Name>OSDevGrp.OSIntranet.Domain.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
