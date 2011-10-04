@@ -12,5 +12,23 @@
         /// <param name="id">Unik identifikation af data proxy, som skal fremsøges.</param>
         /// <returns>SQL foresprøgelse.</returns>
         string GetSqlQueryForId(TId id);
+
+        /// <summary>
+        /// Returnerer SQL kommando til oprettelse af data proxy på MySQL.
+        /// </summary>
+        /// <returns>SQL kommando til oprettelse.</returns>
+        string GetSqlCommandForInsert();
+
+        /// <summary>
+        /// Returnerer SQL kommando til opdatering af data proxy på MySQL.
+        /// </summary>
+        /// <returns>SQL kommando til opdatering.</returns>
+        string GetSqlCommandForUpdate();
+
+        /// <summary>
+        /// Returnerer SQL kommando til slening af data proxy fra MySQL.
+        /// </summary>
+        /// <returns>SQL kommando til sletning.</returns>
+        string GetSqlCommandForDelete();
     }
 }
