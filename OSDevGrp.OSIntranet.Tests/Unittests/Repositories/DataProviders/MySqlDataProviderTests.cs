@@ -68,6 +68,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 return string.Format("SELECT SystemNo,Title FROM Systems WHERE SystemNo={0}", id);
             }
 
+            /// <summary>
+            /// Returnerer SQL kommando til oprettelse af data proxy på MySQL.
+            /// </summary>
+            /// <returns>SQL kommando til oprettelse.</returns>
+            public string GetSqlCommandForInsert()
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// Returnerer SQL kommando til opdatering af data proxy på MySQL.
+            /// </summary>
+            /// <returns>SQL kommando til opdatering.</returns>
+            public string GetSqlCommandForUpdate()
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// Returnerer SQL kommando til slening af data proxy fra MySQL.
+            /// </summary>
+            /// <returns>SQL kommando til sletning.</returns>
+            public string GetSqlCommandForDelete()
+            {
+                throw new NotImplementedException();
+            }
+
             #endregion
         }
 
@@ -185,6 +212,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             Assert.That(mySqlDataProvider, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(() => mySqlDataProvider.Get<MyDataProxy, int>(-1));
+        }
+
+        /// <summary>
+        /// Tester, at Add tilfjøer data proxy i MySql.
+        /// </summary>
+        [Test]
+        public void TestAtAddTilføjerDataProxy()
+        {
+            var fixture = new Fixture();
+
+            var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>();
+            Assert.That(mySqlDataProvider, Is.Not.Null);
+
+            var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            Assert.That(mySqlDataProxy, Is.Not.Null);
+
+            var result = mySqlDataProvider.Add(mySqlDataProxy);
+            Assert.That(result, Is.Not.Null);
         }
 
         /// <summary>
