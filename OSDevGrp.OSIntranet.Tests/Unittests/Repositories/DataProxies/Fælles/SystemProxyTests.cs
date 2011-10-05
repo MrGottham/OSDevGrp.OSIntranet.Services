@@ -3,6 +3,7 @@ using System.Data;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -165,7 +166,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         {
             var fixture = new Fixture();
             fixture.Inject(new SystemProxy());
-            fixture.Inject<object>(MockRepository.GenerateMock<IDataReader>());
+            fixture.Inject(MockRepository.GenerateMock<IDataReader>());
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
             var systemProxy = fixture.CreateAnonymous<SystemProxy>();
@@ -173,7 +174,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                systemProxy.MapData(fixture.CreateAnonymous<object>(), fixture.CreateAnonymous<IDataProviderBase>()));
+                systemProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
+        }
+
+        /// <summary>
+        /// Tester, at MapData mapper data for et system under OSWEBDB.
+        /// </summary>
+        [Test]
+        public void TestAtMapDataMapperDataProxy()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new SystemProxy());
+            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
+
+            var mocker = new MockRepository();
+            var dataReader = mocker.DynamicMultiMock<IDataReader>(typeof (MySqlDataReader));
+            fixture.Inject(dataReader);
+            mocker.ReplayAll();
+
+            var systemProxy = fixture.CreateAnonymous<SystemProxy>();
+            Assert.That(systemProxy, Is.Not.Null);
+
+            systemProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
         }
     }
 }
