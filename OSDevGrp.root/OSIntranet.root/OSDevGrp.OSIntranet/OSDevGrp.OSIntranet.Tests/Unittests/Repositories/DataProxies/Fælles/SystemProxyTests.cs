@@ -198,6 +198,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
             Assert.That(systemProxy, Is.Not.Null);
 
             systemProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            Assert.That(systemProxy.DataIsLoaded, Is.True);
 
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Title")));
