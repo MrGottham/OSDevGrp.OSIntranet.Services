@@ -121,7 +121,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
                                                                                    dataReader.GetType(), "dataReader"));
             }
-            
+
+            base.Nummer = 1;
+
             //throw new NotImplementedException();
         }
 
