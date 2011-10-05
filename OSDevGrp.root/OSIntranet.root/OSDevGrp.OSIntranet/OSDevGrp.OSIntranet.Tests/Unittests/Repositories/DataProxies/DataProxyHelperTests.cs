@@ -68,6 +68,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         }
 
         /// <summary>
+        /// Egen nedarvet klasse til test af hjælpeklasse til en data proxy.
+        /// </summary>
+        private class MyInheritDataProxy : MyDataProxy
+        {
+        }
+
+        /// <summary>
         /// Tester, at SetFieldValue kaster en ArgumentNullException, hvis data proxy er null.
         /// </summary>
         [Test]
@@ -140,6 +147,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             fixture.Inject("_nummer");
 
             var dataProxy = new MyDataProxy();
+            Assert.That(dataProxy, Is.Not.Null);
+            Assert.That(dataProxy.Nummer, Is.EqualTo(0));
+
+            dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>());
+            Assert.That(dataProxy.Nummer, Is.Not.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Tester, at SetFieldValue sætter værdi på variablen i basisklassen.
+        /// </summary>
+        [Test]
+        public void TestAtSetFieldValueSætterFieldValuePåBase()
+        {
+            var fixture = new Fixture();
+            fixture.Inject("_nummer");
+
+            var dataProxy = new MyInheritDataProxy();
             Assert.That(dataProxy, Is.Not.Null);
             Assert.That(dataProxy.Nummer, Is.EqualTo(0));
 
