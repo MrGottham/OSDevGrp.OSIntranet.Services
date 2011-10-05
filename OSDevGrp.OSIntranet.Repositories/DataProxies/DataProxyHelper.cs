@@ -33,8 +33,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
                 throw new ArgumentNullException("value");
             }
 
-            /*
-            var field = dataProxy.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var field = dataProxy.GetType().GetField(fieldName,
+                                                     BindingFlags.Instance | BindingFlags.NonPublic |
+                                                     BindingFlags.Public);
             if (field != null)
             {
                 field.SetValue(dataProxy, value);
@@ -44,20 +45,17 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
             var baseType = dataProxy.GetType().BaseType;
             if (baseType != null)
             {
-                field = baseType.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                field = baseType.GetField(fieldName,
+                                          BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
                 if (field != null)
                 {
-                    field.SetValue();
+                    field.SetValue(dataProxy, value);
+                    return;
                 }
             }
 
-            if (field == null)
-            {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, fieldName,
-                                                                               "fieldName"));
-            }
-            field.SetValue(dataProxy, value);
-            */
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, fieldName,
+                                                                           "fieldName"));
         }
     }
 }
