@@ -85,7 +85,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>SQL kommando til oprettelse.</returns>
             public string GetSqlCommandForInsert()
             {
-                throw new NotImplementedException();
+                var fixture = new Fixture();
+                var dateTime = DateTime.Now;
+                return
+                    string.Format(
+                        "INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,'{0}','{1}','{2}','{3}')",
+                        dateTime.ToString("yyyy-MM-dd"), dateTime.ToString("HH:mm:ss"),
+                        dateTime.AddMinutes(15).ToString("HH:mm:ss"), fixture.CreateAnonymous<string>());
             }
 
             /// <summary>
@@ -94,7 +100,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>SQL kommando til opdatering.</returns>
             public string GetSqlCommandForUpdate()
             {
-                throw new NotImplementedException();
+                var fixture = new Fixture();
+                return string.Format("UPDATE Calapps SET Subject='{0}' WHERE SystemNo=1 AND CalId=77777",
+                                     fixture.CreateAnonymous<string>());
             }
 
             /// <summary>
@@ -103,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>SQL kommando til sletning.</returns>
             public string GetSqlCommandForDelete()
             {
-                throw new NotImplementedException();
+                return string.Format("DELETE FROM Calapps WHERE SystemNo=1 AND CalId=77777");
             }
 
             #endregion
@@ -247,6 +255,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
             var result = mySqlDataProvider.Add(mySqlDataProxy);
             Assert.That(result, Is.Not.Null);
+
+            mySqlDataProvider.Delete(result);
         }
 
         /// <summary>
@@ -264,6 +274,51 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         }
 
         /// <summary>
+        /// Tester, at Add kaster en MySqlException, hvis data proxy allerede findes.
+        /// </summary>
+        [Test]
+        public void TestAtAddKasterMySqlExceptionHvisDataProxyFindes()
+        {
+            var fixture = new Fixture();
+
+            var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>();
+            Assert.That(mySqlDataProvider, Is.Not.Null);
+
+            var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            Assert.That(mySqlDataProxy, Is.Not.Null);
+
+            var result = mySqlDataProvider.Add(mySqlDataProxy);
+            Assert.That(result, Is.Not.Null);
+
+            Assert.Throws<MySqlException>(() => mySqlDataProvider.Add(mySqlDataProxy));
+
+            mySqlDataProvider.Delete(result);
+        }
+
+        /// <summary>
+        /// Tester, at Save gemmer data proxy i MySql.
+        /// </summary>
+        [Test]
+        public void TestAtSaveGemmerDataProxy()
+        {
+            var fixture = new Fixture();
+
+            var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>();
+            Assert.That(mySqlDataProvider, Is.Not.Null);
+
+            var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            Assert.That(mySqlDataProxy, Is.Not.Null);
+
+            var result = mySqlDataProvider.Add(mySqlDataProxy);
+            Assert.That(result, Is.Not.Null);
+
+            result = mySqlDataProvider.Save(mySqlDataProxy);
+            Assert.That(result, Is.Not.Null);
+
+            mySqlDataProvider.Delete(result);
+        }
+
+        /// <summary>
         /// Tester, at Save kaster en ArgumentNullException, hvis data proxy er null.
         /// </summary>
         [Test]
@@ -275,6 +330,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             Assert.That(mySqlDataProvider, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.Save<MyDataProxy>(null));
+        }
+
+        /// <summary>
+        /// Tester, at Delete sletter data proxy fra MySql.
+        /// </summary>
+        [Test]
+        public void TestAtDeleteSletterDataProxy()
+        {
+            var fixture = new Fixture();
+
+            var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>();
+            Assert.That(mySqlDataProvider, Is.Not.Null);
+
+            var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            Assert.That(mySqlDataProxy, Is.Not.Null);
+
+            var result = mySqlDataProvider.Add(mySqlDataProxy);
+            Assert.That(result, Is.Not.Null);
+
+            mySqlDataProvider.Delete(result);
         }
 
         /// <summary>

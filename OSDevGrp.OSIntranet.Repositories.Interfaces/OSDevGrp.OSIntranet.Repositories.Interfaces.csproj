@@ -50,7 +50,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataProviders\IMySqlDataProvider.cs" />
+    <Compile Include="DataProxies\Fælles\ISystemProxy.cs" />
     <Compile Include="DataProxies\IDataProxyBase.cs" />
+    <Compile Include="DataProxies\ILazyLoadable.cs" />
     <Compile Include="DataProxies\IMySqlDataProxy.cs" />
     <Compile Include="IAdresseRepository.cs" />
     <Compile Include="DataProviders\IDataProviderBase.cs" />

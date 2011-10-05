@@ -4,7 +4,7 @@
     /// Interface til en data proxy for data fra MySql.
     /// </summary>
     /// <typeparam name="TDataProxy">Typen på den data proxy, som der arbejdes med på MySql.</typeparam>
-    public interface IMySqlDataProxy<in TDataProxy> : IDataProxyBase where TDataProxy : IDataProxyBase
+    public interface IMySqlDataProxy<in TDataProxy> : IDataProxyBase
     {
         /// <summary>
         /// Returnerer den unikke identifikation for data proxy.
