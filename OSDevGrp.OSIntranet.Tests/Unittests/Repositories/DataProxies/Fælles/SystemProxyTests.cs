@@ -178,10 +178,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         }
 
         /// <summary>
-        /// Tester, at MapData mapper data for et system under OSWEBDB.
+        /// Tester, at MapData mapper data proxy for et system under OSWEBDB.
         /// </summary>
         [Test]
-        public void TestAtMapDataMapperDataProxy()
+        public void TestAtMapDataMapperSystemProxy()
         {
             var fixture = new Fixture();
             fixture.Inject(new SystemProxy());
