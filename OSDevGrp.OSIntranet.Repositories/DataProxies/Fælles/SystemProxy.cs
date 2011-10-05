@@ -134,7 +134,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         public bool DataIsLoaded
         {
             get;
-            set;
+            protected set;
         }
 
         #endregion
