@@ -23,10 +23,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// Henter data for en given data proxy i data provideren.
         /// </summary>
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
-        /// <typeparam name="TId">Typen på den unikke identifikation for data i data proxy.</typeparam>
-        /// <param name="id">Unik identifikation for data proxy, der skal hentes.</param>
+        /// <param name="queryForDataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning.</param>
         /// <returns>Data proxy.</returns>
-        public abstract TDataProxy Get<TDataProxy, TId>(TId id) where TDataProxy : class, IDataProxyBase, new();
+        public abstract TDataProxy Get<TDataProxy>(TDataProxy queryForDataProxy) where TDataProxy : class, IDataProxyBase, new();
 
         /// <summary>
         /// Tilføjer data til data provideren.

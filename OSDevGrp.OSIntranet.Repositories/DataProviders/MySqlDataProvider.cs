@@ -65,21 +65,18 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// Henter og returnerer en given data proxy fra MySql.
         /// </summary>
         /// <typeparam name="TDataProxy">Typen på data proxy med data fra MySql.</typeparam>
-        /// <typeparam name="TId">Typen på den unikke identifikation for data proxy på MySql.</typeparam>
-        /// <param name="id">Unik identifikation af data proxy, som skal fremsøges fra MySql.</param>
+        /// <param name="queryForDataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning i MySql.</param>
         /// <returns>Data proxy med data fra MySql.</returns>
-        public override TDataProxy Get<TDataProxy, TId>(TId id)
+        public override TDataProxy Get<TDataProxy>(TDataProxy queryForDataProxy)
         {
-            if (Equals(id, null))
+            if (queryForDataProxy == null)
             {
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException("queryForDataProxy");
             }
             _mySqlConnection.Open();
             try
             {
-                var queryDataProxy = (IMySqlDataProxy<TId>) new TDataProxy();
-                var sqlQuery = queryDataProxy.GetSqlQueryForId(id);
-                
+                var sqlQuery = ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).GetSqlQueryForId(queryForDataProxy);
                 using (var command = _mySqlConnection.CreateCommand())
                 {
                     command.CommandText = sqlQuery;
@@ -90,7 +87,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                             reader.Dispose();
                             throw new IntranetRepositoryException(
                                 Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
-                                                             queryDataProxy.GetType().Name, id));
+                                                             queryForDataProxy.GetType().Name,
+                                                             ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).UniqueId));
                         }
                         var dataProxy = new TDataProxy();
                         if (reader.Read())
@@ -123,7 +121,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             _mySqlConnection.Open();
             try
             {
-                throw new NotImplementedException();
+                var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForInsert();
+                using (var command = _mySqlConnection.CreateCommand())
+                {
+                    command.CommandText = sqlCommand;
+                    command.ExecuteNonQuery();
+                    command.Dispose();
+                }
+                return dataProxy;
             }
             finally
             {
@@ -146,7 +151,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             _mySqlConnection.Open();
             try
             {
-                throw new NotImplementedException();
+                var sqlCommand = ((IMySqlDataProxy<TDataProxy>)dataProxy).GetSqlCommandForUpdate();
+                using (var command = _mySqlConnection.CreateCommand())
+                {
+                    command.CommandText = sqlCommand;
+                    command.ExecuteNonQuery();
+                    command.Dispose();
+                }
+                return dataProxy;
             }
             finally
             {
@@ -168,7 +180,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             _mySqlConnection.Open();
             try
             {
-                throw new NotImplementedException();
+                var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForDelete();
+                using (var command = _mySqlConnection.CreateCommand())
+                {
+                    command.CommandText = sqlCommand;
+                    command.ExecuteNonQuery();
+                    command.Dispose();
+                }
             }
             finally
             {
