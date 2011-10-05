@@ -229,6 +229,7 @@
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseBaseTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProxies\DataProxyHelperTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Fælles\SystemProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />

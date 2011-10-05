@@ -3,8 +3,8 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles;
-using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Resources;
+using MySql.Data.MySqlClient;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
 {
@@ -122,9 +122,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
                                                                                    dataReader.GetType(), "dataReader"));
             }
 
-            base.Nummer = 1;
-
-            //throw new NotImplementedException();
+            this.SetFieldValue("_nummer", mySqlDataReader.GetInt32("SystemNo"));
+            base.Titel = mySqlDataReader.GetString("Title");
+            DataIsLoaded = true;
         }
 
         #endregion
