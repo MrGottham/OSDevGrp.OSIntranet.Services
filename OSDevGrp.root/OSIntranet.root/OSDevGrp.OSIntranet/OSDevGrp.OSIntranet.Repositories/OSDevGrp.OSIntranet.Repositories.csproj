@@ -82,6 +82,7 @@
     <Compile Include="AdresseRepository.cs" />
     <Compile Include="DataProviders\DataProviderBase.cs" />
     <Compile Include="DataProviders\MySqlDataProvider.cs" />
+    <Compile Include="DataProxies\Fælles\SystemProxy.cs" />
     <Compile Include="DomainObjectBuilder.cs" />
     <Compile Include="FinansstyringRepository.cs" />
     <Compile Include="FællesRepository.cs" />
@@ -113,9 +114,7 @@
       <Name>OSDevGrp.OSIntranet.Resources</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DataProxies\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
