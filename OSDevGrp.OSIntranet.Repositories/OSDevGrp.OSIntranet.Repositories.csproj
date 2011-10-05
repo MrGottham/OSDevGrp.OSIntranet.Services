@@ -82,6 +82,7 @@
     <Compile Include="AdresseRepository.cs" />
     <Compile Include="DataProviders\DataProviderBase.cs" />
     <Compile Include="DataProviders\MySqlDataProvider.cs" />
+    <Compile Include="DataProxies\DataProxyHelper.cs" />
     <Compile Include="DataProxies\Fælles\SystemProxy.cs" />
     <Compile Include="DomainObjectBuilder.cs" />
     <Compile Include="FinansstyringRepository.cs" />
