@@ -19,7 +19,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// <summary>
         /// Egen data proxy til test af data provider, som benytter MySql.
         /// </summary>
-        private class MyDataProxy : IMySqlDataProxy<int>
+        private class MyDataProxy : IMySqlDataProxy<MyDataProxy>
         {
             /// <summary>
             /// Systemnummer.
@@ -27,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             public int SystemNo
             {
                 get;
-                private set;
+                set;
             }
 
             /// <summary>
@@ -56,16 +56,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
             #endregion
 
-            #region IMySqlDataProxy<int> Members
+            #region IMySqlDataProxy<MyDataProxy> Members
+
+            /// <summary>
+            /// Returnerer den unikke identifikation for data proxy.
+            /// </summary>
+            public string UniqueId
+            {
+                get
+                {
+                    return SystemNo.ToString();
+                }
+            }
 
             /// <summary>
             /// Returnerer SQL foresprøgelse til søgning efter en given data proxy på MySql.
             /// </summary>
-            /// <param name="id">Unik identifikation af data proxy, som skal fremsøges.</param>
+            /// <param name="queryForDataProxy">Data proxy indeholdende de nødvendige værdier til fremsøgning på MySql.</param>
             /// <returns>SQL foresprøgelse.</returns>
-            public string GetSqlQueryForId(int id)
+            public string GetSqlQueryForId(MyDataProxy queryForDataProxy)
             {
-                return string.Format("SELECT SystemNo,Title FROM Systems WHERE SystemNo={0}", id);
+                return string.Format("SELECT SystemNo,Title FROM Systems WHERE SystemNo={0}", queryForDataProxy.SystemNo);
             }
 
             /// <summary>
@@ -179,7 +190,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>();
             Assert.That(mySqlDataProvider, Is.Not.Null);
 
-            var result = mySqlDataProvider.Get<MyDataProxy, int>(1);
+            var result = mySqlDataProvider.Get(new MyDataProxy
+                                                   {
+                                                       SystemNo = 1
+                                                   });
             Assert.That(result, Is.Not.Null);
             Assert.That(result.SystemNo, Is.EqualTo(1));
             Assert.That(result.Title, Is.Not.Null);
@@ -187,17 +201,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         }
 
         /// <summary>
-        /// Tester, at Get kaster en ArgumentNullException, hvis query er null.
+        /// Tester, at Get kaster en ArgumentNullException, hvis den data proxy, der foresprøges efter, er null.
         /// </summary>
         [Test]
-        public void TestAtGetKasterArgumenutNullExceptionHvisIdErNull()
+        public void TestAtGetKasterArgumenutNullExceptionHvisQueryForDataProxyErNull()
         {
             var fixture = new Fixture();
 
             var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>();
             Assert.That(mySqlDataProvider, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.Get<MyDataProxy, object>(null));
+            Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.Get<MyDataProxy>(null));
         }
 
         /// <summary>
@@ -211,7 +225,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>();
             Assert.That(mySqlDataProvider, Is.Not.Null);
 
-            Assert.Throws<IntranetRepositoryException>(() => mySqlDataProvider.Get<MyDataProxy, int>(-1));
+            Assert.Throws<IntranetRepositoryException>(() => mySqlDataProvider.Get(new MyDataProxy
+                                                                                       {
+                                                                                           SystemNo = -1
+                                                                                       }));
         }
 
         /// <summary>

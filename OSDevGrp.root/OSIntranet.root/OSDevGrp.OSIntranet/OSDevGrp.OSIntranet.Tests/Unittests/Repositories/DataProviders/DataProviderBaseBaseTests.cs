@@ -81,10 +81,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Henter data for en given data proxy i data provideren.
             /// </summary>
             /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
-            /// <typeparam name="TId">Typen på den unikke identifikation for data i data proxy.</typeparam>
-            /// <param name="id">Unik identifikation for data proxy, der skal hentes.</param>
+            /// <param name="queryForDataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning.</param>
             /// <returns>Data proxy.</returns>
-            public override TDataProxy Get<TDataProxy, TId>(TId id)
+            public override TDataProxy Get<TDataProxy>(TDataProxy queryForDataProxy)
             {
                 var dataProxy = _fixture.CreateAnonymous<TDataProxy>();
                 dataProxy.MapData(_fixture, this);
@@ -170,7 +169,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             var dataProvider = fixture.CreateAnonymous<MyDataProvider>();
             Assert.That(dataProvider, Is.Not.Null);
 
-            var result = dataProvider.Get<MyDataProxy, string>(fixture.CreateAnonymous<string>());
+            var result = dataProvider.Get(new MyDataProxy());
             Assert.That(result, Is.Not.Null);
         }
 
