@@ -190,6 +190,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
                 .Return(fixture.CreateAnonymous<int>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Title")))
+                .Return(fixture.CreateAnonymous<string>());
             fixture.Inject(dataReader);
 
             var systemProxy = fixture.CreateAnonymous<SystemProxy>();
@@ -198,6 +200,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
             systemProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
 
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Title")));
         }
     }
 }
