@@ -187,15 +187,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
             fixture.Inject(new SystemProxy());
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var mocker = new MockRepository();
-            var dataReader = mocker.DynamicMultiMock<IDataReader>(typeof (MySqlDataReader));
+            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             fixture.Inject(dataReader);
-            mocker.ReplayAll();
 
             var systemProxy = fixture.CreateAnonymous<SystemProxy>();
             Assert.That(systemProxy, Is.Not.Null);
 
-            systemProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            systemProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
         }
     }
 }
