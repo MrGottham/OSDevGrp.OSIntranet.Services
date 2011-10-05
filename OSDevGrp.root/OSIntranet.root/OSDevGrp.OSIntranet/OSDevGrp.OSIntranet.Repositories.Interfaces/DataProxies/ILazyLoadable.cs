@@ -11,7 +11,6 @@
         bool DataIsLoaded
         {
             get;
-            set;
         }
     }
 }
