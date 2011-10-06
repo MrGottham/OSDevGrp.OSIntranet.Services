@@ -9,7 +9,9 @@ using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -28,7 +30,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisChannelFactoryErNull()
         {
-            Assert.Throws<ArgumentNullException>(() => new FællesRepository(null, null));
+            var fixture = new Fixture();
+            fixture.Inject<IChannelFactory>(null);
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                new FællesRepository(fixture.CreateAnonymous<IChannelFactory>(),
+                                     fixture.CreateAnonymous<IMySqlDataProvider>(),
+                                     fixture.CreateAnonymous<IDomainObjectBuilder>()));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis data provider til MySql er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisMySqlDataProviderErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IChannelFactory>());
+            fixture.Inject<IMySqlDataProvider>(null);
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                new FællesRepository(fixture.CreateAnonymous<IChannelFactory>(),
+                                     fixture.CreateAnonymous<IMySqlDataProvider>(),
+                                     fixture.CreateAnonymous<IDomainObjectBuilder>()));
         }
 
         /// <summary>
@@ -37,8 +64,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisDomainObjectBuilderErNull()
         {
-            var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
-            Assert.Throws<ArgumentNullException>(() => new FællesRepository(channelFactory, null));
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IChannelFactory>());
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            fixture.Inject<IDomainObjectBuilder>(null);
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                new FællesRepository(fixture.CreateAnonymous<IChannelFactory>(),
+                                     fixture.CreateAnonymous<IMySqlDataProvider>(),
+                                     fixture.CreateAnonymous<IDomainObjectBuilder>()));
         }
 
         /// <summary>
@@ -48,6 +82,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBrevhovedGetAllHenterAlleBrevhoveder()
         {
             var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
 
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFællesRepositoryService>(new[] { typeof(ICommunicationObject) });
@@ -59,13 +94,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             channelFactory.Expect(m => m.CreateChannel<IFællesRepositoryService>(Arg<string>.Is.Anything))
                 .Return(service);
+            fixture.Inject(channelFactory);
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             domainObjectBuilder.Expect(
                 m => m.BuildMany<BrevhovedView, Brevhoved>(Arg<IEnumerable<BrevhovedView>>.Is.NotNull))
                 .Return(fixture.CreateMany<Brevhoved>(3));
+            fixture.Inject(domainObjectBuilder);
 
-            var repository = new FællesRepository(channelFactory, domainObjectBuilder);
+            var repository = fixture.CreateAnonymous<FællesRepository>();
+            Assert.That(repository, Is.Not.Null);
+
             var brevhoveder = repository.BrevhovedGetAll();
             Assert.That(brevhoveder, Is.Not.Null);
             Assert.That(brevhoveder.Count(), Is.EqualTo(3));
@@ -81,6 +120,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBrevhovedGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
         {
             var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
 
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFællesRepositoryService>(new[] { typeof(ICommunicationObject) });
@@ -92,10 +133,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             channelFactory.Expect(m => m.CreateChannel<IFællesRepositoryService>(Arg<string>.Is.Anything))
                 .Return(service);
+            fixture.Inject(channelFactory);
 
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
+            var repository = fixture.CreateAnonymous<FællesRepository>();
+            Assert.That(repository, Is.Not.Null);
 
-            var repository = new FællesRepository(channelFactory, domainObjectBuilder);
             Assert.Throws<IntranetRepositoryException>(() => repository.BrevhovedGetAll());
         }
 
@@ -106,6 +148,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBrevhovedGetAllKasterIntranetRepositoryExceptionVedFaultException()
         {
             var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
 
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFællesRepositoryService>(new[] { typeof(ICommunicationObject) });
@@ -117,10 +161,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             channelFactory.Expect(m => m.CreateChannel<IFællesRepositoryService>(Arg<string>.Is.Anything))
                 .Return(service);
+            fixture.Inject(channelFactory);
 
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
+            var repository = fixture.CreateAnonymous<FællesRepository>();
+            Assert.That(repository, Is.Not.Null);
 
-            var repository = new FællesRepository(channelFactory, domainObjectBuilder);
             Assert.Throws<IntranetRepositoryException>(() => repository.BrevhovedGetAll());
         }
 
@@ -131,6 +176,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
         public void TestAtBrevhovedGetAllKasterIntranetRepositoryExceptionVedException()
         {
             var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
 
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFællesRepositoryService>(new[] { typeof(ICommunicationObject) });
@@ -142,11 +189,79 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             channelFactory.Expect(m => m.CreateChannel<IFællesRepositoryService>(Arg<string>.Is.Anything))
                 .Return(service);
+            fixture.Inject(channelFactory);
 
-            var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
+            var repository = fixture.CreateAnonymous<FællesRepository>();
+            Assert.That(repository, Is.Not.Null);
 
-            var repository = new FællesRepository(channelFactory, domainObjectBuilder);
             Assert.Throws<IntranetRepositoryException>(() => repository.BrevhovedGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at SystemGetAll henter systemer.
+        /// </summary>
+        [Test]
+        public void TestAtSystemGetAllHenterSystemer()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IChannelFactory>());
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
+
+            var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
+            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
+                .Return(fixture.CreateMany<SystemProxy>(3));
+            fixture.Inject(mySqlDataProvider);
+
+            var repository = fixture.CreateAnonymous<FællesRepository>();
+            Assert.That(repository, Is.Not.Null);
+
+            var systemer = repository.SystemGetAll();
+            Assert.That(systemer, Is.Not.Null);
+            Assert.That(systemer.Count(), Is.EqualTo(3));
+
+            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at SystemGetAll kaster en IntranetRepositoryException ved IntranetRepositoryException.
+        /// </summary>
+        [Test]
+        public void TestAtSystemGetAllKasterIntranetRepositoryExceptionVedIntranetRepositoryException()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IChannelFactory>());
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
+
+            var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
+            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            fixture.Inject(mySqlDataProvider);
+
+            var repository = fixture.CreateAnonymous<FællesRepository>();
+            Assert.That(repository, Is.Not.Null);
+
+            Assert.Throws<IntranetRepositoryException>(() => repository.SystemGetAll());
+        }
+
+        /// <summary>
+        /// Tester, at SystemGetAll kaster en IntranetRepositoryException ved Exception.
+        /// </summary>
+        [Test]
+        public void TestAtSystemGetAllKasterIntranetRepositoryExceptionVedException()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IChannelFactory>());
+            fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
+
+            var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
+            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<Exception>());
+            fixture.Inject(mySqlDataProvider);
+
+            var repository = fixture.CreateAnonymous<FællesRepository>();
+            Assert.That(repository, Is.Not.Null);
+
+            Assert.Throws<IntranetRepositoryException>(() => repository.SystemGetAll());
         }
     }
 }

@@ -10,7 +10,9 @@ using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Repositories
@@ -29,6 +31,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         #region Private variables
 
         private readonly IChannelFactory _channelFactory;
+        private readonly IMySqlDataProvider _mySqlDataProvider;
         private readonly IDomainObjectBuilder _domainObjectBuilder;
 
         #endregion
@@ -39,18 +42,24 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Danner repository til fælles elementer i domænet.
         /// </summary>
         /// <param name="channelFactory">Implementering af en ChannelFactory.</param>
+        /// <param name="mySqlDataProvider">Implementering af data provider til MySql.</param>
         /// <param name="domainObjectBuilder">Implementering af domæneobjekt bygger.</param>
-        public FællesRepository(IChannelFactory channelFactory, IDomainObjectBuilder domainObjectBuilder)
+        public FællesRepository(IChannelFactory channelFactory, IMySqlDataProvider mySqlDataProvider, IDomainObjectBuilder domainObjectBuilder)
         {
             if (channelFactory == null)
             {
                 throw new ArgumentNullException("channelFactory");
+            }
+            if (mySqlDataProvider == null)
+            {
+                throw new ArgumentNullException("mySqlDataProvider");
             }
             if (domainObjectBuilder == null)
             {
                 throw new ArgumentNullException("channelFactory");
             }
             _channelFactory = channelFactory;
+            _mySqlDataProvider = mySqlDataProvider;
             _domainObjectBuilder = domainObjectBuilder;
         }
 
@@ -95,9 +104,22 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// Henter alle systemer under OSWEBDB.
         /// </summary>
         /// <returns>Liste af systemer under OSWEBDB.</returns>
-        public IEnumerable<ISystem> SystemerGetAll()
+        public IEnumerable<ISystem> SystemGetAll()
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _mySqlDataProvider.GetCollection<SystemProxy>("SELECT SystemNo,Title FROM Systems ORDER BY SystemNo");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
         }
 
         #endregion
