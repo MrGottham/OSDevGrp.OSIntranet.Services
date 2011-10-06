@@ -189,5 +189,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
                 () =>
                 brugerProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
         }
+
+        /// <summary>
+        /// Tester, at MapData mapper data proxy for en bruger.
+        /// </summary>
+        [Test]
+        public void TestAtMapDataMapperBrugerProxy()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new BrugerProxy());
+            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
+
+            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
+                .Return(fixture.CreateAnonymous<int>());
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
+                .Return(fixture.CreateAnonymous<int>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("UserName")))
+                .Return(fixture.CreateAnonymous<string>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Name")))
+                .Return(fixture.CreateAnonymous<string>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Initials")))
+                .Return(fixture.CreateAnonymous<string>());
+            fixture.Inject(dataReader);
+
+            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            Assert.That(brugerProxy, Is.Not.Null);
+
+            brugerProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            Assert.That(brugerProxy.DataIsLoaded, Is.True);
+
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("UserId")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("UserName")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Name")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Initials")));
+        }
     }
 }
