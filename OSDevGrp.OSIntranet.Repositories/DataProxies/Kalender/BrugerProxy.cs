@@ -1,8 +1,12 @@
-﻿using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
+﻿using System;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
+using OSDevGrp.OSIntranet.Resources;
+using MySql.Data.MySqlClient;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
 {
@@ -107,7 +111,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="dataProvider">Dataprovider.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
-            throw new System.NotImplementedException();
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException("dataReader");
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
+                                                                                   dataReader.GetType(), "dataReader"));
+            }
+
+            throw new NotImplementedException();
         }
 
         #endregion
