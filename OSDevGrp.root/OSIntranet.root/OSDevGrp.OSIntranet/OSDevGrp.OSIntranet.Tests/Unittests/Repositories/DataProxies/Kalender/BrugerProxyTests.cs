@@ -185,7 +185,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(
+            Assert.Throws<IntranetRepositoryException>(
                 () =>
                 brugerProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
         }
