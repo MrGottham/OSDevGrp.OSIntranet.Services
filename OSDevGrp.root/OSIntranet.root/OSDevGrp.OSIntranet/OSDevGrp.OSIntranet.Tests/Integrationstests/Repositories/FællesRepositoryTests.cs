@@ -38,5 +38,16 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
             Assert.That(brevhoveder, Is.Not.Null);
             Assert.That(brevhoveder.Count(), Is.GreaterThan(0));
         }
+
+        /// <summary>
+        /// Tester, at SystemGetAll henter systemer.
+        /// </summary>
+        [Test]
+        public void TestAtSystemGetAllHenterSystemer()
+        {
+            var systemer = _fællesRepository.SystemGetAll();
+            Assert.That(systemer, Is.Not.Null);
+            Assert.That(systemer.Count(), Is.GreaterThan(0));
+        }
     }
 }
