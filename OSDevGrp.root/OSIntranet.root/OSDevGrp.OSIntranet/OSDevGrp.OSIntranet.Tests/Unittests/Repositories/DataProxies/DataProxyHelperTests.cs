@@ -185,5 +185,50 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             Assert.Throws<IntranetSystemException>(
                 () => dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>()));
         }
+
+        /// <summary>
+        /// Tester, at GetNullableSqlString kaster en ArgumentNullException, hvis data proxy er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetNullableSqlStringKasterArgumentNullExceptionHvisDataProxyErNull()
+        {
+            var fixture = new Fixture();
+
+            Assert.Throws<ArgumentNullException>(
+                () => DataProxyHelper.GetNullableSqlString(null, fixture.CreateAnonymous<string>()));
+        }
+
+        /// <summary>
+        /// Tester, at GetNullableSqlString returnerer SQL streng for værdi.
+        /// </summary>
+        [Test]
+        public void TestAtGetNullableSqlStringReturnererSqlStringForValue()
+        {
+            var fixture = new Fixture();
+            var value = fixture.CreateAnonymous<string>();
+
+            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            Assert.That(dataProxy, Is.Not.Null);
+
+            var sqlString = dataProxy.GetNullableSqlString(value);
+            Assert.That(sqlString, Is.Not.Null);
+            Assert.That(sqlString, Is.EqualTo(string.Format("'{0}'", value)));
+        }
+
+        /// <summary>
+        /// Tester, at GetNullableSqlString returnerer SQL streng for null.
+        /// </summary>
+        [Test]
+        public void TestAtGetNullableSqlStringReturnererSqlStringForNull()
+        {
+            var fixture = new Fixture();
+
+            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            Assert.That(dataProxy, Is.Not.Null);
+
+            var sqlString = dataProxy.GetNullableSqlString(null);
+            Assert.That(sqlString, Is.Not.Null);
+            Assert.That(sqlString, Is.EqualTo("NULL"));
+        }
     }
 }

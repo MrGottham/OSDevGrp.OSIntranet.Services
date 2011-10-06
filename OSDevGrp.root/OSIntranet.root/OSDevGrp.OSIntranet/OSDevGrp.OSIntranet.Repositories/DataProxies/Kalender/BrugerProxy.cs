@@ -66,7 +66,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL foresprøgelse.</returns>
         public virtual string GetSqlQueryForId(IBruger queryForDataProxy)
         {
-            throw new System.NotImplementedException();
+            return string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} AND UserId={1}", System.Nummer, Id);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new System.NotImplementedException();
+            return string.Format("INSERT INTO Calusers (SystemNo,UserId,UserName,Name,Initials) VALUES({0},{1},{2},{3},{4})", System.Nummer, Id, this.GetNullableSqlString(UserName), this.GetNullableSqlString(Navn), this.GetNullableSqlString(Initialer));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new System.NotImplementedException();
+            return string.Format("UPDATE Calusers SET UserName={2},Name={3},Initials={4} WHERE SystemNo={0} AND UserId={1}", System.Nummer, Id, this.GetNullableSqlString(UserName), this.GetNullableSqlString(Navn), this.GetNullableSqlString(Initialer));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new System.NotImplementedException();
+            return string.Format("DELETE FROM Calusers WHERE SystemNo={0} AND UserId={1}", System.Nummer, Id);
         }
 
         #endregion
