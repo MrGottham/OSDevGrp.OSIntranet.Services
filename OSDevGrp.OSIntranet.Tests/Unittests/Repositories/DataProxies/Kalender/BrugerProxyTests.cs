@@ -37,5 +37,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             Assert.That(brugerProxy.Navn, Is.EqualTo(typeof(Bruger).ToString()));
             Assert.That(brugerProxy.DataIsLoaded, Is.False);
         }
+
+        /// <summary>
+        /// Tester, at UniqueId returnerer den unikke idenfikation for brugeren.
+        /// </summary>
+        [Test]
+        public void TestAtUniqueIdReturnererIdentifikation()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new BrugerProxy());
+
+            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            Assert.That(brugerProxy, Is.Not.Null);
+
+            var uniqueId = brugerProxy.UniqueId;
+            Assert.That(uniqueId, Is.Not.Null);
+            Assert.That(uniqueId, Is.EqualTo("0-0"));
+        }
     }
 }
