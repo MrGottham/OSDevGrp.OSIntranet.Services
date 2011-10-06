@@ -127,7 +127,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
                                                                                    dataReader.GetType(), "dataReader"));
             }
 
-            throw new NotImplementedException();
+            this.SetFieldValue("_system", new SystemProxy(mySqlDataReader.GetInt32("SystemNo")));
+            this.SetFieldValue("_id", mySqlDataReader.GetInt32("UserId"));
+            DataIsLoaded = true;
         }
 
         #endregion
