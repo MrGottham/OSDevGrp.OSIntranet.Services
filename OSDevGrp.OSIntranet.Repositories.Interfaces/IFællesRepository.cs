@@ -19,6 +19,6 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// Henter alle systemer under OSWEBDB.
         /// </summary>
         /// <returns>Liste af systemer under OSWEBDB.</returns>
-        IEnumerable<ISystem> SystemerGetAll();
+        IEnumerable<ISystem> SystemGetAll();
     }
 }
