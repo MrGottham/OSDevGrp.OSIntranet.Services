@@ -59,7 +59,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         }
 
         /// <summary>
-        /// Returnerer SQL forespørgelse efter systemet under OSWEBDB.
+        /// Returnerer SQL forespørgelse til foresprøgelse efter systemet under OSWEBDB.
         /// </summary>
         /// <param name="queryForDataProxy">Data proxy indeholdende nødvendige data til forespørgelsen.</param>
         /// <returns>SQL forespørgelse.</returns>
@@ -69,7 +69,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         }
 
         /// <summary>
-        /// Returnerer SQL kommando til indsættelse af systemet under OSWEBDB-
+        /// Returnerer SQL kommando til indsættelse af systemet under OSWEBDB.
         /// </summary>
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForInsert()
