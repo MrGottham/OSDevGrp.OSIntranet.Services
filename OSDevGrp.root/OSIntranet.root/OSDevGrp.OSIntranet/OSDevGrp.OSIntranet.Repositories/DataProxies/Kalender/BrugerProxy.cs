@@ -55,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         {
             get
             {
-                throw new System.NotImplementedException();
+                return string.Format("{0}-{1}", System.Nummer, Id);
             }
         }
 

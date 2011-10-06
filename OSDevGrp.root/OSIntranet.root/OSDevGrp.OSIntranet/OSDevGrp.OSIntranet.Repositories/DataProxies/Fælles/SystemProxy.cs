@@ -54,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         {
             get
             {
-                return base.Nummer.ToString();
+                return Nummer.ToString();
             }
         }
 
@@ -74,7 +74,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            return string.Format("INSERT INTO Systems (SystemNo,Title) VALUES({0},'{1}')", base.Nummer, base.Titel);
+            return string.Format("INSERT INTO Systems (SystemNo,Title) VALUES({0},'{1}')", Nummer, Titel);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            return string.Format("UPDATE Systems SET Title='{0}' WHERE SystemNo={1}", base.Titel, base.Nummer);
+            return string.Format("UPDATE Systems SET Title='{0}' WHERE SystemNo={1}", Titel, Nummer);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            return string.Format("DELETE FROM Systems WHERE SystemNo={0}", base.Nummer);
+            return string.Format("DELETE FROM Systems WHERE SystemNo={0}", Nummer);
         }
 
         #endregion
