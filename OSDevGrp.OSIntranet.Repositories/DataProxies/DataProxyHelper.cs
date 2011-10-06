@@ -57,5 +57,20 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
             throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, fieldName,
                                                                            "fieldName"));
         }
+
+        /// <summary>
+        /// Returnerer en nullable streng, som kan benyttes i SQL.
+        /// </summary>
+        /// <param name="dataProxy">Data proxy, hvorpå strengen skal returneres.</param>
+        /// <param name="value">Værdi for den nullable streng.</param>
+        /// <returns>Streng, som kan benyttes </returns>
+        public static string GetNullableSqlString(this IDataProxyBase dataProxy, string value)
+        {
+            if (dataProxy == null)
+            {
+                throw new ArgumentNullException("dataProxy");
+            }
+            return value == null ? "NULL" : string.Format("'{0}'", value);
+        }
     }
 }
