@@ -2,6 +2,7 @@
 using System.Data;
 using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using MySql.Data.MySqlClient;
@@ -224,6 +225,50 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("UserName")));
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Name")));
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Initials")));
+        }
+
+        /// <summary>
+        /// Tester, at System lazy loades.
+        /// </summary>
+        [Test]
+        public void TestAtSystemLazyLoades()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new BrugerProxy());
+
+            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
+                .Return(fixture.CreateAnonymous<int>());
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
+                .Return(fixture.CreateAnonymous<int>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("UserName")))
+                .Return(fixture.CreateAnonymous<string>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Name")))
+                .Return(fixture.CreateAnonymous<string>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Initials")))
+                .Return(fixture.CreateAnonymous<string>());
+            fixture.Inject(dataReader);
+
+            var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProvider.Expect(m => m.Get(Arg<SystemProxy>.Is.NotNull))
+                .Return(fixture.CreateAnonymous<SystemProxy>());
+            fixture.Inject(dataProvider);
+
+            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            Assert.That(brugerProxy, Is.Not.Null);
+
+            brugerProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            Assert.That(brugerProxy.DataIsLoaded, Is.True);
+
+            Assert.That(brugerProxy.System, Is.Not.Null);
+
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("UserId")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("UserName")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Name")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Initials")));
+
+            dataProvider.AssertWasCalled(m => m.Get(Arg<SystemProxy>.Is.NotNull));
         }
     }
 }
