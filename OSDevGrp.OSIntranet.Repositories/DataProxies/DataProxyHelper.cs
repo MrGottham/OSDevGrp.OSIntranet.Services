@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Resources;
 
@@ -71,6 +72,48 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
                 throw new ArgumentNullException("dataProxy");
             }
             return value == null ? "NULL" : string.Format("'{0}'", value);
+        }
+
+        /// <summary>
+        /// Henter og returnerer en given data proxy gennem en data provider.
+        /// </summary>
+        /// <typeparam name="TDataProxy">Typen på data proxy, som skal hentes.</typeparam>
+        /// <param name="dataProxy">Data proxy, hvorfra en given data proxy skal hentes.</param>
+        /// <param name="dataProvider">Data provider, der skal hente data proxy.</param>
+        /// <param name="queryForDataProxy">Data proxy indeholdende de nødvendige værdier til at hente al data gennem data provideren.</param>
+        /// <param name="callerName">Navn på metoden, der kalder.</param>
+        /// <returns>Data proxy indeholdende</returns>
+        public static TDataProxy Get<TDataProxy>(this IDataProxyBase dataProxy, IDataProviderBase dataProvider, TDataProxy queryForDataProxy, string callerName) where TDataProxy : class, IDataProxyBase, new()
+        {
+            if (dataProxy == null)
+            {
+                throw new ArgumentNullException("dataProxy");
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (queryForDataProxy == null)
+            {
+                throw new ArgumentNullException("queryForDataProxy");
+            }
+            if (string.IsNullOrEmpty(callerName))
+            {
+                throw new ArgumentNullException("callerName");
+            }
+            try
+            {
+                return dataProvider.Get(queryForDataProxy);
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, callerName, ex.Message), ex);
+            }
         }
     }
 }

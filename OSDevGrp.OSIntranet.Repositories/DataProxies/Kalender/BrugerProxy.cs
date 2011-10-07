@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Reflection;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Resources;
 using MySql.Data.MySqlClient;
@@ -15,6 +18,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
     /// </summary>
     public class BrugerProxy : Bruger, IBrugerProxy
     {
+        #region Private variables
+
+        private IDataProviderBase _dataProvider;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -46,6 +55,28 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             : base(new SystemProxy(system), id, initialer, navn)
         {
             DataIsLoaded = false;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// System under OSWEBDB, som brugeren er tilknyttet.
+        /// </summary>
+        public override ISystem System
+        {
+            get
+            {
+                if (base.System is ILazyLoadable)
+                {
+                    if (((ILazyLoadable) base.System).DataIsLoaded == false && _dataProvider != null)
+                    {
+                        this.SetFieldValue("_system", this.Get(_dataProvider, base.System as SystemProxy, MethodBase.GetCurrentMethod().Name));
+                    }
+                }
+                return base.System;
+            }
         }
 
         #endregion
@@ -129,7 +160,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
 
             this.SetFieldValue("_system", new SystemProxy(mySqlDataReader.GetInt32("SystemNo")));
             this.SetFieldValue("_id", mySqlDataReader.GetInt32("UserId"));
+            UserName = mySqlDataReader.GetString("UserName");
+            Navn = mySqlDataReader.GetString("Name");
+            Initialer = mySqlDataReader.GetString("Initials");
             DataIsLoaded = true;
+
+            _dataProvider = dataProvider;
         }
 
         #endregion
