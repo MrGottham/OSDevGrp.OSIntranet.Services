@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 
 namespace OSDevGrp.OSIntranet.Repositories.Interfaces
@@ -8,6 +9,14 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
     /// </summary>
     public interface IKalenderRepository : IRepository
     {
+        /// <summary>
+        /// Henter alle kalenderaftaler fra en given dato til et system under OSWEBDB.
+        /// </summary>
+        /// <param name="system">Unik identifikation af systemet under OSWEBDB.</param>
+        /// <param name="fromDate">Datoen, hvorfra kalenderaftaler skal hentes.</param>
+        /// <returns>Liste indeholdende kalenderaftaler til systemer.</returns>
+        IEnumerable<IAftale> AftaleGetAllBySystem(int system, DateTime fromDate);
+
         /// <summary>
         /// Henter alle kalenderbrugere til et system under OSWEBDB.
         /// </summary>
