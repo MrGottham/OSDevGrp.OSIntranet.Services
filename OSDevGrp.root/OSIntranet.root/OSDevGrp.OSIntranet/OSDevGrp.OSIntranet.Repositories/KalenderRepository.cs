@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Repositories
 {
@@ -37,13 +41,38 @@ namespace OSDevGrp.OSIntranet.Repositories
         #region IKalenderRepository Members
 
         /// <summary>
+        /// Henter alle kalenderaftaler fra en given dato til et system under OSWEBDB.
+        /// </summary>
+        /// <param name="system">Unik identifikation af systemet under OSWEBDB.</param>
+        /// <param name="fromDate">Datoen, hvorfra kalenderaftaler skal hentes.</param>
+        /// <returns>Liste indeholdende kalenderaftaler til systemer.</returns>
+        public IEnumerable<IAftale> AftaleGetAllBySystem(int system, DateTime fromDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Henter alle kalenderbrugere til et system under OSWEBDB.
         /// </summary>
         /// <param name="system">Unik identifikation af systemet under OSWEBDB.</param>
         /// <returns>Liste indeholdende kalenderbrugere til systemet.</returns>
         public IEnumerable<IBruger> BrugerGetAllBySystem(int system)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return
+                    _mySqlDataProvider.GetCollection<BrugerProxy>(string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} ORDER BY Name,Initials,UserId", system));
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
         }
 
         #endregion

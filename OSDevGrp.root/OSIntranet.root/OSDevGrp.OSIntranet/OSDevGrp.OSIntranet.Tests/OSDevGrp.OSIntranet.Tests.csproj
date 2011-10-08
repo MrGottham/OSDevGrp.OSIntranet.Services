@@ -107,6 +107,7 @@
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FællesRepositoryTests.cs" />
+    <Compile Include="Integrationstests\Repositories\KalenderRepositoryTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
@@ -231,6 +232,8 @@
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\DataProxyHelperTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Fælles\SystemProxyTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProxies\Kalender\AftaleProxyTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugeraftaleProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugerProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
