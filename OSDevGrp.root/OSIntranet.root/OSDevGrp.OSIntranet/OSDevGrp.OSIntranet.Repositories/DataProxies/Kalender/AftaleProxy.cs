@@ -27,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="system">Unik identifikation af systemet for kalenderaftalen.</param>
         /// <param name="id">Unik identifikation af kalenderaftalen.</param>
         public AftaleProxy(int system, int id)
-            : this(system, id, DateTime.MinValue, DateTime.MaxValue, typeof(AftaleProxy).ToString())
+            : this(system, id, DateTime.MinValue, DateTime.MaxValue, typeof(Aftale).ToString())
         {
         }
 
