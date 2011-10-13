@@ -101,6 +101,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL foresprøgelse.</returns>
         public virtual string GetSqlQueryForId(IBruger queryForDataProxy)
         {
+            if (queryForDataProxy == null)
+            {
+                throw new ArgumentNullException("queryForDataProxy");
+            }
             return string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} AND UserId={1}", System.Nummer, Id);
         }
 

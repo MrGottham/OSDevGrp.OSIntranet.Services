@@ -1,8 +1,12 @@
-﻿using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
+﻿using System;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
+using OSDevGrp.OSIntranet.Resources;
+using MySql.Data.MySqlClient;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
 {
@@ -45,7 +49,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         {
             get
             {
-                throw new System.NotImplementedException();
+                return string.Format("{0}-{1}-{2}", System.Nummer, Aftale.Id, Bruger.Id);
             }
         }
 
@@ -56,7 +60,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL forespørgelse.</returns>
         public virtual string GetSqlQueryForId(IBrugeraftale queryForDataProxy)
         {
-            throw new System.NotImplementedException();
+            if (queryForDataProxy == null)
+            {
+                throw new ArgumentNullException("queryForDataProxy");
+            }
+            return string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} AND UserId={2}", queryForDataProxy.System.Nummer, queryForDataProxy.Aftale.Id, queryForDataProxy.Bruger.Id);
         }
 
         /// <summary>
@@ -65,7 +73,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new System.NotImplementedException();
+            return string.Format("INSERT INTO Calmerge (SystemNo,CalId,UserId,Properties) VALUES({0},{1},{2},{3})", System.Nummer, Aftale.Id, Bruger.Id, Properties);
+
         }
 
         /// <summary>
@@ -74,7 +83,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new System.NotImplementedException();
+            return string.Format("UPDATE Calmerge SET Properties={3} WHERE SystemNo={0} AND CalId={1} AND UserId={2}", System.Nummer, Aftale.Id, Bruger.Id, Properties);
         }
 
         /// <summary>
@@ -83,7 +92,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new System.NotImplementedException();
+            return string.Format("DELETE FROM Calmerge WHERE SystemNo={0} AND CalId={1} AND UserId={2}", System.Nummer, Aftale.Id, Bruger.Id);
         }
 
         #endregion
@@ -97,7 +106,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="dataProvider">Dataprovider.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
-            throw new System.NotImplementedException();
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException("dataReader");
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
+                                                                                   dataReader.GetType(), "dataReader"));
+            }
+
+            throw new NotImplementedException();
         }
 
         #endregion
