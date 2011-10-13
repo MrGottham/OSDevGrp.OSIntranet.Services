@@ -151,7 +151,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             _mySqlConnection.Open();
             try
             {
-                var sqlCommand = ((IMySqlDataProxy<TDataProxy>)dataProxy).GetSqlCommandForUpdate();
+                var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForUpdate();
                 using (var command = _mySqlConnection.CreateCommand())
                 {
                     command.CommandText = sqlCommand;

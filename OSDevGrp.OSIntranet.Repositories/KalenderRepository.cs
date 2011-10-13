@@ -48,7 +48,45 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste indeholdende kalenderaftaler til systemer.</returns>
         public IEnumerable<IAftale> AftaleGetAllBySystem(int system, DateTime fromDate)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _mySqlDataProvider.GetCollection<AftaleProxy>(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND Date>='{1}'", system, fromDate.ToString("yyyy-MM-dd")));
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Henter en given kalenderaftale fra et system under OSWEBDB.
+        /// </summary>
+        /// <param name="system">Unik identifikation af systemet under OSWEBDB.</param>
+        /// <param name="id">Unik identifikation af kalenderaftalen.</param>
+        /// <returns>Kalenderaftale.</returns>
+        public IAftale AftaleGetBySystemAndId(int system, int id)
+        {
+            try
+            {
+                var queryForAftale = new AftaleProxy(system, id);
+                return _mySqlDataProvider.Get(queryForAftale);
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
+                                                 ex.Message), ex);
+            }
         }
 
         /// <summary>
@@ -60,8 +98,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                return
-                    _mySqlDataProvider.GetCollection<BrugerProxy>(string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} ORDER BY Name,Initials,UserId", system));
+                return _mySqlDataProvider.GetCollection<BrugerProxy>(string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} ORDER BY Name,Initials,UserId", system));
             }
             catch (IntranetRepositoryException)
             {
