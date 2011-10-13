@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 
 namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders
@@ -6,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders
     /// <summary>
     /// Interface til en basis data provider.
     /// </summary>
-    public interface IDataProviderBase
+    public interface IDataProviderBase : ICloneable, IDisposable
     {
         /// <summary>
         /// Henter og returnerer data fra data provideren.

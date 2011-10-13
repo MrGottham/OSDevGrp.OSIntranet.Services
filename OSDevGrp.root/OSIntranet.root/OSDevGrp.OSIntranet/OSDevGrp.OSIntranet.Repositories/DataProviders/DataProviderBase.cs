@@ -51,5 +51,24 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         public abstract void Delete<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase;
 
         #endregion
+
+        #region ICloneable Members
+
+        /// <summary>
+        /// Danner ny instans af data provideren.
+        /// </summary>
+        /// <returns>Ny instans af data provideren.</returns>
+        public abstract object Clone();
+
+        #endregion
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Frigørelse af allokerede ressourcer i data provideren.
+        /// </summary>
+        public abstract void Dispose();
+
+        #endregion
     }
 }
