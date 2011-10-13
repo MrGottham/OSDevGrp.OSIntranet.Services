@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using NUnit.Framework;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -206,6 +207,129 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             Assert.Throws<IntranetRepositoryException>(
                 () =>
                 aftaleProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
+        }
+
+        /// <summary>
+        /// Tester, at MapData mapper data proxy for en aftale.
+        /// </summary>
+        [Test]
+        public void TestAtMapDataMapperAftaleProxy()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new MySqlDateTime(2011, 10, 8, 0, 0, 0));
+            fixture.Inject(new TimeSpan(12, 0, 0));
+            fixture.Inject(new AftaleProxy());
+
+            var systemNo = fixture.CreateAnonymous<int>();
+            var calId = fixture.CreateAnonymous<int>();
+
+            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
+                .Return(systemNo)
+                .Repeat.Any();
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("CalId")))
+                .Return(calId)
+                .Repeat.Any();
+            dataReader.Expect(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("Date")))
+                .Return(fixture.CreateAnonymous<MySqlDateTime>());
+            dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("FromTime")))
+                .Return(fixture.CreateAnonymous<TimeSpan>());
+            dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("ToTime")))
+                .Return(fixture.CreateAnonymous<TimeSpan>().Add(new TimeSpan(0, 15, 0)));
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
+                .Return(fixture.CreateAnonymous<int>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Subject")))
+                .Return(fixture.CreateAnonymous<string>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Note")))
+                .Return(fixture.CreateAnonymous<string>());
+            fixture.Inject(dataReader);
+
+            fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.CreateAnonymous<int>())));
+            var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProvider.Expect(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull))
+                .Return(fixture.CreateMany<BrugeraftaleProxy>(3));
+            fixture.Inject(dataProvider);
+
+            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            Assert.That(aftaleProxy, Is.Not.Null);
+
+            aftaleProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            Assert.That(aftaleProxy.DataIsLoaded, Is.True);
+
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Times(2));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("CalId")), opt => opt.Repeat.Times(2));
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("Date")));
+            dataReader.AssertWasCalled(m => m.GetTimeSpan(Arg<string>.Is.Equal("FromTime")));
+            dataReader.AssertWasCalled(m => m.GetTimeSpan(Arg<string>.Is.Equal("ToTime")));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Subject")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Note")));
+
+            dataProvider.AssertWasCalled(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at System lazy loades.
+        /// </summary>
+        [Test]
+        public void TestAtSystemLazyLoades()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new MySqlDateTime(2011, 10, 8, 0, 0, 0));
+            fixture.Inject(new TimeSpan(12, 0, 0));
+            fixture.Inject(new AftaleProxy());
+
+            var systemNo = fixture.CreateAnonymous<int>();
+            var calId = fixture.CreateAnonymous<int>();
+
+            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
+                .Return(systemNo)
+                .Repeat.Any();
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("CalId")))
+                .Return(calId)
+                .Repeat.Any();
+            dataReader.Expect(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("Date")))
+                .Return(fixture.CreateAnonymous<MySqlDateTime>());
+            dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("FromTime")))
+                .Return(fixture.CreateAnonymous<TimeSpan>());
+            dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("ToTime")))
+                .Return(fixture.CreateAnonymous<TimeSpan>().Add(new TimeSpan(0, 15, 0)));
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
+                .Return(fixture.CreateAnonymous<int>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Subject")))
+                .Return(fixture.CreateAnonymous<string>());
+            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Note")))
+                .Return(fixture.CreateAnonymous<string>());
+            fixture.Inject(dataReader);
+
+            fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.CreateAnonymous<int>())));
+            var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProvider.Expect(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull))
+                .Return(fixture.CreateMany<BrugeraftaleProxy>(3));
+            dataProvider.Expect(m => m.Get(Arg<SystemProxy>.Is.NotNull))
+                .Return(fixture.CreateAnonymous<SystemProxy>());
+            fixture.Inject(dataProvider);
+
+            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            Assert.That(aftaleProxy, Is.Not.Null);
+
+            aftaleProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            Assert.That(aftaleProxy.DataIsLoaded, Is.True);
+
+            Assert.That(aftaleProxy.System, Is.Not.Null);
+
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Times(2));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("CalId")), opt => opt.Repeat.Times(2));
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("Date")));
+            dataReader.AssertWasCalled(m => m.GetTimeSpan(Arg<string>.Is.Equal("FromTime")));
+            dataReader.AssertWasCalled(m => m.GetTimeSpan(Arg<string>.Is.Equal("ToTime")));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Subject")));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Note")));
+
+            dataProvider.AssertWasCalled(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull));
+            dataProvider.AssertWasCalled(m => m.Get(Arg<SystemProxy>.Is.NotNull));
         }
     }
 }

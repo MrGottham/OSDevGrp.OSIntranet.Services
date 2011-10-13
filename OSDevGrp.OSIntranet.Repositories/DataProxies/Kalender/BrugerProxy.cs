@@ -70,7 +70,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             {
                 if (base.System is ILazyLoadable)
                 {
-                    if (((ILazyLoadable) base.System).DataIsLoaded == false && _dataProvider != null)
+                    if (((ILazyLoadable)base.System).DataIsLoaded == false && _dataProvider != null)
                     {
                         this.SetFieldValue("_system", this.Get(_dataProvider, base.System as SystemProxy, MethodBase.GetCurrentMethod().Name));
                     }

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Reflection;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Resources;
 using MySql.Data.MySqlClient;
@@ -15,6 +18,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
     /// </summary>
     public class AftaleProxy : Aftale, IAftaleProxy
     {
+        #region Private variables
+
+        private IDataProviderBase _dataProvider;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -47,6 +56,28 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             : base(new SystemProxy(system), id, fraTidspunkt, tilTidspunkt, emne, properties)
         {
             DataIsLoaded = false;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// System under OSWEBDB, som aftalen er tilknyttet.
+        /// </summary>
+        public override ISystem System
+        {
+            get
+            {
+                if (base.System is ILazyLoadable)
+                {
+                    if (((ILazyLoadable)base.System).DataIsLoaded == false && _dataProvider != null)
+                    {
+                        this.SetFieldValue("_system", this.Get(_dataProvider, base.System as SystemProxy, MethodBase.GetCurrentMethod().Name));
+                    }
+                }
+                return base.System;
+            }
         }
 
         #endregion
@@ -132,7 +163,25 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
                                                                                    dataReader.GetType(), "dataReader"));
             }
 
-            throw new NotImplementedException();
+            this.SetFieldValue("_system", new SystemProxy(mySqlDataReader.GetInt32("SystemNo")));
+            this.SetFieldValue("_id", mySqlDataReader.GetInt32("CalId"));
+            var mySqlDateTime = mySqlDataReader.GetMySqlDateTime("Date");
+            var mySqlFromTime = mySqlDataReader.GetTimeSpan("FromTime");
+            var mySqlToTime = mySqlDataReader.GetTimeSpan("ToTime");
+            FraTidspunkt = new DateTime(mySqlDateTime.Year, mySqlDateTime.Month, mySqlDateTime.Day, mySqlFromTime.Hours,
+                                        mySqlFromTime.Minutes, mySqlFromTime.Seconds);
+            TilTidspunkt = new DateTime(mySqlDateTime.Year, mySqlDateTime.Month, mySqlDateTime.Day, mySqlToTime.Hours,
+                                        mySqlToTime.Minutes, mySqlToTime.Seconds);
+            Properties = mySqlDataReader.GetInt32("Properties");
+            Emne = mySqlDataReader.GetString("Subject");
+            Notat = mySqlDataReader.GetString("Note");
+            foreach (var brugeraftale in dataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1}", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
+            {
+                TilføjDeltager(brugeraftale);
+            }
+            DataIsLoaded = true;
+
+            _dataProvider = dataProvider;
         }
 
         #endregion
