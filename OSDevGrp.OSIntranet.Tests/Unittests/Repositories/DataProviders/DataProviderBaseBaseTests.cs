@@ -121,6 +121,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
             }
 
+            /// <summary>
+            /// Danner ny instans af data provideren.
+            /// </summary>
+            /// <returns>Ny instans af data provideren.</returns>
+            public override object Clone()
+            {
+                return new MyDataProvider(_fixture);
+            }
+
             #endregion
         }
 
