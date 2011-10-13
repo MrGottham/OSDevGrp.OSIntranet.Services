@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Reflection;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Resources;
 using MySql.Data.MySqlClient;
@@ -15,6 +18,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
     /// </summary>
     public class BrugeraftaleProxy : Brugeraftale, IBrugeraftaleProxy
     {
+        #region Private variables
+
+        private IDataProviderBase _dataProvider;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -39,6 +48,65 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         }
 
         #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// System under OSWEBDB, som brugeraftalen er tilknyttet.
+        /// </summary>
+        public override ISystem System
+        {
+            get
+            {
+                if (base.System is ILazyLoadable)
+                {
+                    if (((ILazyLoadable)base.System).DataIsLoaded == false && _dataProvider != null)
+                    {
+                        this.SetFieldValue("_system", this.Get(_dataProvider, base.System as SystemProxy, MethodBase.GetCurrentMethod().Name));
+                    }
+                }
+                return base.System;
+            }
+        }
+
+        /// <summary>
+        /// Aftale, som brugeraftalen er tilknyttet.
+        /// </summary>
+        public override IAftale Aftale
+        {
+            get
+            {
+                if (base.Aftale is ILazyLoadable)
+                {
+                    if (((ILazyLoadable)base.Aftale).DataIsLoaded == false && _dataProvider != null)
+                    {
+                        this.SetFieldValue("_aftale", this.Get(_dataProvider, base.Aftale as AftaleProxy, MethodBase.GetCurrentMethod().Name));
+                    }
+                }
+                return base.Aftale;
+            }
+        }
+
+        /// <summary>
+        /// Bruger, som brugeraftalen er tilknyttet.
+        /// </summary>
+        public override IBruger Bruger
+        {
+            get
+            {
+                if (base.Bruger is ILazyLoadable)
+                {
+                    if (((ILazyLoadable)base.Bruger).DataIsLoaded == false && _dataProvider != null)
+                    {
+                        this.SetFieldValue("_bruger", this.Get(_dataProvider, base.Bruger as BrugerProxy, MethodBase.GetCurrentMethod().Name));
+                    }
+                }
+                return base.Bruger;
+            }
+        }
+
+        #endregion
+
 
         #region IMySqlDataProxy<IBrugeraftale> Members
 
@@ -122,7 +190,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
                                                                                    dataReader.GetType(), "dataReader"));
             }
 
-            throw new NotImplementedException();
+            this.SetFieldValue("_system", new SystemProxy(mySqlDataReader.GetInt32("SystemNo")));
+            this.SetFieldValue("_aftale", new AftaleProxy(mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId")));
+            this.SetFieldValue("_bruger", new BrugerProxy(mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("UserId")));
+            Properties = mySqlDataReader.GetInt32("Properties");
+            DataIsLoaded = true;
+
+            _dataProvider = dataProvider;
         }
 
         #endregion
