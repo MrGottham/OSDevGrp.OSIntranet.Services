@@ -65,6 +65,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL forespørgelse.</returns>
         public virtual string GetSqlQueryForId(ISystem queryForDataProxy)
         {
+            if (queryForDataProxy == null)
+            {
+                throw new ArgumentNullException("queryForDataProxy");
+            }
             return string.Format("SELECT SystemNo,Title FROM Systems WHERE SystemNo={0}", queryForDataProxy.Nummer);
         }
 

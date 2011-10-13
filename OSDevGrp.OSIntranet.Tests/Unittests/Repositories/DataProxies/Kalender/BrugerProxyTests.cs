@@ -74,6 +74,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         }
 
         /// <summary>
+        /// Tester, at GetSqlQueryForId kaster ArgumentNullException, hvis data proxy, der skal forespørges efter, er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetSqlQueryForIdKasterArgumentNullExceptionHvisQueryForDataProxyErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new BrugerProxy(1, 2));
+
+            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            Assert.That(brugerProxy, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => brugerProxy.GetSqlQueryForId(null));
+        }
+
+        /// <summary>
         /// Tester, at GetSqlCommandForInsert returnerer SQL kommando til oprettelse af brugeren.
         /// </summary>
         [Test]

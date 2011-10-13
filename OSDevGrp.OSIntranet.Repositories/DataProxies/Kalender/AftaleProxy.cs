@@ -1,9 +1,12 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
+using OSDevGrp.OSIntranet.Resources;
+using MySql.Data.MySqlClient;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
 {
@@ -57,7 +60,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         {
             get
             {
-                throw new NotImplementedException();
+                return string.Format("{0}-{1}", System.Nummer, Id);
             }
         }
 
@@ -68,7 +71,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL forespørgelse.</returns>
         public virtual string GetSqlQueryForId(IAftale queryForDataProxy)
         {
-            throw new NotImplementedException();
+            if (queryForDataProxy == null)
+            {
+                throw new ArgumentNullException("queryForDataProxy");
+            }
+            return string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND CalId={1}", queryForDataProxy.System.Nummer, queryForDataProxy.Id);
         }
 
         /// <summary>
@@ -77,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new NotImplementedException();
+            return string.Format("INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note) VALUES({0},{1},{2},{3},{4},{5},{6},{7})", System.Nummer, Id, this.GetNullableSqlString(FraTidspunkt.ToString("yyyy-MM-dd")), this.GetNullableSqlString(FraTidspunkt.ToString("HH:mm:ss")), this.GetNullableSqlString(TilTidspunkt.ToString("HH:mm:ss")), Properties, this.GetNullableSqlString(Emne), this.GetNullableSqlString(Notat));
         }
 
         /// <summary>
@@ -86,7 +93,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new NotImplementedException();
+            return string.Format("UPDATE Calapps SET Date={2},FromTime={3},ToTime={4},Properties={5},Subject={6},Note={7} WHERE SystemNo={0} AND CalId={1}", System.Nummer, Id, this.GetNullableSqlString(FraTidspunkt.ToString("yyyy-MM-dd")), this.GetNullableSqlString(FraTidspunkt.ToString("HH:mm:ss")), this.GetNullableSqlString(TilTidspunkt.ToString("HH:mm:ss")), Properties, this.GetNullableSqlString(Emne), this.GetNullableSqlString(Notat));
         }
 
         /// <summary>
@@ -95,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new NotImplementedException();
+            return string.Format("DELETE FROM Calapps WHERE SystemNo={0} AND CalId={1}", System.Nummer, Id);
         }
 
         #endregion
@@ -109,6 +116,22 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="dataProvider">Dataprovider.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException("dataReader");
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
+                                                                                   dataReader.GetType(), "dataReader"));
+            }
+
             throw new NotImplementedException();
         }
 

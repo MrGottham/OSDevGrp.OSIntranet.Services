@@ -67,6 +67,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         }
 
         /// <summary>
+        /// Tester, at GetSqlQueryForId kaster ArgumentNullException, hvis data proxy, der skal forespørges efter, er null.
+        /// </summary>
+        [Test]
+        public void TestAtGetSqlQueryForIdKasterArgumentNullExceptionHvisQueryForDataProxyErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new SystemProxy(1));
+
+            var systemProxy = fixture.CreateAnonymous<SystemProxy>();
+            Assert.That(systemProxy, Is.Not.Null);
+
+            Assert.Throws<ArgumentNullException>(() => systemProxy.GetSqlQueryForId(null));
+        }
+
+        /// <summary>
         /// Tester, at GetSqlCommandForInsert returnerer SQL kommando til oprettelse af systemet under OSWEBDB.
         /// </summary>
         [Test]
