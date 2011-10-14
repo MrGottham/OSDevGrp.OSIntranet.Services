@@ -37,8 +37,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// </summary>
         /// <param name="nummer">Unik identifikation af systemet under OSWEBDB.</param>
         /// <param name="title">Titel for systemet under OSWEBDB.</param>
-        public SystemProxy(int nummer, string title)
-            : base(nummer, title)
+        /// <param name="properties">Egenskaber for systemet under OSWEBDB.</param>
+        public SystemProxy(int nummer, string title, int properties = 0)
+            : base(nummer, title, properties)
         {
             DataIsLoaded = false;
         }
@@ -69,7 +70,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
             {
                 throw new ArgumentNullException("queryForDataProxy");
             }
-            return string.Format("SELECT SystemNo,Title FROM Systems WHERE SystemNo={0}", queryForDataProxy.Nummer);
+            return string.Format("SELECT SystemNo,Title,Properties FROM Systems WHERE SystemNo={0}", queryForDataProxy.Nummer);
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            return string.Format("INSERT INTO Systems (SystemNo,Title) VALUES({0},{1})", Nummer, this.GetNullableSqlString(Titel));
+            return string.Format("INSERT INTO Systems (SystemNo,Title,Properties) VALUES({0},{1},{2})", Nummer, this.GetNullableSqlString(Titel), Properties);
         }
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL kommando.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            return string.Format("UPDATE Systems SET Title={1} WHERE SystemNo={0}", Nummer, this.GetNullableSqlString(Titel));
+            return string.Format("UPDATE Systems SET Title={1},Properties={2} WHERE SystemNo={0}", Nummer, this.GetNullableSqlString(Titel), Properties);
         }
 
         /// <summary>
@@ -127,7 +128,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
             }
 
             this.SetFieldValue("_nummer", mySqlDataReader.GetInt32("SystemNo"));
-            base.Titel = mySqlDataReader.GetString("Title");
+            Titel = mySqlDataReader.GetString("Title");
+            Properties = mySqlDataReader.GetInt32("Properties");
             DataIsLoaded = true;
         }
 

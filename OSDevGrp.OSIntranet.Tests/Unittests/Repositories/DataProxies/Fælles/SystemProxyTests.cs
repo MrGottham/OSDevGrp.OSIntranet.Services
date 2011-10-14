@@ -30,6 +30,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
             Assert.That(systemProxy.Nummer, Is.EqualTo(0));
             Assert.That(systemProxy.Titel, Is.Not.Null);
             Assert.That(systemProxy.Titel, Is.EqualTo(typeof(OSIntranet.Domain.Fælles.System).ToString()));
+            Assert.That(systemProxy.Properties, Is.EqualTo(0));
+            Assert.That(systemProxy.Kalender, Is.False);
             Assert.That(systemProxy.DataIsLoaded, Is.False);
         }
 
@@ -63,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
 
             var sqlQuery = systemProxy.GetSqlQueryForId(systemProxy);
             Assert.That(sqlQuery, Is.Not.Null);
-            Assert.That(sqlQuery, Is.EqualTo("SELECT SystemNo,Title FROM Systems WHERE SystemNo=1"));
+            Assert.That(sqlQuery, Is.EqualTo("SELECT SystemNo,Title,Properties FROM Systems WHERE SystemNo=1"));
         }
 
         /// <summary>
@@ -89,14 +91,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         {
             var fixture = new Fixture();
             var title = fixture.CreateAnonymous<string>();
-            fixture.Inject(new SystemProxy(1, title));
+            var properties = fixture.CreateAnonymous<int>();
+            fixture.Inject(new SystemProxy(1, title, properties));
 
             var systemProxy = fixture.CreateAnonymous<SystemProxy>();
             Assert.That(systemProxy, Is.Not.Null);
 
             var sqlCommand = systemProxy.GetSqlCommandForInsert();
             Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Systems (SystemNo,Title) VALUES(1,'{0}')", title)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Systems (SystemNo,Title,Properties) VALUES(1,'{0}',{1})", title, properties)));
         }
 
         /// <summary>
@@ -107,14 +110,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         {
             var fixture = new Fixture();
             var title = fixture.CreateAnonymous<string>();
-            fixture.Inject(new SystemProxy(1, title));
+            var properties = fixture.CreateAnonymous<int>();
+            fixture.Inject(new SystemProxy(1, title, properties));
 
             var systemProxy = fixture.CreateAnonymous<SystemProxy>();
             Assert.That(systemProxy, Is.Not.Null);
 
             var sqlCommand = systemProxy.GetSqlCommandForUpdate();
             Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Systems SET Title='{0}' WHERE SystemNo=1", title)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Systems SET Title='{0}',Properties={1} WHERE SystemNo=1", title, properties)));
         }
 
         /// <summary>
@@ -207,6 +211,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
                 .Return(fixture.CreateAnonymous<int>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Title")))
                 .Return(fixture.CreateAnonymous<string>());
+            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
+                .Return(fixture.CreateAnonymous<int>());
             fixture.Inject(dataReader);
 
             var systemProxy = fixture.CreateAnonymous<SystemProxy>();
@@ -217,6 +223,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
 
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Title")));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
         }
     }
 }

@@ -24,6 +24,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
             Assert.That(system.Nummer, Is.EqualTo(nummer));
             Assert.That(system.Titel, Is.Not.Null);
             Assert.That(system.Titel, Is.EqualTo(titel));
+            Assert.That(system.Properties, Is.EqualTo(0));
+            Assert.That(system.Kalender, Is.False);
         }
 
         /// <summary>
@@ -91,6 +93,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
             Assert.That(system, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => system.Titel = string.Empty);
+        }
+
+        /// <summary>
+        /// Tester, at Kalender ændres.
+        /// </summary>
+        [Test]
+        public void TestAtKalenderÆndres()
+        {
+            var fixture = new Fixture();
+
+            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            Assert.That(system, Is.Not.Null);
+
+            system.Kalender = true;
+            Assert.That(system.Kalender, Is.True);
+
+            system.Kalender = false;
+            Assert.That(system.Kalender, Is.False);
         }
     }
 }

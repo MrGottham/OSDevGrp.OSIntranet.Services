@@ -108,7 +108,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                return _mySqlDataProvider.GetCollection<SystemProxy>("SELECT SystemNo,Title FROM Systems ORDER BY SystemNo");
+                return _mySqlDataProvider.GetCollection<SystemProxy>("SELECT SystemNo,Title,Properties FROM Systems ORDER BY SystemNo");
             }
             catch (IntranetRepositoryException)
             {
