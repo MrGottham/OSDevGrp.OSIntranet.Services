@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders
     /// <summary>
     /// Interface til en basis data provider.
     /// </summary>
-    public interface IDataProviderBase : ICloneable, IDisposable
+    public interface IDataProviderBase : IDisposable, ICloneable
     {
         /// <summary>
         /// Henter og returnerer data fra data provideren.

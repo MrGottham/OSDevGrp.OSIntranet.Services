@@ -246,6 +246,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
 
             fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.CreateAnonymous<int>())));
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProvider.Expect(m => m.Clone())
+                .Return(dataProvider);
             dataProvider.Expect(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull))
                 .Return(fixture.CreateMany<BrugeraftaleProxy>(3));
             fixture.Inject(dataProvider);
@@ -265,6 +267,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Subject")));
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Note")));
 
+            dataProvider.AssertWasCalled(m => m.Clone());
             dataProvider.AssertWasCalled(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull));
         }
 
@@ -305,6 +308,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
 
             fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.CreateAnonymous<int>())));
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProvider.Expect(m => m.Clone())
+                .Return(dataProvider);
             dataProvider.Expect(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull))
                 .Return(fixture.CreateMany<BrugeraftaleProxy>(3));
             dataProvider.Expect(m => m.Get(Arg<SystemProxy>.Is.NotNull))
@@ -328,6 +333,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Subject")));
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Note")));
 
+            dataProvider.AssertWasCalled(m => m.Clone());
             dataProvider.AssertWasCalled(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull));
             dataProvider.AssertWasCalled(m => m.Get(Arg<SystemProxy>.Is.NotNull));
         }

@@ -23,6 +23,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         #region Methods
 
         /// <summary>
+        /// Frigørelse af allokerede ressourcer i data provideren til MySql.
+        /// </summary>
+        public override void Dispose()
+        {
+            _mySqlConnection.Dispose();
+        }
+
+        /// <summary>
+        /// Danner ny instans af data provideren til MySql.
+        /// </summary>
+        /// <returns>Ny instans af data provideren til MSql.</returns>
+        public override object Clone()
+        {
+            return new MySqlDataProvider();
+        }
+
+        /// <summary>
         /// Henter og returnerer data fra MySql.
         /// </summary>
         /// <typeparam name="TDataProxy">Typen på data proxy med data fra MySql.</typeparam>
@@ -49,9 +66,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                             dataProxy.MapData(reader, this);
                             collection.Add(dataProxy);
                         }
-                        reader.Dispose();
+                        reader.Close();
                     }
-                    command.Dispose();
                 }
                 return collection;
             }
@@ -84,7 +100,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     {
                         if (!reader.HasRows)
                         {
-                            reader.Dispose();
+                            reader.Close();
                             throw new IntranetRepositoryException(
                                 Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
                                                              queryForDataProxy.GetType().Name,
@@ -95,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                         {
                             dataProxy.MapData(reader, this);
                         }
-                        reader.Dispose();
+                        reader.Close();
                         return dataProxy;
                     }
                 }
@@ -126,7 +142,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 {
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
-                    command.Dispose();
                 }
                 return dataProxy;
             }
@@ -156,7 +171,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 {
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
-                    command.Dispose();
                 }
                 return dataProxy;
             }
@@ -185,7 +199,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 {
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
-                    command.Dispose();
                 }
             }
             finally

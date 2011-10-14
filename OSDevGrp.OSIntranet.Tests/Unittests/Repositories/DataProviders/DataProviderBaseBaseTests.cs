@@ -62,6 +62,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             #region Methods
 
             /// <summary>
+            /// Frigørelse af allokerede ressourcer i data provideren.
+            /// </summary>
+            public override void Dispose()
+            {
+            }
+
+            /// <summary>
+            /// Danner ny instans af data provideren.
+            /// </summary>
+            /// <returns>Ny instans af data provideren.</returns>
+            public override object Clone()
+            {
+                return new MyDataProvider(_fixture);
+            }
+
+            /// <summary>
             /// Henter og returnerer data fra data provideren.
             /// </summary>
             /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
@@ -121,15 +137,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
             }
 
-            /// <summary>
-            /// Danner ny instans af data provideren.
-            /// </summary>
-            /// <returns>Ny instans af data provideren.</returns>
-            public override object Clone()
-            {
-                return new MyDataProvider(_fixture);
-            }
-
             #endregion
         }
 
@@ -143,8 +150,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             fixture.Inject(new MyDataProxy());
             fixture.Inject(new MyDataProvider(fixture));
 
-            var dataProvider = fixture.CreateAnonymous<MyDataProvider>();
-            Assert.That(dataProvider, Is.Not.Null);
+            using (var dataProvider = fixture.CreateAnonymous<MyDataProvider>())
+            {
+                Assert.That(dataProvider, Is.Not.Null);
+            }
+        }
+
+        /// <summary>
+        /// Tester, at Clone initierer ny basis data provider.
+        /// </summary>
+        [Test]
+        public void TestAtCloneInitiererNyDataProviderBase()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(new MyDataProxy());
+            fixture.Inject(new MyDataProvider(fixture));
+
+            using (var dataProvider = fixture.CreateAnonymous<MyDataProvider>())
+            {
+                Assert.That(dataProvider, Is.Not.Null);
+
+                using (var clonedDataProvider = dataProvider.Clone() as IDataProviderBase)
+                {
+                    Assert.That(clonedDataProvider, Is.Not.Null);
+                }
+            }
         }
 
         /// <summary>
@@ -157,12 +187,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             fixture.Inject(new MyDataProxy());
             fixture.Inject(new MyDataProvider(fixture));
 
-            var dataProvider = fixture.CreateAnonymous<MyDataProvider>();
-            Assert.That(dataProvider, Is.Not.Null);
+            using (var dataProvider = fixture.CreateAnonymous<MyDataProvider>())
+            {
+                Assert.That(dataProvider, Is.Not.Null);
 
-            var result = dataProvider.GetCollection<MyDataProxy>(fixture.CreateAnonymous<string>());
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(3));
+                var result = dataProvider.GetCollection<MyDataProxy>(fixture.CreateAnonymous<string>());
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Count(), Is.EqualTo(3));
+            }
         }
 
         /// <summary>
@@ -175,11 +207,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             fixture.Inject(new MyDataProxy());
             fixture.Inject(new MyDataProvider(fixture));
 
-            var dataProvider = fixture.CreateAnonymous<MyDataProvider>();
-            Assert.That(dataProvider, Is.Not.Null);
+            using (var dataProvider = fixture.CreateAnonymous<MyDataProvider>())
+            {
+                Assert.That(dataProvider, Is.Not.Null);
 
-            var result = dataProvider.Get(new MyDataProxy());
-            Assert.That(result, Is.Not.Null);
+                var result = dataProvider.Get(new MyDataProxy());
+                Assert.That(result, Is.Not.Null);
+            }
         }
 
         /// <summary>
@@ -192,11 +226,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             fixture.Inject(new MyDataProxy());
             fixture.Inject(new MyDataProvider(fixture));
 
-            var dataProvider = fixture.CreateAnonymous<MyDataProvider>();
-            Assert.That(dataProvider, Is.Not.Null);
+            using (var dataProvider = fixture.CreateAnonymous<MyDataProvider>())
+            {
+                Assert.That(dataProvider, Is.Not.Null);
 
-            var result = dataProvider.Add(fixture.CreateAnonymous<MyDataProxy>());
-            Assert.That(result, Is.Not.Null);
+                var result = dataProvider.Add(fixture.CreateAnonymous<MyDataProxy>());
+                Assert.That(result, Is.Not.Null);
+            }
         }
 
         /// <summary>
@@ -209,11 +245,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             fixture.Inject(new MyDataProxy());
             fixture.Inject(new MyDataProvider(fixture));
 
-            var dataProvider = fixture.CreateAnonymous<MyDataProvider>();
-            Assert.That(dataProvider, Is.Not.Null);
+            using (var dataProvider = fixture.CreateAnonymous<MyDataProvider>())
+            {
+                Assert.That(dataProvider, Is.Not.Null);
 
-            var result = dataProvider.Save(fixture.CreateAnonymous<MyDataProxy>());
-            Assert.That(result, Is.Not.Null);
+                var result = dataProvider.Save(fixture.CreateAnonymous<MyDataProxy>());
+                Assert.That(result, Is.Not.Null);
+            }
         }
 
         /// <summary>
@@ -226,10 +264,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             fixture.Inject(new MyDataProxy());
             fixture.Inject(new MyDataProvider(fixture));
 
-            var dataProvider = fixture.CreateAnonymous<MyDataProvider>();
-            Assert.That(dataProvider, Is.Not.Null);
+            using (var dataProvider = fixture.CreateAnonymous<MyDataProvider>())
+            {
+                Assert.That(dataProvider, Is.Not.Null);
 
-            dataProvider.Delete(fixture.CreateAnonymous<MyDataProxy>());
+                dataProvider.Delete(fixture.CreateAnonymous<MyDataProxy>());
+            }
         }
     }
 }

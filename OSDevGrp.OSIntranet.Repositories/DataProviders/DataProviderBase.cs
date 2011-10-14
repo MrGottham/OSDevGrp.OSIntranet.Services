@@ -9,7 +9,26 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
     /// </summary>
     public abstract class DataProviderBase : IDataProviderBase
     {
-        #region IDataProviderBase<TDataProxy> Members
+        #region IDisposable Members
+
+        /// <summary>
+        /// Frigørelse af allokerede ressourcer i data provideren.
+        /// </summary>
+        public abstract void Dispose();
+
+        #endregion
+
+        #region ICloneable Members
+
+        /// <summary>
+        /// Danner ny instans af data provideren.
+        /// </summary>
+        /// <returns>Ny instans af data provideren.</returns>
+        public abstract object Clone();
+
+        #endregion
+
+        #region IDataProviderBase Members
 
         /// <summary>
         /// Henter og returnerer data fra data provideren.
@@ -49,25 +68,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
         /// <param name="dataProxy">Data proxy med data, som skal slettes fra data provideren.</param>
         public abstract void Delete<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase;
-
-        #endregion
-
-        #region ICloneable Members
-
-        /// <summary>
-        /// Danner ny instans af data provideren.
-        /// </summary>
-        /// <returns>Ny instans af data provideren.</returns>
-        public abstract object Clone();
-
-        #endregion
-
-        #region IDisposable Members
-
-        /// <summary>
-        /// Frigørelse af allokerede ressourcer i data provideren.
-        /// </summary>
-        public abstract void Dispose();
 
         #endregion
     }
