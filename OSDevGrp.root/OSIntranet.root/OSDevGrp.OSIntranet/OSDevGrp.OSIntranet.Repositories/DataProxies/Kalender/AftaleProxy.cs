@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
@@ -175,11 +176,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             Properties = mySqlDataReader.GetInt32("Properties");
             Emne = mySqlDataReader.GetString("Subject");
             Notat = mySqlDataReader.GetString("Note");
-            using (var clonedDataProvider = (IDataProviderBase)dataProvider.Clone())
+            var deltagere = base.Deltagere as IList<IBrugeraftale>;
+            if (deltagere != null)
             {
-                foreach (var brugeraftale in clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1}", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
+                using (var clonedDataProvider = (IDataProviderBase)dataProvider.Clone())
                 {
-                    TilføjDeltager(brugeraftale);
+                    foreach (var brugeraftale in clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1}", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
+                    {
+                        deltagere.Add(brugeraftale);
+                    }
                 }
             }
             DataIsLoaded = true;

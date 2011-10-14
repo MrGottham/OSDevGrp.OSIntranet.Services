@@ -41,6 +41,16 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
         }
 
         /// <summary>
+        /// Tester, at AftaleGetBySystemAndId henter en given aftale.
+        /// </summary>
+        [Test]
+        public void TestAtAftaleGetBySystemAndIdHenterAftale()
+        {
+            var aftale = _kalenderRepository.AftaleGetBySystemAndId(1, 1);
+            Assert.That(aftale, Is.Not.Null);
+        }
+
+        /// <summary>
         /// Tester, at BrugerGetAllBySystem henter brugere.
         /// </summary>
         [Test]
