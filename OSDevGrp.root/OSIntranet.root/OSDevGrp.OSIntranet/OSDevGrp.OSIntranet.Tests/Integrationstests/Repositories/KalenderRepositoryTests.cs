@@ -48,6 +48,15 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
         {
             var aftale = _kalenderRepository.AftaleGetBySystemAndId(1, 1);
             Assert.That(aftale, Is.Not.Null);
+            Assert.That(aftale.System, Is.Not.Null);
+            Assert.That(aftale.Deltagere, Is.Not.Null);
+            foreach (var deltager in aftale.Deltagere)
+            {
+                Assert.That(deltager, Is.Not.Null);
+                Assert.That(deltager.System, Is.Not.Null);
+                Assert.That(deltager.Aftale, Is.Not.Null);
+                Assert.That(deltager.Bruger, Is.Not.Null);
+            }
         }
 
         /// <summary>

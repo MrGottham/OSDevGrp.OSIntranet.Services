@@ -131,7 +131,6 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
             }
         }
 
-
         /// <summary>
         /// Angivelse af, at aftalen skal eksporteres.
         /// </summary>

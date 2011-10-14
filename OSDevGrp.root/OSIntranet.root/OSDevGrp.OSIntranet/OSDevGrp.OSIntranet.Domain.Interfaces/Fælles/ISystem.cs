@@ -21,5 +21,14 @@
             get;
             set;
         }
+
+        /// <summary>
+        /// Angivelse af, om systemet benytter kalenderen under OSWEBDB.
+        /// </summary>
+        bool Kalender
+        {
+            get;
+            set;
+        }
     }
 }
