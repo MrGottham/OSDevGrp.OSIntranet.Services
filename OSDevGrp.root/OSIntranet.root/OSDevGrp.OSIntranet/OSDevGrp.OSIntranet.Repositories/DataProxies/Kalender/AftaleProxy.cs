@@ -175,9 +175,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             Properties = mySqlDataReader.GetInt32("Properties");
             Emne = mySqlDataReader.GetString("Subject");
             Notat = mySqlDataReader.GetString("Note");
-            foreach (var brugeraftale in dataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1}", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
+            using (var clonedDataProvider = (IDataProviderBase)dataProvider.Clone())
             {
-                TilføjDeltager(brugeraftale);
+                foreach (var brugeraftale in clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1}", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
+                {
+                    TilføjDeltager(brugeraftale);
+                }
             }
             DataIsLoaded = true;
 

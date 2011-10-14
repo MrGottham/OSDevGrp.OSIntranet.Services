@@ -50,7 +50,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                return _mySqlDataProvider.GetCollection<AftaleProxy>(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND Date>='{1}'", system, fromDate.ToString("yyyy-MM-dd")));
+                return _mySqlDataProvider.GetCollection<AftaleProxy>(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND Date>='{1}' ORDER BY Date DESC,FromTime DESC,ToTime DESC,CalId DESC", system, fromDate.ToString("yyyy-MM-dd")));
             }
             catch (IntranetRepositoryException)
             {
