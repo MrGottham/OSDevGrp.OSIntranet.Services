@@ -70,6 +70,7 @@
     <Compile Include="Queries\DebitorlisteGetQuery.cs" />
     <Compile Include="Queries\FirmaGetQuery.cs" />
     <Compile Include="Queries\FirmalisteGetQuery.cs" />
+    <Compile Include="Queries\KalenderbrugereGetQuery.cs" />
     <Compile Include="Queries\KontoGetQuery.cs" />
     <Compile Include="Queries\KontogrupperGetQuery.cs" />
     <Compile Include="Queries\KontoplanGetQuery.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Queries\PersonlisteGetQuery.cs" />
     <Compile Include="Queries\PostnumreGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
+    <Compile Include="Queries\SystemerGetQuery.cs" />
     <Compile Include="Queries\TelefonlisteGetQuery.cs" />
     <Compile Include="Responses\BogføringsadvarselResponse.cs" />
     <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
@@ -103,6 +105,8 @@
     <Compile Include="Views\DebitorListeView.cs" />
     <Compile Include="Views\DebitorView.cs" />
     <Compile Include="Views\FirmaView.cs" />
+    <Compile Include="Views\KalenderbrugerAftaleView.cs" />
+    <Compile Include="Views\KalenderbrugerView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />
     <Compile Include="Views\KontogruppeView.cs" />
     <Compile Include="Views\KontoplanView.cs" />
@@ -116,6 +120,7 @@
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\SaldoBaseView.cs" />
     <Compile Include="Views\SaldolisteBaseView.cs" />
+    <Compile Include="Views\SystemView.cs" />
     <Compile Include="Views\TabelView.cs" />
     <Compile Include="Views\TelefonlisteView.cs" />
   </ItemGroup>
