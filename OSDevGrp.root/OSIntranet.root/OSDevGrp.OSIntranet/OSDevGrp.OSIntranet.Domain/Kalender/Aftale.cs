@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OSDevGrp.OSIntranet.Domain.Comparers;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -159,7 +160,8 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         {
             get
             {
-                return _deltagere;
+                var comparer = new BrugeraftaleComparer(new KalenderbrugerComparer());
+                return _deltagere.OrderBy(m => m, comparer).ToList();
             }
         }
 

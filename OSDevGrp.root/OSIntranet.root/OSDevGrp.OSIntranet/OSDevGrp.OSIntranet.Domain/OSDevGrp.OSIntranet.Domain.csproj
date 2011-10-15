@@ -53,6 +53,8 @@
     <Compile Include="Adressekartotek\AdresselisteHelper.cs" />
     <Compile Include="Adressekartotek\BetalingsbetingelselisteHelper.cs" />
     <Compile Include="Comparers\AdressekontoSaldoComparer.cs" />
+    <Compile Include="Comparers\BrugeraftaleComparer.cs" />
+    <Compile Include="Comparers\KalenderbrugerComparer.cs" />
     <Compile Include="DomainObjectListHelper.cs" />
     <Compile Include="Finansstyring\Bogføringsadvarsel.cs" />
     <Compile Include="Finansstyring\Bogføringsresultat.cs" />

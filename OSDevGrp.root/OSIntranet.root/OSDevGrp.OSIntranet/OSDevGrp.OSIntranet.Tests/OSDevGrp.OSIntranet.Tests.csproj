@@ -179,6 +179,8 @@
     <Compile Include="Unittests\Domain\Adressekartotek\AdresselisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\BetalingsbetingelselisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Comparers\AdressekontoSaldoComparerTests.cs" />
+    <Compile Include="Unittests\Domain\Comparers\BrugeraftaleComparerTests.cs" />
+    <Compile Include="Unittests\Domain\Comparers\KalenderbrugerComparerTests.cs" />
     <Compile Include="Unittests\Domain\DomainObjectListHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\BogføringsadvarselTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\BogføringsresultatTests.cs" />
