@@ -7,6 +7,8 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
 using IObjectMapper = OSDevGrp.OSIntranet.Infrastructure.Interfaces.IObjectMapper;
@@ -499,6 +501,33 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
 
+            Mapper.CreateMap<IBrugeraftale, KalenderbrugerAftaleView>()
+                .ForMember(x => x.System, opt => opt.MapFrom(s => s.Aftale.System))
+                .ForMember(x => x.Id, opt => opt.MapFrom(s => s.Aftale.Id))
+                .ForMember(x => x.FraTidspunkt, opt => opt.MapFrom(s => s.Aftale.FraTidspunkt))
+                .ForMember(x => x.TilTidspunkt, opt => opt.MapFrom(s => s.Aftale.TilTidspunkt))
+                .ForMember(x => x.Emne, opt => opt.MapFrom(s => s.Aftale.Emne))
+                .ForMember(x => x.Notat, opt => opt.MapFrom(s => s.Aftale.Notat))
+                .ForMember(x => x.Offentlig, opt => opt.MapFrom(s => s.Offentligtgørelse))
+                .ForMember(x => x.Privat, opt => opt.MapFrom(s => s.Privat))
+                .ForMember(x => x.Alarm, opt => opt.MapFrom(s => s.Alarm))
+                .ForMember(x => x.Udført, opt => opt.MapFrom(s => s.Udført))
+                .ForMember(x => x.Eksporteres, opt => opt.MapFrom(s => s.Eksporter))
+                .ForMember(x => x.Eksporteret, opt => opt.MapFrom(s => s.Eksporteret))
+                .ForMember(x => x.Deltagere, opt => opt.MapFrom(s => s.Aftale.Deltagere));
+
+            Mapper.CreateMap<IBrugeraftale, KalenderbrugerView>()
+                .ForMember(x => x.System, opt => opt.MapFrom(s => s.Bruger.System))
+                .ForMember(x => x.Id, opt => opt.MapFrom(s => s.Bruger.Id))
+                .ForMember(x => x.Initialer, opt => opt.MapFrom(s => s.Bruger.Initialer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Bruger.Navn));
+
+            Mapper.CreateMap<IBruger, KalenderbrugerView>()
+                .ForMember(x => x.System, opt => opt.MapFrom(s => s.System))
+                .ForMember(x => x.Id, opt => opt.MapFrom(s => s.Id))
+                .ForMember(x => x.Initialer, opt => opt.MapFrom(s => s.Initialer))
+                .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
+
             Mapper.CreateMap<Brevhoved, BrevhovedreferenceView>()
                 .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                 .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
@@ -514,6 +543,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(x => x.Linje6, opt => opt.MapFrom(s => s.Linje6))
                 .ForMember(x => x.Linje7, opt => opt.MapFrom(s => s.Linje7))
                 .ForMember(x => x.CvrNr, opt => opt.MapFrom(s => s.CvrNr));
+
+            Mapper.CreateMap<ISystem, SystemView>()
+                .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
+                .ForMember(x => x.Titel, opt => opt.MapFrom(s => s.Titel))
+                .ForMember(x => x.Kalender, opt => opt.MapFrom(s => s.Kalender));
 
             Mapper.AssertConfigurationIsValid();
         }
