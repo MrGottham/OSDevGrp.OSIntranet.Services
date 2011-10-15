@@ -181,7 +181,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             {
                 using (var clonedDataProvider = (IDataProviderBase)dataProvider.Clone())
                 {
-                    foreach (var brugeraftale in clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1}", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
+                    foreach (var brugeraftale in clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
                     {
                         deltagere.Add(brugeraftale);
                     }
