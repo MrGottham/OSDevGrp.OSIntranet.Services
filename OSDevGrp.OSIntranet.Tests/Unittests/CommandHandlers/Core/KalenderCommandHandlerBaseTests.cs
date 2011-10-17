@@ -40,10 +40,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
-            Assert.That(queryHandler, Is.Not.Null);
-            Assert.That(queryHandler.Repository, Is.Not.Null);
-            Assert.That(queryHandler.ObjectMapper, Is.Not.Null);
+            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            Assert.That(commandHandler, Is.Not.Null);
+            Assert.That(commandHandler.Repository, Is.Not.Null);
+            Assert.That(commandHandler.ObjectMapper, Is.Not.Null);
         }
 
         /// <summary>
