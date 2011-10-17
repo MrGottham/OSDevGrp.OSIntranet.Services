@@ -34,10 +34,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
         }
 
         /// <summary>
-        /// Tester, at konstruktøren initierer FinansstyringQueryHandlerBase.
+        /// Tester, at konstruktøren initierer FællesElementQueryHandlerBase.
         /// </summary>
         [Test]
-        public void TestAtConstructorInitiererFinansstyringQueryHandlerBase()
+        public void TestAtConstructorInitiererFællesElementQueryHandlerBase()
         {
             var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();

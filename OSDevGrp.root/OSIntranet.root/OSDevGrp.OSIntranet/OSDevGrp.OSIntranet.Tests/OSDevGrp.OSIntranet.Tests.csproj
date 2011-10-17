@@ -120,6 +120,7 @@
     <Compile Include="Unittests\CommandHandlers\Core\CommandHandlerBaseExtensionsTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FinansstyringCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\DataContractTestHelper.cs" />
@@ -218,6 +219,7 @@
     <Compile Include="Unittests\QueryHandlers\BudgetkontogrupperGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\Core\KalenderQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\RegnskabQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorlisteGetQueryHandlerTests.cs" />
