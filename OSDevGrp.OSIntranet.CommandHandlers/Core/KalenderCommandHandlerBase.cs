@@ -65,5 +65,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         }
 
         #endregion
+
+        #region Methods
+
+        #endregion
     }
 }
