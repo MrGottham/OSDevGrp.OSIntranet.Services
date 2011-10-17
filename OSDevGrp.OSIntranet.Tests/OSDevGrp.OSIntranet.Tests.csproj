@@ -139,6 +139,8 @@
     <Compile Include="Unittests\Contracts\Queries\DebitorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FirmaGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FirmalisteGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftaleGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftalerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugereGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontogrupperGetQueryTests.cs" />

@@ -70,6 +70,8 @@
     <Compile Include="Queries\DebitorlisteGetQuery.cs" />
     <Compile Include="Queries\FirmaGetQuery.cs" />
     <Compile Include="Queries\FirmalisteGetQuery.cs" />
+    <Compile Include="Queries\KalenderbrugerAftaleGetQuery.cs" />
+    <Compile Include="Queries\KalenderbrugerAftalerGetQuery.cs" />
     <Compile Include="Queries\KalenderbrugereGetQuery.cs" />
     <Compile Include="Queries\KontoGetQuery.cs" />
     <Compile Include="Queries\KontogrupperGetQuery.cs" />
