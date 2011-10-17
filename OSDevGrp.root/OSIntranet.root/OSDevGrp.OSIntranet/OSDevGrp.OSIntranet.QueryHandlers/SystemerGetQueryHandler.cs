@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
@@ -11,41 +11,41 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces;
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
     /// <summary>
-    /// QueryHandler til håndtering af forespørgelsen: BrevhovederGetQuery.
+    /// QueryHandler til håndtering af forespørgelsen: SystemerGetQuery.
     /// </summary>
-    public class BrevhovederGetQueryHandler : FællesElementQueryHandlerBase, IQueryHandler<BrevhovederGetQuery, IEnumerable<BrevhovedView>>
+    public class SystemerGetQueryHandler : FællesElementQueryHandlerBase, IQueryHandler<SystemerGetQuery, IEnumerable<SystemView>>
     {
         #region Constructor
 
         /// <summary>
-        /// Danner QueryHandler til håndtering af forespørgelsen: BrevhovederGetQuery.
+        /// Danner QueryHandler til håndtering af forespørgelsen: SystemerGetQuery.
         /// </summary>
         /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        public BrevhovederGetQueryHandler(IFællesRepository fællesRepository, IObjectMapper objectMapper)
+        public SystemerGetQueryHandler(IFællesRepository fællesRepository, IObjectMapper objectMapper)
             : base(fællesRepository, objectMapper)
         {
         }
 
         #endregion
 
-        #region IQueryHandler<BrevhovederGetQuery,IEnumerable<BrevhovedView>> Members
+        #region IQueryHandler<SystemerGetQuery,IEnumerable<SystemView>> Members
 
         /// <summary>
-        /// Henter og returnerer brevhoveder.
+        /// Henter og returnerer systemer under OSWEBDB.
         /// </summary>
-        /// <param name="query">Forespørgelse efter brevhoveder.</param>
-        /// <returns>Liste af brevhoveder.</returns>
-        public IEnumerable<BrevhovedView> Query(BrevhovederGetQuery query)
+        /// <param name="query">Foresprøgelser efter systemer under OSWEBDB.</param>
+        /// <returns>Liste indeholdende systemer under OSWEBDB.</returns>
+        public IEnumerable<SystemView> Query(SystemerGetQuery query)
         {
             if (query == null)
             {
                 throw new ArgumentNullException("query");
             }
 
-            var brevhoveder = Repository.BrevhovedGetAll();
+            var systemer = Repository.SystemGetAll();
 
-            return MapMany<Brevhoved, BrevhovedView>(brevhoveder);
+            return MapMany<ISystem, SystemView>(systemer);
         }
 
         #endregion

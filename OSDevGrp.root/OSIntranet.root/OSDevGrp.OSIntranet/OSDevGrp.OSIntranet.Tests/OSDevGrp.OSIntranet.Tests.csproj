@@ -235,6 +235,7 @@
     <Compile Include="Unittests\QueryHandlers\PersonlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\PostnumreGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\SystemerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\TelefonlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseBaseTests.cs" />
