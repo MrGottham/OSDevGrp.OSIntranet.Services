@@ -180,4 +180,8 @@
   <data name="UserAppointmentDontExists" xml:space="preserve">
     <value>The user are not booked on the appointment.</value>
   </data>
+  <data name="NoCalendarUserWithThoseInitials" xml:space="preserve">
+    <value>The are no calendar users with the initials '{0}'.</value>
+    <comment>{0} = Initials.</comment>
+  </data>
 </root>

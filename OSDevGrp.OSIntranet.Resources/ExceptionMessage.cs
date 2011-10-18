@@ -22,6 +22,7 @@
         BudgetAccountIsOverdrawn,
         NoRegistrationForDelegate,
         UserAppointmentAlreadyExists,
-        UserAppointmentDontExists
+        UserAppointmentDontExists,
+        NoCalendarUserWithThoseInitials
     }
 }
