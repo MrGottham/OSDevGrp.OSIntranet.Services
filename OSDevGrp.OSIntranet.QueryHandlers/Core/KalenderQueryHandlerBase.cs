@@ -24,15 +24,21 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         /// Danner basisklasse for en QueryHandler til kalenderdelen under OSWEBDB.
         /// </summary>
         /// <param name="kalenderRepository">Implementering af repository til kalenderdelen under OSWEBDB.</param>
+        /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet, såsom systemer under OSWEBDB.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        protected KalenderQueryHandlerBase(IKalenderRepository kalenderRepository, IObjectMapper objectMapper)
+        protected KalenderQueryHandlerBase(IKalenderRepository kalenderRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
             : base(objectMapper)
         {
             if (kalenderRepository == null)
             {
                 throw new ArgumentNullException("kalenderRepository");
             }
+            if (fællesRepository == null)
+            {
+                throw new ArgumentNullException("fællesRepository");
+            }
             _kalenderRepository = kalenderRepository;
+            _fællesRepository = fællesRepository;
         }
 
         #endregion
@@ -42,11 +48,22 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         /// <summary>
         /// Repository til kalenderdelen under OSWEBDB.
         /// </summary>
-        public virtual IKalenderRepository Repository
+        public virtual IKalenderRepository KalenderRepository
         {
             get
             {
                 return _kalenderRepository;
+            }
+        }
+
+        /// <summary>
+        /// Repository til fælles elementer i domænet, såsom systemer under OSWEBDB.
+        /// </summary>
+        public virtual IFællesRepository FællesRepository
+        {
+            get
+            {
+                return _fællesRepository;
             }
         }
 

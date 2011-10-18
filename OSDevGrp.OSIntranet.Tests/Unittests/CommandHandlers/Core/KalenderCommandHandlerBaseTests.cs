@@ -23,9 +23,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             /// Danner egen klasse til test af basisklasse for en CommandHandler til kalenderdelen under OSWEBDB.
             /// </summary>
             /// <param name="kalenderRepository">Implementering af repository til kalenderdelen under OSWEBDB.</param>
+            /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet, såsom systemer under OSWEBDB.</param>
             /// <param name="objectMapper">Implementering af objectmapper.</param>
-            public MyKalenderCommandHandler(IKalenderRepository kalenderRepository, IObjectMapper objectMapper)
-                : base(kalenderRepository, objectMapper)
+            public MyKalenderCommandHandler(IKalenderRepository kalenderRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
+                : base(kalenderRepository, fællesRepository, objectMapper)
             {
             }
         }
@@ -38,11 +39,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
+            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
             var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
-            Assert.That(commandHandler.Repository, Is.Not.Null);
+            Assert.That(commandHandler.KalenderRepository, Is.Not.Null);
+            Assert.That(commandHandler.FællesRepository, Is.Not.Null);
             Assert.That(commandHandler.ObjectMapper, Is.Not.Null);
         }
 
@@ -54,11 +57,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var fixture = new Fixture();
             fixture.Inject<IKalenderRepository>(null);
+            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
             Assert.Throws<ArgumentNullException>(
                 () =>
                 new MyKalenderCommandHandler(fixture.CreateAnonymous<IKalenderRepository>(),
+                                             fixture.CreateAnonymous<IFællesRepository>(),
+                                             fixture.CreateAnonymous<IObjectMapper>()));
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis repository til fælles elementer i domænet er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisFællesRepositoryErNull()
+        {
+            var fixture = new Fixture();
+            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
+            fixture.Inject<IFællesRepository>(null);
+            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
+
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                new MyKalenderCommandHandler(fixture.CreateAnonymous<IKalenderRepository>(),
+                                             fixture.CreateAnonymous<IFællesRepository>(),
                                              fixture.CreateAnonymous<IObjectMapper>()));
         }
 
@@ -70,11 +93,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
+            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject<IObjectMapper>(null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
                 new MyKalenderCommandHandler(fixture.CreateAnonymous<IKalenderRepository>(),
+                                             fixture.CreateAnonymous<IFællesRepository>(),
                                              fixture.CreateAnonymous<IObjectMapper>()));
         }
     }
