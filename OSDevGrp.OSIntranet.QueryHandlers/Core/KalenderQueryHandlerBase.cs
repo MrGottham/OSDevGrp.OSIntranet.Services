@@ -14,6 +14,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         #region Private variables
 
         private readonly IKalenderRepository _kalenderRepository;
+        private readonly IFællesRepository _fællesRepository;
 
         #endregion
 
