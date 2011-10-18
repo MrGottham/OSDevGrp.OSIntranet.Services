@@ -13,6 +13,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         #region Private variables
 
         private readonly IKalenderRepository _kalenderRepository;
+        private readonly IFællesRepository _fællesRepository;
         private readonly IObjectMapper _objectMapper;
 
         #endregion
@@ -23,18 +24,24 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// Danner basisklasse for en CommandHandler til kalenderdelen under OSWEBDB.
         /// </summary>
         /// <param name="kalenderRepository">Implementering af repository til kalenderdelen under OSWEBDB.</param>
+        /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet, såsom systemer under OSWEBDB.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        protected KalenderCommandHandlerBase(IKalenderRepository kalenderRepository, IObjectMapper objectMapper)
+        protected KalenderCommandHandlerBase(IKalenderRepository kalenderRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
         {
             if (kalenderRepository == null)
             {
                 throw new ArgumentNullException("kalenderRepository");
+            }
+            if (fællesRepository == null)
+            {
+                throw new ArgumentNullException("fællesRepository");
             }
             if (objectMapper == null)
             {
                 throw new ArgumentNullException("objectMapper");
             }
             _kalenderRepository = kalenderRepository;
+            _fællesRepository = fællesRepository;
             _objectMapper = objectMapper;
         }
 
@@ -45,11 +52,22 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <summary>
         /// Repository til kalenderdelen under OSWEBDB.
         /// </summary>
-        public virtual IKalenderRepository Repository
+        public virtual IKalenderRepository KalenderRepository
         {
             get
             {
                 return _kalenderRepository;
+            }
+        }
+
+        /// <summary>
+        /// Repository til fælles elementer i domænet, såsom systemer under OSWEBDB.
+        /// </summary>
+        public virtual IFællesRepository FællesRepository
+        {
+            get
+            {
+                return _fællesRepository;
             }
         }
 
