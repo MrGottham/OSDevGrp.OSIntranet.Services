@@ -180,4 +180,8 @@
   <data name="UserAppointmentDontExists" xml:space="preserve">
     <value>Deltageren er ikke booket på aftalen.</value>
   </data>
+  <data name="NoCalendarUserWithThoseInitials" xml:space="preserve">
+    <value>Der findes ingen kalenderbrugere med initialerne '{0}'.</value>
+    <comment>{0} = Initialer.</comment>
+  </data>
 </root>
