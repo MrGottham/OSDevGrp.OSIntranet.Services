@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         }
 
         /// <summary>
-        /// Tester, at Query henter kalenderbrugere til et system under OSWEBDB..
+        /// Tester, at Query henter kalenderbrugere til et system under OSWEBDB.
         /// </summary>
         [Test]
         public void TestAtQueryHenterKalenderbrugere()
