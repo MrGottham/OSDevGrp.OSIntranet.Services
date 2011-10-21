@@ -49,6 +49,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             var brugere = BrugerlisteGetBySystemAndInitialer(system, query.Initialer);
             var brugeraftaler = KalenderRepository.AftaleGetAllBySystem(system.Nummer, query.FraDato)
                 .SelectMany(m => m.Deltagere)
+                .Where(m => brugere.SingleOrDefault(n => n.Id == m.Bruger.Id) != null)
                 .ToList();
 
             return MapMany<IBrugeraftale, KalenderbrugerAftaleView>(brugeraftaler);
