@@ -69,6 +69,17 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
         }
 
+        /// <summary>
+        /// Henter alle systemer under OSWEBDB.
+        /// </summary>
+        /// <param name="query">Forespørgelse efter alle systemer under OSWEBDB.</param>
+        /// <returns>Liste af alle systemer under OSWEBDB.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<SystemView> SystemerGet(SystemerGetQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

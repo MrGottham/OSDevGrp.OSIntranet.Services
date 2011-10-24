@@ -1,9 +1,14 @@
-﻿using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
+﻿using System;
+using System.Linq;
+using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
@@ -35,7 +40,23 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <returns>Kalenderaftale til en kalenderbruger med et givent sæt initialer.</returns>
         public KalenderbrugerAftaleView Query(KalenderbrugerAftaleGetQuery query)
         {
-            throw new System.NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+
+            var system = SystemGetByNummer(query.System);
+            var brugere = BrugerlisteGetBySystemAndInitialer(system, query.Initialer);
+            var brugeraftale = KalenderRepository.AftaleGetBySystemAndId(system.Nummer, query.AftaleId).Deltagere
+                .Where(m => brugere.SingleOrDefault(n => n.Id == m.Bruger.Id) != null)
+                .FirstOrDefault();
+            if (brugeraftale == null)
+            {
+                throw new IntranetRepositoryException(
+                    Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentDontExists));
+            }
+
+            return Map<IBrugeraftale, KalenderbrugerAftaleView>(brugeraftale);
         }
 
         #endregion
