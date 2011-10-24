@@ -156,7 +156,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             kalenderRepository.AssertWasCalled(
                 m =>
                 m.AftaleGetBySystemAndId(Arg<int>.Is.Equal(systemer.ElementAt(1).Nummer), Arg<int>.Is.Equal(aftale.Id)));
-            objectMapper.AssertWasCalled(m => m.Map<IBrugeraftale, KalenderbrugerView>(Arg<IBrugeraftale>.Is.NotNull));
+            objectMapper.AssertWasCalled(
+                m => m.Map<IBrugeraftale, KalenderbrugerAftaleView>(Arg<IBrugeraftale>.Is.NotNull));
         }
 
         /// <summary>
