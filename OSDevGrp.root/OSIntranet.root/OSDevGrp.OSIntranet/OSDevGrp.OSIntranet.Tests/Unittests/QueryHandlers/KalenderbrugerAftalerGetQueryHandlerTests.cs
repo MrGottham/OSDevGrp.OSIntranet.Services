@@ -82,9 +82,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var brugere = fixture.CreateMany<IBruger>(7).ToList();
             fixture.Customize<IAftale>(e => e.FromFactory(() =>
                                                               {
-                                                                  var dt =
-                                                                      fixture.CreateAnonymous<DateTime>().AddDays(
-                                                                          r.Next(100));
+                                                                  var dt = fixture.CreateAnonymous<DateTime>().AddDays(r.Next(100));
                                                                   var aftale = MockRepository.GenerateMock<IAftale>();
                                                                   aftale.Expect(m => m.System)
                                                                       .Return(systemer.ElementAt(1))
