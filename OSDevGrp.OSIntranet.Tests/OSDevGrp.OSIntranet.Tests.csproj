@@ -227,6 +227,7 @@
     <Compile Include="Unittests\QueryHandlers\Core\FællesElementQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FirmaGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FirmalisteGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftaleGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftalerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugereGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoGetQueryHandlerTests.cs" />
