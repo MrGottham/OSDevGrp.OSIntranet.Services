@@ -153,5 +153,105 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.Throws<FaultException<IntranetSystemFault>>(
                 () => service.BrevhovederGet(fixture.CreateAnonymous<BrevhovederGetQuery>()));
         }
+
+        /// <summary>
+        /// Tester, at SystemerGet kalder QueryBus.
+        /// </summary>
+        [Test]
+        public void TestAtSystemerGetKalderQueryBus()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<CommonService>();
+            Assert.That(service, Is.Not.Null);
+
+            service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>());
+
+            queryBus.AssertWasCalled(
+                m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tester, at SystemerGet kaster en IntranetRepositoryFault.
+        /// </summary>
+        [Test]
+        public void TestAtSystemerGetKasterIntranetRepositoryFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<CommonService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetRepositoryFault>>(
+                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at SystemerGet kaster en IntranetBusinessFault.
+        /// </summary>
+        [Test]
+        public void TestAtSystemerGetKasterIntranetBusinessFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<CommonService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetBusinessFault>>(
+                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at SystemerGet kaster en IntranetSystemFault.
+        /// </summary>
+        [Test]
+        public void TestAtSystemerGetKasterIntranetSystemFault()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<CommonService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+        }
+
+        /// <summary>
+        /// Tester, at SystemerGet kaster en IntranetSystemFault ved unhandled exception.
+        /// </summary>
+        [Test]
+        public void TestAtSystemerGetKasterIntranetSystemFaultVedUnhandledException()
+        {
+            var fixture = new Fixture();
+
+            var queryBus = MockRepository.GenerateMock<IQueryBus>();
+            queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
+                .Throw(fixture.CreateAnonymous<Exception>());
+            fixture.Inject(queryBus);
+
+            var service = fixture.CreateAnonymous<CommonService>();
+            Assert.That(service, Is.Not.Null);
+
+            Assert.Throws<FaultException<IntranetSystemFault>>(
+                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+        }
     }
 }
