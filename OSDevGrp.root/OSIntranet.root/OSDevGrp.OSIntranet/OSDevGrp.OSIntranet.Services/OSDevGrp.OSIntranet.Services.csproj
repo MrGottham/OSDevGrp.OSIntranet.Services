@@ -72,6 +72,7 @@
   <ItemGroup>
     <Content Include="commonservice.svc" />
     <Content Include="adressekartotekservice.svc" />
+    <Content Include="kalenderservice.svc" />
     <Content Include="finansstyringservice.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

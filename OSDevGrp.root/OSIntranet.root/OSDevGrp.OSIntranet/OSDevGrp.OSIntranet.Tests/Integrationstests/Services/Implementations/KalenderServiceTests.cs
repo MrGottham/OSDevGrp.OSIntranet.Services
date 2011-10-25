@@ -48,6 +48,23 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tester, at en given kalenderaftale til en given kalenderbruger hentes.
+        /// </summary>
+        [Test]
+        public void TestAtKalenderaftaleHentes()
+        {
+            var query = new KalenderbrugerAftaleGetQuery
+                            {
+                                System = 1,
+                                AftaleId = 1,
+                                Initialer = "OS"
+                            };
+            var result = _service.KalenderbrugerAftaleGet(query);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Id, Is.EqualTo(query.AftaleId));
+        }
+
+        /// <summary>
         /// Tester, at kalenderbrugere til et system under OSWEBDB hentes.
         /// </summary>
         [Test]

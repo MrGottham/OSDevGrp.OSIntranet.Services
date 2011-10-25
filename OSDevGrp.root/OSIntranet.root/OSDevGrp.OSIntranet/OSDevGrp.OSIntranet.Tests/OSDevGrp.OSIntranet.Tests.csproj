@@ -111,6 +111,7 @@
     <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\ClientCalls\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
