@@ -176,17 +176,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             Properties = mySqlDataReader.GetInt32("Properties");
             Emne = mySqlDataReader.GetString("Subject");
             Notat = mySqlDataReader.GetString("Note");
-            var deltagere = base.Deltagere as IList<IBrugeraftale>;
-            if (deltagere != null)
+            var deltagere = new List<IBrugeraftale>();
+            using (var clonedDataProvider = (IDataProviderBase)dataProvider.Clone())
             {
-                using (var clonedDataProvider = (IDataProviderBase)dataProvider.Clone())
-                {
-                    foreach (var brugeraftale in clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))))
-                    {
-                        deltagere.Add(brugeraftale);
-                    }
-                }
+                deltagere.AddRange(clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))));
             }
+            this.SetFieldValue("_deltagere", deltagere);
             DataIsLoaded = true;
 
             _dataProvider = dataProvider;
