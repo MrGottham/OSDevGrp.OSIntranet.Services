@@ -40,5 +40,17 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.GreaterThan(0));
         }
+
+        /// <summary>
+        /// Tester, at systemer under OSWEBDB hentes.
+        /// </summary>
+        [Test]
+        public void TestAtSystemerHentes()
+        {
+            var query = new SystemerGetQuery();
+            var result = _service.SystemerGet(query);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.GreaterThan(0));
+        }
     }
 }

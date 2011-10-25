@@ -77,7 +77,26 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public IEnumerable<SystemView> SystemerGet(SystemerGetQuery query)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return _queryBus.Query<SystemerGetQuery, IEnumerable<SystemView>>(query);
+            }
+            catch (IntranetRepositoryException ex)
+            {
+                throw CreateIntranetRepositoryFault(ex);
+            }
+            catch (IntranetBusinessException ex)
+            {
+                throw CreateIntranetBusinessFault(ex);
+            }
+            catch (IntranetSystemException ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
+            catch (Exception ex)
+            {
+                throw CreateIntranetSystemFault(ex);
+            }
         }
 
         #endregion
