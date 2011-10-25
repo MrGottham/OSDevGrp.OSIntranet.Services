@@ -114,6 +114,7 @@
     <Compile Include="Integrationstests\Services\Implementations\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\Implementations\KalenderServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unittests\CommandHandlers\BogføringslinjeOpretCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\AdressekartotekCommandHandlerBaseTests.cs" />
