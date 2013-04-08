@@ -27,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
         {
             var konfigurationRepository = new KonfigurationRepository(ConfigurationManager.AppSettings);
 
-            container.Register(Component.For<IDomainObjectBuilder>().ImplementedBy<DomainObjectBuilder>());
+            container.Register(Component.For<IDomainObjectBuilder>().ImplementedBy<DomainObjectBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<ICommandBus>().ImplementedBy<CommandBus>().LifeStyle.Transient);
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);

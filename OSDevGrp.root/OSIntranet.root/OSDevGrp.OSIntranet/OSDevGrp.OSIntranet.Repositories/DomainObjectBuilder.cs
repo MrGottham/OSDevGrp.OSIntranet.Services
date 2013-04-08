@@ -31,6 +31,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         private Func<int, Budgetkontogruppe> _getBudgetkontogruppeCallback;
         private Func<int, Brevhoved> _getBrevhovedCallback;
         private readonly IList<Regnskab> _regnskaber = new List<Regnskab>();
+        private static readonly object SyncRoot = new object();
 
         #endregion
 
@@ -229,23 +230,26 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           regnskab.SætBrevhoved(brevhoved);
                                       }
-                                      var cached = _regnskaber.SingleOrDefault(m => m.Nummer == regnskab.Nummer);
-                                      if (cached != null)
+                                      lock (SyncRoot)
                                       {
-                                          _regnskaber.Remove(cached);
+                                          var cached = _regnskaber.SingleOrDefault(m => m.Nummer == regnskab.Nummer);
+                                          if (cached != null)
+                                          {
+                                              _regnskaber.Remove(cached);
+                                          }
+                                          _regnskaber.Add(regnskab);
+                                          var regnskabslisteHelper = new RegnskabslisteHelper(_regnskaber);
+                                          GetRegnskabCallback = regnskabslisteHelper.GetById;
+                                          foreach (var konto in BuildMany<KontoView, Konto>(s.Konti))
+                                          {
+                                              regnskab.TilføjKonto(konto);
+                                          }
+                                          foreach (var budgetkonto in BuildMany<BudgetkontoView, Budgetkonto>(s.Budgetkonti))
+                                          {
+                                              regnskab.TilføjKonto(budgetkonto);
+                                          }
+                                          BuildMany<BogføringslinjeView, Bogføringslinje>(s.Konti.SelectMany(m => m.Bogføringslinjer));
                                       }
-                                      _regnskaber.Add(regnskab);
-                                      var regnskabslisteHelper = new RegnskabslisteHelper(_regnskaber);
-                                      GetRegnskabCallback = regnskabslisteHelper.GetById;
-                                      foreach (var konto in BuildMany<KontoView, Konto>(s.Konti))
-                                      {
-                                          regnskab.TilføjKonto(konto);
-                                      }
-                                      foreach (var budgetkonto in BuildMany<BudgetkontoView, Budgetkonto>(s.Budgetkonti))
-                                      {
-                                          regnskab.TilføjKonto(budgetkonto);
-                                      }
-                                      BuildMany<BogføringslinjeView, Bogføringslinje>(s.Konti.SelectMany(m => m.Bogføringslinjer));
                                       return regnskab;
                                   });
 
@@ -260,7 +264,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       Regnskab regnskab;
                                       try
                                       {
-                                          regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
+                                          lock (SyncRoot)
+                                          {
+                                              regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
+                                          }
                                       }
                                       catch (IntranetRepositoryException)
                                       {
@@ -310,7 +317,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       Regnskab regnskab;
                                       try
                                       {
-                                          regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
+                                          lock (SyncRoot)
+                                          {
+                                              regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
+                                          }
                                       }
                                       catch (IntranetRepositoryException)
                                       {
@@ -360,7 +370,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       Regnskab regnskab;
                                       try
                                       {
-                                          regnskab = GetRegnskabCallback(s.Konto.Regnskab.Nummer);
+                                          lock (SyncRoot)
+                                          {
+                                              regnskab = GetRegnskabCallback(s.Konto.Regnskab.Nummer);
+                                          }
                                       }
                                       catch (IntranetRepositoryException)
                                       {
@@ -640,12 +653,14 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     if (innerException is AutoMapperMappingException)
                     {
+                        innerException = innerException.InnerException;
                         continue;
                     }
                     errorMessage.AppendFormat(" -> {0}", innerException.Message);
                     if (innerException is IntranetRepositoryException)
                     {
-                        break;
+                        innerException = null;
+                        continue;
                     }
                     innerException = innerException.InnerException;
                 }
