@@ -634,14 +634,21 @@ namespace OSDevGrp.OSIntranet.Repositories
                     throw ex.InnerException;
                 }
                 var errorMessage = new StringBuilder(ex.Message);
+
                 var innerException = ex.InnerException;
                 while (innerException != null)
                 {
-                    errorMessage.Append(" -> ");
-                    errorMessage.Append(innerException.Message);
+                    if (innerException is AutoMapperMappingException)
+                    {
+                        continue;
+                    }
+                    errorMessage.AppendFormat(" -> {0}", innerException.Message);
+                    if (innerException is IntranetRepositoryException)
+                    {
+                        break;
+                    }
                     innerException = innerException.InnerException;
                 }
-                errorMessage.AppendFormat("Context: {0}", ex.Context);
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, errorMessage), ex);
             }
         }
