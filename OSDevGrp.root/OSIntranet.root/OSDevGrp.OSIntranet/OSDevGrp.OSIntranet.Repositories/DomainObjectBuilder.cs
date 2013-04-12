@@ -45,22 +45,25 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<PersonView, AdresseBase>()
                 .ConvertUsing(s =>
                                   {
-                                      if (GetAdressegruppeCallback == null)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
-                                      }
                                       Adressegruppe adressegruppe;
-                                      try
+                                      lock (SyncRoot)
                                       {
-                                          adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
-                                      }
-                                      catch (IntranetRepositoryException)
-                                      {
-                                          throw;
-                                      }
-                                      catch (Exception ex)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Adressegruppe), s.Adressegruppe.Nummer), ex);
+                                          if (GetAdressegruppeCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
+                                          }
+                                          try
+                                          {
+                                              adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
+                                          }
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe), s.Adressegruppe.Nummer), ex);
+                                          }
                                       }
                                       var person = new Person(s.Nummer, s.Navn, adressegruppe);
                                       person.SætAdresseoplysninger(s.Adresse1, s.Adresse2, s.PostnummerBy);
@@ -71,22 +74,25 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       person.SætWebadresse(s.Webadresse);
                                       if (s.Betalingsbetingelse != null)
                                       {
-                                          if (GetBetalingsbetingelseCallback == null)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
-                                          }
                                           Betalingsbetingelse betalingsbetingelse;
-                                          try
+                                          lock (SyncRoot)
                                           {
-                                              betalingsbetingelse = GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
-                                          }
-                                          catch (IntranetRepositoryException)
-                                          {
-                                              throw;
-                                          }
-                                          catch (Exception ex)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse), s.Betalingsbetingelse.Nummer), ex);
+                                              if (GetBetalingsbetingelseCallback == null)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
+                                              }
+                                              try
+                                              {
+                                                  betalingsbetingelse = GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
+                                              }
+                                              catch (IntranetRepositoryException)
+                                              {
+                                                  throw;
+                                              }
+                                              catch (Exception ex)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse), s.Betalingsbetingelse.Nummer), ex);
+                                              }
                                           }
                                           person.SætBetalingsbetingelse(betalingsbetingelse);
                                       }
@@ -94,22 +100,25 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       person.SætFilofaxAdresselabel(s.FilofaxAdresselabel);
                                       if (s.Firma != null)
                                       {
-                                          if (GetAdresseBaseCallback == null)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
-                                          }
                                           Firma firma;
-                                          try
+                                          lock (SyncRoot)
                                           {
-                                              firma = (Firma) GetAdresseBaseCallback(s.Firma.Nummer);
-                                          }
-                                          catch (IntranetRepositoryException)
-                                          {
-                                              throw;
-                                          }
-                                          catch (Exception ex)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma), s.Firma.Nummer), ex);
+                                              if (GetAdresseBaseCallback == null)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
+                                              }
+                                              try
+                                              {
+                                                  firma = (Firma) GetAdresseBaseCallback(s.Firma.Nummer);
+                                              }
+                                              catch (IntranetRepositoryException)
+                                              {
+                                                  throw;
+                                              }
+                                              catch (Exception ex)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma), s.Firma.Nummer), ex);
+                                              }
                                           }
                                           firma.TilføjPerson(person);
                                       }
@@ -119,22 +128,25 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<FirmaView, AdresseBase>()
                 .ConvertUsing(s =>
                                   {
-                                      if (GetAdressegruppeCallback == null)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
-                                      }
                                       Adressegruppe adressegruppe;
-                                      try
+                                      lock (SyncRoot)
                                       {
-                                          adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
-                                      }
-                                      catch (IntranetRepositoryException)
-                                      {
-                                          throw;
-                                      }
-                                      catch (Exception ex)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe), s.Adressegruppe.Nummer), ex);
+                                          if (GetAdressegruppeCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
+                                          }
+                                          try
+                                          {
+                                              adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
+                                          }
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe), s.Adressegruppe.Nummer), ex);
+                                          }
                                       }
                                       var firma = new Firma(s.Nummer, s.Navn, adressegruppe);
                                       firma.SætAdresseoplysninger(s.Adresse1, s.Adresse2, s.PostnummerBy);
@@ -144,22 +156,25 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       firma.SætWebadresse(s.Webadresse);
                                       if (s.Betalingsbetingelse != null)
                                       {
-                                          if (GetBetalingsbetingelseCallback == null)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
-                                          }
                                           Betalingsbetingelse betalingsbetingelse;
-                                          try
+                                          lock (SyncRoot)
                                           {
-                                              betalingsbetingelse = GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
-                                          }
-                                          catch (IntranetRepositoryException)
-                                          {
-                                              throw;
-                                          }
-                                          catch (Exception ex)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse), s.Betalingsbetingelse.Nummer), ex);
+                                              if (GetBetalingsbetingelseCallback == null)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
+                                              }
+                                              try
+                                              {
+                                                  betalingsbetingelse = GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
+                                              }
+                                              catch (IntranetRepositoryException)
+                                              {
+                                                  throw;
+                                              }
+                                              catch (Exception ex)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse), s.Betalingsbetingelse.Nummer), ex);
+                                              }
                                           }
                                           firma.SætBetalingsbetingelse(betalingsbetingelse);
                                       }
@@ -183,22 +198,25 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       var regnskab = new Regnskab(s.Nummer, s.Navn);
                                       if (s.Brevhoved != null && s.Brevhoved.Nummer != 0)
                                       {
-                                          if (GetBrevhovedCallback == null)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
-                                          }
                                           Brevhoved brevhoved;
-                                          try
+                                          lock (SyncRoot)
                                           {
-                                              brevhoved = GetBrevhovedCallback(s.Brevhoved.Nummer);
-                                          }
-                                          catch (IntranetRepositoryException)
-                                          {
-                                              throw;
-                                          }
-                                          catch (Exception ex)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved), s.Brevhoved.Nummer), ex);
+                                              if (GetBrevhovedCallback == null)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
+                                              }
+                                              try
+                                              {
+                                                  brevhoved = GetBrevhovedCallback(s.Brevhoved.Nummer);
+                                              }
+                                              catch (IntranetRepositoryException)
+                                              {
+                                                  throw;
+                                              }
+                                              catch (Exception ex)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved), s.Brevhoved.Nummer), ex);
+                                              }
                                           }
                                           regnskab.SætBrevhoved(brevhoved);
                                       }
@@ -211,22 +229,25 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       var regnskab = new Regnskab(s.Nummer, s.Navn);
                                       if (s.Brevhoved != null && s.Brevhoved.Nummer != 0)
                                       {
-                                          if (GetBrevhovedCallback == null)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
-                                          }
                                           Brevhoved brevhoved;
-                                          try
+                                          lock (SyncRoot)
                                           {
-                                              brevhoved = GetBrevhovedCallback(s.Brevhoved.Nummer);
-                                          }
-                                          catch (IntranetRepositoryException)
-                                          {
-                                              throw;
-                                          }
-                                          catch (Exception ex)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved), s.Brevhoved.Nummer), ex);
+                                              if (GetBrevhovedCallback == null)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
+                                              }
+                                              try
+                                              {
+                                                  brevhoved = GetBrevhovedCallback(s.Brevhoved.Nummer);
+                                              }
+                                              catch (IntranetRepositoryException)
+                                              {
+                                                  throw;
+                                              }
+                                              catch (Exception ex)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved), s.Brevhoved.Nummer), ex);
+                                              }
                                           }
                                           regnskab.SætBrevhoved(brevhoved);
                                       }
@@ -257,42 +278,45 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<KontoView, Konto>()
                 .ConvertUsing(s =>
                                   {
-                                      if (GetRegnskabCallback == null)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
-                                      }
                                       Regnskab regnskab;
-                                      try
+                                      lock (SyncRoot)
                                       {
-                                          lock (SyncRoot)
+                                          if (GetRegnskabCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
+                                          }
+                                          try
                                           {
                                               regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
                                           }
-                                      }
-                                      catch (IntranetRepositoryException)
-                                      {
-                                          throw;
-                                      }
-                                      catch (Exception ex)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Regnskab.Nummer), ex);
-                                      }
-                                      if (GetKontogruppeCallback == null)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetKontogruppeCallback"));
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Regnskab.Nummer), ex);
+                                          }
                                       }
                                       Kontogruppe kontogruppe;
-                                      try
+                                      lock (SyncRoot)
                                       {
-                                          kontogruppe = GetKontogruppeCallback(s.Kontogruppe.Nummer);
-                                      }
-                                      catch (IntranetRepositoryException)
-                                      {
-                                          throw;
-                                      }
-                                      catch (Exception ex)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Kontogruppe), s.Kontogruppe.Nummer), ex);
+                                          if (GetKontogruppeCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetKontogruppeCallback"));
+                                          }
+                                          try
+                                          {
+                                              kontogruppe = GetKontogruppeCallback(s.Kontogruppe.Nummer);
+                                          }
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Kontogruppe), s.Kontogruppe.Nummer), ex);
+                                          }
                                       }
                                       var konto = new Konto(regnskab, s.Kontonummer, s.Kontonavn, kontogruppe);
                                       konto.SætBeskrivelse(s.Beskrivelse);
@@ -310,42 +334,45 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<BudgetkontoView, Budgetkonto>()
                 .ConvertUsing(s =>
                                   {
-                                      if (GetRegnskabCallback == null)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
-                                      }
                                       Regnskab regnskab;
-                                      try
+                                      lock (SyncRoot)
                                       {
-                                          lock (SyncRoot)
+                                          if (GetRegnskabCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
+                                          }
+                                          try
                                           {
                                               regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
                                           }
-                                      }
-                                      catch (IntranetRepositoryException)
-                                      {
-                                          throw;
-                                      }
-                                      catch (Exception ex)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Regnskab.Nummer), ex);
-                                      }
-                                      if (GetBudgetkontogruppeCallback == null)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBudgetkontogruppeCallback"));
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Regnskab.Nummer), ex);
+                                          }
                                       }
                                       Budgetkontogruppe budgetkontogruppe;
-                                      try
+                                      lock (SyncRoot)
                                       {
-                                          budgetkontogruppe = GetBudgetkontogruppeCallback(s.Budgetkontogruppe.Nummer);
-                                      }
-                                      catch (IntranetRepositoryException)
-                                      {
-                                          throw;
-                                      }
-                                      catch (Exception ex)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkontogruppe), s.Budgetkontogruppe.Nummer), ex);
+                                          if (GetBudgetkontogruppeCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBudgetkontogruppeCallback"));
+                                          }
+                                          try
+                                          {
+                                              budgetkontogruppe = GetBudgetkontogruppeCallback(s.Budgetkontogruppe.Nummer);
+                                          }
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkontogruppe), s.Budgetkontogruppe.Nummer), ex);
+                                          }
                                       }
                                       var budgetkonto = new Budgetkonto(regnskab, s.Kontonummer, s.Kontonavn, budgetkontogruppe);
                                       budgetkonto.SætBeskrivelse(s.Beskrivelse);
@@ -363,33 +390,32 @@ namespace OSDevGrp.OSIntranet.Repositories
             Mapper.CreateMap<BogføringslinjeView, Bogføringslinje>()
                 .ConvertUsing(s =>
                                   {
-                                      if (GetRegnskabCallback == null)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
-                                      }
                                       Regnskab regnskab;
-                                      try
+                                      lock (SyncRoot)
                                       {
-                                          lock (SyncRoot)
+                                          if (GetRegnskabCallback == null)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
+                                          }
+                                          try
                                           {
                                               regnskab = GetRegnskabCallback(s.Konto.Regnskab.Nummer);
                                           }
+                                          catch (IntranetRepositoryException)
+                                          {
+                                              throw;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Konto.Regnskab.Nummer), ex);
+                                          }
                                       }
-                                      catch (IntranetRepositoryException)
-                                      {
-                                          throw;
-                                      }
-                                      catch (Exception ex)
-                                      {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Konto.Regnskab.Nummer), ex);
-                                      }
-
                                       Konto konto;
                                       try
                                       {
                                           konto = regnskab.Konti
-                                              .OfType<Konto>()
-                                              .Single(m => String.Compare(m.Kontonummer, s.Konto.Kontonummer, StringComparison.Ordinal) == 0);
+                                                          .OfType<Konto>()
+                                                          .Single(m => String.Compare(m.Kontonummer, s.Konto.Kontonummer, StringComparison.Ordinal) == 0);
                                       }
                                       catch (InvalidOperationException ex)
                                       {
@@ -401,8 +427,8 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           try
                                           {
                                               budgetkonto = regnskab.Konti
-                                                  .OfType<Budgetkonto>()
-                                                  .Single(m => String.Compare(m.Kontonummer, s.Budgetkonto.Kontonummer, StringComparison.Ordinal) == 0);
+                                                                    .OfType<Budgetkonto>()
+                                                                    .Single(m => String.Compare(m.Kontonummer, s.Budgetkonto.Kontonummer, StringComparison.Ordinal) == 0);
                                           }
                                           catch (InvalidOperationException ex)
                                           {
@@ -412,21 +438,24 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       AdresseBase adresse = null;
                                       if (s.Adresse != null && s.Adresse.Nummer != 0)
                                       {
-                                          if (GetAdresseBaseCallback == null)
+                                          lock (SyncRoot)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
-                                          }
-                                          try
-                                          {
-                                              adresse = GetAdresseBaseCallback(s.Adresse.Nummer);
-                                          }
-                                          catch (IntranetRepositoryException)
-                                          {
-                                              throw;
-                                          }
-                                          catch (Exception ex)
-                                          {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase), s.Adresse.Nummer), ex);
+                                              if (GetAdresseBaseCallback == null)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
+                                              }
+                                              try
+                                              {
+                                                  adresse = GetAdresseBaseCallback(s.Adresse.Nummer);
+                                              }
+                                              catch (IntranetRepositoryException)
+                                              {
+                                                  throw;
+                                              }
+                                              catch (Exception ex)
+                                              {
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase), s.Adresse.Nummer), ex);
+                                              }
                                           }
                                       }
                                       var bogføringslinje = new Bogføringslinje(s.Løbenummer, s.Dato, s.Bilag, s.Tekst, s.Debit, s.Kredit);
@@ -505,7 +534,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     throw new ArgumentNullException("value");
                 }
-                _getAdresseBaseCallback = value;
+                lock (SyncRoot)
+                {
+                    _getAdresseBaseCallback = value;
+                }
             }
         }
 
@@ -524,7 +556,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     throw new ArgumentNullException("value");
                 }
-                _getAdressegruppeCallback = value;
+                lock (SyncRoot)
+                {
+                    _getAdressegruppeCallback = value;
+                }
             }
         }
 
@@ -543,7 +578,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     throw new ArgumentNullException("value");
                 }
-                _getBetalingsbetingelseCallback = value;
+                lock (SyncRoot)
+                {
+                    _getBetalingsbetingelseCallback = value;
+                }
             }
         }
 
@@ -562,7 +600,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     throw new ArgumentNullException("value");
                 }
-                _getRegnskabCallback = value;
+                lock (SyncRoot)
+                {
+                    _getRegnskabCallback = value;
+                }
             }
         }
 
@@ -581,7 +622,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     throw new ArgumentNullException("value");
                 }
-                _getKontogruppeCallback = value;
+                lock (SyncRoot)
+                {
+                    _getKontogruppeCallback = value;
+                }
             }
         }
 
@@ -600,7 +644,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     throw new ArgumentNullException("value");
                 }
-                _getBudgetkontogruppeCallback = value;
+                lock (SyncRoot)
+                {
+                    _getBudgetkontogruppeCallback = value;
+                }
             }
         }
 
@@ -619,7 +666,10 @@ namespace OSDevGrp.OSIntranet.Repositories
                 {
                     throw new ArgumentNullException("value");
                 }
-                _getBrevhovedCallback = value;
+                lock (SyncRoot)
+                {
+                    _getBrevhovedCallback = value;
+                }
             }
         }
 
