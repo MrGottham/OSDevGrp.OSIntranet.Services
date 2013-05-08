@@ -32,6 +32,7 @@ namespace OSDevGrp.OSIntranet.Repositories
 
         private readonly IChannelFactory _channelFactory;
         private readonly IDomainObjectBuilder _domainObjectBuilder;
+        private static readonly object SyncRoot = new object();
 
         #endregion
 
@@ -82,21 +83,19 @@ namespace OSDevGrp.OSIntranet.Repositories
                 var personQuery = new PersonGetAllQuery();
                 var personViews = channel.PersonGetAll(personQuery);
                 // Mapper views til adresser.
-                var adresser = new List<AdresseBase>();
-                var adressegruppelisteHelper =
-                    new AdressegruppelisteHelper(
-                        _domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(adressegruppeViews));
-                var betalingsbetingelselisteHelper =
-                    new BetalingsbetingelselisteHelper(
-                        _domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
-                            betalingsbetingelseViews));
-                var adresselisteHelper = new AdresselisteHelper(adresser);
-                _domainObjectBuilder.GetAdressegruppeCallback = adressegruppelisteHelper.GetById;
-                _domainObjectBuilder.GetBetalingsbetingelseCallback = betalingsbetingelselisteHelper.GetById;
-                _domainObjectBuilder.GetAdresseBaseCallback = adresselisteHelper.GetById;
-                adresser.AddRange(_domainObjectBuilder.BuildMany<FirmaView, AdresseBase>(firmaViews));
-                adresser.AddRange(_domainObjectBuilder.BuildMany<PersonView, AdresseBase>(personViews));
-                return adresser.OrderBy(m => m, new AdresseComparer()).ToList();
+                lock (SyncRoot)
+                {
+                    var adresser = new List<AdresseBase>();
+                    var adressegruppelisteHelper = new AdressegruppelisteHelper(_domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(adressegruppeViews));
+                    var betalingsbetingelselisteHelper = new BetalingsbetingelselisteHelper(_domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(betalingsbetingelseViews));
+                    var adresselisteHelper = new AdresselisteHelper(adresser);
+                    _domainObjectBuilder.GetAdressegruppeCallback = adressegruppelisteHelper.GetById;
+                    _domainObjectBuilder.GetBetalingsbetingelseCallback = betalingsbetingelselisteHelper.GetById;
+                    _domainObjectBuilder.GetAdresseBaseCallback = adresselisteHelper.GetById;
+                    adresser.AddRange(_domainObjectBuilder.BuildMany<FirmaView, AdresseBase>(firmaViews));
+                    adresser.AddRange(_domainObjectBuilder.BuildMany<PersonView, AdresseBase>(personViews));
+                    return adresser.OrderBy(m => m, new AdresseComparer()).ToList();
+                }
             }
             catch (IntranetRepositoryException)
             {
@@ -108,9 +107,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
             finally
             {
