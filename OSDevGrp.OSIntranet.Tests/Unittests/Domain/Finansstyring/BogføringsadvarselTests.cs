@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
         {
             var fixture = new Fixture();
             Assert.Throws<ArgumentNullException>(
-                () => new Bogføringsadvarsel(null, fixture.CreateAnonymous<Konto>(), 0M));
+                () => new Bogføringsadvarsel(null, fixture.Create<Konto>(), 0M));
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
         {
             var fixture = new Fixture();
             Assert.Throws<ArgumentNullException>(
-                () => new Bogføringsadvarsel(string.Empty, fixture.CreateAnonymous<Konto>(), 0M));
+                () => new Bogføringsadvarsel(string.Empty, fixture.Create<Konto>(), 0M));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
         {
             var fixture = new Fixture();
             Assert.Throws<ArgumentNullException>(
-                () => new Bogføringsadvarsel(fixture.CreateAnonymous<string>(), null, 0M));
+                () => new Bogføringsadvarsel(fixture.Create<string>(), null, 0M));
         }
 
         /// <summary>
@@ -52,9 +52,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
         public void TestAtConstructorInitiererBogføringsadvarsel()
         {
             var fixture = new Fixture();
-            var advarsel = fixture.CreateAnonymous<string>();
-            var konto = fixture.CreateAnonymous<Konto>();
-            var beløb = fixture.CreateAnonymous<decimal>();
+            var advarsel = fixture.Create<string>();
+            var konto = fixture.Create<Konto>();
+            var beløb = fixture.Create<decimal>();
             var bogføringsadvarsel = new Bogføringsadvarsel(advarsel, konto, beløb);
             Assert.That(bogføringsadvarsel, Is.Not.Null);
             Assert.That(bogføringsadvarsel.Advarsel, Is.Not.Null);

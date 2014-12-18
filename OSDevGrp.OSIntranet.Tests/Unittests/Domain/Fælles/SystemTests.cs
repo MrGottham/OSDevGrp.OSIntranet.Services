@@ -17,8 +17,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         public void TestAtConstructorInitiererSystem()
         {
             var fixture = new Fixture();
-            var nummer = fixture.CreateAnonymous<int>();
-            var titel = fixture.CreateAnonymous<string>();
+            var nummer = fixture.Create<int>();
+            var titel = fixture.Create<string>();
             var system = new OSIntranet.Domain.Fælles.System(nummer, titel);
             Assert.That(system, Is.Not.Null);
             Assert.That(system.Nummer, Is.EqualTo(nummer));
@@ -35,7 +35,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         public void TestAtConstructorKasterArgumentNullExceptionHvisTitelErNull()
         {
             var fixture = new Fixture();
-            var nummer = fixture.CreateAnonymous<int>();
+            var nummer = fixture.Create<int>();
             Assert.Throws<ArgumentNullException>(() => new OSIntranet.Domain.Fælles.System(nummer, null));
         }
 
@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         public void TestAtConstructorKasterArgumentNullExceptionHvisTitelErEmpty()
         {
             var fixture = new Fixture();
-            var nummer = fixture.CreateAnonymous<int>();
+            var nummer = fixture.Create<int>();
             Assert.Throws<ArgumentNullException>(() => new OSIntranet.Domain.Fælles.System(nummer, string.Empty));
         }
 
@@ -58,10 +58,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         {
             var fixture = new Fixture();
 
-            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            var system = fixture.Create<OSIntranet.Domain.Fælles.System>();
             Assert.That(system, Is.Not.Null);
 
-            var titel = fixture.CreateAnonymous<string>();
+            var titel = fixture.Create<string>();
             system.Titel = titel;
             Assert.That(system.Titel, Is.Not.Null);
             Assert.That(system.Titel, Is.EqualTo(titel));
@@ -75,7 +75,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         {
             var fixture = new Fixture();
 
-            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            var system = fixture.Create<OSIntranet.Domain.Fælles.System>();
             Assert.That(system, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => system.Titel = null);
@@ -89,7 +89,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         {
             var fixture = new Fixture();
 
-            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            var system = fixture.Create<OSIntranet.Domain.Fælles.System>();
             Assert.That(system, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => system.Titel = string.Empty);
@@ -103,7 +103,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Fælles
         {
             var fixture = new Fixture();
 
-            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            var system = fixture.Create<OSIntranet.Domain.Fælles.System>();
             Assert.That(system, Is.Not.Null);
 
             system.Kalender = true;

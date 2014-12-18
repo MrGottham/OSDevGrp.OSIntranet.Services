@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<AdressekontolisteGetQueryHandler>();
+            var queryHandler = fixture.Create<AdressekontolisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -69,13 +69,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<AdressekontolisteGetQueryHandler>();
+            var queryHandler = fixture.Create<AdressekontolisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new AdressekontolisteGetQuery
                             {
-                                Regnskabsnummer = fixture.CreateAnonymous<int>(),
-                                StatusDato = fixture.CreateAnonymous<DateTime>()
+                                Regnskabsnummer = fixture.Create<int>(),
+                                StatusDato = fixture.Create<DateTime>()
                             };
             var adressekonti = queryHandler.Query(query);
             Assert.That(adressekonti, Is.Not.Null);

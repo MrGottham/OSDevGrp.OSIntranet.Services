@@ -88,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 m => m.BuildMany<RegnskabListeView, Regnskab>(Arg<IEnumerable<RegnskabListeView>>.Is.NotNull))
                 .Return(fixture.CreateMany<Regnskab>(3));
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
 
@@ -112,7 +112,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetAll(Arg<RegnskabGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -122,7 +122,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
 
@@ -141,7 +141,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetAll(Arg<RegnskabGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -151,7 +151,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
 
@@ -170,7 +170,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetAll(Arg<RegnskabGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -180,7 +180,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
 
@@ -199,7 +199,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
@@ -214,7 +214,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<ArgumentNullException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), null, null));
+            Assert.Throws<ArgumentNullException>(() => repository.RegnskabGet(fixture.Create<int>(), null, null));
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
@@ -242,12 +242,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<ArgumentNullException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, null));
+            Assert.Throws<ArgumentNullException>(() => repository.RegnskabGet(fixture.Create<int>(), getBrevhovedCallback, null));
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] {typeof (ICommunicationObject)});
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
-                .Return(fixture.CreateAnonymous<RegnskabView>());
+                .Return(fixture.Create<RegnskabView>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
@@ -284,17 +284,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 m.BuildMany<BudgetkontogruppeView, Budgetkontogruppe>(Arg<IEnumerable<BudgetkontogruppeView>>.Is.NotNull))
                 .Return(fixture.CreateMany<Budgetkontogruppe>(3));
             domainObjectBuilder.Expect(m => m.Build<RegnskabView, Regnskab>(Arg<RegnskabView>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<Regnskab>());
+                .Return(fixture.Create<Regnskab>());
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
-            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.Create<Person>());
             Assert.That(getAdresseCallback, Is.Not.Null);
             Assert.That(getAdresseCallback(1), Is.Not.Null);
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var regnskab = repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback);
+            var regnskab = repository.RegnskabGet(fixture.Create<int>(), getBrevhovedCallback, getAdresseCallback);
             Assert.That(regnskab, Is.Not.Null);
 
             domainObjectBuilder.AssertWasCalled(
@@ -316,7 +316,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
@@ -330,15 +330,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
-            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.Create<Person>());
             Assert.That(getAdresseCallback, Is.Not.Null);
             Assert.That(getAdresseCallback(1), Is.Not.Null);
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.Create<int>(), getBrevhovedCallback, getAdresseCallback));
         }
 
         /// <summary>
@@ -352,7 +352,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
@@ -366,15 +366,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
-            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.Create<Person>());
             Assert.That(getAdresseCallback, Is.Not.Null);
             Assert.That(getAdresseCallback(1), Is.Not.Null);
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.Create<int>(), getBrevhovedCallback, getAdresseCallback));
         }
 
         /// <summary>
@@ -388,7 +388,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.RegnskabGetByNummer(Arg<RegnskabGetByNummerQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<KontogruppeView>(3));
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
@@ -402,15 +402,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
-            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.CreateAnonymous<Brevhoved>());
+            var getBrevhovedCallback = new Func<int, Brevhoved>(nummer => fixture.Create<Brevhoved>());
             Assert.That(getBrevhovedCallback, Is.Not.Null);
             Assert.That(getBrevhovedCallback(1), Is.Not.Null);
-            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.CreateAnonymous<Person>());
+            var getAdresseCallback = new Func<int, AdresseBase>(nummer => fixture.Create<Person>());
             Assert.That(getAdresseCallback, Is.Not.Null);
             Assert.That(getAdresseCallback(1), Is.Not.Null);
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.CreateAnonymous<int>(), getBrevhovedCallback, getAdresseCallback));
+            Assert.Throws<IntranetRepositoryException>(() => repository.RegnskabGet(fixture.Create<int>(), getBrevhovedCallback, getAdresseCallback));
         }
 
         /// <summary>
@@ -457,7 +457,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -482,7 +482,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -507,7 +507,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.KontogruppeGetAll(Arg<KontogruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -567,7 +567,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -592,7 +592,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -617,7 +617,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BudgetkontogruppeGetAll(Arg<BudgetkontogruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -644,9 +644,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, null,
-                                              fixture.CreateAnonymous<string>(), null,
-                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                repository.BogføringslinjeAdd(fixture.Create<DateTime>(), null, null,
+                                              fixture.Create<string>(), null,
+                                              fixture.Create<decimal>(), fixture.Create<decimal>(),
                                               null));
         }
 
@@ -661,11 +661,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var channelFactory = MockRepository.GenerateMock<IChannelFactory>();
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var konto = fixture.CreateAnonymous<Konto>();
+            var konto = fixture.Create<Konto>();
             Assert.Throws<ArgumentNullException>(
                 () =>
-                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto, null, null,
-                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                repository.BogføringslinjeAdd(fixture.Create<DateTime>(), null, konto, null, null,
+                                              fixture.Create<decimal>(), fixture.Create<decimal>(),
                                               null));
         }
 
@@ -680,7 +680,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<BogføringslinjeView>());
+                .Return(fixture.Create<BogføringslinjeView>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -691,13 +691,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var konto = fixture.CreateAnonymous<Konto>();
-            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
-            var adressekonto = fixture.CreateAnonymous<Person>();
-            var result = repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
-                                                       fixture.CreateAnonymous<string>(), budgetkonto,
-                                                       fixture.CreateAnonymous<decimal>(),
-                                                       fixture.CreateAnonymous<decimal>(), adressekonto);
+            var konto = fixture.Create<Konto>();
+            var budgetkonto = fixture.Create<Budgetkonto>();
+            var adressekonto = fixture.Create<Person>();
+            var result = repository.BogføringslinjeAdd(fixture.Create<DateTime>(), null, konto,
+                                                       fixture.Create<string>(), budgetkonto,
+                                                       fixture.Create<decimal>(),
+                                                       fixture.Create<decimal>(), adressekonto);
             Assert.That(result, Is.Not.Null);
 
             Assert.That(konto.Bogføringslinjer.Count(), Is.EqualTo(1));
@@ -718,7 +718,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -729,12 +729,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var konto = fixture.CreateAnonymous<Konto>();
+            var konto = fixture.Create<Konto>();
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
-                                              fixture.CreateAnonymous<string>(), null,
-                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                repository.BogføringslinjeAdd(fixture.Create<DateTime>(), null, konto,
+                                              fixture.Create<string>(), null,
+                                              fixture.Create<decimal>(), fixture.Create<decimal>(),
                                               null));
         }
 
@@ -749,7 +749,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -760,12 +760,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var konto = fixture.CreateAnonymous<Konto>();
+            var konto = fixture.Create<Konto>();
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
-                                              fixture.CreateAnonymous<string>(), null,
-                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                repository.BogføringslinjeAdd(fixture.Create<DateTime>(), null, konto,
+                                              fixture.Create<string>(), null,
+                                              fixture.Create<decimal>(), fixture.Create<decimal>(),
                                               null));
         }
 
@@ -780,7 +780,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFinansstyringRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BogføringslinjeAdd(Arg<BogføringslinjeAddCommand>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -791,12 +791,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = MockRepository.GenerateMock<IDomainObjectBuilder>();
 
             var repository = new FinansstyringRepository(channelFactory, domainObjectBuilder);
-            var konto = fixture.CreateAnonymous<Konto>();
+            var konto = fixture.Create<Konto>();
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                repository.BogføringslinjeAdd(fixture.CreateAnonymous<DateTime>(), null, konto,
-                                              fixture.CreateAnonymous<string>(), null,
-                                              fixture.CreateAnonymous<decimal>(), fixture.CreateAnonymous<decimal>(),
+                repository.BogføringslinjeAdd(fixture.Create<DateTime>(), null, konto,
+                                              fixture.Create<string>(), null,
+                                              fixture.Create<decimal>(), fixture.Create<decimal>(),
                                               null));
         }
     }

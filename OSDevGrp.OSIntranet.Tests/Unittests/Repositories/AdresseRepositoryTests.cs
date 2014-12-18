@@ -111,9 +111,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<AdressegruppeView>(3));
             service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
@@ -142,9 +142,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<AdressegruppeView>(3));
             service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
@@ -173,9 +173,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.PersonGetAll(Arg<PersonGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             service.Expect(m => m.FirmaGetAll(Arg<FirmaGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
                 .Return(fixture.CreateMany<AdressegruppeView>(3));
             service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
@@ -237,7 +237,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -262,7 +262,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -287,7 +287,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.PostnummerGetAll(Arg<PostnummerGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -345,7 +345,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -370,7 +370,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -395,7 +395,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.AdressegruppeGetAll(Arg<AdressegruppeGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -457,7 +457,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -482,7 +482,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 
@@ -507,7 +507,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IAdresseRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BetalingsbetingelseGetAll(Arg<BetalingsbetingelseGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed).Repeat.Any();
             mocker.ReplayAll();
 

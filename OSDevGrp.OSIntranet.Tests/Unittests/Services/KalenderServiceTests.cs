@@ -47,7 +47,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         {
             var fixture = new Fixture();
             fixture.Inject<IQueryBus>(null);
-            Assert.Throws<ArgumentNullException>(() => new KalenderService(fixture.CreateAnonymous<IQueryBus>()));
+            Assert.Throws<ArgumentNullException>(() => new KalenderService(fixture.Create<IQueryBus>()));
         }
 
         /// <summary>
@@ -61,10 +61,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
-            service.KalenderbrugerAftalerGet(fixture.CreateAnonymous<KalenderbrugerAftalerGetQuery>());
+            service.KalenderbrugerAftalerGet(fixture.Create<KalenderbrugerAftalerGetQuery>());
 
             queryBus.AssertWasCalled(
                 m =>
@@ -85,14 +85,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftalerGetQuery, IEnumerable<KalenderbrugerAftaleView>>(
                     Arg<KalenderbrugerAftalerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.KalenderbrugerAftalerGet(fixture.CreateAnonymous<KalenderbrugerAftalerGetQuery>()));
+                () => service.KalenderbrugerAftalerGet(fixture.Create<KalenderbrugerAftalerGetQuery>()));
         }
 
         /// <summary>
@@ -108,14 +108,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftalerGetQuery, IEnumerable<KalenderbrugerAftaleView>>(
                     Arg<KalenderbrugerAftalerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.KalenderbrugerAftalerGet(fixture.CreateAnonymous<KalenderbrugerAftalerGetQuery>()));
+                () => service.KalenderbrugerAftalerGet(fixture.Create<KalenderbrugerAftalerGetQuery>()));
         }
 
         /// <summary>
@@ -131,14 +131,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftalerGetQuery, IEnumerable<KalenderbrugerAftaleView>>(
                     Arg<KalenderbrugerAftalerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.KalenderbrugerAftalerGet(fixture.CreateAnonymous<KalenderbrugerAftalerGetQuery>()));
+                () => service.KalenderbrugerAftalerGet(fixture.Create<KalenderbrugerAftalerGetQuery>()));
         }
 
         /// <summary>
@@ -154,14 +154,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftalerGetQuery, IEnumerable<KalenderbrugerAftaleView>>(
                     Arg<KalenderbrugerAftalerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.KalenderbrugerAftalerGet(fixture.CreateAnonymous<KalenderbrugerAftalerGetQuery>()));
+                () => service.KalenderbrugerAftalerGet(fixture.Create<KalenderbrugerAftalerGetQuery>()));
         }
 
         /// <summary>
@@ -175,10 +175,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
-            service.KalenderbrugerAftaleGet(fixture.CreateAnonymous<KalenderbrugerAftaleGetQuery>());
+            service.KalenderbrugerAftaleGet(fixture.Create<KalenderbrugerAftaleGetQuery>());
 
             queryBus.AssertWasCalled(
                 m =>
@@ -199,14 +199,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftaleGetQuery, KalenderbrugerAftaleView>(
                     Arg<KalenderbrugerAftaleGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.KalenderbrugerAftaleGet(fixture.CreateAnonymous<KalenderbrugerAftaleGetQuery>()));
+                () => service.KalenderbrugerAftaleGet(fixture.Create<KalenderbrugerAftaleGetQuery>()));
         }
 
         /// <summary>
@@ -222,14 +222,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftaleGetQuery, KalenderbrugerAftaleView>(
                     Arg<KalenderbrugerAftaleGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.KalenderbrugerAftaleGet(fixture.CreateAnonymous<KalenderbrugerAftaleGetQuery>()));
+                () => service.KalenderbrugerAftaleGet(fixture.Create<KalenderbrugerAftaleGetQuery>()));
         }
 
         /// <summary>
@@ -245,14 +245,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftaleGetQuery, KalenderbrugerAftaleView>(
                     Arg<KalenderbrugerAftaleGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.KalenderbrugerAftaleGet(fixture.CreateAnonymous<KalenderbrugerAftaleGetQuery>()));
+                () => service.KalenderbrugerAftaleGet(fixture.Create<KalenderbrugerAftaleGetQuery>()));
         }
 
         /// <summary>
@@ -268,14 +268,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugerAftaleGetQuery, KalenderbrugerAftaleView>(
                     Arg<KalenderbrugerAftaleGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.KalenderbrugerAftaleGet(fixture.CreateAnonymous<KalenderbrugerAftaleGetQuery>()));
+                () => service.KalenderbrugerAftaleGet(fixture.Create<KalenderbrugerAftaleGetQuery>()));
         }
 
         /// <summary>
@@ -289,10 +289,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
-            service.KalenderbrugereGet(fixture.CreateAnonymous<KalenderbrugereGetQuery>());
+            service.KalenderbrugereGet(fixture.Create<KalenderbrugereGetQuery>());
 
             queryBus.AssertWasCalled(
                 m =>
@@ -313,14 +313,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugereGetQuery, IEnumerable<KalenderbrugerView>>(
                     Arg<KalenderbrugereGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.KalenderbrugereGet(fixture.CreateAnonymous<KalenderbrugereGetQuery>()));
+                () => service.KalenderbrugereGet(fixture.Create<KalenderbrugereGetQuery>()));
         }
 
         /// <summary>
@@ -336,14 +336,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugereGetQuery, IEnumerable<KalenderbrugerView>>(
                     Arg<KalenderbrugereGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.KalenderbrugereGet(fixture.CreateAnonymous<KalenderbrugereGetQuery>()));
+                () => service.KalenderbrugereGet(fixture.Create<KalenderbrugereGetQuery>()));
         }
 
         /// <summary>
@@ -359,14 +359,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugereGetQuery, IEnumerable<KalenderbrugerView>>(
                     Arg<KalenderbrugereGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.KalenderbrugereGet(fixture.CreateAnonymous<KalenderbrugereGetQuery>()));
+                () => service.KalenderbrugereGet(fixture.Create<KalenderbrugereGetQuery>()));
         }
 
         /// <summary>
@@ -382,14 +382,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<KalenderbrugereGetQuery, IEnumerable<KalenderbrugerView>>(
                     Arg<KalenderbrugereGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.KalenderbrugereGet(fixture.CreateAnonymous<KalenderbrugereGetQuery>()));
+                () => service.KalenderbrugereGet(fixture.Create<KalenderbrugereGetQuery>()));
         }
 
         /// <summary>
@@ -403,10 +403,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
-            service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>());
+            service.SystemerGet(fixture.Create<SystemerGetQuery>());
 
             queryBus.AssertWasCalled(
                 m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull));
@@ -422,14 +422,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
 
         /// <summary>
@@ -442,14 +442,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
 
         /// <summary>
@@ -462,14 +462,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
 
         /// <summary>
@@ -482,14 +482,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<KalenderService>();
+            var service = fixture.Create<KalenderService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
     }
 }

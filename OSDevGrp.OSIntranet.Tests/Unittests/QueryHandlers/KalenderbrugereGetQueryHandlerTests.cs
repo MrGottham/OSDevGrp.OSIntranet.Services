@@ -31,7 +31,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var queryHandler = fixture.CreateAnonymous<KalenderbrugereGetQueryHandler>();
+            var queryHandler = fixture.Create<KalenderbrugereGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -49,7 +49,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                               {
                                                                   var system = MockRepository.GenerateMock<ISystem>();
                                                                   system.Expect(m => m.Nummer)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   return system;
                                                               }));
@@ -66,13 +66,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                                       .Return(systemer.ElementAt(1))
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Id)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Initialer)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Navn)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   return bruger;
                                                               }));
@@ -87,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 .Return(fixture.CreateMany<KalenderbrugerView>(7));
             fixture.Inject(objectMapper);
 
-            var queryHandler = fixture.CreateAnonymous<KalenderbrugereGetQueryHandler>();
+            var queryHandler = fixture.Create<KalenderbrugereGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new KalenderbrugereGetQuery

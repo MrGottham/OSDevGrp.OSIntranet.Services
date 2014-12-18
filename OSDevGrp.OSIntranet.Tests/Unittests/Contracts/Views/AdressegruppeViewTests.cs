@@ -17,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         public void TestAtViewKanInitieres()
         {
             var fixture = new Fixture();
-            var view = fixture.CreateAnonymous<AdressegruppeView>();
+            var view = fixture.Create<AdressegruppeView>();
             DataContractTestHelper.TestAtContractErInitieret(view);
         }
 
@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         public void TestAtViewKanSerialiseres()
         {
             var fixture = new Fixture();
-            var view = fixture.CreateAnonymous<AdressegruppeView>();
+            var view = fixture.Create<AdressegruppeView>();
             DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(view);
         }
     }

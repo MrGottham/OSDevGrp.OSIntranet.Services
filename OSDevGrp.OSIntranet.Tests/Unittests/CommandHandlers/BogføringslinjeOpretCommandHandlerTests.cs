@@ -7,6 +7,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -42,10 +43,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject<IKonfigurationRepository>(null);
             fixture.Inject(objectMapper);
 
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(
-                    () => fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>()).InnerException,
-                Is.TypeOf(typeof (ArgumentNullException)));
+            Assert.That(Assert.Throws<TargetInvocationException>(() => fixture.Create<BogføringslinjeOpretCommandHandler>()).InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
         /// <summary>
@@ -55,8 +53,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestAtExecuteTilføjerBogføringslinjeUdenAdressekonto()
         {
             var fixture = new Fixture();
+            fixture.Inject<KontoBaseView>(new KontoView());
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -66,25 +65,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 regnskab.TilføjKonto(budgetkonto);
             }
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+            finansstyringRepository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
                 .Return(regnskab);
-            finansstyringRepository.Expect(
-                m =>
-                m.BogføringslinjeAdd(Arg<DateTime>.Is.Anything, Arg<string>.Is.Anything, Arg<Konto>.Is.NotNull,
-                                     Arg<string>.Is.NotNull, Arg<Budgetkonto>.Is.NotNull,
-                                     Arg<decimal>.Is.GreaterThan(0M), Arg<decimal>.Is.GreaterThan(0M),
-                                     Arg<AdresseBase>.Is.Null))
+            finansstyringRepository.Expect(m => m.BogføringslinjeAdd(Arg<DateTime>.Is.Anything, Arg<string>.Is.Anything, Arg<Konto>.Is.NotNull, Arg<string>.Is.NotNull, Arg<Budgetkonto>.Is.NotNull, Arg<decimal>.Is.GreaterThan(0M), Arg<decimal>.Is.GreaterThan(0M), Arg<AdresseBase>.Is.Null))
                 .WhenCalled(m =>
                                 {
-                                    var bogføringslinje = new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                              (DateTime) m.Arguments[0],
-                                                                              (string) m.Arguments[1],
-                                                                              (string) m.Arguments[3],
-                                                                              (decimal) m.Arguments[5],
-                                                                              (decimal) m.Arguments[6]);
+                                    var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), (DateTime) m.Arguments[0], (string) m.Arguments[1], (string) m.Arguments[3], (decimal) m.Arguments[5], (decimal) m.Arguments[6]);
                                     if (m.Arguments[2] as Konto != null)
                                     {
                                         ((Konto) m.Arguments[2]).TilføjBogføringslinje(bogføringslinje);
@@ -108,9 +94,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(30);
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             fixture.Inject(fixture.CreateMany<BogføringsadvarselResponse>(3));
-            objectMapper.Expect(
-                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<BogføringslinjeOpretResponse>());
+            objectMapper.Expect(m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull))
+                .Return(fixture.Create<BogføringslinjeOpretResponse>());
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(adresseRepository);
@@ -118,37 +103,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
-                                  Tekst = fixture.CreateAnonymous<string>(),
+                                  Tekst = fixture.Create<string>(),
                                   Budgetkontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>()
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>()
                               };
             var result = commandHandler.Execute(command);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Advarsler, Is.Not.Null);
  
-            finansstyringRepository.AssertWasCalled(
-                m =>
-                m.BogføringslinjeAdd(Arg<DateTime>.Is.Equal(command.Dato),
-                                     Arg<string>.Is.Equal(command.Bilag),
-                                     Arg<Konto>.Is.NotNull,
-                                     Arg<string>.Is.Equal(command.Tekst),
-                                     Arg<Budgetkonto>.Is.NotNull,
-                                     Arg<decimal>.Is.Equal(command.Debit),
-                                     Arg<decimal>.Is.Equal(command.Kredit),
-                                     Arg<AdresseBase>.Is.Null));
-            objectMapper.AssertWasCalled(
-                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull));
+            finansstyringRepository.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<DateTime>.Is.Equal(command.Dato), Arg<string>.Is.Equal(command.Bilag), Arg<Konto>.Is.NotNull, Arg<string>.Is.Equal(command.Tekst), Arg<Budgetkonto>.Is.NotNull, Arg<decimal>.Is.Equal(command.Debit), Arg<decimal>.Is.Equal(command.Kredit), Arg<AdresseBase>.Is.Null));
+            objectMapper.AssertWasCalled(m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull));
         }
 
         /// <summary>
@@ -158,8 +133,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestAtExecuteTilføjerBogføringslinjeMedAdressekonto()
         {
             var fixture = new Fixture();
+            fixture.Inject<KontoBaseView>(new KontoView());
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -169,25 +145,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 regnskab.TilføjKonto(budgetkonto);
             }
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+            finansstyringRepository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
                 .Return(regnskab);
-            finansstyringRepository.Expect(
-                m =>
-                m.BogføringslinjeAdd(Arg<DateTime>.Is.Anything, Arg<string>.Is.Anything, Arg<Konto>.Is.NotNull,
-                                     Arg<string>.Is.NotNull, Arg<Budgetkonto>.Is.NotNull,
-                                     Arg<decimal>.Is.GreaterThan(0M), Arg<decimal>.Is.GreaterThan(0M),
-                                     Arg<AdresseBase>.Is.NotNull))
+            finansstyringRepository.Expect(m => m.BogføringslinjeAdd(Arg<DateTime>.Is.Anything, Arg<string>.Is.Anything, Arg<Konto>.Is.NotNull, Arg<string>.Is.NotNull, Arg<Budgetkonto>.Is.NotNull, Arg<decimal>.Is.GreaterThan(0M), Arg<decimal>.Is.GreaterThan(0M), Arg<AdresseBase>.Is.NotNull))
                 .WhenCalled(m =>
                                 {
-                                    var bogføringslinje = new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                              (DateTime) m.Arguments[0],
-                                                                              (string) m.Arguments[1],
-                                                                              (string) m.Arguments[3],
-                                                                              (decimal) m.Arguments[5],
-                                                                              (decimal) m.Arguments[6]);
+                                    var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), (DateTime) m.Arguments[0], (string) m.Arguments[1], (string) m.Arguments[3], (decimal) m.Arguments[5], (decimal) m.Arguments[6]);
                                     if (m.Arguments[2] as Konto != null)
                                     {
                                         ((Konto) m.Arguments[2]).TilføjBogføringslinje(bogføringslinje);
@@ -215,9 +178,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(30);
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             fixture.Inject(fixture.CreateMany<BogføringsadvarselResponse>(3));
-            objectMapper.Expect(
-                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<BogføringslinjeOpretResponse>());
+            objectMapper.Expect(m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull))
+                .Return(fixture.Create<BogføringslinjeOpretResponse>());
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(adresseRepository);
@@ -225,38 +187,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
-                                  Tekst = fixture.CreateAnonymous<string>(),
+                                  Tekst = fixture.Create<string>(),
                                   Budgetkontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
                                   Adressekonto = adressekonti.ElementAt(1).Nummer
                               };
             var result = commandHandler.Execute(command);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Advarsler, Is.Not.Null);
 
-            finansstyringRepository.AssertWasCalled(
-                m =>
-                m.BogføringslinjeAdd(Arg<DateTime>.Is.Equal(command.Dato),
-                                     Arg<string>.Is.Equal(command.Bilag),
-                                     Arg<Konto>.Is.NotNull,
-                                     Arg<string>.Is.Equal(command.Tekst),
-                                     Arg<Budgetkonto>.Is.NotNull,
-                                     Arg<decimal>.Is.Equal(command.Debit),
-                                     Arg<decimal>.Is.Equal(command.Kredit),
-                                     Arg<AdresseBase>.Is.NotNull));
-            objectMapper.AssertWasCalled(
-                m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull));
+            finansstyringRepository.AssertWasCalled(m => m.BogføringslinjeAdd(Arg<DateTime>.Is.Equal(command.Dato), Arg<string>.Is.Equal(command.Bilag), Arg<Konto>.Is.NotNull, Arg<string>.Is.Equal(command.Tekst), Arg<Budgetkonto>.Is.NotNull, Arg<decimal>.Is.Equal(command.Debit), Arg<decimal>.Is.Equal(command.Kredit), Arg<AdresseBase>.Is.NotNull));
+            objectMapper.AssertWasCalled(m => m.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(Arg<IBogføringsresultat>.Is.NotNull));
         }
 
         /// <summary>
@@ -279,7 +231,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => commandHandler.Execute(null));
@@ -298,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 m =>
                 m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, Brevhoved>>.Is.NotNull,
                               Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
             adresseRepository.Expect(m => m.AdresseGetAll())
                 .Return(fixture.CreateMany<Person>(25));
@@ -314,20 +266,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             var command = new BogføringslinjeOpretCommand
                               {
-                                  Regnskabsnummer = fixture.CreateAnonymous<int>(),
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
-                                  Kontonummer = fixture.CreateAnonymous<string>(),
-                                  Tekst = fixture.CreateAnonymous<string>(),
-                                  Budgetkontonummer = fixture.CreateAnonymous<string>(),
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Regnskabsnummer = fixture.Create<int>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
+                                  Kontonummer = fixture.Create<string>(),
+                                  Tekst = fixture.Create<string>(),
+                                  Budgetkontonummer = fixture.Create<string>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetRepositoryException>(() => commandHandler.Execute(command));
         }
@@ -340,7 +292,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
                 m =>
@@ -364,21 +316,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now.AddDays(-31));
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
-                                  Kontonummer = fixture.CreateAnonymous<string>(),
-                                  Tekst = fixture.CreateAnonymous<string>(),
-                                  Budgetkontonummer = fixture.CreateAnonymous<string>(),
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
+                                  Kontonummer = fixture.Create<string>(),
+                                  Tekst = fixture.Create<string>(),
+                                  Budgetkontonummer = fixture.Create<string>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
         }
@@ -391,7 +343,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
                 m =>
@@ -415,21 +367,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now.AddDays(1));
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
-                                  Kontonummer = fixture.CreateAnonymous<string>(),
-                                  Tekst = fixture.CreateAnonymous<string>(),
-                                  Budgetkontonummer = fixture.CreateAnonymous<string>(),
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
+                                  Kontonummer = fixture.Create<string>(),
+                                  Tekst = fixture.Create<string>(),
+                                  Budgetkontonummer = fixture.Create<string>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
         }
@@ -442,7 +394,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
                 m =>
@@ -466,21 +418,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = null,
-                                  Tekst = fixture.CreateAnonymous<string>(),
-                                  Budgetkontonummer = fixture.CreateAnonymous<string>(),
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Tekst = fixture.Create<string>(),
+                                  Budgetkontonummer = fixture.Create<string>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
         }
@@ -493,7 +445,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -521,21 +473,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
-                                  Kontonummer = fixture.CreateAnonymous<string>(),
-                                  Tekst = fixture.CreateAnonymous<string>(),
-                                  Budgetkontonummer = fixture.CreateAnonymous<string>(),
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
+                                  Kontonummer = fixture.Create<string>(),
+                                  Tekst = fixture.Create<string>(),
+                                  Budgetkontonummer = fixture.Create<string>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetRepositoryException>(() => commandHandler.Execute(command));
         }
@@ -548,7 +500,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -576,21 +528,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
                                   Tekst = null,
-                                  Budgetkontonummer = fixture.CreateAnonymous<string>(),
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Budgetkontonummer = fixture.Create<string>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
         }
@@ -603,7 +555,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -635,21 +587,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
-                                  Tekst = fixture.CreateAnonymous<string>(),
-                                  Budgetkontonummer = fixture.CreateAnonymous<string>(),
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Tekst = fixture.Create<string>(),
+                                  Budgetkontonummer = fixture.Create<string>(),
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetRepositoryException>(() => commandHandler.Execute(command));
         }
@@ -662,7 +614,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -694,21 +646,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
-                                  Tekst = fixture.CreateAnonymous<string>(),
+                                  Tekst = fixture.Create<string>(),
                                   Budgetkontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
-                                  Debit = fixture.CreateAnonymous<decimal>()*-1,
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Debit = fixture.Create<decimal>()*-1,
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
         }
@@ -721,7 +673,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -753,21 +705,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
-                                  Tekst = fixture.CreateAnonymous<string>(),
+                                  Tekst = fixture.Create<string>(),
                                   Budgetkontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>()*-1,
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>()*-1,
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
         }
@@ -780,7 +732,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -812,7 +764,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
@@ -820,14 +772,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
-                                  Tekst = fixture.CreateAnonymous<string>(),
+                                  Tekst = fixture.Create<string>(),
                                   Budgetkontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetBusinessException>(() => commandHandler.Execute(command));
         }
@@ -840,7 +792,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(25))
             {
                 regnskab.TilføjKonto(konto);
@@ -873,7 +825,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(DateTime.Now);
@@ -881,14 +833,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var command = new BogføringslinjeOpretCommand
                               {
                                   Regnskabsnummer = regnskab.Nummer,
-                                  Dato = fixture.CreateAnonymous<DateTime>(),
-                                  Bilag = fixture.CreateAnonymous<string>(),
+                                  Dato = fixture.Create<DateTime>(),
+                                  Bilag = fixture.Create<string>(),
                                   Kontonummer = regnskab.Konti.OfType<Konto>().ElementAt(1).Kontonummer,
-                                  Tekst = fixture.CreateAnonymous<string>(),
+                                  Tekst = fixture.Create<string>(),
                                   Budgetkontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
-                                  Debit = fixture.CreateAnonymous<decimal>(),
-                                  Kredit = fixture.CreateAnonymous<decimal>(),
-                                  Adressekonto = fixture.CreateAnonymous<int>()
+                                  Debit = fixture.Create<decimal>(),
+                                  Kredit = fixture.Create<decimal>(),
+                                  Adressekonto = fixture.Create<int>()
                               };
             Assert.Throws<IntranetRepositoryException>(() => commandHandler.Execute(command));
         }
@@ -913,13 +865,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
 
-            var commandHandler = fixture.CreateAnonymous<BogføringslinjeOpretCommandHandler>();
+            var commandHandler = fixture.Create<BogføringslinjeOpretCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             Assert.Throws<IntranetSystemException>(
                 () =>
-                commandHandler.HandleException(fixture.CreateAnonymous<BogføringslinjeOpretCommand>(),
-                                               fixture.CreateAnonymous<Exception>()));
+                commandHandler.HandleException(fixture.Create<BogføringslinjeOpretCommand>(),
+                                               fixture.Create<Exception>()));
         }
     }
 }

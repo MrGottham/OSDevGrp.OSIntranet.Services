@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var queryHandler = fixture.CreateAnonymous<KalenderbrugerAftaleGetQueryHandler>();
+            var queryHandler = fixture.Create<KalenderbrugerAftaleGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -48,13 +48,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(DateTime.Now);
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var r = new Random(fixture.CreateAnonymous<DateTime>().Millisecond);
+            var r = new Random(fixture.Create<DateTime>().Millisecond);
 
             fixture.Customize<ISystem>(e => e.FromFactory(() =>
                                                               {
                                                                   var system = MockRepository.GenerateMock<ISystem>();
                                                                   system.Expect(m => m.Nummer)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   return system;
                                                               }));
@@ -71,26 +71,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                                       .Return(systemer.ElementAt(1))
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Id)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Initialer)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Navn)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   return bruger;
                                                               }));
             var brugere = fixture.CreateMany<IBruger>(7).ToList();
             fixture.Customize<IAftale>(e => e.FromFactory(() =>
                                                               {
-                                                                  var dt = fixture.CreateAnonymous<DateTime>().AddDays(r.Next(100));
+                                                                  var dt = fixture.Create<DateTime>().AddDays(r.Next(100));
                                                                   var a = MockRepository.GenerateMock<IAftale>();
                                                                   a.Expect(m => m.System)
                                                                       .Return(systemer.ElementAt(1))
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.Id)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.FraTidspunkt)
                                                                       .Return(dt)
@@ -99,7 +99,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                                       .Return(dt.AddMinutes(15 + (15*r.Next(7))))
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.Emne)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.Deltagere)
                                                                       .Return(null)
@@ -122,7 +122,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                                       .Repeat.Any();
                                                                   return a;
                                                               }));
-            var aftale = fixture.CreateAnonymous<IAftale>();
+            var aftale = fixture.Create<IAftale>();
             var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
             kalenderRepository.Expect(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(systemer.ElementAt(1).Nummer)))
                 .Return(brugere);
@@ -135,10 +135,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(fixture.CreateMany<KalenderbrugerView>(3));
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(m => m.Map<IBrugeraftale, KalenderbrugerAftaleView>(Arg<IBrugeraftale>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<KalenderbrugerAftaleView>());
+                .Return(fixture.Create<KalenderbrugerAftaleView>());
             fixture.Inject(objectMapper);
 
-            var queryHandler = fixture.CreateAnonymous<KalenderbrugerAftaleGetQueryHandler>();
+            var queryHandler = fixture.Create<KalenderbrugerAftaleGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new KalenderbrugerAftaleGetQuery
@@ -170,13 +170,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(DateTime.Now);
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var r = new Random(fixture.CreateAnonymous<DateTime>().Millisecond);
+            var r = new Random(fixture.Create<DateTime>().Millisecond);
 
             fixture.Customize<ISystem>(e => e.FromFactory(() =>
                                                               {
                                                                   var system = MockRepository.GenerateMock<ISystem>();
                                                                   system.Expect(m => m.Nummer)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   return system;
                                                               }));
@@ -193,26 +193,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                                       .Return(systemer.ElementAt(1))
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Id)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Initialer)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   bruger.Expect(m => m.Navn)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   return bruger;
                                                               }));
             var brugere = fixture.CreateMany<IBruger>(7).ToList();
             fixture.Customize<IAftale>(e => e.FromFactory(() =>
                                                               {
-                                                                  var dt = fixture.CreateAnonymous<DateTime>().AddDays(r.Next(100));
+                                                                  var dt = fixture.Create<DateTime>().AddDays(r.Next(100));
                                                                   var a = MockRepository.GenerateMock<IAftale>();
                                                                   a.Expect(m => m.System)
                                                                       .Return(systemer.ElementAt(1))
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.Id)
-                                                                      .Return(fixture.CreateAnonymous<int>())
+                                                                      .Return(fixture.Create<int>())
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.FraTidspunkt)
                                                                       .Return(dt)
@@ -221,7 +221,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                                       .Return(dt.AddMinutes(15 + (15*r.Next(7))))
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.Emne)
-                                                                      .Return(fixture.CreateAnonymous<string>())
+                                                                      .Return(fixture.Create<string>())
                                                                       .Repeat.Any();
                                                                   a.Expect(m => m.Deltagere)
                                                                       .Return(null)
@@ -244,7 +244,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                                                                       .Repeat.Any();
                                                                   return a;
                                                               }));
-            var aftale = fixture.CreateAnonymous<IAftale>();
+            var aftale = fixture.Create<IAftale>();
             var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
             kalenderRepository.Expect(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(systemer.ElementAt(1).Nummer)))
                 .Return(brugere);
@@ -257,10 +257,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(fixture.CreateMany<KalenderbrugerView>(3));
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(m => m.Map<IBrugeraftale, KalenderbrugerAftaleView>(Arg<IBrugeraftale>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<KalenderbrugerAftaleView>());
+                .Return(fixture.Create<KalenderbrugerAftaleView>());
             fixture.Inject(objectMapper);
 
-            var queryHandler = fixture.CreateAnonymous<KalenderbrugerAftaleGetQueryHandler>();
+            var queryHandler = fixture.Create<KalenderbrugerAftaleGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new KalenderbrugerAftaleGetQuery

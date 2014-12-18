@@ -27,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError,
                                                             MethodBase.GetCurrentMethod().Name,
-                                                            fixture.CreateAnonymous<string>());
+                                                            fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -45,8 +45,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue,
-                                                            fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<string>(),
+                                                            fixture.Create<int>(),
+                                                            fixture.Create<string>(),
                                                             MethodBase.GetCurrentMethod().Name);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
@@ -66,8 +66,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
-                                                            fixture.CreateAnonymous<Type>(),
-                                                            fixture.CreateAnonymous<string>());
+                                                            fixture.Create<Type>(),
+                                                            fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -85,7 +85,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, null,
-                                                            fixture.CreateAnonymous<string>());
+                                                            fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -104,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType,
-                                                            fixture.CreateAnonymous<Type>());
+                                                            fixture.Create<Type>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -122,8 +122,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue,
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>());
+                                                            fixture.Create<string>(),
+                                                            fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -141,9 +141,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue,
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>());
+                                                            fixture.Create<string>(),
+                                                            fixture.Create<string>(),
+                                                            fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -161,7 +161,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld,
-                                                            fixture.CreateAnonymous<int>());
+                                                            fixture.Create<int>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -257,7 +257,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate,
-                                                            fixture.CreateAnonymous<Type>());
+                                                            fixture.Create<Type>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -303,7 +303,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials, fixture.CreateAnonymous<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials, fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }

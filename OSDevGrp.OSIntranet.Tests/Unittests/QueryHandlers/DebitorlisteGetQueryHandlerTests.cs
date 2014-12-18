@@ -41,7 +41,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject<IKonfigurationRepository>(null);
             fixture.Inject(objectMapper);
             Assert.That(
-                Assert.Throws<TargetInvocationException>(() => fixture.CreateAnonymous<DebitorlisteGetQueryHandler>()).
+                Assert.Throws<TargetInvocationException>(() => fixture.Create<DebitorlisteGetQueryHandler>()).
                     InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
@@ -64,7 +64,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(fællesRepository);
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<DebitorlisteGetQueryHandler>();
+            var queryHandler = fixture.Create<DebitorlisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -81,19 +81,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var debitorer = fixture.CreateMany<Person>(15).ToList();
             debitorer.ForEach(
                 m =>
-                m.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<decimal>(), 0M)));
+                m.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                            fixture.Create<DateTime>(),
+                                                            fixture.Create<string>(),
+                                                            fixture.Create<string>(),
+                                                            fixture.Create<decimal>(), 0M)));
             var kreditorer = fixture.CreateMany<Person>(15).ToList();
             kreditorer.ForEach(
                 m =>
-                m.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(), 0M,
-                                                            fixture.CreateAnonymous<decimal>())));
+                m.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                            fixture.Create<DateTime>(),
+                                                            fixture.Create<string>(),
+                                                            fixture.Create<string>(), 0M,
+                                                            fixture.Create<decimal>())));
             var personer = new List<Person>();
             personer.AddRange(debitorer);
             personer.AddRange(kreditorer);
@@ -119,13 +119,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(fællesRepository);
             fixture.Inject(konfigurationRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<DebitorlisteGetQueryHandler>();
+            var queryHandler = fixture.Create<DebitorlisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new DebitorlisteGetQuery
                             {
-                                Regnskabsnummer = fixture.CreateAnonymous<int>(),
-                                StatusDato = fixture.CreateAnonymous<DateTime>()
+                                Regnskabsnummer = fixture.Create<int>(),
+                                StatusDato = fixture.Create<DateTime>()
                             };
             var result = queryHandler.Query(query);
             Assert.That(result, Is.Not.Null);

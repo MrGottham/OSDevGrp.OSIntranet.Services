@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Infrastructure.Interfaces", "OSDevGrp.OSIntranet.Infrastructure.Interfaces\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj", "{E510F652-6E85-402E-9EFF-474841121181}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0A1F688-C012-4C39-92DF-E435C33FB0A7}"
@@ -16,15 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External references", "External references", "{8CC59821-8B5B-420E-81DA-01CB7CABB700}"
 	ProjectSection(SolutionItems) = preProject
-		External references\AutoMapper.dll = External references\AutoMapper.dll
 		External references\Castle.Core.dll = External references\Castle.Core.dll
 		External references\Castle.Windsor.dll = External references\Castle.Windsor.dll
-		External references\MySql.Data.chm = External references\MySql.Data.chm
-		External references\mysql.data.dll = External references\mysql.data.dll
-		External references\mysql.data.entity.dll = External references\mysql.data.entity.dll
-		External references\mysql.visualstudio.dll = External references\mysql.visualstudio.dll
-		External references\mysql.web.dll = External references\mysql.web.dll
-		External references\nunit.framework.dll = External references\nunit.framework.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll
@@ -35,8 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External references", "Exte
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll
 		External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll = External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll
-		External references\Ploeh.AutoFixture.dll = External references\Ploeh.AutoFixture.dll
-		External references\Rhino.Mocks.dll = External references\Rhino.Mocks.dll
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Infrastructure", "OSDevGrp.OSIntranet.Infrastructure\OSDevGrp.OSIntranet.Infrastructure.csproj", "{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}"
@@ -68,6 +59,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Domain.Interfaces", "OSDevGrp.OSIntranet.Domain.Interfaces\OSDevGrp.OSIntranet.Domain.Interfaces.csproj", "{14E268A0-B79F-4EF0-B299-5B2D34BF93AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Domain", "OSDevGrp.OSIntranet.Domain\OSDevGrp.OSIntranet.Domain.csproj", "{B02149C7-DBE2-42CA-AA67-AF18B3D1D321}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F5E1CF7B-7D54-4565-8B12-CD46EF0F3993}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution

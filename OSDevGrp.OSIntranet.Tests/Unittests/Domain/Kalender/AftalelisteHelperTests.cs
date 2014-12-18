@@ -28,18 +28,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             fixture.Inject(DateTime.Now);
             var aftaler = new List<IAftale>
                               {
-                                  new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                             fixture.CreateAnonymous<DateTime>(),
-                                             fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                             fixture.CreateAnonymous<string>()),
-                                  new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                             fixture.CreateAnonymous<DateTime>(),
-                                             fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                             fixture.CreateAnonymous<string>()),
-                                  new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                             fixture.CreateAnonymous<DateTime>(),
-                                             fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                             fixture.CreateAnonymous<string>())
+                                  new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                             fixture.Create<DateTime>(),
+                                             fixture.Create<DateTime>().AddMinutes(15),
+                                             fixture.Create<string>()),
+                                  new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                             fixture.Create<DateTime>(),
+                                             fixture.Create<DateTime>().AddMinutes(15),
+                                             fixture.Create<string>()),
+                                  new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                             fixture.Create<DateTime>(),
+                                             fixture.Create<DateTime>().AddMinutes(15),
+                                             fixture.Create<string>())
                               };
             var aftalelisteHelper = new AftalelisteHelper(aftaler);
             Assert.That(aftalelisteHelper, Is.Not.Null);
@@ -62,18 +62,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             fixture.Inject(DateTime.Now);
             var aftaler = new List<IAftale>
                               {
-                                  new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                             fixture.CreateAnonymous<DateTime>(),
-                                             fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                             fixture.CreateAnonymous<string>()),
-                                  new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                             fixture.CreateAnonymous<DateTime>(),
-                                             fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                             fixture.CreateAnonymous<string>()),
-                                  new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                             fixture.CreateAnonymous<DateTime>(),
-                                             fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                             fixture.CreateAnonymous<string>())
+                                  new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                             fixture.Create<DateTime>(),
+                                             fixture.Create<DateTime>().AddMinutes(15),
+                                             fixture.Create<string>()),
+                                  new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                             fixture.Create<DateTime>(),
+                                             fixture.Create<DateTime>().AddMinutes(15),
+                                             fixture.Create<string>()),
+                                  new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                             fixture.Create<DateTime>(),
+                                             fixture.Create<DateTime>().AddMinutes(15),
+                                             fixture.Create<string>())
                               };
             var aftalelisteHelper = new AftalelisteHelper(aftaler);
             Assert.That(aftalelisteHelper, Is.Not.Null);

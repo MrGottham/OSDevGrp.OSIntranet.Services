@@ -33,20 +33,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);
             container.Register(Component.For<IKonfigurationRepository>().Instance(konfigurationRepository).LifeStyle.Transient);
 
-            container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories")
-                                   .BasedOn(typeof(IDataProviderBase)).WithService.FromInterface(typeof(IDataProviderBase)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IDataProviderBase)).WithService.FromInterface(typeof (IDataProviderBase)));
 
-            container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories")
-                                   .BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)));
 
-            container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers")
-                                   .BasedOn(typeof(ICommandHandler)).WithService.FromInterface(typeof(ICommandHandler)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers").BasedOn(typeof (ICommandHandler)).WithService.FromInterface(typeof (ICommandHandler)));
 
-            container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.QueryHandlers")
-                                   .BasedOn(typeof (IQueryHandler)).WithService.FromInterface(typeof (IQueryHandler)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.QueryHandlers").BasedOn(typeof (IQueryHandler)).WithService.FromInterface(typeof (IQueryHandler)));
 
-            container.Register(AllTypes.FromAssemblyNamed("OSDevGrp.OSIntranet.Services")
-                                   .BasedOn(typeof (IIntranetService)).WithService.FromInterface(typeof (IIntranetService)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Services").BasedOn(typeof (IIntranetService)).WithService.FromInterface(typeof (IIntranetService)));
         }
 
         #endregion

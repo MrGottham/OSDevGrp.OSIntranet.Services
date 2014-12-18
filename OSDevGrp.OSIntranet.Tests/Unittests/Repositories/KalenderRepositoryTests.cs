@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject<IMySqlDataProvider>(null);
 
             Assert.Throws<ArgumentNullException>(
-                () => new KalenderRepository(fixture.CreateAnonymous<IMySqlDataProvider>()));
+                () => new KalenderRepository(fixture.Create<IMySqlDataProvider>()));
         }
 
         /// <summary>
@@ -43,11 +43,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(fixture.CreateMany<AftaleProxy>(25));
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
-            var aftaler = repository.AftaleGetAllBySystem(fixture.CreateAnonymous<int>(),
-                                                          fixture.CreateAnonymous<DateTime>());
+            var aftaler = repository.AftaleGetAllBySystem(fixture.Create<int>(),
+                                                          fixture.Create<DateTime>());
             Assert.That(aftaler, Is.Not.Null);
             Assert.That(aftaler.Count(), Is.EqualTo(25));
 
@@ -65,15 +65,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<string>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                repository.AftaleGetAllBySystem(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<DateTime>()));
+                repository.AftaleGetAllBySystem(fixture.Create<int>(), fixture.Create<DateTime>()));
         }
 
         /// <summary>
@@ -87,15 +87,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<string>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                repository.AftaleGetAllBySystem(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<DateTime>()));
+                repository.AftaleGetAllBySystem(fixture.Create<int>(), fixture.Create<DateTime>()));
         }
 
         /// <summary>
@@ -109,14 +109,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.Get(Arg<AftaleProxy>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<AftaleProxy>());
+                .Return(fixture.Create<AftaleProxy>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
-            var aftale = repository.AftaleGetBySystemAndId(fixture.CreateAnonymous<int>(),
-                                                           fixture.CreateAnonymous<int>());
+            var aftale = repository.AftaleGetBySystemAndId(fixture.Create<int>(),
+                                                           fixture.Create<int>());
             Assert.That(aftale, Is.Not.Null);
 
             mySqlDataProvider.AssertWasCalled(m => m.Get(Arg<AftaleProxy>.Is.NotNull));
@@ -133,14 +133,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.Get(Arg<AftaleProxy>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
-                () => repository.AftaleGetBySystemAndId(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<int>()));
+                () => repository.AftaleGetBySystemAndId(fixture.Create<int>(), fixture.Create<int>()));
         }
 
         /// <summary>
@@ -154,14 +154,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.Get(Arg<AftaleProxy>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
-                () => repository.AftaleGetBySystemAndId(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<int>()));
+                () => repository.AftaleGetBySystemAndId(fixture.Create<int>(), fixture.Create<int>()));
         }
 
         /// <summary>
@@ -177,10 +177,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(fixture.CreateMany<BrugerProxy>(3));
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
-            var brugere = repository.BrugerGetAllBySystem(fixture.CreateAnonymous<int>());
+            var brugere = repository.BrugerGetAllBySystem(fixture.Create<int>());
             Assert.That(brugere, Is.Not.Null);
             Assert.That(brugere.Count(), Is.EqualTo(3));
 
@@ -197,14 +197,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
-                () => repository.BrugerGetAllBySystem(fixture.CreateAnonymous<int>()));
+                () => repository.BrugerGetAllBySystem(fixture.Create<int>()));
 
             mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull));
         }
@@ -219,14 +219,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<KalenderRepository>();
+            var repository = fixture.Create<KalenderRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
-                () => repository.BrugerGetAllBySystem(fixture.CreateAnonymous<int>()));
+                () => repository.BrugerGetAllBySystem(fixture.Create<int>()));
 
             mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull));
         }

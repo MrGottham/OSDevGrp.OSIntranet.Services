@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BogføringerGetQueryHandler>();
+            var queryHandler = fixture.Create<BogføringerGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -51,7 +51,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(3))
             {
                 regnskab.TilføjKonto(konto);
@@ -75,20 +75,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 .Return(fixture.CreateMany<Brevhoved>(3));
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(m => m.Map<Bogføringslinje, BogføringslinjeView>(Arg<Bogføringslinje>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<BogføringslinjeView>())
+                .Return(fixture.Create<BogføringslinjeView>())
                 .Repeat.Any();
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BogføringerGetQueryHandler>();
+            var queryHandler = fixture.Create<BogføringerGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new BogføringerGetQuery
                             {
                                 Regnskabsnummer = regnskab.Nummer,
-                                StatusDato = fixture.CreateAnonymous<DateTime>(),
+                                StatusDato = fixture.Create<DateTime>(),
                                 Linjer = 30
                             };
             var bogføringslinjer = queryHandler.Query(query);

@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(adresseRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<PersonGetQueryHandler>();
+            var queryHandler = fixture.Create<PersonGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -55,11 +55,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 .Return(adresser);
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(m => m.Map<Person, PersonView>(Arg<Person>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<PersonView>());
+                .Return(fixture.Create<PersonView>());
 
             fixture.Inject(adresseRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<PersonGetQueryHandler>();
+            var queryHandler = fixture.Create<PersonGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new PersonGetQuery

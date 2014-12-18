@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<SystemerGetQueryHandler>();
+            var queryHandler = fixture.Create<SystemerGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -57,7 +57,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<SystemerGetQueryHandler>();
+            var queryHandler = fixture.Create<SystemerGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new SystemerGetQuery();

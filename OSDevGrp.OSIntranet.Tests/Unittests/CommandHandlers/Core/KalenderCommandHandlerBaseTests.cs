@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
             Assert.That(commandHandler.KalenderRepository, Is.Not.Null);
             Assert.That(commandHandler.FællesRepository, Is.Not.Null);
@@ -66,9 +66,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new MyKalenderCommandHandler(fixture.CreateAnonymous<IKalenderRepository>(),
-                                             fixture.CreateAnonymous<IFællesRepository>(),
-                                             fixture.CreateAnonymous<IObjectMapper>()));
+                new MyKalenderCommandHandler(fixture.Create<IKalenderRepository>(),
+                                             fixture.Create<IFællesRepository>(),
+                                             fixture.Create<IObjectMapper>()));
         }
 
         /// <summary>
@@ -84,9 +84,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new MyKalenderCommandHandler(fixture.CreateAnonymous<IKalenderRepository>(),
-                                             fixture.CreateAnonymous<IFællesRepository>(),
-                                             fixture.CreateAnonymous<IObjectMapper>()));
+                new MyKalenderCommandHandler(fixture.Create<IKalenderRepository>(),
+                                             fixture.Create<IFællesRepository>(),
+                                             fixture.Create<IObjectMapper>()));
         }
 
         /// <summary>
@@ -102,9 +102,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new MyKalenderCommandHandler(fixture.CreateAnonymous<IKalenderRepository>(),
-                                             fixture.CreateAnonymous<IFællesRepository>(),
-                                             fixture.CreateAnonymous<IObjectMapper>()));
+                new MyKalenderCommandHandler(fixture.Create<IKalenderRepository>(),
+                                             fixture.Create<IFællesRepository>(),
+                                             fixture.Create<IObjectMapper>()));
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             foreach (var system in systemer)
             {
                 system.Expect(m => m.Nummer)
-                    .Return(fixture.CreateAnonymous<int>())
+                    .Return(fixture.Create<int>())
                     .Repeat.Any();
             }
             var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
@@ -131,7 +131,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Repeat.Any();
             fixture.Inject(fællesRepository);
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             var result = commandHandler.SystemGetByNummer(systemer.ElementAt(1).Nummer);
@@ -156,7 +156,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             foreach (var system in systemer)
             {
                 system.Expect(m => m.Nummer)
-                    .Return(fixture.CreateAnonymous<int>())
+                    .Return(fixture.Create<int>())
                     .Repeat.Any();
             }
             var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
@@ -165,11 +165,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Repeat.Any();
             fixture.Inject(fællesRepository);
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
-                () => commandHandler.SystemGetByNummer(fixture.CreateAnonymous<int>()));
+                () => commandHandler.SystemGetByNummer(fixture.Create<int>()));
 
             fællesRepository.AssertWasCalled(m => m.SystemGetAll());
         }
@@ -185,14 +185,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject<ISystem>(null);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                  fixture.CreateAnonymous<string>()));
+                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                  fixture.Create<string>()));
         }
 
         /// <summary>
@@ -206,15 +206,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject<string>(null);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                  fixture.CreateAnonymous<string>()));
+                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                  fixture.Create<string>()));
         }
 
         /// <summary>
@@ -228,15 +228,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(string.Empty);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                  fixture.CreateAnonymous<string>()));
+                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                  fixture.Create<string>()));
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             var system = MockRepository.GenerateMock<ISystem>();
             system.Expect(m => m.Nummer)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
             fixture.Inject(system);
 
@@ -260,7 +260,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             foreach (var bruger in brugere)
             {
                 bruger.Expect(m => m.Initialer)
-                    .Return(fixture.CreateAnonymous<string>())
+                    .Return(fixture.Create<string>())
                     .Repeat.Any();
             }
             var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
@@ -268,10 +268,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(brugere);
             fixture.Inject(kalenderRepository);
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
-            var brugerliste = commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
+            var brugerliste = commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
                                                                                 brugere.ElementAt(1).Initialer);
             Assert.That(brugerliste, Is.Not.Null);
             Assert.That(brugerliste.Count(), Is.EqualTo(1));
@@ -291,7 +291,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             var system = MockRepository.GenerateMock<ISystem>();
             system.Expect(m => m.Nummer)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
             fixture.Inject(system);
 
@@ -300,7 +300,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             foreach (var bruger in brugere)
             {
                 bruger.Expect(m => m.Initialer)
-                    .Return(fixture.CreateAnonymous<string>())
+                    .Return(fixture.Create<string>())
                     .Repeat.Any();
             }
             var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
@@ -308,13 +308,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(brugere);
             fixture.Inject(kalenderRepository);
 
-            var commandHandler = fixture.CreateAnonymous<MyKalenderCommandHandler>();
+            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
             Assert.That(commandHandler, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                  fixture.CreateAnonymous<string>()));
+                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                  fixture.Create<string>()));
 
             kalenderRepository.AssertWasCalled(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(system.Nummer)));
         }

@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new AftaleProxy());
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
             Assert.That(aftaleProxy.System, Is.Not.Null);
             Assert.That(aftaleProxy.System.Nummer, Is.EqualTo(0));
@@ -49,7 +49,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new AftaleProxy(1, 2));
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
             var uniqueId = aftaleProxy.UniqueId;
@@ -66,7 +66,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new AftaleProxy(1, 2));
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
             var sqlQuery = aftaleProxy.GetSqlQueryForId(aftaleProxy);
@@ -83,7 +83,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new AftaleProxy(1, 2));
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => aftaleProxy.GetSqlQueryForId(null));
@@ -96,14 +96,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         public void TestAtGetSqlCommandForInsertReturnererSqlCommand()
         {
             var fixture = new Fixture();
-            var emne = fixture.CreateAnonymous<string>();
-            var notat = fixture.CreateAnonymous<string>();
-            var properties = fixture.CreateAnonymous<int>();
+            var emne = fixture.Create<string>();
+            var notat = fixture.Create<string>();
+            var properties = fixture.Create<int>();
             fixture.Inject(new DateTime(2011, 10, 8, 12, 0, 0));
-            fixture.Inject(new AftaleProxy(1, 2, fixture.CreateAnonymous<DateTime>(),
-                                           fixture.CreateAnonymous<DateTime>().AddMinutes(15), emne, properties));
+            fixture.Inject(new AftaleProxy(1, 2, fixture.Create<DateTime>(),
+                                           fixture.Create<DateTime>().AddMinutes(15), emne, properties));
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
             aftaleProxy.Notat = notat;
 
@@ -119,14 +119,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         public void TestAtGetSqlCommandForUpdateReturnererSqlCommand()
         {
             var fixture = new Fixture();
-            var emne = fixture.CreateAnonymous<string>();
-            var notat = fixture.CreateAnonymous<string>();
-            var properties = fixture.CreateAnonymous<int>();
+            var emne = fixture.Create<string>();
+            var notat = fixture.Create<string>();
+            var properties = fixture.Create<int>();
             fixture.Inject(new DateTime(2011, 10, 8, 12, 0, 0));
-            fixture.Inject(new AftaleProxy(1, 2, fixture.CreateAnonymous<DateTime>(),
-                                           fixture.CreateAnonymous<DateTime>().AddMinutes(15), emne, properties));
+            fixture.Inject(new AftaleProxy(1, 2, fixture.Create<DateTime>(),
+                                           fixture.Create<DateTime>().AddMinutes(15), emne, properties));
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
             aftaleProxy.Notat = notat;
 
@@ -144,7 +144,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new AftaleProxy(1, 2));
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
             var sqlCommand = aftaleProxy.GetSqlCommandForDelete();
@@ -163,12 +163,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             fixture.Inject<IDataReader>(null);
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                aftaleProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
+                aftaleProxy.MapData(fixture.Create<IDataReader>(), fixture.Create<IDataProviderBase>()));
         }
 
         /// <summary>
@@ -182,12 +182,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             fixture.Inject(MockRepository.GenerateMock<IDataReader>());
             fixture.Inject<IDataProviderBase>(null);
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                aftaleProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
+                aftaleProxy.MapData(fixture.Create<IDataReader>(), fixture.Create<IDataProviderBase>()));
         }
 
         /// <summary>
@@ -201,12 +201,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             fixture.Inject(MockRepository.GenerateMock<IDataReader>());
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                aftaleProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
+                aftaleProxy.MapData(fixture.Create<IDataReader>(), fixture.Create<IDataProviderBase>()));
         }
 
         /// <summary>
@@ -216,12 +216,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         public void TestAtMapDataMapperAftaleProxy()
         {
             var fixture = new Fixture();
-            fixture.Inject(new MySqlDateTime(2011, 10, 8, 0, 0, 0));
+            fixture.Inject(new MySqlDateTime(2011, 10, 8, 0, 0, 0, 0));
             fixture.Inject(new TimeSpan(12, 0, 0));
             fixture.Inject(new AftaleProxy());
 
-            var systemNo = fixture.CreateAnonymous<int>();
-            var calId = fixture.CreateAnonymous<int>();
+            var systemNo = fixture.Create<int>();
+            var calId = fixture.Create<int>();
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
@@ -231,20 +231,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
                 .Return(calId)
                 .Repeat.Any();
             dataReader.Expect(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("Date")))
-                .Return(fixture.CreateAnonymous<MySqlDateTime>());
+                .Return(fixture.Create<MySqlDateTime>());
             dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("FromTime")))
-                .Return(fixture.CreateAnonymous<TimeSpan>());
+                .Return(fixture.Create<TimeSpan>());
             dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("ToTime")))
-                .Return(fixture.CreateAnonymous<TimeSpan>().Add(new TimeSpan(0, 15, 0)));
+                .Return(fixture.Create<TimeSpan>().Add(new TimeSpan(0, 15, 0)));
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
-                .Return(fixture.CreateAnonymous<int>());
+                .Return(fixture.Create<int>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Subject")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Note")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             fixture.Inject(dataReader);
 
-            fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.CreateAnonymous<int>())));
+            fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.Create<int>())));
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
             dataProvider.Expect(m => m.Clone())
                 .Return(dataProvider);
@@ -252,10 +252,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
                 .Return(fixture.CreateMany<BrugeraftaleProxy>(3));
             fixture.Inject(dataProvider);
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
-            aftaleProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            aftaleProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IDataProviderBase>());
             Assert.That(aftaleProxy.DataIsLoaded, Is.True);
 
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Times(2));
@@ -278,12 +278,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         public void TestAtSystemLazyLoades()
         {
             var fixture = new Fixture();
-            fixture.Inject(new MySqlDateTime(2011, 10, 8, 0, 0, 0));
+            fixture.Inject(new MySqlDateTime(2011, 10, 8, 0, 0, 0, 0));
             fixture.Inject(new TimeSpan(12, 0, 0));
             fixture.Inject(new AftaleProxy());
 
-            var systemNo = fixture.CreateAnonymous<int>();
-            var calId = fixture.CreateAnonymous<int>();
+            var systemNo = fixture.Create<int>();
+            var calId = fixture.Create<int>();
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
@@ -293,33 +293,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
                 .Return(calId)
                 .Repeat.Any();
             dataReader.Expect(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("Date")))
-                .Return(fixture.CreateAnonymous<MySqlDateTime>());
+                .Return(fixture.Create<MySqlDateTime>());
             dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("FromTime")))
-                .Return(fixture.CreateAnonymous<TimeSpan>());
+                .Return(fixture.Create<TimeSpan>());
             dataReader.Expect(m => m.GetTimeSpan(Arg<string>.Is.Equal("ToTime")))
-                .Return(fixture.CreateAnonymous<TimeSpan>().Add(new TimeSpan(0, 15, 0)));
+                .Return(fixture.Create<TimeSpan>().Add(new TimeSpan(0, 15, 0)));
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
-                .Return(fixture.CreateAnonymous<int>());
+                .Return(fixture.Create<int>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Subject")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Note")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             fixture.Inject(dataReader);
 
-            fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.CreateAnonymous<int>())));
+            fixture.Customize<BrugeraftaleProxy>(m => m.FromFactory(() => new BrugeraftaleProxy(systemNo, calId, fixture.Create<int>())));
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
             dataProvider.Expect(m => m.Clone())
                 .Return(dataProvider);
             dataProvider.Expect(m => m.GetCollection<BrugeraftaleProxy>(Arg<string>.Is.NotNull))
                 .Return(fixture.CreateMany<BrugeraftaleProxy>(3));
             dataProvider.Expect(m => m.Get(Arg<SystemProxy>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<SystemProxy>());
+                .Return(fixture.Create<SystemProxy>());
             fixture.Inject(dataProvider);
 
-            var aftaleProxy = fixture.CreateAnonymous<AftaleProxy>();
+            var aftaleProxy = fixture.Create<AftaleProxy>();
             Assert.That(aftaleProxy, Is.Not.Null);
 
-            aftaleProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            aftaleProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IDataProviderBase>());
             Assert.That(aftaleProxy.DataIsLoaded, Is.True);
 
             Assert.That(aftaleProxy.System, Is.Not.Null);

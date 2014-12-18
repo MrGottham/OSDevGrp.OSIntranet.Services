@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BrevhovederGetQueryHandler>();
+            var queryHandler = fixture.Create<BrevhovederGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BrevhovederGetQueryHandler>();
+            var queryHandler = fixture.Create<BrevhovederGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new BrevhovederGetQuery();

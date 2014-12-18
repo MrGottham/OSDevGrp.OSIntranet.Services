@@ -36,9 +36,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new FællesRepository(fixture.CreateAnonymous<IChannelFactory>(),
-                                     fixture.CreateAnonymous<IMySqlDataProvider>(),
-                                     fixture.CreateAnonymous<IDomainObjectBuilder>()));
+                new FællesRepository(fixture.Create<IChannelFactory>(),
+                                     fixture.Create<IMySqlDataProvider>(),
+                                     fixture.Create<IDomainObjectBuilder>()));
         }
 
         /// <summary>
@@ -53,9 +53,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new FællesRepository(fixture.CreateAnonymous<IChannelFactory>(),
-                                     fixture.CreateAnonymous<IMySqlDataProvider>(),
-                                     fixture.CreateAnonymous<IDomainObjectBuilder>()));
+                new FællesRepository(fixture.Create<IChannelFactory>(),
+                                     fixture.Create<IMySqlDataProvider>(),
+                                     fixture.Create<IDomainObjectBuilder>()));
         }
 
         /// <summary>
@@ -70,9 +70,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject<IDomainObjectBuilder>(null);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new FællesRepository(fixture.CreateAnonymous<IChannelFactory>(),
-                                     fixture.CreateAnonymous<IMySqlDataProvider>(),
-                                     fixture.CreateAnonymous<IDomainObjectBuilder>()));
+                new FællesRepository(fixture.Create<IChannelFactory>(),
+                                     fixture.Create<IMySqlDataProvider>(),
+                                     fixture.Create<IDomainObjectBuilder>()));
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(fixture.CreateMany<Brevhoved>(3));
             fixture.Inject(domainObjectBuilder);
 
-            var repository = fixture.CreateAnonymous<FællesRepository>();
+            var repository = fixture.Create<FællesRepository>();
             Assert.That(repository, Is.Not.Null);
 
             var brevhoveder = repository.BrevhovedGetAll();
@@ -126,7 +126,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFællesRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BrevhovedGetAll(Arg<BrevhovedGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -135,7 +135,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(service);
             fixture.Inject(channelFactory);
 
-            var repository = fixture.CreateAnonymous<FællesRepository>();
+            var repository = fixture.Create<FællesRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(() => repository.BrevhovedGetAll());
@@ -154,7 +154,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFællesRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BrevhovedGetAll(Arg<BrevhovedGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<FaultException>());
+                .Throw(fixture.Create<FaultException>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -163,7 +163,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(service);
             fixture.Inject(channelFactory);
 
-            var repository = fixture.CreateAnonymous<FællesRepository>();
+            var repository = fixture.Create<FællesRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(() => repository.BrevhovedGetAll());
@@ -182,7 +182,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var mocker = new MockRepository();
             var service = mocker.DynamicMultiMock<IFællesRepositoryService>(new[] { typeof(ICommunicationObject) });
             service.Expect(m => m.BrevhovedGetAll(Arg<BrevhovedGetAllQuery>.Is.Anything))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             Expect.Call(((ICommunicationObject)service).State).Return(CommunicationState.Closed);
             mocker.ReplayAll();
 
@@ -191,7 +191,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(service);
             fixture.Inject(channelFactory);
 
-            var repository = fixture.CreateAnonymous<FællesRepository>();
+            var repository = fixture.Create<FællesRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(() => repository.BrevhovedGetAll());
@@ -212,7 +212,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
                 .Return(fixture.CreateMany<SystemProxy>(3));
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<FællesRepository>();
+            var repository = fixture.Create<FællesRepository>();
             Assert.That(repository, Is.Not.Null);
 
             var systemer = repository.SystemGetAll();
@@ -234,10 +234,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<FællesRepository>();
+            var repository = fixture.Create<FællesRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(() => repository.SystemGetAll());
@@ -255,10 +255,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(mySqlDataProvider);
 
-            var repository = fixture.CreateAnonymous<FællesRepository>();
+            var repository = fixture.Create<FællesRepository>();
             Assert.That(repository, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(() => repository.SystemGetAll());

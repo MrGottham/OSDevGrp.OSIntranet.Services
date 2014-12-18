@@ -87,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                DataProxyHelper.SetFieldValue(null, fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>()));
+                DataProxyHelper.SetFieldValue(null, fixture.Create<string>(), fixture.Create<int>()));
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
-                () => dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>()));
+                () => dataProxy.SetFieldValue(fixture.Create<string>(), fixture.Create<int>()));
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
-                () => dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>()));
+                () => dataProxy.SetFieldValue(fixture.Create<string>(), fixture.Create<int>()));
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
-                () => dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<object>()));
+                () => dataProxy.SetFieldValue(fixture.Create<string>(), fixture.Create<object>()));
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             Assert.That(dataProxy, Is.Not.Null);
             Assert.That(dataProxy.Nummer, Is.EqualTo(0));
 
-            dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>());
+            dataProxy.SetFieldValue(fixture.Create<string>(), fixture.Create<int>());
             Assert.That(dataProxy.Nummer, Is.Not.EqualTo(0));
         }
 
@@ -169,7 +169,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             Assert.That(dataProxy, Is.Not.Null);
             Assert.That(dataProxy.Nummer, Is.EqualTo(0));
 
-            dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>());
+            dataProxy.SetFieldValue(fixture.Create<string>(), fixture.Create<int>());
             Assert.That(dataProxy.Nummer, Is.Not.EqualTo(0));
         }
 
@@ -185,7 +185,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<IntranetSystemException>(
-                () => dataProxy.SetFieldValue(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<int>()));
+                () => dataProxy.SetFieldValue(fixture.Create<string>(), fixture.Create<int>()));
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             var fixture = new Fixture();
 
             Assert.Throws<ArgumentNullException>(
-                () => DataProxyHelper.GetNullableSqlString(null, fixture.CreateAnonymous<string>()));
+                () => DataProxyHelper.GetNullableSqlString(null, fixture.Create<string>()));
         }
 
         /// <summary>
@@ -207,9 +207,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         public void TestAtGetNullableSqlStringReturnererSqlStringForValue()
         {
             var fixture = new Fixture();
-            var value = fixture.CreateAnonymous<string>();
+            var value = fixture.Create<string>();
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             var sqlString = dataProxy.GetNullableSqlString(value);
@@ -225,7 +225,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         {
             var fixture = new Fixture();
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             var sqlString = dataProxy.GetNullableSqlString(null);
@@ -244,8 +244,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                DataProxyHelper.Get(null, fixture.CreateAnonymous<IDataProviderBase>(),
-                                    fixture.CreateAnonymous<MyDataProxy>(), MethodBase.GetCurrentMethod().Name));
+                DataProxyHelper.Get(null, fixture.Create<IDataProviderBase>(),
+                                    fixture.Create<MyDataProxy>(), MethodBase.GetCurrentMethod().Name));
         }
 
         /// <summary>
@@ -257,12 +257,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             var fixture = new Fixture();
             fixture.Inject<IDataProviderBase>(null);
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.CreateAnonymous<IDataProviderBase>(), fixture.CreateAnonymous<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
         }
 
@@ -275,13 +275,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             fixture.Inject<MyDataProxy>(null);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.CreateAnonymous<IDataProviderBase>(), fixture.CreateAnonymous<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
         }
 
@@ -294,12 +294,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.CreateAnonymous<IDataProviderBase>(), fixture.CreateAnonymous<MyDataProxy>(), null));
+                dataProxy.Get(fixture.Create<IDataProviderBase>(), fixture.Create<MyDataProxy>(), null));
         }
 
         /// <summary>
@@ -311,12 +311,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.CreateAnonymous<IDataProviderBase>(), fixture.CreateAnonymous<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase>(), fixture.Create<MyDataProxy>(),
                               string.Empty));
         }
 
@@ -330,14 +330,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
             dataProvider.Expect(m => m.Get(Arg<MyDataProxy>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<MyDataProxy>());
+                .Return(fixture.Create<MyDataProxy>());
             fixture.Inject(dataProvider);
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
-            var loadDataProxy = dataProxy.Get(fixture.CreateAnonymous<IDataProviderBase>(),
-                                              fixture.CreateAnonymous<MyDataProxy>(), MethodBase.GetCurrentMethod().Name);
+            var loadDataProxy = dataProxy.Get(fixture.Create<IDataProviderBase>(),
+                                              fixture.Create<MyDataProxy>(), MethodBase.GetCurrentMethod().Name);
             Assert.That(loadDataProxy, Is.Not.Null);
 
             dataProvider.AssertWasCalled(m => m.Get(Arg<MyDataProxy>.Is.NotNull));
@@ -353,15 +353,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
             dataProvider.Expect(m => m.Get(Arg<MyDataProxy>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(dataProvider);
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                dataProxy.Get(fixture.CreateAnonymous<IDataProviderBase>(), fixture.CreateAnonymous<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
 
             dataProvider.AssertWasCalled(m => m.Get(Arg<MyDataProxy>.Is.NotNull));
@@ -377,15 +377,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
             dataProvider.Expect(m => m.Get(Arg<MyDataProxy>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(dataProvider);
 
-            var dataProxy = fixture.CreateAnonymous<MyDataProxy>();
+            var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                dataProxy.Get(fixture.CreateAnonymous<IDataProviderBase>(), fixture.CreateAnonymous<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
 
             dataProvider.AssertWasCalled(m => m.Get(Arg<MyDataProxy>.Is.NotNull));

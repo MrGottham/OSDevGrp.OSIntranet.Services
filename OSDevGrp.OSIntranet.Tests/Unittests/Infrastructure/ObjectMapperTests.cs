@@ -96,8 +96,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var adressegruppe = new Adressegruppe(1, "Adresser", 0);
             Assert.That(adressegruppe, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
+            var person = fixture.Create<Person>();
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
             var telefonlisteView = objectMapper.Map<AdresseBase, TelefonlisteView>(person);
             Assert.That(telefonlisteView, Is.Not.Null);
             Assert.That(telefonlisteView.Nummer, Is.EqualTo(person.Nummer));
@@ -108,9 +108,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(telefonlisteView.SekundærTelefon, Is.Not.Null);
             Assert.That(telefonlisteView.SekundærTelefon, Is.EqualTo(person.Mobil));
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
+            var firma = fixture.Create<Firma>();
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             telefonlisteView = objectMapper.Map<AdresseBase, TelefonlisteView>(firma);
             Assert.That(telefonlisteView, Is.Not.Null);
             Assert.That(telefonlisteView.Nummer, Is.EqualTo(firma.Nummer));
@@ -121,8 +120,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(telefonlisteView.SekundærTelefon, Is.Not.Null);
             Assert.That(telefonlisteView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
 
-            var andenAdresse = new OtherAddress(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<string>(),
-                                                fixture.CreateAnonymous<Adressegruppe>());
+            var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, TelefonlisteView>(andenAdresse));
         }
 
@@ -138,14 +136,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
-            person.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                             fixture.CreateAnonymous<DateTime>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<decimal>(), 0M));
-            person.Calculate(fixture.CreateAnonymous<DateTime>());
+            var person = fixture.Create<Person>();
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
+            person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            person.Calculate(fixture.Create<DateTime>());
             var adressekontolisteView = objectMapper.Map<AdresseBase, AdressekontolisteView>(person);
             Assert.That(adressekontolisteView, Is.Not.Null);
             Assert.That(adressekontolisteView.Nummer, Is.EqualTo(person.Nummer));
@@ -157,15 +151,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontolisteView.SekundærTelefon, Is.EqualTo(person.Mobil));
             Assert.That(adressekontolisteView.Saldo, Is.GreaterThan(0M));
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
-            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            firma.Calculate(fixture.CreateAnonymous<DateTime>());
+            var firma = fixture.Create<Firma>();
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            firma.Calculate(fixture.Create<DateTime>());
             adressekontolisteView = objectMapper.Map<AdresseBase, AdressekontolisteView>(firma);
             Assert.That(adressekontolisteView, Is.Not.Null);
             Assert.That(adressekontolisteView.Nummer, Is.EqualTo(firma.Nummer));
@@ -177,8 +166,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontolisteView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
             Assert.That(adressekontolisteView.Saldo, Is.GreaterThan(0M));
 
-            var andenAdresse = new OtherAddress(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<string>(),
-                                                fixture.CreateAnonymous<Adressegruppe>());
+            var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontolisteView>(andenAdresse));
         }
 
@@ -194,18 +182,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                         fixture.CreateAnonymous<string>());
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
-            person.SætMailadresse(fixture.CreateAnonymous<string>());
-            person.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            person.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                             fixture.CreateAnonymous<DateTime>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<decimal>(), 0M));
-            person.Calculate(fixture.CreateAnonymous<DateTime>());
+            var person = fixture.Create<Person>();
+            person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
+            person.SætMailadresse(fixture.Create<string>());
+            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            person.Calculate(fixture.Create<DateTime>());
             var adressekontoView = objectMapper.Map<AdresseBase, AdressekontoView>(person);
             Assert.That(adressekontoView, Is.Not.Null);
             Assert.That(adressekontoView.Nummer, Is.EqualTo(person.Nummer));
@@ -226,19 +209,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontoView.Betalingsbetingelse, Is.Not.Null);
             Assert.That(adressekontoView.Saldo, Is.GreaterThan(0M));
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                        fixture.CreateAnonymous<string>());
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
-            firma.SætMailadresse(fixture.CreateAnonymous<string>());
-            firma.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            firma.Calculate(fixture.CreateAnonymous<DateTime>());
+            var firma = fixture.Create<Firma>();
+            firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætMailadresse(fixture.Create<string>());
+            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            firma.Calculate(fixture.Create<DateTime>());
             adressekontoView = objectMapper.Map<AdresseBase, AdressekontoView>(firma);
             Assert.That(adressekontoView, Is.Not.Null);
             Assert.That(adressekontoView.Nummer, Is.EqualTo(firma.Nummer));
@@ -259,8 +236,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontoView.Betalingsbetingelse, Is.Not.Null);
             Assert.That(adressekontoView.Saldo, Is.GreaterThan(0M));
 
-            var andenAdresse = new OtherAddress(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<string>(),
-                                                fixture.CreateAnonymous<Adressegruppe>());
+            var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontoView>(andenAdresse));
         }
 
@@ -276,14 +252,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
-            person.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                             fixture.CreateAnonymous<DateTime>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<decimal>(), 0M));
-            person.Calculate(fixture.CreateAnonymous<DateTime>());
+            var person = fixture.Create<Person>();
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
+            person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            person.Calculate(fixture.Create<DateTime>());
             var debitorlisteView = objectMapper.Map<AdresseBase, DebitorlisteView>(person);
             Assert.That(debitorlisteView, Is.Not.Null);
             Assert.That(debitorlisteView.Nummer, Is.EqualTo(person.Nummer));
@@ -295,15 +267,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorlisteView.SekundærTelefon, Is.EqualTo(person.Mobil));
             Assert.That(debitorlisteView.Saldo, Is.GreaterThan(0M));
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
-            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            firma.Calculate(fixture.CreateAnonymous<DateTime>());
+            var firma = fixture.Create<Firma>();
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            firma.Calculate(fixture.Create<DateTime>());
             debitorlisteView = objectMapper.Map<AdresseBase, DebitorlisteView>(firma);
             Assert.That(debitorlisteView, Is.Not.Null);
             Assert.That(debitorlisteView.Nummer, Is.EqualTo(firma.Nummer));
@@ -315,8 +282,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorlisteView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
             Assert.That(debitorlisteView.Saldo, Is.GreaterThan(0M));
 
-            var andenAdresse = new OtherAddress(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<string>(),
-                                                fixture.CreateAnonymous<Adressegruppe>());
+            var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, DebitorlisteView>(andenAdresse));
         }
 
@@ -332,18 +298,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                         fixture.CreateAnonymous<string>());
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
-            person.SætMailadresse(fixture.CreateAnonymous<string>());
-            person.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            person.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                             fixture.CreateAnonymous<DateTime>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<decimal>(), 0M));
-            person.Calculate(fixture.CreateAnonymous<DateTime>());
+            var person = fixture.Create<Person>();
+            person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
+            person.SætMailadresse(fixture.Create<string>());
+            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            person.Calculate(fixture.Create<DateTime>());
             var debitorView = objectMapper.Map<AdresseBase, DebitorView>(person);
             Assert.That(debitorView, Is.Not.Null);
             Assert.That(debitorView.Nummer, Is.EqualTo(person.Nummer));
@@ -364,19 +325,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorView.Betalingsbetingelse, Is.Not.Null);
             Assert.That(debitorView.Saldo, Is.GreaterThan(0M));
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                        fixture.CreateAnonymous<string>());
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
-            firma.SætMailadresse(fixture.CreateAnonymous<string>());
-            firma.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            firma.Calculate(fixture.CreateAnonymous<DateTime>());
+            var firma = fixture.Create<Firma>();
+            firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætMailadresse(fixture.Create<string>());
+            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            firma.Calculate(fixture.Create<DateTime>());
             debitorView = objectMapper.Map<AdresseBase, DebitorView>(firma);
             Assert.That(debitorView, Is.Not.Null);
             Assert.That(debitorView.Nummer, Is.EqualTo(firma.Nummer));
@@ -397,8 +352,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorView.Betalingsbetingelse, Is.Not.Null);
             Assert.That(debitorView.Saldo, Is.GreaterThan(0M));
 
-            var andenAdresse = new OtherAddress(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<string>(),
-                                                fixture.CreateAnonymous<Adressegruppe>());
+            var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, DebitorView>(andenAdresse));
         }
 
@@ -414,14 +368,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
-            person.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                             fixture.CreateAnonymous<DateTime>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             0M, fixture.CreateAnonymous<decimal>()));
-            person.Calculate(fixture.CreateAnonymous<DateTime>());
+            var person = fixture.Create<Person>();
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
+            person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
+            person.Calculate(fixture.Create<DateTime>());
             var kreditorlisteView = objectMapper.Map<AdresseBase, KreditorlisteView>(person);
             Assert.That(kreditorlisteView, Is.Not.Null);
             Assert.That(kreditorlisteView.Nummer, Is.EqualTo(person.Nummer));
@@ -433,15 +383,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorlisteView.SekundærTelefon, Is.EqualTo(person.Mobil));
             Assert.That(kreditorlisteView.Saldo, Is.LessThan(0M));
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
-            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            0M, fixture.CreateAnonymous<decimal>()));
-            firma.Calculate(fixture.CreateAnonymous<DateTime>());
+            var firma = fixture.Create<Firma>();
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
+            firma.Calculate(fixture.Create<DateTime>());
             kreditorlisteView = objectMapper.Map<AdresseBase, KreditorlisteView>(firma);
             Assert.That(kreditorlisteView, Is.Not.Null);
             Assert.That(kreditorlisteView.Nummer, Is.EqualTo(firma.Nummer));
@@ -453,8 +398,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorlisteView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
             Assert.That(kreditorlisteView.Saldo, Is.LessThan(0M));
 
-            var andenAdresse = new OtherAddress(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<string>(),
-                                                fixture.CreateAnonymous<Adressegruppe>());
+            var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, KreditorlisteView>(andenAdresse));
         }
 
@@ -470,18 +414,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                         fixture.CreateAnonymous<string>());
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
-            person.SætMailadresse(fixture.CreateAnonymous<string>());
-            person.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            person.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                             fixture.CreateAnonymous<DateTime>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             fixture.CreateAnonymous<string>(),
-                                                             0M, fixture.CreateAnonymous<decimal>()));
-            person.Calculate(fixture.CreateAnonymous<DateTime>());
+            var person = fixture.Create<Person>();
+            person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(),
+                                         fixture.Create<string>());
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
+            person.SætMailadresse(fixture.Create<string>());
+            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
+            person.Calculate(fixture.Create<DateTime>());
             var kreditorView = objectMapper.Map<AdresseBase, KreditorView>(person);
             Assert.That(kreditorView, Is.Not.Null);
             Assert.That(kreditorView.Nummer, Is.EqualTo(person.Nummer));
@@ -502,19 +442,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorView.Betalingsbetingelse, Is.Not.Null);
             Assert.That(kreditorView.Saldo, Is.LessThan(0M));
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                        fixture.CreateAnonymous<string>());
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
-            firma.SætMailadresse(fixture.CreateAnonymous<string>());
-            firma.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            0M, fixture.CreateAnonymous<decimal>()));
-            firma.Calculate(fixture.CreateAnonymous<DateTime>());
+            var firma = fixture.Create<Firma>();
+            firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætMailadresse(fixture.Create<string>());
+            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
+            firma.Calculate(fixture.Create<DateTime>());
             kreditorView = objectMapper.Map<AdresseBase, KreditorView>(firma);
             Assert.That(kreditorView, Is.Not.Null);
             Assert.That(kreditorView.Nummer, Is.EqualTo(firma.Nummer));
@@ -535,8 +469,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorView.Betalingsbetingelse, Is.Not.Null);
             Assert.That(kreditorView.Saldo, Is.LessThan(0M));
 
-            var andenAdresse = new OtherAddress(fixture.CreateAnonymous<int>(), fixture.CreateAnonymous<string>(),
-                                                fixture.CreateAnonymous<Adressegruppe>());
+            var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
             Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, KreditorView>(andenAdresse));
         }
 
@@ -552,18 +485,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.CreateAnonymous<Person>();
-            person.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                         fixture.CreateAnonymous<string>());
-            person.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>());
-            person.SætFødselsdato(fixture.CreateAnonymous<DateTime>());
-            person.SætBekendtskab(fixture.CreateAnonymous<string>());
-            person.SætMailadresse(fixture.CreateAnonymous<string>());
-            person.SætWebadresse(fixture.CreateAnonymous<string>());
-            person.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            person.SætUdlånsfrist(fixture.CreateAnonymous<int>());
+            var person = fixture.Create<Person>();
+            person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
+            person.SætFødselsdato(fixture.Create<DateTime>());
+            person.SætBekendtskab(fixture.Create<string>());
+            person.SætMailadresse(fixture.Create<string>());
+            person.SætWebadresse(fixture.Create<string>());
+            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            person.SætUdlånsfrist(fixture.Create<int>());
 
-            var firma = fixture.CreateAnonymous<Firma>();
+            var firma = fixture.Create<Firma>();
             firma.TilføjPerson(person);
             
             var personView = objectMapper.Map<Person, PersonView>(person);
@@ -607,17 +539,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var firma = fixture.CreateAnonymous<Firma>();
-            firma.SætAdresseoplysninger(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                                         fixture.CreateAnonymous<string>());
-            firma.SætTelefon(fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>(),
-                             fixture.CreateAnonymous<string>());
-            firma.SætBekendtskab(fixture.CreateAnonymous<string>());
-            firma.SætMailadresse(fixture.CreateAnonymous<string>());
-            firma.SætWebadresse(fixture.CreateAnonymous<string>());
-            firma.SætBetalingsbetingelse(fixture.CreateAnonymous<Betalingsbetingelse>());
-            firma.SætUdlånsfrist(fixture.CreateAnonymous<int>());
-            firma.TilføjPerson(fixture.CreateAnonymous<Person>());
+            var firma = fixture.Create<Firma>();
+            firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            firma.SætBekendtskab(fixture.Create<string>());
+            firma.SætMailadresse(fixture.Create<string>());
+            firma.SætWebadresse(fixture.Create<string>());
+            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            firma.SætUdlånsfrist(fixture.Create<int>());
+            firma.TilføjPerson(fixture.Create<Person>());
 
             var firmaView = objectMapper.Map<Firma, FirmaView>(firma);
             Assert.That(firmaView, Is.Not.Null);
@@ -659,7 +589,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var postnummer = fixture.CreateAnonymous<Postnummer>();
+            var postnummer = fixture.Create<Postnummer>();
             var postnummerView = objectMapper.Map<Postnummer, PostnummerView>(postnummer);
             Assert.That(postnummerView, Is.Not.Null);
             Assert.That(postnummerView.Landekode, Is.Not.Null);
@@ -681,7 +611,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var adressegruppe = fixture.CreateAnonymous<Adressegruppe>();
+            var adressegruppe = fixture.Create<Adressegruppe>();
             var adressegruppeView = objectMapper.Map<Adressegruppe, AdressegruppeView>(adressegruppe);
             Assert.That(adressegruppeView, Is.Not.Null);
             Assert.That(adressegruppeView.Nummer, Is.EqualTo(adressegruppe.Nummer));
@@ -701,7 +631,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var betalingsbetingelse = fixture.CreateAnonymous<Betalingsbetingelse>();
+            var betalingsbetingelse = fixture.Create<Betalingsbetingelse>();
             var betalingsbetingelseView = objectMapper.Map<Betalingsbetingelse, BetalingsbetingelseView>(betalingsbetingelse);
             Assert.That(betalingsbetingelseView, Is.Not.Null);
             Assert.That(betalingsbetingelseView.Nummer, Is.EqualTo(betalingsbetingelse.Nummer));
@@ -720,8 +650,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
-            regnskab.SætBrevhoved(fixture.CreateAnonymous<Brevhoved>());
+            var regnskab = fixture.Create<Regnskab>();
+            regnskab.SætBrevhoved(fixture.Create<Brevhoved>());
             var regnskabslisteView = objectMapper.Map<Regnskab, RegnskabslisteView>(regnskab);
             Assert.That(regnskabslisteView, Is.Not.Null);
             Assert.That(regnskabslisteView.Nummer, Is.EqualTo(regnskab.Nummer));
@@ -740,15 +670,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         public void TestAtKontoBaseForKontoKanMappesTilKontoBaseView()
         {
             var fixture = new Fixture();
-            fixture.Inject<KontoBase>(fixture.CreateAnonymous<Konto>());
+            fixture.Inject<KontoBase>(fixture.Create<Konto>());
 
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var kontoBase = fixture.CreateAnonymous<KontoBase>();
+            var kontoBase = fixture.Create<KontoBase>();
             Assert.That(kontoBase, Is.Not.Null);
-            kontoBase.SætBeskrivelse(fixture.CreateAnonymous<string>());
-            kontoBase.SætNote(fixture.CreateAnonymous<string>());
+            kontoBase.SætBeskrivelse(fixture.Create<string>());
+            kontoBase.SætNote(fixture.Create<string>());
 
             var kontoBaseView = objectMapper.Map<KontoBase, KontoBaseView>(kontoBase);
             Assert.That(kontoBaseView, Is.Not.Null);
@@ -770,15 +700,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         public void TestAtKontoBaseForBudgetkontoKanMappesTilKontoBaseView()
         {
             var fixture = new Fixture();
-            fixture.Inject<KontoBase>(fixture.CreateAnonymous<Budgetkonto>());
+            fixture.Inject<KontoBase>(fixture.Create<Budgetkonto>());
 
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var kontoBase = fixture.CreateAnonymous<KontoBase>();
+            var kontoBase = fixture.Create<KontoBase>();
             Assert.That(kontoBase, Is.Not.Null);
-            kontoBase.SætBeskrivelse(fixture.CreateAnonymous<string>());
-            kontoBase.SætNote(fixture.CreateAnonymous<string>());
+            kontoBase.SætBeskrivelse(fixture.Create<string>());
+            kontoBase.SætNote(fixture.Create<string>());
 
             var kontoBaseView = objectMapper.Map<KontoBase, KontoBaseView>(kontoBase);
             Assert.That(kontoBaseView, Is.Not.Null);
@@ -800,20 +730,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         public void TestAtMapKasterIntranetSystemExceptionHvisKontoBaseIkkeKanMappesTilKontoBaseView()
         {
             var fixture = new Fixture();
-            fixture.Inject<KontoBase>(fixture.CreateAnonymous<OtherKonto>());
+            fixture.Inject<KontoBase>(fixture.Create<OtherKonto>());
 
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var kontoBase = new OtherKonto(fixture.CreateAnonymous<Regnskab>(), fixture.CreateAnonymous<string>(),
-                                           fixture.CreateAnonymous<string>());
+            var kontoBase = new OtherKonto(fixture.Create<Regnskab>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(kontoBase, Is.Not.Null);
-            kontoBase.SætBeskrivelse(fixture.CreateAnonymous<string>());
-            kontoBase.SætNote(fixture.CreateAnonymous<string>());
+            kontoBase.SætBeskrivelse(fixture.Create<string>());
+            kontoBase.SætNote(fixture.Create<string>());
 
-            Assert.That(
-                Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<KontoBase, KontoBaseView>(kontoBase)).
-                    InnerException, Is.TypeOf(typeof (IntranetSystemException)));
+            Assert.That(Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<KontoBase, KontoBaseView>(kontoBase)).InnerException, Is.TypeOf(typeof (IntranetSystemException)));
         }
 
         /// <summary>
@@ -828,20 +755,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var konto = fixture.CreateAnonymous<Konto>();
-            konto.SætBeskrivelse(fixture.CreateAnonymous<string>());
-            konto.SætNote(fixture.CreateAnonymous<string>());
-            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.CreateAnonymous<DateTime>().Year,
-                                                                fixture.CreateAnonymous<DateTime>().Month, 5000M));
-            konto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(), 2500M, 0M));
-            konto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(), 0M, 250M));
-            konto.Calculate(fixture.CreateAnonymous<DateTime>());
+            var minLobenr = fixture.Create<int>();
+            var konto = fixture.Create<Konto>();
+            konto.SætBeskrivelse(fixture.Create<string>());
+            konto.SætNote(fixture.Create<string>());
+            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 5000M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 2500M, 0M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 250M));
+            konto.Calculate(fixture.Create<DateTime>());
 
             var kontoplanView = objectMapper.Map<Konto, KontoplanView>(konto);
             Assert.That(kontoplanView, Is.Not.Null);
@@ -872,20 +793,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var konto = fixture.CreateAnonymous<Konto>();
-            konto.SætBeskrivelse(fixture.CreateAnonymous<string>());
-            konto.SætNote(fixture.CreateAnonymous<string>());
-            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.CreateAnonymous<DateTime>().Year,
-                                                                fixture.CreateAnonymous<DateTime>().Month, 5000M));
-            konto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(), 2500M, 0M));
-            konto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(), 0M, 250M));
-            konto.Calculate(fixture.CreateAnonymous<DateTime>());
+            var minLobenr = fixture.Create<int>();
+            var konto = fixture.Create<Konto>();
+            konto.SætBeskrivelse(fixture.Create<string>());
+            konto.SætNote(fixture.Create<string>());
+            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 5000M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 2500M, 0M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 250M));
+            konto.Calculate(fixture.Create<DateTime>());
 
             var kontoView = objectMapper.Map<Konto, KontoView>(konto);
             Assert.That(kontoView, Is.Not.Null);
@@ -917,7 +832,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var kreditoplysninger = fixture.CreateAnonymous<Kreditoplysninger>();
+            var kreditoplysninger = fixture.Create<Kreditoplysninger>();
 
             var kreditoplysningerView = objectMapper.Map<Kreditoplysninger, KreditoplysningerView>(kreditoplysninger);
             Assert.That(kreditoplysningerView, Is.Not.Null);
@@ -938,21 +853,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
-            budgetkonto.SætBeskrivelse(fixture.CreateAnonymous<string>());
-            budgetkonto.SætNote(fixture.CreateAnonymous<string>());
-            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.CreateAnonymous<DateTime>().Year,
-                                                                      fixture.CreateAnonymous<DateTime>().Month, 15000M,
-                                                                      0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                  fixture.CreateAnonymous<DateTime>(),
-                                                                  fixture.CreateAnonymous<string>(),
-                                                                  fixture.CreateAnonymous<string>(), 10000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                  fixture.CreateAnonymous<DateTime>(),
-                                                                  fixture.CreateAnonymous<string>(),
-                                                                  fixture.CreateAnonymous<string>(), 4000M, 0M));
-            budgetkonto.Calculate(fixture.CreateAnonymous<DateTime>());
+            var minLobenr = fixture.Create<int>();
+            var budgetkonto = fixture.Create<Budgetkonto>();
+            budgetkonto.SætBeskrivelse(fixture.Create<string>());
+            budgetkonto.SætNote(fixture.Create<string>());
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 15000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 10000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 4000M, 0M));
+            budgetkonto.Calculate(fixture.Create<DateTime>());
 
             var bugetkontoplanView = objectMapper.Map<Budgetkonto, BudgetkontoplanView>(budgetkonto);
             Assert.That(bugetkontoplanView, Is.Not.Null);
@@ -967,7 +875,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(bugetkontoplanView.Notat, Is.EqualTo(budgetkonto.Note));
             Assert.That(bugetkontoplanView.Budgetkontogruppe, Is.Not.Null);
             Assert.That(bugetkontoplanView.Budget, Is.EqualTo(15000M));
+            Assert.That(bugetkontoplanView.BudgetSidsteMåned, Is.EqualTo(0M));
+            Assert.That(bugetkontoplanView.BudgetÅrTilDato, Is.EqualTo(0M));
+            Assert.That(bugetkontoplanView.BudgetSidsteÅr, Is.EqualTo(0M));
             Assert.That(bugetkontoplanView.Bogført, Is.EqualTo(14000M));
+            Assert.That(bugetkontoplanView.BogførtSidsteMåned, Is.EqualTo(0M));
+            Assert.That(bugetkontoplanView.BogførtÅrTilDato, Is.EqualTo(0M));
+            Assert.That(bugetkontoplanView.BogførtSidsteÅr, Is.EqualTo(0M));
             Assert.That(bugetkontoplanView.Disponibel, Is.EqualTo(0M));
         }
 
@@ -983,21 +897,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
-            budgetkonto.SætBeskrivelse(fixture.CreateAnonymous<string>());
-            budgetkonto.SætNote(fixture.CreateAnonymous<string>());
-            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.CreateAnonymous<DateTime>().Year,
-                                                                      fixture.CreateAnonymous<DateTime>().Month, 15000M,
-                                                                      0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                  fixture.CreateAnonymous<DateTime>(),
-                                                                  fixture.CreateAnonymous<string>(),
-                                                                  fixture.CreateAnonymous<string>(), 10000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                  fixture.CreateAnonymous<DateTime>(),
-                                                                  fixture.CreateAnonymous<string>(),
-                                                                  fixture.CreateAnonymous<string>(), 4000M, 0M));
-            budgetkonto.Calculate(fixture.CreateAnonymous<DateTime>());
+            var minLobenr = fixture.Create<int>();
+            var budgetkonto = fixture.Create<Budgetkonto>();
+            budgetkonto.SætBeskrivelse(fixture.Create<string>());
+            budgetkonto.SætNote(fixture.Create<string>());
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 15000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 10000M, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 4000M, 0M));
+            budgetkonto.Calculate(fixture.Create<DateTime>());
 
             var budgetkontoView = objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
             Assert.That(budgetkontoView, Is.Not.Null);
@@ -1012,7 +919,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(budgetkontoView.Notat, Is.EqualTo(budgetkonto.Note));
             Assert.That(budgetkontoView.Budgetkontogruppe, Is.Not.Null);
             Assert.That(budgetkontoView.Budget, Is.EqualTo(15000M));
+            Assert.That(budgetkontoView.BudgetSidsteMåned, Is.EqualTo(0M));
+            Assert.That(budgetkontoView.BudgetÅrTilDato, Is.EqualTo(0M));
+            Assert.That(budgetkontoView.BudgetSidsteÅr, Is.EqualTo(0M));
             Assert.That(budgetkontoView.Bogført, Is.EqualTo(14000M));
+            Assert.That(budgetkontoView.BogførtSidsteMåned, Is.EqualTo(0M));
+            Assert.That(budgetkontoView.BogførtÅrTilDato, Is.EqualTo(0M));
+            Assert.That(budgetkontoView.BogførtSidsteÅr, Is.EqualTo(0M));
             Assert.That(budgetkontoView.Disponibel, Is.EqualTo(0M));
             Assert.That(budgetkontoView.Budgetoplysninger, Is.Not.Null);
             Assert.That(budgetkontoView.Budgetoplysninger.Count(), Is.EqualTo(1));
@@ -1030,28 +943,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
-            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.CreateAnonymous<DateTime>().Year, fixture.CreateAnonymous<DateTime>().Month, 0M, 3000M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                  fixture.CreateAnonymous<DateTime>(),
-                                                                  fixture.CreateAnonymous<string>(),
-                                                                  fixture.CreateAnonymous<string>(), 0M, 2500M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                  fixture.CreateAnonymous<DateTime>(),
-                                                                  fixture.CreateAnonymous<string>(),
-                                                                  fixture.CreateAnonymous<string>(), 0M, 250M));
-            budgetkonto.Calculate(fixture.CreateAnonymous<DateTime>());
+            var minLobenr = fixture.Create<int>();
+            var budgetkonto = fixture.Create<Budgetkonto>();
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 0M, 3000M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 2500M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 250M));
+            budgetkonto.Calculate(fixture.Create<DateTime>());
 
-            var budgetoplysninger = budgetkonto.Budgetoplysninger
-                .SingleOrDefault(m =>
-                                 m.År == fixture.CreateAnonymous<DateTime>().Year &&
-                                 m.Måned == fixture.CreateAnonymous<DateTime>().Month);
+            var budgetoplysninger = budgetkonto.Budgetoplysninger.SingleOrDefault(m => m.År == fixture.Create<DateTime>().Year && m.Måned == fixture.Create<DateTime>().Month);
             Assert.That(budgetoplysninger, Is.Not.Null);
 
             var budgetoplysningerView = objectMapper.Map<Budgetoplysninger, BudgetoplysningerView>(budgetoplysninger);
             Assert.That(budgetoplysningerView, Is.Not.Null);
-            Assert.That(budgetoplysningerView.År, Is.EqualTo(fixture.CreateAnonymous<DateTime>().Year));
-            Assert.That(budgetoplysningerView.Måned, Is.EqualTo(fixture.CreateAnonymous<DateTime>().Month));
+            Assert.That(budgetoplysningerView.År, Is.EqualTo(fixture.Create<DateTime>().Year));
+            Assert.That(budgetoplysningerView.Måned, Is.EqualTo(fixture.Create<DateTime>().Month));
             Assert.That(budgetoplysningerView.Budget, Is.EqualTo(-3000M));
             Assert.That(budgetoplysningerView.Bogført, Is.EqualTo(-2750M));
         }
@@ -1068,16 +973,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var konto = fixture.CreateAnonymous<Konto>();
-            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
-            var adresse = fixture.CreateAnonymous<Person>();
+            var konto = fixture.Create<Konto>();
+            var budgetkonto = fixture.Create<Budgetkonto>();
+            var adresse = fixture.Create<Person>();
 
-            var bogføringslinje = new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                      fixture.CreateAnonymous<DateTime>(),
-                                                      fixture.CreateAnonymous<string>(),
-                                                      fixture.CreateAnonymous<string>(),
-                                                      fixture.CreateAnonymous<decimal>(),
-                                                      fixture.CreateAnonymous<decimal>());
+            var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
             konto.TilføjBogføringslinje(bogføringslinje);
             budgetkonto.TilføjBogføringslinje(bogføringslinje);
             adresse.TilføjBogføringslinje(bogføringslinje);
@@ -1106,35 +1006,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             var fixture = new Fixture();
             
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             Assert.That(regnskab, Is.Not.Null);
             fixture.Inject(regnskab);
             
-            var konto = fixture.CreateAnonymous<Konto>();
+            var konto = fixture.Create<Konto>();
             Assert.That(konto, Is.Not.Null);
             fixture.Inject(konto);
             
-            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var budgetkonto = fixture.Create<Budgetkonto>();
             Assert.That(budgetkonto, Is.Not.Null);
             fixture.Inject(budgetkonto);
 
-            var adressekonto = fixture.CreateAnonymous<Person>();
+            var adressekonto = fixture.Create<Person>();
             Assert.That(adressekonto, Is.Not.Null);
             fixture.Inject(adressekonto);
             
-            var bogføringslinje = fixture.CreateAnonymous<Bogføringslinje>();
+            var bogføringslinje = fixture.Create<Bogføringslinje>();
             Assert.That(bogføringslinje, Is.Not.Null);
             konto.TilføjBogføringslinje(bogføringslinje);
             budgetkonto.TilføjBogføringslinje(bogføringslinje);
             adressekonto.TilføjBogføringslinje(bogføringslinje);
             fixture.Inject(bogføringslinje);
 
-            fixture.Inject<IBogføringsresultat>(fixture.CreateAnonymous<Bogføringsresultat>());
+            fixture.Inject<IBogføringsresultat>(fixture.Create<Bogføringsresultat>());
 
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var bogføringsresultat = fixture.CreateAnonymous<Bogføringsresultat>();
+            var bogføringsresultat = fixture.Create<Bogføringsresultat>();
             Assert.That(bogføringsresultat, Is.Not.Null);
 
             var bogføringslinjeOpretResponse = objectMapper.Map<IBogføringsresultat, BogføringslinjeOpretResponse>(bogføringsresultat);
@@ -1159,13 +1059,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         public void TestAtBogføringsadvarselKanMappesTilBogføringsadvarselResponse()
         {
             var fixture = new Fixture();
-            fixture.Inject<KontoBase>(fixture.CreateAnonymous<Konto>());
-            fixture.Inject<IBogføringsadvarsel>(fixture.CreateAnonymous<Bogføringsadvarsel>());
+            fixture.Inject<KontoBase>(fixture.Create<Konto>());
+            fixture.Inject<IBogføringsadvarsel>(fixture.Create<Bogføringsadvarsel>());
 
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var bogføringsadvarsel = fixture.CreateAnonymous<IBogføringsadvarsel>();
+            var bogføringsadvarsel = fixture.Create<IBogføringsadvarsel>();
             Assert.That(bogføringsadvarsel, Is.Not.Null);
 
             var bogføringsadvarselReponse = objectMapper.Map<IBogføringsadvarsel, BogføringsadvarselResponse>(bogføringsadvarsel);
@@ -1188,7 +1088,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(objectMapper, Is.Not.Null);
 
             fixture.Inject(KontogruppeType.Aktiver);
-            var kontogruppeAktiver = fixture.CreateAnonymous<Kontogruppe>();
+            var kontogruppeAktiver = fixture.Create<Kontogruppe>();
             var kontogruppeAktiverView = objectMapper.Map<Kontogruppe, KontogruppeView>(kontogruppeAktiver);
             Assert.That(kontogruppeAktiverView, Is.Not.Null);
             Assert.That(kontogruppeAktiverView.Nummer, Is.EqualTo(kontogruppeAktiver.Nummer));
@@ -1198,7 +1098,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kontogruppeAktiverView.ErPassiver, Is.False);
 
             fixture.Inject(KontogruppeType.Passiver);
-            var kontogruppePassiver = fixture.CreateAnonymous<Kontogruppe>();
+            var kontogruppePassiver = fixture.Create<Kontogruppe>();
             var kontogruppePassiverView = objectMapper.Map<Kontogruppe, KontogruppeView>(kontogruppePassiver);
             Assert.That(kontogruppePassiverView, Is.Not.Null);
             Assert.That(kontogruppePassiverView.Nummer, Is.EqualTo(kontogruppePassiver.Nummer));
@@ -1219,7 +1119,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var budgetkontogruppe = fixture.CreateAnonymous<Budgetkontogruppe>();
+            var budgetkontogruppe = fixture.Create<Budgetkontogruppe>();
             var budgetkontogruppeView = objectMapper.Map<Budgetkontogruppe, BudgetkontogruppeView>(budgetkontogruppe);
             Assert.That(budgetkontogruppeView, Is.Not.Null);
             Assert.That(budgetkontogruppeView.Nummer, Is.EqualTo(budgetkontogruppe.Nummer));
@@ -1241,22 +1141,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var aftale = MockRepository.GenerateMock<IAftale>();
             aftale.Expect(m => m.System)
-                .Return(fixture.CreateAnonymous<ISystem>())
+                .Return(fixture.Create<ISystem>())
                 .Repeat.Any();
             aftale.Expect(m => m.Id)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
             aftale.Expect(m => m.FraTidspunkt)
-                .Return(fixture.CreateAnonymous<DateTime>())
+                .Return(fixture.Create<DateTime>())
                 .Repeat.Any();
             aftale.Expect(m => m.TilTidspunkt)
-                .Return(fixture.CreateAnonymous<DateTime>().AddMinutes(15))
+                .Return(fixture.Create<DateTime>().AddMinutes(15))
                 .Repeat.Any();
             aftale.Expect(m => m.Emne)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             aftale.Expect(m => m.Notat)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             aftale.Expect(m => m.Deltagere)
                 .Return(fixture.CreateMany<IBrugeraftale>(3))
@@ -1266,7 +1166,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var brugeraftale = fixture.CreateAnonymous<Brugeraftale>();
+            var brugeraftale = fixture.Create<Brugeraftale>();
             var kalenderbrugerAftaleView = objectMapper.Map<IBrugeraftale, KalenderbrugerAftaleView>(brugeraftale);
             Assert.That(kalenderbrugerAftaleView, Is.Not.Null);
             Assert.That(kalenderbrugerAftaleView.System, Is.Not.Null);
@@ -1298,23 +1198,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var bruger = MockRepository.GenerateMock<IBruger>();
             bruger.Expect(m => m.System)
-                .Return(fixture.CreateAnonymous<ISystem>())
+                .Return(fixture.Create<ISystem>())
                 .Repeat.Any();
             bruger.Expect(m => m.Id)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
             bruger.Expect(m => m.Initialer)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             bruger.Expect(m => m.Navn)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             fixture.Inject(bruger);
 
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var brugeraftale = fixture.CreateAnonymous<Brugeraftale>();
+            var brugeraftale = fixture.Create<Brugeraftale>();
             var kalenderbrugerView = objectMapper.Map<IBrugeraftale, KalenderbrugerView>(brugeraftale);
             Assert.That(kalenderbrugerView, Is.Not.Null);
             Assert.That(kalenderbrugerView.System, Is.Not.Null);
@@ -1337,7 +1237,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             var kalenderbrugerView = objectMapper.Map<IBruger, KalenderbrugerView>(bruger);
             Assert.That(kalenderbrugerView, Is.Not.Null);
             Assert.That(kalenderbrugerView.System, Is.Not.Null);
@@ -1359,7 +1259,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var brevhoved = fixture.CreateAnonymous<Brevhoved>();
+            var brevhoved = fixture.Create<Brevhoved>();
             var brevhovedreferenceView = objectMapper.Map<Brevhoved, BrevhovedreferenceView>(brevhoved);
             Assert.That(brevhovedreferenceView, Is.Not.Null);
             Assert.That(brevhovedreferenceView.Nummer, Is.EqualTo(brevhoved.Nummer));
@@ -1378,7 +1278,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var brevhoved = fixture.CreateAnonymous<Brevhoved>();
+            var brevhoved = fixture.Create<Brevhoved>();
             var brevhovedView = objectMapper.Map<Brevhoved, BrevhovedView>(brevhoved);
             Assert.That(brevhovedView, Is.Not.Null);
             Assert.That(brevhovedView.Nummer, Is.EqualTo(brevhoved.Nummer));
@@ -1405,7 +1305,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var system = fixture.CreateAnonymous<OSIntranet.Domain.Fælles.System>();
+            var system = fixture.Create<OSIntranet.Domain.Fælles.System>();
             var systemView = objectMapper.Map<ISystem, SystemView>(system);
             Assert.That(systemView, Is.Not.Null);
             Assert.That(systemView.Nummer, Is.EqualTo(system.Nummer));

@@ -91,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                     string.Format(
                         "INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,'{0}','{1}','{2}','{3}')",
                         dateTime.ToString("yyyy-MM-dd"), dateTime.ToString("HH:mm:ss"),
-                        dateTime.AddMinutes(15).ToString("HH:mm:ss"), fixture.CreateAnonymous<string>());
+                        dateTime.AddMinutes(15).ToString("HH:mm:ss"), fixture.Create<string>());
             }
 
             /// <summary>
@@ -102,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 var fixture = new Fixture();
                 return string.Format("UPDATE Calapps SET Subject='{0}' WHERE SystemNo=1 AND CalId=77777",
-                                     fixture.CreateAnonymous<string>());
+                                     fixture.Create<string>());
             }
 
             /// <summary>
@@ -125,7 +125,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
             }
@@ -139,7 +139,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -158,7 +158,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -174,7 +174,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -192,7 +192,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -208,11 +208,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
-                Assert.Throws<MySqlException>(() => mySqlDataProvider.GetCollection<MyDataProxy>(fixture.CreateAnonymous<string>()));
+                Assert.Throws<MySqlException>(() => mySqlDataProvider.GetCollection<MyDataProxy>(fixture.Create<string>()));
             }
         }
 
@@ -224,7 +224,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -247,7 +247,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -263,7 +263,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -282,11 +282,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+                var mySqlDataProxy = fixture.Create<MyDataProxy>();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
 
                 var result = mySqlDataProvider.Add(mySqlDataProxy);
@@ -304,7 +304,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -320,11 +320,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+                var mySqlDataProxy = fixture.Create<MyDataProxy>();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
 
                 var result = mySqlDataProvider.Add(mySqlDataProxy);
@@ -344,11 +344,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+                var mySqlDataProxy = fixture.Create<MyDataProxy>();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
 
                 var result = mySqlDataProvider.Add(mySqlDataProxy);
@@ -369,7 +369,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -385,11 +385,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.CreateAnonymous<MyDataProxy>();
+                var mySqlDataProxy = fixture.Create<MyDataProxy>();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
 
                 var result = mySqlDataProvider.Add(mySqlDataProxy);
@@ -407,7 +407,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.CreateAnonymous<MySqlDataProvider>())
+            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 

@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BudgetkontoGetQueryHandler>();
+            var queryHandler = fixture.Create<BudgetkontoGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -51,7 +51,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var budgetknt in fixture.CreateMany<Budgetkonto>(3))
             {
                 regnskab.TilføjKonto(budgetknt);
@@ -59,8 +59,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 for (var i = 0; i < 24; i++)
                 {
                     budgetknt.TilføjBudgetoplysninger(new Budgetoplysninger(tempDate.Year, tempDate.Month,
-                                                                            fixture.CreateAnonymous<decimal>(),
-                                                                            fixture.CreateAnonymous<decimal>()));
+                                                                            fixture.Create<decimal>(),
+                                                                            fixture.Create<decimal>()));
                     tempDate = tempDate.AddMonths(-1);
                 }
                 foreach (var bogføringslinje in fixture.CreateMany<Bogføringslinje>(250))
@@ -84,20 +84,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             fixture.Inject(fixture.CreateMany<BudgetoplysningerView>(24));
             objectMapper.Expect(m => m.Map<Budgetkonto, BudgetkontoView>(Arg<Budgetkonto>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<BudgetkontoView>());
+                .Return(fixture.Create<BudgetkontoView>());
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BudgetkontoGetQueryHandler>();
+            var queryHandler = fixture.Create<BudgetkontoGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new BudgetkontoGetQuery
                             {
                                 Regnskabsnummer = regnskab.Nummer,
                                 Kontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
-                                StatusDato = fixture.CreateAnonymous<DateTime>()
+                                StatusDato = fixture.Create<DateTime>()
                             };
             Assert.That(query, Is.Not.Null);
             var budgetkonto = queryHandler.Query(query);

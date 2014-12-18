@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(adresseRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BetalingsbetingelserGetQueryHandler>();
+            var queryHandler = fixture.Create<BetalingsbetingelserGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -58,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(adresseRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BetalingsbetingelserGetQueryHandler>();
+            var queryHandler = fixture.Create<BetalingsbetingelserGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new BetalingsbetingelserGetQuery();

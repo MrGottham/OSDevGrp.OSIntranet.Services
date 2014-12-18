@@ -27,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy());
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
             Assert.That(brugerProxy.System, Is.Not.Null);
             Assert.That(brugerProxy.System.Nummer, Is.EqualTo(0));
@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy(1, 2));
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             var uniqueId = brugerProxy.UniqueId;
@@ -65,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy(1, 2));
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             var sqlQuery = brugerProxy.GetSqlQueryForId(brugerProxy);
@@ -82,7 +82,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy(1, 2));
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => brugerProxy.GetSqlQueryForId(null));
@@ -95,12 +95,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         public void TestAtGetSqlCommandForInsertReturnererSqlCommand()
         {
             var fixture = new Fixture();
-            var userName = fixture.CreateAnonymous<string>();
-            var navn = fixture.CreateAnonymous<string>();
-            var initialer = fixture.CreateAnonymous<string>();
+            var userName = fixture.Create<string>();
+            var navn = fixture.Create<string>();
+            var initialer = fixture.Create<string>();
             fixture.Inject(new BrugerProxy(1, 2, initialer, navn));
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
             brugerProxy.UserName = userName;
 
@@ -116,12 +116,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         public void TestAtGetSqlCommandForUpdateReturnererSqlCommand()
         {
             var fixture = new Fixture();
-            var userName = fixture.CreateAnonymous<string>();
-            var navn = fixture.CreateAnonymous<string>();
-            var initialer = fixture.CreateAnonymous<string>();
+            var userName = fixture.Create<string>();
+            var navn = fixture.Create<string>();
+            var initialer = fixture.Create<string>();
             fixture.Inject(new BrugerProxy(1, 2, initialer, navn));
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
             brugerProxy.UserName = userName;
 
@@ -139,7 +139,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy(1, 2));
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             var sqlCommand = brugerProxy.GetSqlCommandForDelete();
@@ -158,12 +158,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             fixture.Inject<object>(null);
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                brugerProxy.MapData(fixture.CreateAnonymous<object>(), fixture.CreateAnonymous<IDataProviderBase>()));
+                brugerProxy.MapData(fixture.Create<object>(), fixture.Create<IDataProviderBase>()));
 
         }
 
@@ -178,12 +178,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             fixture.Inject(new object());
             fixture.Inject<IDataProviderBase>(null);
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                brugerProxy.MapData(fixture.CreateAnonymous<object>(), fixture.CreateAnonymous<IDataProviderBase>()));
+                brugerProxy.MapData(fixture.Create<object>(), fixture.Create<IDataProviderBase>()));
 
         }
 
@@ -198,12 +198,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             fixture.Inject(MockRepository.GenerateMock<IDataReader>());
             fixture.Inject(MockRepository.GenerateMock<IDataProviderBase>());
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                brugerProxy.MapData(fixture.CreateAnonymous<IDataReader>(), fixture.CreateAnonymous<IDataProviderBase>()));
+                brugerProxy.MapData(fixture.Create<IDataReader>(), fixture.Create<IDataProviderBase>()));
         }
 
         /// <summary>
@@ -218,21 +218,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
-                .Return(fixture.CreateAnonymous<int>());
+                .Return(fixture.Create<int>());
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
-                .Return(fixture.CreateAnonymous<int>());
+                .Return(fixture.Create<int>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("UserName")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Name")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Initials")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             fixture.Inject(dataReader);
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
-            brugerProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            brugerProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IDataProviderBase>());
             Assert.That(brugerProxy.DataIsLoaded, Is.True);
 
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
@@ -253,26 +253,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
-                .Return(fixture.CreateAnonymous<int>());
+                .Return(fixture.Create<int>());
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
-                .Return(fixture.CreateAnonymous<int>());
+                .Return(fixture.Create<int>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("UserName")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Name")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Initials")))
-                .Return(fixture.CreateAnonymous<string>());
+                .Return(fixture.Create<string>());
             fixture.Inject(dataReader);
 
             var dataProvider = MockRepository.GenerateMock<IDataProviderBase>();
             dataProvider.Expect(m => m.Get(Arg<SystemProxy>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<SystemProxy>());
+                .Return(fixture.Create<SystemProxy>());
             fixture.Inject(dataProvider);
 
-            var brugerProxy = fixture.CreateAnonymous<BrugerProxy>();
+            var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
-            brugerProxy.MapData(fixture.CreateAnonymous<MySqlDataReader>(), fixture.CreateAnonymous<IDataProviderBase>());
+            brugerProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IDataProviderBase>());
             Assert.That(brugerProxy.DataIsLoaded, Is.True);
 
             Assert.That(brugerProxy.System, Is.Not.Null);

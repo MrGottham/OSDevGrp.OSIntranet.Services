@@ -36,7 +36,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<DebitorGetQueryHandler>();
+            var queryHandler = fixture.Create<DebitorGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -60,19 +60,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 .Return(fixture.CreateMany<Brevhoved>(3));
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(m => m.Map<AdresseBase, DebitorView>(Arg<AdresseBase>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<DebitorView>());
+                .Return(fixture.Create<DebitorView>());
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<DebitorGetQueryHandler>();
+            var queryHandler = fixture.Create<DebitorGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new DebitorGetQuery
                             {
-                                Regnskabsnummer = fixture.CreateAnonymous<int>(),
-                                StatusDato = fixture.CreateAnonymous<DateTime>(),
+                                Regnskabsnummer = fixture.Create<int>(),
+                                StatusDato = fixture.Create<DateTime>(),
                                 Nummer = personer.ElementAt(3).Nummer
                             };
             var debitor = queryHandler.Query(query);

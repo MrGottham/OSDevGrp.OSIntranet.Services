@@ -47,7 +47,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         {
             var fixture = new Fixture();
             fixture.Inject<IQueryBus>(null);
-            Assert.Throws<ArgumentNullException>(() => new AdressekartotekService(fixture.CreateAnonymous<IQueryBus>()));
+            Assert.Throws<ArgumentNullException>(() => new AdressekartotekService(fixture.Create<IQueryBus>()));
         }
 
         /// <summary>
@@ -61,10 +61,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>());
+            service.TelefonlisteGet(fixture.Create<TelefonlisteGetQuery>());
 
             queryBus.AssertWasCalled(
                 m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull));
@@ -81,14 +81,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+                () => service.TelefonlisteGet(fixture.Create<TelefonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -102,14 +102,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+                () => service.TelefonlisteGet(fixture.Create<TelefonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -123,14 +123,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+                () => service.TelefonlisteGet(fixture.Create<TelefonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -144,14 +144,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<TelefonlisteGetQuery, IEnumerable<TelefonlisteView>>(Arg<TelefonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.TelefonlisteGet(fixture.CreateAnonymous<TelefonlisteGetQuery>()));
+                () => service.TelefonlisteGet(fixture.Create<TelefonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -165,10 +165,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>());
+            service.PersonlisteGet(fixture.Create<PersonlisteGetQuery>());
 
             queryBus.AssertWasCalled(
                 m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull));
@@ -185,14 +185,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+                () => service.PersonlisteGet(fixture.Create<PersonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -206,14 +206,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+                () => service.PersonlisteGet(fixture.Create<PersonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -227,14 +227,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+                () => service.PersonlisteGet(fixture.Create<PersonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -248,14 +248,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PersonlisteGetQuery, IEnumerable<PersonView>>(Arg<PersonlisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.PersonlisteGet(fixture.CreateAnonymous<PersonlisteGetQuery>()));
+                () => service.PersonlisteGet(fixture.Create<PersonlisteGetQuery>()));
         }
 
         /// <summary>
@@ -269,10 +269,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>());
+            service.PersonGet(fixture.Create<PersonGetQuery>());
 
             queryBus.AssertWasCalled(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull));
         }
@@ -287,14 +287,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+                () => service.PersonGet(fixture.Create<PersonGetQuery>()));
         }
 
         /// <summary>
@@ -307,14 +307,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+                () => service.PersonGet(fixture.Create<PersonGetQuery>()));
         }
 
         /// <summary>
@@ -327,14 +327,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+                () => service.PersonGet(fixture.Create<PersonGetQuery>()));
         }
 
         /// <summary>
@@ -347,14 +347,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<PersonGetQuery, PersonView>(Arg<PersonGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.PersonGet(fixture.CreateAnonymous<PersonGetQuery>()));
+                () => service.PersonGet(fixture.Create<PersonGetQuery>()));
         }
 
         /// <summary>
@@ -368,10 +368,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>());
+            service.FirmalisteGet(fixture.Create<FirmalisteGetQuery>());
 
             queryBus.AssertWasCalled(
                 m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull));
@@ -387,14 +387,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+                () => service.FirmalisteGet(fixture.Create<FirmalisteGetQuery>()));
         }
 
         /// <summary>
@@ -407,14 +407,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+                () => service.FirmalisteGet(fixture.Create<FirmalisteGetQuery>()));
         }
 
         /// <summary>
@@ -427,14 +427,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+                () => service.FirmalisteGet(fixture.Create<FirmalisteGetQuery>()));
         }
 
         /// <summary>
@@ -447,14 +447,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmalisteGetQuery, IEnumerable<FirmaView>>(Arg<FirmalisteGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.FirmalisteGet(fixture.CreateAnonymous<FirmalisteGetQuery>()));
+                () => service.FirmalisteGet(fixture.Create<FirmalisteGetQuery>()));
         }
 
         /// <summary>
@@ -468,10 +468,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>());
+            service.FirmaGet(fixture.Create<FirmaGetQuery>());
 
             queryBus.AssertWasCalled(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull));
         }
@@ -486,14 +486,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+                () => service.FirmaGet(fixture.Create<FirmaGetQuery>()));
         }
 
         /// <summary>
@@ -506,14 +506,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+                () => service.FirmaGet(fixture.Create<FirmaGetQuery>()));
         }
 
         /// <summary>
@@ -526,14 +526,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+                () => service.FirmaGet(fixture.Create<FirmaGetQuery>()));
         }
 
         /// <summary>
@@ -546,14 +546,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<FirmaGetQuery, FirmaView>(Arg<FirmaGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.FirmaGet(fixture.CreateAnonymous<FirmaGetQuery>()));
+                () => service.FirmaGet(fixture.Create<FirmaGetQuery>()));
         }
 
         /// <summary>
@@ -567,10 +567,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.PostnumreGet(fixture.CreateAnonymous<PostnumreGetQuery>());
+            service.PostnumreGet(fixture.Create<PostnumreGetQuery>());
 
             queryBus.AssertWasCalled(
                 m => m.Query<PostnumreGetQuery, IEnumerable<PostnummerView>>(Arg<PostnumreGetQuery>.Is.NotNull));
@@ -587,14 +587,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PostnumreGetQuery, IEnumerable<PostnummerView>>(Arg<PostnumreGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.PostnumreGet(fixture.CreateAnonymous<PostnumreGetQuery>()));
+                () => service.PostnumreGet(fixture.Create<PostnumreGetQuery>()));
         }
 
         /// <summary>
@@ -608,14 +608,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PostnumreGetQuery, IEnumerable<PostnummerView>>(Arg<PostnumreGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.PostnumreGet(fixture.CreateAnonymous<PostnumreGetQuery>()));
+                () => service.PostnumreGet(fixture.Create<PostnumreGetQuery>()));
         }
 
         /// <summary>
@@ -629,14 +629,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PostnumreGetQuery, IEnumerable<PostnummerView>>(Arg<PostnumreGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.PostnumreGet(fixture.CreateAnonymous<PostnumreGetQuery>()));
+                () => service.PostnumreGet(fixture.Create<PostnumreGetQuery>()));
         }
 
         /// <summary>
@@ -650,14 +650,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<PostnumreGetQuery, IEnumerable<PostnummerView>>(Arg<PostnumreGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.PostnumreGet(fixture.CreateAnonymous<PostnumreGetQuery>()));
+                () => service.PostnumreGet(fixture.Create<PostnumreGetQuery>()));
         }
 
         /// <summary>
@@ -671,10 +671,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.AdressegrupperGet(fixture.CreateAnonymous<AdressegrupperGetQuery>());
+            service.AdressegrupperGet(fixture.Create<AdressegrupperGetQuery>());
 
             queryBus.AssertWasCalled(
                 m =>
@@ -693,14 +693,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             queryBus.Expect(
                 m =>
                 m.Query<AdressegrupperGetQuery, IEnumerable<AdressegruppeView>>(Arg<AdressegrupperGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.AdressegrupperGet(fixture.CreateAnonymous<AdressegrupperGetQuery>()));
+                () => service.AdressegrupperGet(fixture.Create<AdressegrupperGetQuery>()));
         }
 
         /// <summary>
@@ -715,14 +715,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             queryBus.Expect(
                 m =>
                 m.Query<AdressegrupperGetQuery, IEnumerable<AdressegruppeView>>(Arg<AdressegrupperGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.AdressegrupperGet(fixture.CreateAnonymous<AdressegrupperGetQuery>()));
+                () => service.AdressegrupperGet(fixture.Create<AdressegrupperGetQuery>()));
         }
 
         /// <summary>
@@ -737,14 +737,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             queryBus.Expect(
                 m =>
                 m.Query<AdressegrupperGetQuery, IEnumerable<AdressegruppeView>>(Arg<AdressegrupperGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.AdressegrupperGet(fixture.CreateAnonymous<AdressegrupperGetQuery>()));
+                () => service.AdressegrupperGet(fixture.Create<AdressegrupperGetQuery>()));
         }
 
         /// <summary>
@@ -759,14 +759,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             queryBus.Expect(
                 m =>
                 m.Query<AdressegrupperGetQuery, IEnumerable<AdressegruppeView>>(Arg<AdressegrupperGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.AdressegrupperGet(fixture.CreateAnonymous<AdressegrupperGetQuery>()));
+                () => service.AdressegrupperGet(fixture.Create<AdressegrupperGetQuery>()));
         }
 
         /// <summary>
@@ -780,10 +780,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
-            service.BetalingsbetingelserGet(fixture.CreateAnonymous<BetalingsbetingelserGetQuery>());
+            service.BetalingsbetingelserGet(fixture.Create<BetalingsbetingelserGetQuery>());
 
             queryBus.AssertWasCalled(
                 m =>
@@ -804,14 +804,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>(
                     Arg<BetalingsbetingelserGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.BetalingsbetingelserGet(fixture.CreateAnonymous<BetalingsbetingelserGetQuery>()));
+                () => service.BetalingsbetingelserGet(fixture.Create<BetalingsbetingelserGetQuery>()));
         }
 
         /// <summary>
@@ -827,14 +827,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>(
                     Arg<BetalingsbetingelserGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.BetalingsbetingelserGet(fixture.CreateAnonymous<BetalingsbetingelserGetQuery>()));
+                () => service.BetalingsbetingelserGet(fixture.Create<BetalingsbetingelserGetQuery>()));
         }
 
         /// <summary>
@@ -850,14 +850,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>(
                     Arg<BetalingsbetingelserGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.BetalingsbetingelserGet(fixture.CreateAnonymous<BetalingsbetingelserGetQuery>()));
+                () => service.BetalingsbetingelserGet(fixture.Create<BetalingsbetingelserGetQuery>()));
         }
 
         /// <summary>
@@ -873,14 +873,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
                 m =>
                 m.Query<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>(
                     Arg<BetalingsbetingelserGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<AdressekartotekService>();
+            var service = fixture.Create<AdressekartotekService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.BetalingsbetingelserGet(fixture.CreateAnonymous<BetalingsbetingelserGetQuery>()));
+                () => service.BetalingsbetingelserGet(fixture.Create<BetalingsbetingelserGetQuery>()));
         }
     }
 }

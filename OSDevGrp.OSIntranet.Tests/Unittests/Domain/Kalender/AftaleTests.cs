@@ -32,11 +32,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                                                                    return result;
                                                                }));
 
-            var system = fixture.CreateAnonymous<ISystem>();
-            var id = fixture.CreateAnonymous<int>();
-            var fraTidspunkt = fixture.CreateAnonymous<DateTime>();
-            var tilTidspunkt = fixture.CreateAnonymous<DateTime>();
-            var emne = fixture.CreateAnonymous<string>();
+            var system = fixture.Create<ISystem>();
+            var id = fixture.Create<int>();
+            var fraTidspunkt = fixture.Create<DateTime>();
+            var tilTidspunkt = fixture.Create<DateTime>();
+            var emne = fixture.Create<string>();
             var aftale = new Aftale(system, id, fraTidspunkt, tilTidspunkt, emne);
             Assert.That(aftale, Is.Not.Null);
             Assert.That(aftale.System, Is.Not.Null);
@@ -76,9 +76,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                           fixture.CreateAnonymous<DateTime>(), fixture.CreateAnonymous<DateTime>(),
-                           fixture.CreateAnonymous<string>()));
+                new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                           fixture.Create<DateTime>(), fixture.Create<DateTime>(),
+                           fixture.Create<string>()));
         }
 
         /// <summary>
@@ -99,8 +99,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                           fixture.CreateAnonymous<DateTime>(), fixture.CreateAnonymous<DateTime>(), null));
+                new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                           fixture.Create<DateTime>(), fixture.Create<DateTime>(), null));
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                           fixture.CreateAnonymous<DateTime>(), fixture.CreateAnonymous<DateTime>(), string.Empty));
+                new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                           fixture.Create<DateTime>(), fixture.Create<DateTime>(), string.Empty));
         }
 
         /// <summary>
@@ -137,8 +137,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<IntranetSystemException>(
                 () =>
-                new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                           lastDateTime.AddMinutes(10), lastDateTime, fixture.CreateAnonymous<string>()));
+                new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                           lastDateTime.AddMinutes(10), lastDateTime, fixture.Create<string>()));
         }
 
         /// <summary>
@@ -153,8 +153,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<IntranetSystemException>(
                 () =>
-                new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(), lastDateTime,
-                           lastDateTime.AddMinutes(-10), fixture.CreateAnonymous<string>()));
+                new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(), lastDateTime,
+                           lastDateTime.AddMinutes(-10), fixture.Create<string>()));
         }
 
         /// <summary>
@@ -169,8 +169,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<IntranetSystemException>(
                 () =>
-                new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(), lastDateTime,
-                           lastDateTime, fixture.CreateAnonymous<string>()));
+                new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(), lastDateTime,
+                           lastDateTime, fixture.Create<string>()));
         }
 
         /// <summary>
@@ -182,12 +182,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             var fraTidspunkt = aftale.FraTidspunkt.AddMinutes(-15);
@@ -204,13 +204,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<IntranetSystemException>(() => aftale.FraTidspunkt = aftale.TilTidspunkt.AddMinutes(15));
@@ -225,13 +225,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<IntranetSystemException>(() => aftale.FraTidspunkt = aftale.TilTidspunkt);
@@ -246,13 +246,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             var tilTidspunkt = aftale.TilTidspunkt.AddMinutes(15);
@@ -269,13 +269,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<IntranetSystemException>(() => aftale.TilTidspunkt = aftale.FraTidspunkt.AddMinutes(-15));
@@ -290,13 +290,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<IntranetSystemException>(() => aftale.TilTidspunkt = aftale.FraTidspunkt);
@@ -311,16 +311,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            var emne = fixture.CreateAnonymous<string>();
+            var emne = fixture.Create<string>();
             aftale.Emne = emne;
             Assert.That(aftale.Emne, Is.Not.Null);
             Assert.That(aftale.Emne, Is.EqualTo(emne));
@@ -335,13 +335,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => aftale.Emne = null);
@@ -356,13 +356,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => aftale.Emne = string.Empty);
@@ -377,16 +377,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            var notat = fixture.CreateAnonymous<string>();
+            var notat = fixture.Create<string>();
             aftale.Notat = notat;
             Assert.That(aftale.Notat, Is.Not.Null);
             Assert.That(aftale.Notat, Is.EqualTo(notat));
@@ -413,16 +413,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                 .Repeat.Any();
             fixture.Inject(bruger);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), 1, fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<Aftale>(),
-                                            fixture.CreateAnonymous<IBruger>());
+            var deltager = new Brugeraftale(fixture.Create<ISystem>(), fixture.Create<Aftale>(),
+                                            fixture.Create<IBruger>());
             aftale.TilføjDeltager(deltager);
             Assert.That(aftale.Deltagere, Is.Not.Null);
             Assert.That(aftale.Deltagere.Count(), Is.EqualTo(1));
@@ -437,13 +437,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => aftale.TilføjDeltager(null));
@@ -462,20 +462,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                 .Repeat.Any();
             fixture.Inject(system);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             var invalidSystem = MockRepository.GenerateMock<ISystem>();
             invalidSystem.Expect(m => m.Nummer)
                 .Return(2);
-            var deltager = new Brugeraftale(invalidSystem, fixture.CreateAnonymous<Aftale>(),
-                                            fixture.CreateAnonymous<Bruger>());
+            var deltager = new Brugeraftale(invalidSystem, fixture.Create<Aftale>(),
+                                            fixture.Create<Bruger>());
             Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
         }
 
@@ -492,24 +492,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                 .Repeat.Any();
             fixture.Inject(system);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             var invalidSystem = MockRepository.GenerateMock<ISystem>();
             invalidSystem.Expect(m => m.Nummer)
                 .Return(2);
-            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(),
-                                            new Aftale(invalidSystem, fixture.CreateAnonymous<int>(),
-                                                       fixture.CreateAnonymous<DateTime>(),
-                                                       fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                                       fixture.CreateAnonymous<string>()),
-                                            fixture.CreateAnonymous<Bruger>());
+            var deltager = new Brugeraftale(fixture.Create<ISystem>(),
+                                            new Aftale(invalidSystem, fixture.Create<int>(),
+                                                       fixture.Create<DateTime>(),
+                                                       fixture.Create<DateTime>().AddMinutes(15),
+                                                       fixture.Create<string>()),
+                                            fixture.Create<Bruger>());
             Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
         }
 
@@ -526,20 +526,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                 .Repeat.Any();
             fixture.Inject(system);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), 1, fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(),
-                                            new Aftale(fixture.CreateAnonymous<ISystem>(), 2,
-                                                       fixture.CreateAnonymous<DateTime>(),
-                                                       fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                                       fixture.CreateAnonymous<string>()),
-                                            fixture.CreateAnonymous<Bruger>());
+            var deltager = new Brugeraftale(fixture.Create<ISystem>(),
+                                            new Aftale(fixture.Create<ISystem>(), 2,
+                                                       fixture.Create<DateTime>(),
+                                                       fixture.Create<DateTime>().AddMinutes(15),
+                                                       fixture.Create<string>()),
+                                            fixture.Create<Bruger>());
             Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
         }
 
@@ -556,22 +556,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                 .Repeat.Any();
             fixture.Inject(system);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), 1, fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             var invalidBruger = MockRepository.GenerateMock<IBruger>();
             invalidBruger.Expect(m => m.System.Nummer)
                 .Return(2);
-            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(),
-                                            new Aftale(fixture.CreateAnonymous<ISystem>(), 1,
-                                                       fixture.CreateAnonymous<DateTime>(),
-                                                       fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                                       fixture.CreateAnonymous<string>()), invalidBruger);
+            var deltager = new Brugeraftale(fixture.Create<ISystem>(),
+                                            new Aftale(fixture.Create<ISystem>(), 1,
+                                                       fixture.Create<DateTime>(),
+                                                       fixture.Create<DateTime>().AddMinutes(15),
+                                                       fixture.Create<string>()), invalidBruger);
             Assert.Throws<IntranetSystemException>(() => aftale.TilføjDeltager(deltager));
         }
 
@@ -596,16 +596,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                 .Repeat.Any();
             fixture.Inject(bruger);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), 1, fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<Aftale>(),
-                                            fixture.CreateAnonymous<IBruger>());
+            var deltager = new Brugeraftale(fixture.Create<ISystem>(), fixture.Create<Aftale>(),
+                                            fixture.Create<IBruger>());
             aftale.TilføjDeltager(deltager);
             Assert.That(aftale.Deltagere, Is.Not.Null);
             Assert.That(aftale.Deltagere.Count(), Is.EqualTo(1));
@@ -634,16 +634,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
                 .Repeat.Any();
             fixture.Inject(bruger);
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), 1, fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), 1, fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            var deltager = new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<Aftale>(),
-                                            fixture.CreateAnonymous<IBruger>());
+            var deltager = new Brugeraftale(fixture.Create<ISystem>(), fixture.Create<Aftale>(),
+                                            fixture.Create<IBruger>());
             aftale.TilføjDeltager(deltager);
             Assert.That(aftale.Deltagere, Is.Not.Null);
             Assert.That(aftale.Deltagere.Count(), Is.EqualTo(1));
@@ -661,13 +661,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
 
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => aftale.FjernDeltager(null));
@@ -682,16 +682,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(DateTime.Now);
-            fixture.Inject(new Aftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                                      fixture.CreateAnonymous<DateTime>(),
-                                      fixture.CreateAnonymous<DateTime>().AddMinutes(15),
-                                      fixture.CreateAnonymous<string>()));
+            fixture.Inject(new Aftale(fixture.Create<ISystem>(), fixture.Create<int>(),
+                                      fixture.Create<DateTime>(),
+                                      fixture.Create<DateTime>().AddMinutes(15),
+                                      fixture.Create<string>()));
             fixture.Inject(MockRepository.GenerateMock<IBrugeraftale>());
 
-            var aftale = fixture.CreateAnonymous<Aftale>();
+            var aftale = fixture.Create<Aftale>();
             Assert.That(aftale, Is.Not.Null);
 
-            Assert.Throws<IntranetBusinessException>(() => aftale.FjernDeltager(fixture.CreateAnonymous<IBrugeraftale>()));
+            Assert.Throws<IntranetBusinessException>(() => aftale.FjernDeltager(fixture.Create<IBrugeraftale>()));
         }
     }
 }

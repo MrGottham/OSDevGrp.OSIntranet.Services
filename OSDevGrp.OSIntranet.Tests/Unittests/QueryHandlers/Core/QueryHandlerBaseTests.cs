@@ -75,11 +75,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(m => m.Map<Regnskab, RegnskabslisteView>(Arg<Regnskab>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<RegnskabslisteView>());
+                .Return(fixture.Create<RegnskabslisteView>());
             var queryHandler = new MyQueryHandler(objectMapper);
             Assert.That(queryHandler, Is.Not.Null);
 
-            var view = queryHandler.Map<Regnskab, RegnskabslisteView>(fixture.CreateAnonymous<Regnskab>());
+            var view = queryHandler.Map<Regnskab, RegnskabslisteView>(fixture.Create<Regnskab>());
             Assert.That(view, Is.Not.Null);
 
             objectMapper.AssertWasCalled(m => m.Map<Regnskab, RegnskabslisteView>(Arg<Regnskab>.Is.NotNull));

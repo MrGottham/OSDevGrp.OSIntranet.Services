@@ -17,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Faults
         public void TestAtFaultKanInitieres()
         {
             var fixture = new Fixture();
-            var fault = fixture.CreateAnonymous<IntranetRepositoryFault>();
+            var fault = fixture.Create<IntranetRepositoryFault>();
             DataContractTestHelper.TestAtContractErInitieret(fault);
         }
 
@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Faults
         public void TestAtFaultKanSerialiseres()
         {
             var fixture = new Fixture();
-            var fault = fixture.CreateAnonymous<IntranetRepositoryFault>();
+            var fault = fixture.Create<IntranetRepositoryFault>();
             DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(fault);
         }
     }

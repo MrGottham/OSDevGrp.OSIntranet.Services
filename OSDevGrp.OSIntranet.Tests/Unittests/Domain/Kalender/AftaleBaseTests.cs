@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Offentligtgørelse = true;
@@ -66,7 +66,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Privat = true;
@@ -84,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Alarm = true;
@@ -102,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Udført = true;
@@ -121,7 +121,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Udført = true;
@@ -139,7 +139,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Alarm = true;
@@ -158,7 +158,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Eksporter = true;
@@ -176,7 +176,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Eksporteret = true;
@@ -195,7 +195,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Eksporteret = true;
@@ -213,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
         {
             var fixture = new Fixture();
 
-            var aftale = fixture.CreateAnonymous<MyAftale>();
+            var aftale = fixture.Create<MyAftale>();
             Assert.That(aftale, Is.Not.Null);
 
             aftale.Eksporter = true;

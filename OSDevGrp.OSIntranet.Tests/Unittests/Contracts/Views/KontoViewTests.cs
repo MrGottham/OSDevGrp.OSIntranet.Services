@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         {
             var fixture = new Fixture();
             fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
-            var view = fixture.CreateAnonymous<KontoView>();
+            var view = fixture.Create<KontoView>();
             DataContractTestHelper.TestAtContractErInitieret(view);
         }
 
@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         {
             var fixture = new Fixture();
             fixture.Inject<IEnumerable<KreditoplysningerView>>(fixture.CreateMany<KreditoplysningerView>(24).ToList());
-            var view = fixture.CreateAnonymous<KontoView>();
+            var view = fixture.Create<KontoView>();
             DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(view);
         }
     }

@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<KontoplanGetQueryHandler>();
+            var queryHandler = fixture.Create<KontoplanGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -52,7 +52,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         {
             var fixture = new Fixture();
 
-            var regnskab = fixture.CreateAnonymous<Regnskab>();
+            var regnskab = fixture.Create<Regnskab>();
             foreach (var knt in fixture.CreateMany<Konto>(3))
             {
                 regnskab.TilføjKonto(knt);
@@ -60,7 +60,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 for (var i = 0; i < 24; i++)
                 {
                     knt.TilføjKreditoplysninger(new Kreditoplysninger(tempDate.Year, tempDate.Month,
-                                                                      fixture.CreateAnonymous<decimal>()));
+                                                                      fixture.Create<decimal>()));
                     tempDate = tempDate.AddMonths(-1);
                 }
                 foreach (var bogføringslinje in fixture.CreateMany<Bogføringslinje>(250))
@@ -90,13 +90,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(adresseRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<KontoplanGetQueryHandler>();
+            var queryHandler = fixture.Create<KontoplanGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new KontoplanGetQuery
                             {
                                 Regnskabsnummer = regnskab.Nummer,
-                                StatusDato = fixture.CreateAnonymous<DateTime>()
+                                StatusDato = fixture.Create<DateTime>()
                             };
             Assert.That(query, Is.Not.Null);
             var kontoplan = queryHandler.Query(query);

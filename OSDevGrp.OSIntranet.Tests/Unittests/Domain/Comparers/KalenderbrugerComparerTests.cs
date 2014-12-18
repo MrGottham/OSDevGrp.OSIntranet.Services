@@ -22,9 +22,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IBruger>());
 
-            var comparer = fixture.CreateAnonymous<KalenderbrugerComparer>();
+            var comparer = fixture.Create<KalenderbrugerComparer>();
             Assert.That(comparer, Is.Not.Null);
-            Assert.Throws<ArgumentNullException>(() => comparer.Compare(null, fixture.CreateAnonymous<IBruger>()));
+            Assert.Throws<ArgumentNullException>(() => comparer.Compare(null, fixture.Create<IBruger>()));
         }
 
         /// <summary>
@@ -36,9 +36,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IBruger>());
 
-            var comparer = fixture.CreateAnonymous<KalenderbrugerComparer>();
+            var comparer = fixture.Create<KalenderbrugerComparer>();
             Assert.That(comparer, Is.Not.Null);
-            Assert.Throws<ArgumentNullException>(() => comparer.Compare(fixture.CreateAnonymous<IBruger>(), null));
+            Assert.Throws<ArgumentNullException>(() => comparer.Compare(fixture.Create<IBruger>(), null));
         }
 
         /// <summary>
@@ -51,17 +51,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
 
             var brugerX = MockRepository.GenerateMock<IBruger>();
             brugerX.Expect(m => m.Navn)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
 
             var brugerY = MockRepository.GenerateMock<IBruger>();
             brugerY.Expect(m => m.Navn)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
 
             var result = brugerX.Navn.CompareTo(brugerY.Navn);
 
-            var comparer = fixture.CreateAnonymous<KalenderbrugerComparer>();
+            var comparer = fixture.Create<KalenderbrugerComparer>();
             Assert.That(comparer, Is.Not.Null);
             Assert.That(comparer.Compare(brugerX, brugerY), Is.EqualTo(result));
         }
@@ -76,10 +76,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
 
             var brugerX = MockRepository.GenerateMock<IBruger>();
             brugerX.Expect(m => m.Navn)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             brugerX.Expect(m => m.Initialer)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
 
             var brugerY = MockRepository.GenerateMock<IBruger>();
@@ -87,12 +87,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
                 .Return(brugerX.Navn)
                 .Repeat.Any();
             brugerY.Expect(m => m.Initialer)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
 
             var result = brugerX.Initialer.CompareTo(brugerY.Initialer);
 
-            var comparer = fixture.CreateAnonymous<KalenderbrugerComparer>();
+            var comparer = fixture.Create<KalenderbrugerComparer>();
             Assert.That(comparer, Is.Not.Null);
             Assert.That(comparer.Compare(brugerX, brugerY), Is.EqualTo(result));
         }
@@ -107,13 +107,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
 
             var brugerX = MockRepository.GenerateMock<IBruger>();
             brugerX.Expect(m => m.Navn)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             brugerX.Expect(m => m.Initialer)
-                .Return(fixture.CreateAnonymous<string>())
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             brugerX.Expect(m => m.Id)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
 
             var brugerY = MockRepository.GenerateMock<IBruger>();
@@ -124,12 +124,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
                 .Return(brugerX.Initialer)
                 .Repeat.Any();
             brugerY.Expect(m => m.Id)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
 
             var result = brugerX.Id.CompareTo(brugerY.Id);
 
-            var comparer = fixture.CreateAnonymous<KalenderbrugerComparer>();
+            var comparer = fixture.Create<KalenderbrugerComparer>();
             Assert.That(comparer, Is.Not.Null);
             Assert.That(comparer.Compare(brugerX, brugerY), Is.EqualTo(result));
         }

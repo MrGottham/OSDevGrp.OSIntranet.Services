@@ -17,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanInitieres()
         {
             var fixture = new Fixture();
-            var query = fixture.CreateAnonymous<BudgetkontoplanGetQuery>();
+            var query = fixture.Create<BudgetkontoplanGetQuery>();
             DataContractTestHelper.TestAtContractErInitieret(query);
         }
 
@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         public void TestAtQueryKanSerialiseres()
         {
             var fixture = new Fixture();
-            var query = fixture.CreateAnonymous<BudgetkontoplanGetQuery>();
+            var query = fixture.Create<BudgetkontoplanGetQuery>();
             DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(query);
         }
     }

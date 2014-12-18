@@ -73,12 +73,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(m => m.Map<Regnskab, RegnskabslisteView>(Arg<Regnskab>.Is.NotNull))
-                .Return(fixture.CreateAnonymous<RegnskabslisteView>());
+                .Return(fixture.Create<RegnskabslisteView>());
 
             var commandHandler = new MyCommandHandler();
             Assert.That(commandHandler, Is.Not.Null);
 
-            var domainObject = fixture.CreateAnonymous<Regnskab>();
+            var domainObject = fixture.Create<Regnskab>();
             var view = commandHandler.Map<Regnskab, RegnskabslisteView>(objectMapper, domainObject);
             Assert.That(view, Is.Not.Null);
 
@@ -175,7 +175,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.Throws<ArgumentNullException>(
                 () =>
                 commandHandler.CreateIntranetSystemExceptionException(
-                    fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), null));
+                    fixture.Create<BogføringslinjeOpretCommand>(), null));
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             var result =
                 commandHandler.CreateIntranetSystemExceptionException(
-                    fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), fixture.CreateAnonymous<Exception>());
+                    fixture.Create<BogføringslinjeOpretCommand>(), fixture.Create<Exception>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.TypeOf(typeof(IntranetSystemException)));
         }
@@ -223,7 +223,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 () =>
                 commandHandler.CreateIntranetSystemExceptionException
                     <BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(
-                        fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), null));
+                        fixture.Create<BogføringslinjeOpretCommand>(), null));
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var result =
                 commandHandler.CreateIntranetSystemExceptionException
                     <BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(
-                        fixture.CreateAnonymous<BogføringslinjeOpretCommand>(), fixture.CreateAnonymous<Exception>());
+                        fixture.Create<BogføringslinjeOpretCommand>(), fixture.Create<Exception>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.TypeOf(typeof(IntranetSystemException)));
         }

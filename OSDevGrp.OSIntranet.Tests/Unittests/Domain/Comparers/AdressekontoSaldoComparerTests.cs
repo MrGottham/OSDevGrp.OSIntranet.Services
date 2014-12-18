@@ -31,7 +31,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
         public void TestAtCompareKasterArgumentNullExceptionHvisYErNull()
         {
             var fixture = new Fixture();
-            var x = fixture.CreateAnonymous<Person>();
+            var x = fixture.Create<Person>();
 
             var comparer = new AdressekontoSaldoComparer();
             Assert.That(comparer, Is.Not.Null);
@@ -46,18 +46,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2011, 6, 30));
-            var x = fixture.CreateAnonymous<Person>();
-            x.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                        fixture.CreateAnonymous<DateTime>(),
-                                                        fixture.CreateAnonymous<string>(),
-                                                        fixture.CreateAnonymous<string>(), 5000M, 0M));
-            x.Calculate(fixture.CreateAnonymous<DateTime>());
-            var y = fixture.CreateAnonymous<Person>();
-            y.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                        fixture.CreateAnonymous<DateTime>(),
-                                                        fixture.CreateAnonymous<string>(),
-                                                        fixture.CreateAnonymous<string>(), 2500M, 0M));
-            y.Calculate(fixture.CreateAnonymous<DateTime>());
+            var x = fixture.Create<Person>();
+            x.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                        fixture.Create<DateTime>(),
+                                                        fixture.Create<string>(),
+                                                        fixture.Create<string>(), 5000M, 0M));
+            x.Calculate(fixture.Create<DateTime>());
+            var y = fixture.Create<Person>();
+            y.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                        fixture.Create<DateTime>(),
+                                                        fixture.Create<string>(),
+                                                        fixture.Create<string>(), 2500M, 0M));
+            y.Calculate(fixture.Create<DateTime>());
 
             var comparer = new AdressekontoSaldoComparer();
             Assert.That(comparer, Is.Not.Null);
@@ -72,18 +72,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2011, 6, 30));
-            var x = fixture.CreateAnonymous<Person>();
-            x.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                        fixture.CreateAnonymous<DateTime>(),
-                                                        fixture.CreateAnonymous<string>(),
-                                                        fixture.CreateAnonymous<string>(), 2500M, 0M));
-            x.Calculate(fixture.CreateAnonymous<DateTime>());
-            var y = fixture.CreateAnonymous<Person>();
-            y.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                        fixture.CreateAnonymous<DateTime>(),
-                                                        fixture.CreateAnonymous<string>(),
-                                                        fixture.CreateAnonymous<string>(), 5000M, 0M));
-            y.Calculate(fixture.CreateAnonymous<DateTime>());
+            var x = fixture.Create<Person>();
+            x.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                        fixture.Create<DateTime>(),
+                                                        fixture.Create<string>(),
+                                                        fixture.Create<string>(), 2500M, 0M));
+            x.Calculate(fixture.Create<DateTime>());
+            var y = fixture.Create<Person>();
+            y.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                        fixture.Create<DateTime>(),
+                                                        fixture.Create<string>(),
+                                                        fixture.Create<string>(), 5000M, 0M));
+            y.Calculate(fixture.Create<DateTime>());
 
             var comparer = new AdressekontoSaldoComparer();
             Assert.That(comparer, Is.Not.Null);
@@ -98,18 +98,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2011, 6, 30));
-            var x = fixture.CreateAnonymous<Person>();
-            x.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                        fixture.CreateAnonymous<DateTime>(),
-                                                        fixture.CreateAnonymous<string>(),
-                                                        fixture.CreateAnonymous<string>(), 5000M, 0M));
-            x.Calculate(fixture.CreateAnonymous<DateTime>());
-            var y = fixture.CreateAnonymous<Person>();
-            y.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                        fixture.CreateAnonymous<DateTime>(),
-                                                        fixture.CreateAnonymous<string>(),
-                                                        fixture.CreateAnonymous<string>(), 5000M, 0M));
-            y.Calculate(fixture.CreateAnonymous<DateTime>());
+            var x = fixture.Create<Person>();
+            x.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                        fixture.Create<DateTime>(),
+                                                        fixture.Create<string>(),
+                                                        fixture.Create<string>(), 5000M, 0M));
+            x.Calculate(fixture.Create<DateTime>());
+            var y = fixture.Create<Person>();
+            y.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                        fixture.Create<DateTime>(),
+                                                        fixture.Create<string>(),
+                                                        fixture.Create<string>(), 5000M, 0M));
+            y.Calculate(fixture.Create<DateTime>());
 
             var comparer = new AdressekontoSaldoComparer();
             Assert.That(comparer, Is.Not.Null);

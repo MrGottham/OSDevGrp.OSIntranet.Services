@@ -20,8 +20,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         public void TestAtResourceExceptionKanInstantieres()
         {
             var fixture = new Fixture();
-            var message = fixture.CreateAnonymous<string>();
-            var innerException = fixture.CreateAnonymous<Exception>();
+            var message = fixture.Create<string>();
+            var innerException = fixture.Create<Exception>();
 
             var exception = new ResourceException(message);
             Assert.That(exception, Is.Not.Null);
@@ -42,8 +42,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         public void TestAtResourceExceptionKanSerialiseresOgDeserialiseres()
         {
             var fixture = new Fixture();
-            var message = fixture.CreateAnonymous<string>();
-            var innerException = fixture.CreateAnonymous<Exception>();
+            var message = fixture.Create<string>();
+            var innerException = fixture.Create<Exception>();
 
             var exception = new ResourceException(message, innerException);
             Assert.That(exception, Is.Not.Null);

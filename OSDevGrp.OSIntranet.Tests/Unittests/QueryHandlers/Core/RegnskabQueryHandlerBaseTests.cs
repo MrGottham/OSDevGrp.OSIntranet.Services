@@ -203,7 +203,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
-                () => queryHandler.KontoGetByRegnskabAndKontonummer(fixture.CreateAnonymous<int>(), null));
+                () => queryHandler.KontoGetByRegnskabAndKontonummer(fixture.Create<int>(), null));
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             Assert.Throws<IntranetRepositoryException>(
                 () =>
                 queryHandler.KontoGetByRegnskabAndKontonummer(regnskaber.ElementAt(1).Nummer,
-                                                              fixture.CreateAnonymous<string>()));
+                                                              fixture.Create<string>()));
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
-                () => queryHandler.BudgetkontoGetByRegnskabAndKontonummer(fixture.CreateAnonymous<int>(), null));
+                () => queryHandler.BudgetkontoGetByRegnskabAndKontonummer(fixture.Create<int>(), null));
         }
 
         /// <summary>
@@ -425,7 +425,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             Assert.Throws<IntranetRepositoryException>(
                 () =>
                 queryHandler.BudgetkontoGetByRegnskabAndKontonummer(regnskaber.ElementAt(1).Nummer,
-                                                                    fixture.CreateAnonymous<string>()));
+                                                                    fixture.Create<string>()));
         }
 
         /// <summary>
@@ -438,21 +438,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(new DateTime(2010, 12, 31));
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            0M, fixture.CreateAnonymous<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            0M, fixture.Create<decimal>()));
 
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
@@ -494,21 +494,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(new DateTime(2010, 12, 31));
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            0M, fixture.CreateAnonymous<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            0M, fixture.Create<decimal>()));
 
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
@@ -548,21 +548,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(new DateTime(2010, 12, 31));
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            0M, fixture.CreateAnonymous<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            0M, fixture.Create<decimal>()));
 
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
@@ -585,7 +585,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             Assert.Throws<IntranetRepositoryException>(
                 () =>
                 queryHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer,
-                                                                fixture.CreateAnonymous<int>()));
+                                                                fixture.Create<int>()));
         }
 
         /// <summary>
@@ -598,21 +598,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(new DateTime(2010, 12, 31));
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            0M, fixture.CreateAnonymous<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            0M, fixture.Create<decimal>()));
 
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
@@ -634,7 +634,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var adressekonti =
                 queryHandler.AdressekontoGetAllWithValueByRegnskabAndStatusDato(regnskaber.ElementAt(1).Nummer,
-                                                                                fixture.CreateAnonymous<DateTime>(),
+                                                                                fixture.Create<DateTime>(),
                                                                                 true);
             Assert.That(adressekonti, Is.Not.Null);
             Assert.That(adressekonti.Count(), Is.EqualTo(2));
@@ -650,21 +650,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(new DateTime(2010, 12, 31));
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                                            fixture.CreateAnonymous<DateTime>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            fixture.CreateAnonymous<string>(),
-                                                                            0M, fixture.CreateAnonymous<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
+                                                                            fixture.Create<DateTime>(),
+                                                                            fixture.Create<string>(),
+                                                                            fixture.Create<string>(),
+                                                                            0M, fixture.Create<decimal>()));
 
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
             finansstyringRepository.Expect(
@@ -686,7 +686,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var adressekonti =
                 queryHandler.AdressekontoGetAllWithValueByRegnskabAndStatusDato(regnskaber.ElementAt(1).Nummer,
-                                                                                fixture.CreateAnonymous<DateTime>(),
+                                                                                fixture.Create<DateTime>(),
                                                                                 false);
             Assert.That(adressekonti, Is.Not.Null);
             Assert.That(adressekonti.Count(), Is.EqualTo(1));

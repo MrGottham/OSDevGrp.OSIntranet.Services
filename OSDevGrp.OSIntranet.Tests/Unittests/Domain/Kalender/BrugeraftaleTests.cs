@@ -25,9 +25,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             fixture.Inject(MockRepository.GenerateMock<IAftale>());
             fixture.Inject(MockRepository.GenerateMock<IBruger>());
 
-            var system = fixture.CreateAnonymous<ISystem>();
-            var aftale = fixture.CreateAnonymous<IAftale>();
-            var bruger = fixture.CreateAnonymous<IBruger>();
+            var system = fixture.Create<ISystem>();
+            var aftale = fixture.Create<IAftale>();
+            var bruger = fixture.Create<IBruger>();
             var brugeraftale = new Brugeraftale(system, aftale, bruger);
             Assert.That(brugeraftale, Is.Not.Null);
             Assert.That(brugeraftale.System, Is.Not.Null);
@@ -58,8 +58,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<IAftale>(),
-                                 fixture.CreateAnonymous<IBruger>()));
+                new Brugeraftale(fixture.Create<ISystem>(), fixture.Create<IAftale>(),
+                                 fixture.Create<IBruger>()));
         }
 
         /// <summary>
@@ -75,8 +75,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<IAftale>(),
-                                 fixture.CreateAnonymous<IBruger>()));
+                new Brugeraftale(fixture.Create<ISystem>(), fixture.Create<IAftale>(),
+                                 fixture.Create<IBruger>()));
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Brugeraftale(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<IAftale>(),
-                                 fixture.CreateAnonymous<IBruger>()));
+                new Brugeraftale(fixture.Create<ISystem>(), fixture.Create<IAftale>(),
+                                 fixture.Create<IBruger>()));
         }
     }
 }

@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(adresseRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<FirmalisteGetQueryHandler>();
+            var queryHandler = fixture.Create<FirmalisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -61,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(adresseRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<FirmalisteGetQueryHandler>();
+            var queryHandler = fixture.Create<FirmalisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new FirmalisteGetQuery();

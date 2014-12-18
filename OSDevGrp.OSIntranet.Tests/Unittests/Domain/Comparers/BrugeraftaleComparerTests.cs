@@ -23,7 +23,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<IComparer<IBruger>>());
 
-            var comparer = fixture.CreateAnonymous<BrugeraftaleComparer>();
+            var comparer = fixture.Create<BrugeraftaleComparer>();
             Assert.That(comparer, Is.Not.Null);
         }
 
@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
             fixture.Inject<IComparer<IBruger>>(null);
 
             Assert.Throws<ArgumentNullException>(
-                () => new BrugeraftaleComparer(fixture.CreateAnonymous<IComparer<IBruger>>()));
+                () => new BrugeraftaleComparer(fixture.Create<IComparer<IBruger>>()));
         }
 
         /// <summary>
@@ -50,9 +50,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
             fixture.Inject(MockRepository.GenerateMock<IComparer<IBruger>>());
             fixture.Inject(MockRepository.GenerateMock<IBrugeraftale>());
 
-            var comparer = fixture.CreateAnonymous<BrugeraftaleComparer>();
+            var comparer = fixture.Create<BrugeraftaleComparer>();
             Assert.That(comparer, Is.Not.Null);
-            Assert.Throws<ArgumentNullException>(() => comparer.Compare(null, fixture.CreateAnonymous<IBrugeraftale>()));
+            Assert.Throws<ArgumentNullException>(() => comparer.Compare(null, fixture.Create<IBrugeraftale>()));
         }
 
         /// <summary>
@@ -65,9 +65,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
             fixture.Inject(MockRepository.GenerateMock<IComparer<IBruger>>());
             fixture.Inject(MockRepository.GenerateMock<IBrugeraftale>());
 
-            var comparer = fixture.CreateAnonymous<BrugeraftaleComparer>();
+            var comparer = fixture.Create<BrugeraftaleComparer>();
             Assert.That(comparer, Is.Not.Null);
-            Assert.Throws<ArgumentNullException>(() => comparer.Compare(fixture.CreateAnonymous<IBrugeraftale>(), null));
+            Assert.Throws<ArgumentNullException>(() => comparer.Compare(fixture.Create<IBrugeraftale>(), null));
         }
 
         /// <summary>
@@ -83,15 +83,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers
                 .Return(MockRepository.GenerateMock<IBruger>());
             fixture.Inject(brugerAftale);
 
-            var result = fixture.CreateAnonymous<int>();
+            var result = fixture.Create<int>();
             var brugerComparer = MockRepository.GenerateMock<IComparer<IBruger>>();
             brugerComparer.Expect(m => m.Compare(Arg<IBruger>.Is.NotNull, Arg<IBruger>.Is.NotNull))
                 .Return(result);
             fixture.Inject(brugerComparer);
 
-            var comparer = fixture.CreateAnonymous<BrugeraftaleComparer>();
+            var comparer = fixture.Create<BrugeraftaleComparer>();
             Assert.That(comparer, Is.Not.Null);
-            Assert.That(comparer.Compare(fixture.CreateAnonymous<IBrugeraftale>(), fixture.CreateAnonymous<IBrugeraftale>()), Is.EqualTo(result));
+            Assert.That(comparer.Compare(fixture.Create<IBrugeraftale>(), fixture.Create<IBrugeraftale>()), Is.EqualTo(result));
 
             brugerComparer.AssertWasCalled(m => m.Compare(Arg<IBruger>.Is.NotNull, Arg<IBruger>.Is.NotNull));
         }

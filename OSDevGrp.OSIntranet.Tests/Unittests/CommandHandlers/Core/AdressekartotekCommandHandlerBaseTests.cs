@@ -290,7 +290,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.That(commandHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
-                () => commandHandler.PostnummerGetByLandekodeAndPostnummer(fixture.CreateAnonymous<string>(), null));
+                () => commandHandler.PostnummerGetByLandekodeAndPostnummer(fixture.Create<string>(), null));
         }
 
         /// <summary>
@@ -336,8 +336,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                commandHandler.PostnummerGetByLandekodeAndPostnummer(fixture.CreateAnonymous<string>(),
-                                                                   fixture.CreateAnonymous<string>()));
+                commandHandler.PostnummerGetByLandekodeAndPostnummer(fixture.Create<string>(),
+                                                                   fixture.Create<string>()));
         }
 
         /// <summary>

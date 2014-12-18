@@ -17,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Commands
         public void TestAtCommandKanInitieres()
         {
             var fixture = new Fixture();
-            var command = fixture.CreateAnonymous<BogføringslinjeOpretCommand>();
+            var command = fixture.Create<BogføringslinjeOpretCommand>();
             DataContractTestHelper.TestAtContractErInitieret(command);
         }
 
@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Commands
         public void TestAtCommandKanSerialiseres()
         {
             var fixture = new Fixture();
-            var command = fixture.CreateAnonymous<BogføringslinjeOpretCommand>();
+            var command = fixture.Create<BogføringslinjeOpretCommand>();
             DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(command);
         }
     }

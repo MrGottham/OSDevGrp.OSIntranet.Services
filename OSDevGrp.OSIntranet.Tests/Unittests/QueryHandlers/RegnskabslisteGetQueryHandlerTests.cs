@@ -36,7 +36,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject<IFællesRepository>(null);
             fixture.Inject(objectMapper);
             Assert.That(
-                Assert.Throws<TargetInvocationException>(() => fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>())
+                Assert.Throws<TargetInvocationException>(() => fixture.Create<RegnskabslisteGetQueryHandler>())
                     .InnerException, Is.TypeOf(typeof (ArgumentNullException)));
         }
 
@@ -55,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(finansstyringRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>();
+            var queryHandler = fixture.Create<RegnskabslisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -84,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             fixture.Inject(finansstyringRepository);
             fixture.Inject(fællesRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<RegnskabslisteGetQueryHandler>();
+            var queryHandler = fixture.Create<RegnskabslisteGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new RegnskabslisteGetQuery();

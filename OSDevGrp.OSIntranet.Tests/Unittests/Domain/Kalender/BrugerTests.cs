@@ -22,10 +22,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var system = fixture.CreateAnonymous<ISystem>();
-            var id = fixture.CreateAnonymous<int>();
-            var initiaer = fixture.CreateAnonymous<string>();
-            var navn = fixture.CreateAnonymous<string>();
+            var system = fixture.Create<ISystem>();
+            var id = fixture.Create<int>();
+            var initiaer = fixture.Create<string>();
+            var navn = fixture.Create<string>();
             var bruger = new Bruger(system, id, initiaer, navn);
             Assert.That(bruger, Is.Not.Null);
             Assert.That(bruger.System, Is.Not.Null);
@@ -49,8 +49,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Bruger(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                           fixture.CreateAnonymous<string>(), fixture.CreateAnonymous<string>()));
+                new Bruger(fixture.Create<ISystem>(), fixture.Create<int>(),
+                           fixture.Create<string>(), fixture.Create<string>()));
 
         }
 
@@ -65,8 +65,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Bruger(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(), null,
-                           fixture.CreateAnonymous<string>()));
+                new Bruger(fixture.Create<ISystem>(), fixture.Create<int>(), null,
+                           fixture.Create<string>()));
         }
 
         /// <summary>
@@ -80,8 +80,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Bruger(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(), string.Empty,
-                           fixture.CreateAnonymous<string>()));
+                new Bruger(fixture.Create<ISystem>(), fixture.Create<int>(), string.Empty,
+                           fixture.Create<string>()));
         }
 
         /// <summary>
@@ -95,8 +95,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Bruger(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                           fixture.CreateAnonymous<string>(), null));
+                new Bruger(fixture.Create<ISystem>(), fixture.Create<int>(),
+                           fixture.Create<string>(), null));
         }
 
         /// <summary>
@@ -110,8 +110,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new Bruger(fixture.CreateAnonymous<ISystem>(), fixture.CreateAnonymous<int>(),
-                           fixture.CreateAnonymous<string>(), string.Empty));
+                new Bruger(fixture.Create<ISystem>(), fixture.Create<int>(),
+                           fixture.Create<string>(), string.Empty));
         }
 
         /// <summary>
@@ -123,10 +123,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             Assert.That(bruger, Is.Not.Null);
 
-            var initialer = fixture.CreateAnonymous<string>();
+            var initialer = fixture.Create<string>();
             bruger.Initialer = initialer;
             Assert.That(bruger.Initialer, Is.Not.Null);
             Assert.That(bruger.Initialer, Is.EqualTo(initialer));
@@ -141,7 +141,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             Assert.That(bruger, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => bruger.Initialer = null);
@@ -156,7 +156,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             Assert.That(bruger, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => bruger.Initialer = string.Empty);
@@ -171,10 +171,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             Assert.That(bruger, Is.Not.Null);
 
-            var navn = fixture.CreateAnonymous<string>();
+            var navn = fixture.Create<string>();
             bruger.Navn = navn;
             Assert.That(bruger.Navn, Is.Not.Null);
             Assert.That(bruger.Navn, Is.EqualTo(navn));
@@ -189,7 +189,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             Assert.That(bruger, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => bruger.Navn = null);
@@ -204,7 +204,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             Assert.That(bruger, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => bruger.Navn = string.Empty);
@@ -219,10 +219,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
             var fixture = new Fixture();
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
 
-            var bruger = fixture.CreateAnonymous<Bruger>();
+            var bruger = fixture.Create<Bruger>();
             Assert.That(bruger, Is.Not.Null);
 
-            var userName = fixture.CreateAnonymous<string>();
+            var userName = fixture.Create<string>();
             bruger.UserName = userName;
             Assert.That(bruger.UserName, Is.Not.Null);
             Assert.That(bruger.UserName, Is.EqualTo(userName));

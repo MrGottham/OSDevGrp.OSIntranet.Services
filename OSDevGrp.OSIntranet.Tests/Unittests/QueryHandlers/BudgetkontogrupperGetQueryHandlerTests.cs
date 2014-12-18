@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BudgetkontogrupperGetQueryHandler>();
+            var queryHandler = fixture.Create<BudgetkontogrupperGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(() => queryHandler.Query(null));
@@ -58,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             fixture.Inject(finansstyringRepository);
             fixture.Inject(objectMapper);
-            var queryHandler = fixture.CreateAnonymous<BudgetkontogrupperGetQueryHandler>();
+            var queryHandler = fixture.Create<BudgetkontogrupperGetQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var query = new BudgetkontogrupperGetQuery();

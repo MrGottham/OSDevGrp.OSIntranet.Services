@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         {
             var fixture = new Fixture();
             fixture.Inject<IEnumerable<KalenderbrugerView>>(fixture.CreateMany<KalenderbrugerView>(3).ToList());
-            var view = fixture.CreateAnonymous<KalenderbrugerAftaleView>();
+            var view = fixture.Create<KalenderbrugerAftaleView>();
             DataContractTestHelper.TestAtContractErInitieret(view);
         }
 
@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         {
             var fixture = new Fixture();
             fixture.Inject<IEnumerable<KalenderbrugerView>>(fixture.CreateMany<KalenderbrugerView>(3).ToList());
-            var view = fixture.CreateAnonymous<KalenderbrugerAftaleView>();
+            var view = fixture.Create<KalenderbrugerAftaleView>();
             DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(view);
         }
     }

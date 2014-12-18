@@ -47,7 +47,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         {
             var fixture = new Fixture();
             fixture.Inject<IQueryBus>(null);
-            Assert.Throws<ArgumentNullException>(() => new CommonService(fixture.CreateAnonymous<IQueryBus>()));
+            Assert.Throws<ArgumentNullException>(() => new CommonService(fixture.Create<IQueryBus>()));
         }
 
         /// <summary>
@@ -61,10 +61,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
-            service.BrevhovederGet(fixture.CreateAnonymous<BrevhovederGetQuery>());
+            service.BrevhovederGet(fixture.Create<BrevhovederGetQuery>());
 
             queryBus.AssertWasCalled(
                 m => m.Query<BrevhovederGetQuery, IEnumerable<BrevhovedView>>(Arg<BrevhovederGetQuery>.Is.NotNull));
@@ -81,14 +81,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<BrevhovederGetQuery, IEnumerable<BrevhovedView>>(Arg<BrevhovederGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.BrevhovederGet(fixture.CreateAnonymous<BrevhovederGetQuery>()));
+                () => service.BrevhovederGet(fixture.Create<BrevhovederGetQuery>()));
         }
 
         /// <summary>
@@ -102,14 +102,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<BrevhovederGetQuery, IEnumerable<BrevhovedView>>(Arg<BrevhovederGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.BrevhovederGet(fixture.CreateAnonymous<BrevhovederGetQuery>()));
+                () => service.BrevhovederGet(fixture.Create<BrevhovederGetQuery>()));
         }
 
         /// <summary>
@@ -123,14 +123,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<BrevhovederGetQuery, IEnumerable<BrevhovedView>>(Arg<BrevhovederGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.BrevhovederGet(fixture.CreateAnonymous<BrevhovederGetQuery>()));
+                () => service.BrevhovederGet(fixture.Create<BrevhovederGetQuery>()));
         }
 
         /// <summary>
@@ -144,14 +144,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(
                 m => m.Query<BrevhovederGetQuery, IEnumerable<BrevhovedView>>(Arg<BrevhovederGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.BrevhovederGet(fixture.CreateAnonymous<BrevhovederGetQuery>()));
+                () => service.BrevhovederGet(fixture.Create<BrevhovederGetQuery>()));
         }
 
         /// <summary>
@@ -165,10 +165,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
-            service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>());
+            service.SystemerGet(fixture.Create<SystemerGetQuery>());
 
             queryBus.AssertWasCalled(
                 m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull));
@@ -184,14 +184,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetRepositoryException>());
+                .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetRepositoryFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
 
         /// <summary>
@@ -204,14 +204,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetBusinessException>());
+                .Throw(fixture.Create<IntranetBusinessException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetBusinessFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
 
         /// <summary>
@@ -224,14 +224,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<IntranetSystemException>());
+                .Throw(fixture.Create<IntranetSystemException>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
 
         /// <summary>
@@ -244,14 +244,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             var queryBus = MockRepository.GenerateMock<IQueryBus>();
             queryBus.Expect(m => m.Query<SystemerGetQuery, IEnumerable<SystemView>>(Arg<SystemerGetQuery>.Is.NotNull))
-                .Throw(fixture.CreateAnonymous<Exception>());
+                .Throw(fixture.Create<Exception>());
             fixture.Inject(queryBus);
 
-            var service = fixture.CreateAnonymous<CommonService>();
+            var service = fixture.Create<CommonService>();
             Assert.That(service, Is.Not.Null);
 
             Assert.Throws<FaultException<IntranetSystemFault>>(
-                () => service.SystemerGet(fixture.CreateAnonymous<SystemerGetQuery>()));
+                () => service.SystemerGet(fixture.Create<SystemerGetQuery>()));
         }
     }
 }

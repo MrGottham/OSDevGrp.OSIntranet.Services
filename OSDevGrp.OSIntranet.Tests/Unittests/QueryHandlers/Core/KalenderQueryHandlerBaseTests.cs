@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
             Assert.That(queryHandler.KalenderRepository, Is.Not.Null);
             Assert.That(queryHandler.FællesRepository, Is.Not.Null);
@@ -65,9 +65,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new MyKalenderQueryHandler(fixture.CreateAnonymous<IKalenderRepository>(),
-                                           fixture.CreateAnonymous<IFællesRepository>(),
-                                           fixture.CreateAnonymous<IObjectMapper>()));
+                new MyKalenderQueryHandler(fixture.Create<IKalenderRepository>(),
+                                           fixture.Create<IFællesRepository>(),
+                                           fixture.Create<IObjectMapper>()));
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new MyKalenderQueryHandler(fixture.CreateAnonymous<IKalenderRepository>(),
-                                           fixture.CreateAnonymous<IFællesRepository>(),
-                                           fixture.CreateAnonymous<IObjectMapper>()));
+                new MyKalenderQueryHandler(fixture.Create<IKalenderRepository>(),
+                                           fixture.Create<IFællesRepository>(),
+                                           fixture.Create<IObjectMapper>()));
         }
 
         /// <summary>
@@ -101,9 +101,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new MyKalenderQueryHandler(fixture.CreateAnonymous<IKalenderRepository>(),
-                                           fixture.CreateAnonymous<IFællesRepository>(),
-                                           fixture.CreateAnonymous<IObjectMapper>()));
+                new MyKalenderQueryHandler(fixture.Create<IKalenderRepository>(),
+                                           fixture.Create<IFællesRepository>(),
+                                           fixture.Create<IObjectMapper>()));
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             foreach (var system in systemer)
             {
                 system.Expect(m => m.Nummer)
-                    .Return(fixture.CreateAnonymous<int>())
+                    .Return(fixture.Create<int>())
                     .Repeat.Any();
             }
             var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
@@ -130,7 +130,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
                 .Repeat.Any();
             fixture.Inject(fællesRepository);
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             var result = queryHandler.SystemGetByNummer(systemer.ElementAt(1).Nummer);
@@ -155,7 +155,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             foreach (var system in systemer)
             {
                 system.Expect(m => m.Nummer)
-                    .Return(fixture.CreateAnonymous<int>())
+                    .Return(fixture.Create<int>())
                     .Repeat.Any();
             }
             var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
@@ -164,11 +164,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
                 .Repeat.Any();
             fixture.Inject(fællesRepository);
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
-                () => queryHandler.SystemGetByNummer(fixture.CreateAnonymous<int>()));
+                () => queryHandler.SystemGetByNummer(fixture.Create<int>()));
 
             fællesRepository.AssertWasCalled(m => m.SystemGetAll());
         }
@@ -184,14 +184,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             fixture.Inject<ISystem>(null);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                fixture.CreateAnonymous<string>()));
+                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                fixture.Create<string>()));
         }
 
         /// <summary>
@@ -205,15 +205,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject<string>(null);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                fixture.CreateAnonymous<string>()));
+                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                fixture.Create<string>()));
         }
 
         /// <summary>
@@ -227,15 +227,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
             fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             fixture.Inject(MockRepository.GenerateMock<ISystem>());
             fixture.Inject(string.Empty);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                fixture.CreateAnonymous<string>()));
+                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                fixture.Create<string>()));
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var system = MockRepository.GenerateMock<ISystem>();
             system.Expect(m => m.Nummer)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
             fixture.Inject(system);
 
@@ -259,7 +259,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             foreach (var bruger in brugere)
             {
                 bruger.Expect(m => m.Initialer)
-                    .Return(fixture.CreateAnonymous<string>())
+                    .Return(fixture.Create<string>())
                     .Repeat.Any();
             }
             var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
@@ -267,10 +267,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
                 .Return(brugere);
             fixture.Inject(kalenderRepository);
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
-            var brugerliste = queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
+            var brugerliste = queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
                                                                               brugere.ElementAt(1).Initialer);
             Assert.That(brugerliste, Is.Not.Null);
             Assert.That(brugerliste.Count(), Is.EqualTo(1));
@@ -290,7 +290,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var system = MockRepository.GenerateMock<ISystem>();
             system.Expect(m => m.Nummer)
-                .Return(fixture.CreateAnonymous<int>())
+                .Return(fixture.Create<int>())
                 .Repeat.Any();
             fixture.Inject(system);
 
@@ -299,7 +299,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             foreach (var bruger in brugere)
             {
                 bruger.Expect(m => m.Initialer)
-                    .Return(fixture.CreateAnonymous<string>())
+                    .Return(fixture.Create<string>())
                     .Repeat.Any();
             }
             var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
@@ -307,13 +307,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
                 .Return(brugere);
             fixture.Inject(kalenderRepository);
 
-            var queryHandler = fixture.CreateAnonymous<MyKalenderQueryHandler>();
+            var queryHandler = fixture.Create<MyKalenderQueryHandler>();
             Assert.That(queryHandler, Is.Not.Null);
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.CreateAnonymous<ISystem>(),
-                                                                fixture.CreateAnonymous<string>()));
+                queryHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
+                                                                fixture.Create<string>()));
 
             kalenderRepository.AssertWasCalled(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(system.Nummer)));
         }

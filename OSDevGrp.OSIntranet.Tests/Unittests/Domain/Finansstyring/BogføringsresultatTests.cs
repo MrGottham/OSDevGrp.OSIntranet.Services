@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
         public void TestAtConstructorKasterIntranetSystemExceptionHvisKontoPåBogføringslinjenErNull()
         {
             var fixture = new Fixture();
-            var bogføringslinje = fixture.CreateAnonymous<Bogføringslinje>();
+            var bogføringslinje = fixture.Create<Bogføringslinje>();
             Assert.Throws<IntranetSystemException>(() => new Bogføringsresultat(bogføringslinje));
         }
 
@@ -44,10 +44,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
         {
             var fixture = new Fixture();
             
-            var bogføringslinje = fixture.CreateAnonymous<Bogføringslinje>();
+            var bogføringslinje = fixture.Create<Bogføringslinje>();
             Assert.That(bogføringslinje, Is.Not.Null);
 
-            var konto = fixture.CreateAnonymous<Konto>();
+            var konto = fixture.Create<Konto>();
             Assert.That(konto, Is.Not.Null);
             konto.TilføjBogføringslinje(bogføringslinje);
 
@@ -68,19 +68,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
             var fixture = new Fixture();
             fixture.Inject(DateTime.Now);
 
-            var konto = fixture.CreateAnonymous<Konto>();
+            var loebenr = fixture.Create<int>();
+            var konto = fixture.Create<Konto>();
             Assert.That(konto, Is.Not.Null);
-            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.CreateAnonymous<DateTime>().Year,
-                                                                fixture.CreateAnonymous<DateTime>().Month, 50000M));
-            konto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(), 0M, 48000M));
+            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 50000M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(loebenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 48000M));
 
-            var bogføringslinje = new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                      fixture.CreateAnonymous<DateTime>(),
-                                                      fixture.CreateAnonymous<string>(),
-                                                      fixture.CreateAnonymous<string>(), 0M, 5000M);
+            var bogføringslinje = new Bogføringslinje(loebenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 5000M);
             Assert.That(bogføringslinje, Is.Not.Null);
             konto.TilføjBogføringslinje(bogføringslinje);
 
@@ -109,25 +103,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
             var fixture = new Fixture();
             fixture.Inject(DateTime.Now);
 
-            var konto = fixture.CreateAnonymous<Konto>();
+            var loebenr = fixture.Create<int>();
+            var konto = fixture.Create<Konto>();
             Assert.That(konto, Is.Not.Null);
-            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.CreateAnonymous<DateTime>().Year,
-                                                                fixture.CreateAnonymous<DateTime>().Month, 50000M));
-            konto.TilføjBogføringslinje(new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                            fixture.CreateAnonymous<DateTime>(),
-                                                            fixture.CreateAnonymous<string>(),
-                                                            fixture.CreateAnonymous<string>(), 0M, 25000M));
+            konto.TilføjKreditoplysninger(new Kreditoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 50000M));
+            konto.TilføjBogføringslinje(new Bogføringslinje(loebenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 25000M));
 
-            var budgetkonto = fixture.CreateAnonymous<Budgetkonto>();
+            var budgetkonto = fixture.Create<Budgetkonto>();
             Assert.That(budgetkonto, Is.Not.Null);
-            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.CreateAnonymous<DateTime>().Year,
-                                                                      fixture.CreateAnonymous<DateTime>().Month, 0M,
-                                                                      3000M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 0M, 3000M));
 
-            var bogføringslinje = new Bogføringslinje(fixture.CreateAnonymous<int>(),
-                                                      fixture.CreateAnonymous<DateTime>(),
-                                                      fixture.CreateAnonymous<string>(),
-                                                      fixture.CreateAnonymous<string>(), 0M, 5000M);
+            var bogføringslinje = new Bogføringslinje(loebenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, 5000M);
             Assert.That(bogføringslinje, Is.Not.Null);
             konto.TilføjBogføringslinje(bogføringslinje);
             budgetkonto.TilføjBogføringslinje(bogføringslinje);
