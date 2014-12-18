@@ -853,36 +853,61 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
+            var budgetThisMonth = fixture.Create<decimal>();
+            var bogførtLinje1ThisMonth = fixture.Create<decimal>();
+            var bogførtLinje2ThisMonth = fixture.Create<decimal>();
+
+            var budgetLastMonth = fixture.Create<decimal>();
+            var bogførtLinje1LastMonth = fixture.Create<decimal>();
+            var bogførtLinje2LastMonth = fixture.Create<decimal>();
+
+            var budgetPrevYearSameMonth = fixture.Create<decimal>();
+            var bogførtLinje1PrevYearSameMonth = fixture.Create<decimal>();
+            var bogførtLinje2PrevYearSameMonth = fixture.Create<decimal>();
+
+            var budgetPrevYearPrevMonth = fixture.Create<decimal>();
+            var bogførtLinje1PrevYearPrevMonth = fixture.Create<decimal>();
+            var bogførtLinje2PrevYearPrevMonth = fixture.Create<decimal>();
+
             var minLobenr = fixture.Create<int>();
             var budgetkonto = fixture.Create<Budgetkonto>();
             budgetkonto.SætBeskrivelse(fixture.Create<string>());
             budgetkonto.SætNote(fixture.Create<string>());
-            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 15000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 10000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 4000M, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, budgetThisMonth, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().AddMonths(-1).Year, fixture.Create<DateTime>().AddMonths(-1).Month, budgetLastMonth, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().AddYears(-1).Year, fixture.Create<DateTime>().AddYears(-1).Month, budgetPrevYearSameMonth, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().AddYears(-1).AddMonths(-1).Year, fixture.Create<DateTime>().AddYears(-1).AddMonths(-1).Month, budgetPrevYearPrevMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 7, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1ThisMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 6, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2ThisMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 5, fixture.Create<DateTime>().AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1LastMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 4, fixture.Create<DateTime>().AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2LastMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 3, fixture.Create<DateTime>().AddYears(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1PrevYearSameMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 2, fixture.Create<DateTime>().AddYears(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2PrevYearSameMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>().AddYears(-1).AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1PrevYearPrevMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>().AddYears(-1).AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2PrevYearPrevMonth, 0M));
             budgetkonto.Calculate(fixture.Create<DateTime>());
 
-            var bugetkontoplanView = objectMapper.Map<Budgetkonto, BudgetkontoplanView>(budgetkonto);
-            Assert.That(bugetkontoplanView, Is.Not.Null);
-            Assert.That(bugetkontoplanView.Regnskab, Is.Not.Null);
-            Assert.That(bugetkontoplanView.Kontonummer, Is.Not.Null);
-            Assert.That(bugetkontoplanView.Kontonummer, Is.EqualTo(budgetkonto.Kontonummer));
-            Assert.That(bugetkontoplanView.Kontonavn, Is.Not.Null);
-            Assert.That(bugetkontoplanView.Kontonavn, Is.EqualTo(budgetkonto.Kontonavn));
-            Assert.That(bugetkontoplanView.Beskrivelse, Is.Not.Null);
-            Assert.That(bugetkontoplanView.Beskrivelse, Is.EqualTo(budgetkonto.Beskrivelse));
-            Assert.That(bugetkontoplanView.Notat, Is.Not.Null);
-            Assert.That(bugetkontoplanView.Notat, Is.EqualTo(budgetkonto.Note));
-            Assert.That(bugetkontoplanView.Budgetkontogruppe, Is.Not.Null);
-            Assert.That(bugetkontoplanView.Budget, Is.EqualTo(15000M));
-            Assert.That(bugetkontoplanView.BudgetSidsteMåned, Is.EqualTo(0M));
-            Assert.That(bugetkontoplanView.BudgetÅrTilDato, Is.EqualTo(0M));
-            Assert.That(bugetkontoplanView.BudgetSidsteÅr, Is.EqualTo(0M));
-            Assert.That(bugetkontoplanView.Bogført, Is.EqualTo(14000M));
-            Assert.That(bugetkontoplanView.BogførtSidsteMåned, Is.EqualTo(0M));
-            Assert.That(bugetkontoplanView.BogførtÅrTilDato, Is.EqualTo(0M));
-            Assert.That(bugetkontoplanView.BogførtSidsteÅr, Is.EqualTo(0M));
-            Assert.That(bugetkontoplanView.Disponibel, Is.EqualTo(0M));
+            var budgetkontoplanView = objectMapper.Map<Budgetkonto, BudgetkontoplanView>(budgetkonto);
+            Assert.That(budgetkontoplanView, Is.Not.Null);
+            Assert.That(budgetkontoplanView.Regnskab, Is.Not.Null);
+            Assert.That(budgetkontoplanView.Kontonummer, Is.Not.Null);
+            Assert.That(budgetkontoplanView.Kontonummer, Is.EqualTo(budgetkonto.Kontonummer));
+            Assert.That(budgetkontoplanView.Kontonavn, Is.Not.Null);
+            Assert.That(budgetkontoplanView.Kontonavn, Is.EqualTo(budgetkonto.Kontonavn));
+            Assert.That(budgetkontoplanView.Beskrivelse, Is.Not.Null);
+            Assert.That(budgetkontoplanView.Beskrivelse, Is.EqualTo(budgetkonto.Beskrivelse));
+            Assert.That(budgetkontoplanView.Notat, Is.Not.Null);
+            Assert.That(budgetkontoplanView.Notat, Is.EqualTo(budgetkonto.Note));
+            Assert.That(budgetkontoplanView.Budgetkontogruppe, Is.Not.Null);
+            Assert.That(budgetkontoplanView.Budget, Is.EqualTo(budgetThisMonth));
+            Assert.That(budgetkontoplanView.BudgetSidsteMåned, Is.EqualTo(budgetLastMonth));
+            Assert.That(budgetkontoplanView.BudgetÅrTilDato, Is.EqualTo(budgetThisMonth + budgetLastMonth));
+            Assert.That(budgetkontoplanView.BudgetSidsteÅr, Is.EqualTo(budgetPrevYearSameMonth + budgetPrevYearPrevMonth));
+            Assert.That(budgetkontoplanView.Bogført, Is.EqualTo(bogførtLinje1ThisMonth + bogførtLinje2ThisMonth));
+            Assert.That(budgetkontoplanView.BogførtSidsteMåned, Is.EqualTo(bogførtLinje1LastMonth + bogførtLinje2LastMonth));
+            Assert.That(budgetkontoplanView.BogførtÅrTilDato, Is.EqualTo(bogførtLinje1ThisMonth + bogførtLinje2ThisMonth + bogførtLinje1LastMonth + bogførtLinje2LastMonth));
+            Assert.That(budgetkontoplanView.BogførtSidsteÅr, Is.EqualTo(bogførtLinje1PrevYearSameMonth + bogførtLinje2PrevYearSameMonth + bogførtLinje1PrevYearPrevMonth + bogførtLinje2PrevYearPrevMonth));
+            Assert.That(budgetkontoplanView.Disponibel, Is.EqualTo(0M));
         }
 
         /// <summary>
@@ -897,13 +922,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
+            var budgetThisMonth = fixture.Create<decimal>();
+            var bogførtLinje1ThisMonth = fixture.Create<decimal>();
+            var bogførtLinje2ThisMonth = fixture.Create<decimal>();
+
+            var budgetLastMonth = fixture.Create<decimal>();
+            var bogførtLinje1LastMonth = fixture.Create<decimal>();
+            var bogførtLinje2LastMonth = fixture.Create<decimal>();
+
+            var budgetPrevYearSameMonth = fixture.Create<decimal>();
+            var bogførtLinje1PrevYearSameMonth = fixture.Create<decimal>();
+            var bogførtLinje2PrevYearSameMonth = fixture.Create<decimal>();
+
+            var budgetPrevYearPrevMonth = fixture.Create<decimal>();
+            var bogførtLinje1PrevYearPrevMonth = fixture.Create<decimal>();
+            var bogførtLinje2PrevYearPrevMonth = fixture.Create<decimal>();
+
             var minLobenr = fixture.Create<int>();
             var budgetkonto = fixture.Create<Budgetkonto>();
             budgetkonto.SætBeskrivelse(fixture.Create<string>());
             budgetkonto.SætNote(fixture.Create<string>());
-            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, 15000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 10000M, 0M));
-            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 4000M, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().Year, fixture.Create<DateTime>().Month, budgetThisMonth, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().AddMonths(-1).Year, fixture.Create<DateTime>().AddMonths(-1).Month, budgetLastMonth, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().AddYears(-1).Year, fixture.Create<DateTime>().AddYears(-1).Month, budgetPrevYearSameMonth, 0M));
+            budgetkonto.TilføjBudgetoplysninger(new Budgetoplysninger(fixture.Create<DateTime>().AddYears(-1).AddMonths(-1).Year, fixture.Create<DateTime>().AddYears(-1).AddMonths(-1).Month, budgetPrevYearPrevMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 7, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1ThisMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 6, fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2ThisMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 5, fixture.Create<DateTime>().AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1LastMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 4, fixture.Create<DateTime>().AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2LastMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 3, fixture.Create<DateTime>().AddYears(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1PrevYearSameMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 2, fixture.Create<DateTime>().AddYears(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2PrevYearSameMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr + 1, fixture.Create<DateTime>().AddYears(-1).AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje1PrevYearPrevMonth, 0M));
+            budgetkonto.TilføjBogføringslinje(new Bogføringslinje(minLobenr, fixture.Create<DateTime>().AddYears(-1).AddMonths(-1), fixture.Create<string>(), fixture.Create<string>(), bogførtLinje2PrevYearPrevMonth, 0M));
             budgetkonto.Calculate(fixture.Create<DateTime>());
 
             var budgetkontoView = objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
@@ -918,17 +968,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(budgetkontoView.Notat, Is.Not.Null);
             Assert.That(budgetkontoView.Notat, Is.EqualTo(budgetkonto.Note));
             Assert.That(budgetkontoView.Budgetkontogruppe, Is.Not.Null);
-            Assert.That(budgetkontoView.Budget, Is.EqualTo(15000M));
-            Assert.That(budgetkontoView.BudgetSidsteMåned, Is.EqualTo(0M));
-            Assert.That(budgetkontoView.BudgetÅrTilDato, Is.EqualTo(0M));
-            Assert.That(budgetkontoView.BudgetSidsteÅr, Is.EqualTo(0M));
-            Assert.That(budgetkontoView.Bogført, Is.EqualTo(14000M));
-            Assert.That(budgetkontoView.BogførtSidsteMåned, Is.EqualTo(0M));
-            Assert.That(budgetkontoView.BogførtÅrTilDato, Is.EqualTo(0M));
-            Assert.That(budgetkontoView.BogførtSidsteÅr, Is.EqualTo(0M));
+            Assert.That(budgetkontoView.Budget, Is.EqualTo(budgetThisMonth));
+            Assert.That(budgetkontoView.BudgetSidsteMåned, Is.EqualTo(budgetLastMonth));
+            Assert.That(budgetkontoView.BudgetÅrTilDato, Is.EqualTo(budgetThisMonth + budgetLastMonth));
+            Assert.That(budgetkontoView.BudgetSidsteÅr, Is.EqualTo(budgetPrevYearSameMonth + budgetPrevYearPrevMonth));
+            Assert.That(budgetkontoView.Bogført, Is.EqualTo(bogførtLinje1ThisMonth + bogførtLinje2ThisMonth));
+            Assert.That(budgetkontoView.BogførtSidsteMåned, Is.EqualTo(bogførtLinje1LastMonth + bogførtLinje2LastMonth));
+            Assert.That(budgetkontoView.BogførtÅrTilDato, Is.EqualTo(bogførtLinje1ThisMonth + bogførtLinje2ThisMonth + bogførtLinje1LastMonth + bogførtLinje2LastMonth));
+            Assert.That(budgetkontoView.BogførtSidsteÅr, Is.EqualTo(bogførtLinje1PrevYearSameMonth + bogførtLinje2PrevYearSameMonth + bogførtLinje1PrevYearPrevMonth + bogførtLinje2PrevYearPrevMonth));
             Assert.That(budgetkontoView.Disponibel, Is.EqualTo(0M));
             Assert.That(budgetkontoView.Budgetoplysninger, Is.Not.Null);
-            Assert.That(budgetkontoView.Budgetoplysninger.Count(), Is.EqualTo(1));
+            Assert.That(budgetkontoView.Budgetoplysninger.Count(), Is.EqualTo(4));
         }
 
         /// <summary>
