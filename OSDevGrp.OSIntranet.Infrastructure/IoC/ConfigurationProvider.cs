@@ -7,6 +7,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.Windsor;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories;
+using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 
@@ -17,6 +18,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
     /// </summary>
     public class ConfigurationProvider : IConfigurationProvider
     {
+        #region Private constants
+
+        private const string MySqlDataProviderConnectionStringSettingsName = "OSDevGrp.OSIntranet.Repositories.DataProviders.MySqlDataProvider";
+        private const string FoodWasteProviderConnectionStringSettingsName = "OSDevGrp.OSIntranet.Repositories.DataProviders.FoodWasteDataProvider";
+
+        #endregion
+
         #region IConfigurationProvider Members
 
         /// <summary>
@@ -33,7 +41,8 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);
             container.Register(Component.For<IKonfigurationRepository>().Instance(konfigurationRepository).LifeStyle.Transient);
 
-            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IDataProviderBase)).WithService.FromInterface(typeof (IDataProviderBase)));
+            container.Register(Component.For<IMySqlDataProvider>().Instance(new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName])).LifeStyle.Transient);
+            container.Register(Component.For<IFoodWasteDataProvider>().Instance(new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteProviderConnectionStringSettingsName])).LifeStyle.Transient);
 
             container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)));
 

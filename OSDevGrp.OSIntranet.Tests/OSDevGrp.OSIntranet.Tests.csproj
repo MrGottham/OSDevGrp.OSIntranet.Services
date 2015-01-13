@@ -105,6 +105,7 @@
       <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
@@ -115,6 +116,7 @@
   <ItemGroup>
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
+    <Compile Include="Integrationstests\Repositories\FoodWaste\SystemDataRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\KalenderRepositoryTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
@@ -258,14 +260,17 @@
     <Compile Include="Unittests\QueryHandlers\TelefonlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseBaseTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProviders\FoodWasteDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\DataProxyHelperTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\TranslationInfoProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Fælles\SystemProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\AftaleProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugeraftaleProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugerProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
+    <Compile Include="Unittests\Repositories\FoodWaste\SystemDataRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\KalenderRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />

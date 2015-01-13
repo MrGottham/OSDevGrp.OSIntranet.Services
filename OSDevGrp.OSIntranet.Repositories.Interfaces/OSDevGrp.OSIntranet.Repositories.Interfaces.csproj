@@ -52,7 +52,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataProviders\IFoodWasteDataProvider.cs" />
     <Compile Include="DataProviders\IMySqlDataProvider.cs" />
+    <Compile Include="DataProxies\FoodWaste\ITranslationInfoProxy.cs" />
     <Compile Include="DataProxies\Fælles\ISystemProxy.cs" />
     <Compile Include="DataProxies\IDataProxyBase.cs" />
     <Compile Include="DataProxies\ILazyLoadable.cs" />
@@ -60,6 +62,7 @@
     <Compile Include="DataProxies\Kalender\IAftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\IBrugeraftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\IBrugerProxy.cs" />
+    <Compile Include="FoodWaste\ISystemDataRepository.cs" />
     <Compile Include="IAdresseRepository.cs" />
     <Compile Include="DataProviders\IDataProviderBase.cs" />
     <Compile Include="IDomainObjectBuilder.cs" />

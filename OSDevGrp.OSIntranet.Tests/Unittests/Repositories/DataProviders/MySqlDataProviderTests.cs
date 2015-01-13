@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
@@ -16,6 +18,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
     [TestFixture]
     public class MySqlDataProviderTests
     {
+        #region Private constants
+
+        private const string MySqlDataProviderConnectionStringSettingsName = "OSDevGrp.OSIntranet.Repositories.DataProviders.MySqlDataProvider";
+
+        #endregion
+
         /// <summary>
         /// Egen data proxy til test af data provider, som benytter MySql.
         /// </summary>
@@ -65,7 +73,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 get
                 {
-                    return SystemNo.ToString();
+                    return SystemNo.ToString(CultureInfo.InvariantCulture);
                 }
             }
 
@@ -87,11 +95,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 var fixture = new Fixture();
                 var dateTime = DateTime.Now;
-                return
-                    string.Format(
-                        "INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,'{0}','{1}','{2}','{3}')",
-                        dateTime.ToString("yyyy-MM-dd"), dateTime.ToString("HH:mm:ss"),
-                        dateTime.AddMinutes(15).ToString("HH:mm:ss"), fixture.Create<string>());
+                return string.Format("INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,'{0}','{1}','{2}','{3}')", dateTime.ToString("yyyy-MM-dd"), dateTime.ToString("HH:mm:ss"), dateTime.AddMinutes(15).ToString("HH:mm:ss"), fixture.Create<string>());
             }
 
             /// <summary>
@@ -101,8 +105,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             public string GetSqlCommandForUpdate()
             {
                 var fixture = new Fixture();
-                return string.Format("UPDATE Calapps SET Subject='{0}' WHERE SystemNo=1 AND CalId=77777",
-                                     fixture.Create<string>());
+                return string.Format("UPDATE Calapps SET Subject='{0}' WHERE SystemNo=1 AND CalId=77777", fixture.Create<string>());
             }
 
             /// <summary>
@@ -123,12 +126,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtConstructorInitiererMySqlDataProvider()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
             }
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis konfigurationen til connection streng er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisConnectionStringSettingsErNull()
+        {
+            var exception = Assert.Throws<ArgumentNullException>(() => new MySqlDataProvider(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("connectionStringSettings"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -137,9 +152,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtCloneInitiererNyMySqlDataProvider()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -156,9 +169,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetCollectionKasterArgumenutNullExceptionHvisQueryErNull()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -172,9 +183,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetCollectionHenterDataProxies()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -190,9 +199,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetCollectionKasterArgumenutNullExceptionHvisQueryErEmpty()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -208,7 +215,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -222,9 +229,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetHenterDataProxy()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -245,9 +250,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetKasterArgumenutNullExceptionHvisQueryForDataProxyErNull()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -261,9 +264,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetKasterIntranetRepositoryExceptionHvisIdIkkeFindes()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -282,7 +283,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -302,9 +303,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtAddKasterArgumenutNullExceptionHvisDataProxyErNull()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -320,7 +319,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -344,7 +343,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -367,9 +366,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtSaveKasterArgumenutNullExceptionHvisDataProxyErNull()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -385,7 +382,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         {
             var fixture = new Fixture();
 
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 
@@ -405,9 +402,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtDeleteKasterArgumenutNullExceptionHvisDataProxyErNull()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = fixture.Create<MySqlDataProvider>())
+            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
             {
                 Assert.That(mySqlDataProvider, Is.Not.Null);
 

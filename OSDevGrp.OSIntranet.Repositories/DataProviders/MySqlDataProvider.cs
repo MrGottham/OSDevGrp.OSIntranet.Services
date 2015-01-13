@@ -16,7 +16,26 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
     {
         #region Private variables
 
-        private readonly MySqlConnection _mySqlConnection = new MySqlConnection(ConfigurationManager.ConnectionStrings["OSDevGrp.OSIntranet.Repositories.DataProviders.MySqlDataProvider"].ConnectionString);
+        private readonly ConnectionStringSettings _connectionStringSettings;
+        private readonly MySqlConnection _mySqlConnection;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Danner en data provider, som benytter MySql.
+        /// </summary>
+        /// <param name="connectionStringSettings">Konfiguration for en connection streng.</param>
+        public MySqlDataProvider(ConnectionStringSettings connectionStringSettings)
+        {
+            if (connectionStringSettings == null)
+            {
+                throw new ArgumentNullException("connectionStringSettings");
+            }
+            _connectionStringSettings = connectionStringSettings;
+            _mySqlConnection = new MySqlConnection(_connectionStringSettings.ConnectionString);
+        }
 
         #endregion
 
@@ -36,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <returns>Ny instans af data provideren til MSql.</returns>
         public override object Clone()
         {
-            return new MySqlDataProvider();
+            return new MySqlDataProvider(_connectionStringSettings);
         }
 
         /// <summary>

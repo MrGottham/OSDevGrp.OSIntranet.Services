@@ -50,22 +50,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         public void TestAtQueryHenterBogføringslinjer()
         {
             var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
 
             var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(3))
             {
                 regnskab.TilføjKonto(konto);
-                foreach (var bogføringslinje in fixture.CreateMany<Bogføringslinje>(25))
+                while (konto.Bogføringslinjer.Count() < 25)
                 {
+                    var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), DateTime.Now.AddDays(random.Next(0, 365)*-1), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
                     konto.TilføjBogføringslinje(bogføringslinje);
                 }
             }
             
             var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
+            finansstyringRepository.Expect(m => m.RegnskabGet(Arg<int>.Is.Anything, Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
                 .Return(regnskab);
             var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
             adresseRepository.Expect(m => m.AdresseGetAll())
@@ -95,10 +94,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             Assert.That(bogføringslinjer, Is.Not.Null);
             Assert.That(bogføringslinjer.Count(), Is.EqualTo(query.Linjer));
 
-            finansstyringRepository.AssertWasCalled(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(query.Regnskabsnummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull));
+            finansstyringRepository.AssertWasCalled(m => m.RegnskabGet(Arg<int>.Is.Equal(query.Regnskabsnummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull));
             adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
             fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
         }

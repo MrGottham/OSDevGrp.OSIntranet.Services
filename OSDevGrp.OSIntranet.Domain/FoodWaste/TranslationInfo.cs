@@ -11,12 +11,19 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
     {
         #region Private variables
 
-        private readonly string _cultureName;
-        private readonly CultureInfo _cultureInfo;
+        private string _cultureName;
+        private CultureInfo _cultureInfo;
 
         #endregion
 
-        #region Constructor
+        #region Constructors
+
+        /// <summary>
+        /// Default constructor used by the data providers.
+        /// </summary>
+        protected TranslationInfo()
+        {
+        }
 
         /// <summary>
         /// Create translation information which are used for translation for a given culture.
@@ -42,6 +49,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         public virtual string CultureName
         {
             get { return _cultureName; }
+            protected set { _cultureName = value; }
         }
 
         /// <summary>
@@ -50,6 +58,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         public virtual CultureInfo CultureInfo
         {
             get { return _cultureInfo; }
+            protected set { _cultureInfo = value; }
         }
 
         #endregion
