@@ -11,7 +11,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Properties
 
         /// <summary>
-        /// Get or sets the identfier for the domain object in the food wast domain.
+        /// Gets or sets the identifier for the domain object in the food wast domain.
         /// </summary>
         public virtual Guid? Identifier
         {

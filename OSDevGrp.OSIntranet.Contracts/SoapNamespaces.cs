@@ -12,6 +12,11 @@
         public const string IntranetNamespace = "urn:osdevgrp:osintranet:1.0.0";
 
         /// <summary>
+        /// Namespace for commands, queries, view etc. used by food waste services.
+        /// </summary>
+        public const string FoodWasteNamespace = "urn:osdevgrp:foodwaste:1.0.0";
+
+        /// <summary>
         /// Navn på service til adressekartotek.
         /// </summary>
         public const string AdressekartotekServiceName = "AdressekartotekService";

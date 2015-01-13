@@ -128,6 +128,7 @@
     <Compile Include="Views\SystemView.cs" />
     <Compile Include="Views\TabelView.cs" />
     <Compile Include="Views\TelefonlisteView.cs" />
+    <Compile Include="Views\TranslationInfoSystemView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />
