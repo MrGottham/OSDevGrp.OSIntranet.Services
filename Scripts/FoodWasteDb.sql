@@ -3,4 +3,8 @@
 	CultureName VARCHAR(5) NOT NULL,
 	PRIMARY KEY (TranslationInfoIdentifier)
 );
-CREATE UNIQUE INDEX IF NOT EXISTS IX_TranslationInfos_CultureName ON TranslationInfos (CultureName);
+IF SELECT COUNT(*) FROM information_schema.X WHERE X=DATABASE() THEN
+BEGIN
+	CREATE UNIQUE INDEX IF NOT EXISTS IX_TranslationInfos_CultureName ON TranslationInfos (CultureName);
+END IF;
+
