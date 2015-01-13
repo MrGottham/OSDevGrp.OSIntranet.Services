@@ -60,6 +60,9 @@
     <Compile Include="Finansstyring\IBudgetkontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IKontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />
+    <Compile Include="FoodWaste\IDomainObject.cs" />
+    <Compile Include="FoodWaste\IIdentifiable.cs" />
+    <Compile Include="FoodWaste\ITranslationInfo.cs" />
     <Compile Include="Fælles\IBrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\ISystem.cs" />
     <Compile Include="Fælles\ISystemlisteHelper.cs" />

@@ -206,6 +206,9 @@
     <Compile Include="Unittests\Domain\Finansstyring\BudgetkontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\DomainObjectBaseTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\BrevhovedlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemTests.cs" />
