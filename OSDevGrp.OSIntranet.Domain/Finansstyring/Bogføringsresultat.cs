@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Domain.Finansstyring
                 return;
             }
             _bogføringslinje.Budgetkonto.Calculate(_bogføringslinje.Dato, _bogføringslinje.Løbenummer);
-            if (_bogføringslinje.Budgetkonto.BudgetPrStatusdato < 0M && _bogføringslinje.Budgetkonto.DisponibelPrStatusdato < 0M)
+            if (_bogføringslinje.Kredit != 0M && _bogføringslinje.Budgetkonto.BudgetPrStatusdato <= 0M && _bogføringslinje.Budgetkonto.DisponibelPrStatusdato < 0M)
             {
                 _advarsler.Add(new Bogføringsadvarsel(Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn), _bogføringslinje.Budgetkonto, Math.Abs(_bogføringslinje.Budgetkonto.DisponibelPrStatusdato)));
             }
