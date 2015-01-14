@@ -140,6 +140,10 @@
       <Project>{C16F65E1-A789-4BA4-9713-CA84B34ECBD8}</Project>
       <Name>OSDevGrp.OSIntranet.Repositories</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Security\OSDevGrp.OSIntranet.Security.csproj">
+      <Project>{4d0f45a5-5620-4a70-ad26-515dbd872998}</Project>
+      <Name>OSDevGrp.OSIntranet.Security</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

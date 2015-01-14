@@ -263,6 +263,7 @@
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\SystemerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\TelefonlisteGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\TranslationInfoCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseBaseTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\FoodWasteDataProviderTests.cs" />
@@ -334,6 +335,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Resources\OSDevGrp.OSIntranet.Resources.csproj">
       <Project>{EC187CDE-4BB1-4B84-8AAE-1CE461296611}</Project>
       <Name>OSDevGrp.OSIntranet.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Security\OSDevGrp.OSIntranet.Security.csproj">
+      <Project>{4d0f45a5-5620-4a70-ad26-515dbd872998}</Project>
+      <Name>OSDevGrp.OSIntranet.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Services\OSDevGrp.OSIntranet.Services.csproj">
       <Project>{46A9F437-6741-4CB8-B2F5-CFF0A8272C0F}</Project>

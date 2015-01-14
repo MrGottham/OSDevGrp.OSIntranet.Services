@@ -89,6 +89,7 @@
     <Compile Include="RegnskabslisteGetQueryHandler.cs" />
     <Compile Include="SystemerGetQueryHandler.cs" />
     <Compile Include="TelefonlisteGetQueryHandler.cs" />
+    <Compile Include="TranslationInfoCollectionGetQueryHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />

@@ -105,6 +105,10 @@
       <Project>{E510F652-6E85-402E-9EFF-474841121181}</Project>
       <Name>OSDevGrp.OSIntranet.Infrastructure.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.QueryHandlers\OSDevGrp.OSIntranet.QueryHandlers.csproj">
+      <Project>{821c03bd-0315-4084-804e-c3bd4590e73f}</Project>
+      <Name>OSDevGrp.OSIntranet.QueryHandlers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Repositories.Interfaces\OSDevGrp.OSIntranet.Repositories.Interfaces.csproj">
       <Project>{4775A5D7-009A-4B8D-A9DE-0CEBDFCC1535}</Project>
       <Name>OSDevGrp.OSIntranet.Repositories.Interfaces</Name>
@@ -116,6 +120,10 @@
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Resources\OSDevGrp.OSIntranet.Resources.csproj">
       <Project>{EC187CDE-4BB1-4B84-8AAE-1CE461296611}</Project>
       <Name>OSDevGrp.OSIntranet.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OSDevGrp.OSIntranet.Security\OSDevGrp.OSIntranet.Security.csproj">
+      <Project>{4d0f45a5-5620-4a70-ad26-515dbd872998}</Project>
+      <Name>OSDevGrp.OSIntranet.Security</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
