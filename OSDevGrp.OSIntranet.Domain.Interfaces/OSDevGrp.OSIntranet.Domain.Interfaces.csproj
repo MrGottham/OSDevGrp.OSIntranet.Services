@@ -61,7 +61,9 @@
     <Compile Include="Finansstyring\IKontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />
     <Compile Include="FoodWaste\IDomainObject.cs" />
+    <Compile Include="FoodWaste\IFoodGroup.cs" />
     <Compile Include="FoodWaste\IIdentifiable.cs" />
+    <Compile Include="FoodWaste\ITranslatable.cs" />
     <Compile Include="FoodWaste\ITranslationInfo.cs" />
     <Compile Include="Fælles\IBrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\ISystem.cs" />

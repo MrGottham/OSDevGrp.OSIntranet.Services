@@ -167,6 +167,7 @@
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\SystemerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\TelefonlisteGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\TranslationInfoCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringsadvarselResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringslinjeOpretResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressegruppeViewTests.cs" />
@@ -210,7 +211,9 @@
     <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectBaseTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\DomainObjectMockBuilder.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\BrevhovedlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemlisteHelperTests.cs" />
@@ -222,6 +225,7 @@
     <Compile Include="Unittests\Domain\Kalender\BrugerlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\BrugerTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
+    <Compile Include="Unittests\Infrastructure\FoodWasteObjectMapperTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetBusinessExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />

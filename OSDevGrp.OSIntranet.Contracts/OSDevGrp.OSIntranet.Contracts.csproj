@@ -87,6 +87,7 @@
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Queries\SystemerGetQuery.cs" />
     <Compile Include="Queries\TelefonlisteGetQuery.cs" />
+    <Compile Include="Queries\TranslationInfoCollectionGetQuery.cs" />
     <Compile Include="Responses\BogføringsadvarselResponse.cs" />
     <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
     <Compile Include="Services\IAdressekartotekService.cs" />

@@ -52,13 +52,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
 
+            var statusDate = fixture.Create<DateTime>();
             var regnskab = fixture.Create<Regnskab>();
             foreach (var konto in fixture.CreateMany<Konto>(3))
             {
                 regnskab.TilføjKonto(konto);
                 while (konto.Bogføringslinjer.Count() < 25)
                 {
-                    var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), DateTime.Now.AddDays(random.Next(0, 365)*-1), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
+                    var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), statusDate.AddDays(random.Next(0, 365) * -1), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
                     konto.TilføjBogføringslinje(bogføringslinje);
                 }
             }
@@ -87,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             var query = new BogføringerGetQuery
                             {
                                 Regnskabsnummer = regnskab.Nummer,
-                                StatusDato = fixture.Create<DateTime>(),
+                                StatusDato = statusDate,
                                 Linjer = 30
                             };
             var bogføringslinjer = queryHandler.Query(query);

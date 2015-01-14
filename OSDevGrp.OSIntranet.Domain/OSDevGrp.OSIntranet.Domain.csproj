@@ -66,6 +66,7 @@
     <Compile Include="Finansstyring\RegnskabslisteHelper.cs" />
     <Compile Include="FoodWaste\DomainObjectBase.cs" />
     <Compile Include="FoodWaste\IdentifiableBase.cs" />
+    <Compile Include="FoodWaste\TranslatableBase.cs" />
     <Compile Include="FoodWaste\TranslationInfo.cs" />
     <Compile Include="Fælles\BrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\System.cs" />

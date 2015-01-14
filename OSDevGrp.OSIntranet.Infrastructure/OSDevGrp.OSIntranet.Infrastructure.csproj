@@ -83,6 +83,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FoodWasteObjectMapper.cs" />
     <Compile Include="IoC\ConfigurationProvider.cs" />
     <Compile Include="ObjectMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
