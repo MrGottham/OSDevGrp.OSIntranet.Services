@@ -17,10 +17,12 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
     {
         #region Private variables
 
-        //private readonly ICommandBus _commandBus;
-        //private readonly IQueryBus _queryBus;
+        private readonly ICommandBus _commandBus;
+        private readonly IQueryBus _queryBus;
 
         #endregion
+
+        #region Constructor
 
         /// <summary>
         /// Creates a service which can access and modify system data in the food waste domain.
@@ -29,8 +31,19 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <param name="queryBus">Implementation of the query bus.</param>
         public FoodWasteSystemDataService(ICommandBus commandBus, IQueryBus queryBus)
         {
-            
+            if (commandBus == null)
+            {
+                throw new ArgumentNullException("commandBus");
+            }
+            if (queryBus == null)
+            {
+                throw new ArgumentNullException("queryBus");
+            }
+            _commandBus = commandBus;
+            _queryBus = queryBus;
         }
+
+        #endregion
 
         #region Methods
 
