@@ -61,6 +61,9 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\External references\Castle.Windsor.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.IdentityModel">
+      <HintPath>..\packages\Microsoft.IdentityModel.6.1.7600.16394\lib\net35\Microsoft.IdentityModel.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data">
       <HintPath>..\packages\MySql.Data.6.9.5\lib\net45\MySql.Data.dll</HintPath>
       <Private>True</Private>
