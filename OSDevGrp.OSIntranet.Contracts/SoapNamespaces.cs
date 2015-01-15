@@ -35,5 +35,10 @@
         /// Navn på service til fælles elementer.
         /// </summary>
         public const string CommonServiceName = "CommonService";
+
+        /// <summary>
+        /// Name for the service which can access and modify system data in the food waste domain.
+        /// </summary>
+        public const string FoodWasteSystemDataServiceName = "SystemDataService";
     }
 }

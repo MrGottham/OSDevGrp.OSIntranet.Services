@@ -1,0 +1,2 @@
+﻿http://msdn.microsoft.com/en-us/library/microsoft.identitymodel.securitytokenservice.securitytokenservice.aspx
+http://msdn.microsoft.com/en-us/magazine/dd347547.aspx

@@ -89,6 +89,7 @@
   <ItemGroup>
     <Content Include="commonservice.svc" />
     <Content Include="adressekartotekservice.svc" />
+    <Content Include="foodwastesystemdataservice.svc" />
     <Content Include="kalenderservice.svc" />
     <Content Include="finansstyringservice.svc" />
     <Content Include="Web.config">
@@ -105,6 +106,7 @@
     <Compile Include="Implementations\AdressekartotekService.cs" />
     <Compile Include="Implementations\CommonService.cs" />
     <Compile Include="Implementations\FinansstyringService.cs" />
+    <Compile Include="Implementations\FoodWasteSystemDataService.cs" />
     <Compile Include="Implementations\IntranetServiceBase.cs" />
     <Compile Include="Implementations\KalenderService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

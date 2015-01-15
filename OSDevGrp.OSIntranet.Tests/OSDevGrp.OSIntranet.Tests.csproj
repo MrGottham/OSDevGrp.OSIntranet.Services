@@ -137,6 +137,7 @@
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\DataContractTestHelper.cs" />
+    <Compile Include="Unittests\Contracts\Faults\FoodWasteFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetRepositoryFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
@@ -285,6 +286,7 @@
     <Compile Include="Unittests\Services\AdressekartotekServiceTests.cs" />
     <Compile Include="Unittests\Services\CommonServiceTests.cs" />
     <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />
+    <Compile Include="Unittests\Services\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Unittests\Services\IntranetServiceBaseTests.cs" />
     <Compile Include="Unittests\Services\KalenderServiceTests.cs" />
   </ItemGroup>
