@@ -83,14 +83,30 @@ namespace OSDevGrp.OSIntranet.Security.Services
         /// <returns>The claims to be included in the issued token.</returns>
         protected override IClaimsIdentity GetOutputClaimsIdentity(IClaimsPrincipal principal, RequestSecurityToken request, Scope scope)
         {
-            throw new NotImplementedException();
+            if (principal == null)
+            {
+                var argumentNullException = new ArgumentNullException("principal");
+                throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
+            }
+            if (request == null)
+            {
+                var argumentNullException = new ArgumentNullException("request");
+                throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
+            }
+            if (principal.Identities != null && principal.Identities.Any())
+            {
+                return AppendClaims(principal.Identities.First());
+            }
+            var claimsIdentity = new ClaimsIdentity();
+            claimsIdentity.Claims.Add(new Claim(ClaimTypes.Name, principal.Identity.Name));
+            return AppendClaims(claimsIdentity);
         }
 
         /// <summary>
-        /// Gets the credentials for 
+        /// Gets the credentials for the scope.
         /// </summary>
-        /// <param name="appliesTo"></param>
-        /// <returns></returns>
+        /// <param name="appliesTo">AppliesTo from the incoming RST.</param>
+        /// <returns>Credentials for the scope.</returns>
         private static X509EncryptingCredentials GetCredentialsForAppliesTo(EndpointAddress appliesTo)
         {
             if (appliesTo == null || appliesTo.Uri == null || string.IsNullOrEmpty(appliesTo.Uri.AbsolutePath))
@@ -104,32 +120,20 @@ namespace OSDevGrp.OSIntranet.Security.Services
             throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress, appliesTo.Uri.AbsoluteUri));
         }
 
-        #endregion
-
-        /*
-        public class IdentitySTS : SecurityTokenService
+        /// <summary>
+        /// Appends the claims which should be associated with the claims identify.
+        /// </summary>
+        /// <param name="claimsIdentity">Claims identity.</param>
+        /// <returns>Claims identity with associated claims.</returns>
+        private static IClaimsIdentity AppendClaims(IClaimsIdentity claimsIdentity)
         {
-            protected override IClaimsIdentity GetOutputClaimsIdentity(IClaimsPrincipal principal,
-                RequestSecurityToken request, Scope scope)
+            foreach (var claimConfigurationElement in ConfigurationProvider.Instance.ClaimCollection.OfType<ClaimConfigurationElement>().Where(claimConfigurationElement => claimConfigurationElement.Validate(claimsIdentity)))
             {
-                IClaimsIdentity claimsIdentity = new ClaimsIdentity();
-                claimsIdentity.Claims.Add(new Claim(ClaimTypes.Name, principal.Identity.Name));
-                claimsIdentity.Claims.Add(new Claim(ClaimTypes.Role, "Users"));
-                return claimsIdentity;
+                claimsIdentity.Claims.Add(claimConfigurationElement.Claim);
             }
-
-            protected override Scope GetScope(Microsoft.IdentityModel.Claims.IClaimsPrincipal principal,
-                RequestSecurityToken request)
-            {
-                Scope scope = new Scope(request);
-                scope.EncryptingCredentials = this.GetCredentialsForAppliesTo(request.AppliesTo);
-                scope.SigningCredentials =
-                    new X509SigningCredentials(CertificateUtil.GetCertificate(StoreName.My, StoreLocation.LocalMachine,
-                        "CN=IPKey"));
-                return scope;
-            }
-
+            return claimsIdentity;
         }
-         */
+
+        #endregion
     }
 }

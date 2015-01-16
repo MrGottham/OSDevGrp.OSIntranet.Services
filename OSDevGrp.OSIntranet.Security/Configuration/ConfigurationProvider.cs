@@ -43,6 +43,15 @@ namespace OSDevGrp.OSIntranet.Security.Configuration
         }
 
         /// <summary>
+        /// Gets the collection of claims which can be associated with users.
+        /// </summary>
+        [ConfigurationProperty("claimCollection", IsRequired = true)]
+        public virtual ClaimConfigurationElementCollection ClaimCollection
+        {
+            get { return (ClaimConfigurationElementCollection) this["claimCollection"]; }
+        }
+
+        /// <summary>
         /// Gets an instance of the provider which can deliver configuration data for the basic security token service.
         /// </summary>
         public static ConfigurationProvider Instance

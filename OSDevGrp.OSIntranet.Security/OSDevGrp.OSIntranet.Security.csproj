@@ -55,6 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\CertificateConfigurationElement.cs" />
+    <Compile Include="Configuration\ClaimConfigurationElement.cs" />
+    <Compile Include="Configuration\ClaimConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\RegularExpressionConfigurationElement.cs" />
+    <Compile Include="Configuration\RegularExpressionConfigurationElementCollection.cs" />
     <Compile Include="Configuration\UriConfigurationElement.cs" />
     <Compile Include="Configuration\UriConfigurationElementCollection.cs" />
     <Compile Include="Helper\CertificateHelper.cs" />

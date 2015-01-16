@@ -3,16 +3,16 @@
 namespace OSDevGrp.OSIntranet.Security.Configuration
 {
     /// <summary>
-    /// Collection of configuration elements for some URI addresses.
+    /// Collection of configuration elements containing URI addresses.
     /// </summary>
     public class UriConfigurationElementCollection : ConfigurationElementCollection
     {
         #region Method
 
         /// <summary>
-        /// Creates a new configuration element for an URI address.
+        /// Creates a new configuration element containing an URI address.
         /// </summary>
-        /// <returns>New configuration element for an URI address</returns>
+        /// <returns>New configuration element containing URI address</returns>
         protected override ConfigurationElement CreateNewElement()
         {
             return new UriConfigurationElement();

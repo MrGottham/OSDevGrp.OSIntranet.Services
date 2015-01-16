@@ -1,1 +1,1 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Factory="Microsoft.IdentityModel.Protocols.WSTrust.WSTrustServiceHostFactory" Service="OSDevGrp.OSIntranet.Security.Services.BasicSecurityTokenServiceConfiguration" %>
+﻿<%@ ServiceHost Factory="Microsoft.IdentityModel.Protocols.WSTrust.WSTrustServiceHostFactory" Service="OSDevGrp.OSIntranet.Security.Services.BasicSecurityTokenServiceConfiguration" %>

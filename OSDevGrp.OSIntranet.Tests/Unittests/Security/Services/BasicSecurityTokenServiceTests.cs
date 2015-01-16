@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Security.Principal;
 using System.ServiceModel;
 using Microsoft.IdentityModel.Claims;
 using Microsoft.IdentityModel.Protocols.WSTrust;
@@ -153,7 +155,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         public void TestThatIssueRetursIfAppliesToInRequestSecurityTokenContainsTrustedRelyingParty(string trustedUri)
         {
             var fixture = new Fixture();
-            fixture.Customize<IClaimsPrincipal>(e => e.FromFactory(() => MockRepository.GenerateMock<IClaimsPrincipal>()));
+
+            var identifyMock = MockRepository.GenerateMock<IIdentity>();
+            identifyMock.Expect(m => m.Name)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(identifyMock)
+                .Repeat.Any();
+            claimPrincipalMock.Stub(m => m.Identities)
+                .Return(null)
+                .Repeat.Any();
 
             var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
             Assert.That(basicSecurityTokenService, Is.Not.Null);
@@ -163,8 +177,55 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
                 AppliesTo = new EndpointAddress(new Uri(trustedUri))
             };
 
-            var claimsPrincipal = basicSecurityTokenService.Issue(fixture.Create<IClaimsPrincipal>(), request);
-            Assert.That(claimsPrincipal, Is.Not.Null);
+            var response = basicSecurityTokenService.Issue(claimPrincipalMock, request);
+            Assert.That(response, Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Tests that Issue returns a claims identity with appended claims.
+        /// </summary>
+        [Test]
+        [TestCase("mrgottham@gmail.com", 2)]
+        [TestCase("ole.sorensen@osdevgrp.dk", 1)]
+        public void TestThatIssueRetursClaimsIdentityWithAppendedClaims(string mailAddress, int expectedAppendedClaims)
+        {
+            var fixture = new Fixture();
+
+            var identifyMock = MockRepository.GenerateMock<IIdentity>();
+            identifyMock.Expect(m => m.Name)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            
+            var claimsIdentity = MockRepository.GenerateMock<IClaimsIdentity>();
+            var claimsCollection = new ClaimCollection(claimsIdentity)
+            {
+                new Claim(ClaimTypes.Email, mailAddress)
+            };
+            claimsIdentity.Stub(m => m.Claims)
+                .Return(claimsCollection)
+                .Repeat.Any();
+
+            var claimsIdentityCollection = new ClaimsIdentityCollection(new List<IClaimsIdentity> {claimsIdentity});
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(identifyMock)
+                .Repeat.Any();
+            claimPrincipalMock.Stub(m => m.Identities)
+                .Return(claimsIdentityCollection)
+                .Repeat.Any();
+
+            var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
+            Assert.That(basicSecurityTokenService, Is.Not.Null);
+
+            var request = new RequestSecurityToken
+            {
+                AppliesTo = new EndpointAddress(new Uri("http://localhost"))
+            };
+
+            var response = basicSecurityTokenService.Issue(claimPrincipalMock, request);
+            Assert.That(response, Is.Not.Null);
+
+            Assert.That(claimsCollection.Count, Is.EqualTo(1 + expectedAppendedClaims));
         }
     }
 }
