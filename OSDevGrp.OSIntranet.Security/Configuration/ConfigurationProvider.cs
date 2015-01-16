@@ -19,27 +19,27 @@ namespace OSDevGrp.OSIntranet.Security.Configuration
         /// Gets the issuer token name.
         /// </summary>
         [ConfigurationProperty("issuerTokenName", IsRequired = true)]
-        public virtual NameValueConfigurationElement IssuerTokenName
+        public virtual UriConfigurationElement IssuerTokenName
         {
-            get { return (NameValueConfigurationElement) this["issuerTokenName"]; }
+            get { return (UriConfigurationElement) this["issuerTokenName"]; }
         }
 
         /// <summary>
         /// Gets the subject name for the signing certificate.
         /// </summary>
         [ConfigurationProperty("signingCertificate", IsRequired = true)]
-        public virtual NameValueConfigurationElement SigningCertificate
+        public virtual CertificateConfigurationElement SigningCertificate
         {
-            get { return (NameValueConfigurationElement) this["signingCertificate"]; }
+            get { return (CertificateConfigurationElement) this["signingCertificate"]; }
         }
 
         /// <summary>
         /// Gets the URI's for the trusted relaying parties.
         /// </summary>
         [ConfigurationProperty("trustedRelyingPartyCollection", IsRequired = true)]
-        public virtual NameValueConfigurationCollection TrustedRelyingPartyCollection
+        public virtual UriConfigurationElementCollection TrustedRelyingPartyCollection
         {
-            get { return (NameValueConfigurationCollection) this["trustedRelyingPartyCollection"]; }
+            get { return (UriConfigurationElementCollection) this["trustedRelyingPartyCollection"]; }
         }
 
         /// <summary>

@@ -17,10 +17,10 @@ namespace OSDevGrp.OSIntranet.Security.Services
         /// Creates configuration for the basic security token service.
         /// </summary>
         public BasicSecurityTokenServiceConfiguration() :
-            base(ConfigurationProvider.Instance.IssuerTokenName.Value)
+            base(ConfigurationProvider.Instance.IssuerTokenName.Uri.AbsoluteUri)
         {
-            TokenIssuerName = ConfigurationProvider.Instance.IssuerTokenName.Value;
-            SigningCredentials = new X509SigningCredentials(CertificateHelper.GetCertificate(StoreName.My, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.Value));
+            TokenIssuerName = ConfigurationProvider.Instance.IssuerTokenName.Uri.AbsoluteUri;
+            SigningCredentials = new X509SigningCredentials(CertificateHelper.GetCertificate(StoreName.My, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.SubjetName));
             SecurityTokenService = typeof (BasicSecurityTokenService);
         }
         

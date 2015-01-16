@@ -54,6 +54,9 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\CertificateConfigurationElement.cs" />
+    <Compile Include="Configuration\UriConfigurationElement.cs" />
+    <Compile Include="Configuration\UriConfigurationElementCollection.cs" />
     <Compile Include="Helper\CertificateHelper.cs" />
     <Compile Include="Services\BasicSecurityTokenServiceConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

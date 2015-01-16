@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using System.Linq;
 using System.ServiceModel;
 using System.Security.Cryptography.X509Certificates;
@@ -10,7 +9,6 @@ using Microsoft.IdentityModel.SecurityTokenService;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Configuration;
 using OSDevGrp.OSIntranet.Security.Helper;
-using X509EncryptingCredentials = Microsoft.IdentityModel.SecurityTokenService.X509EncryptingCredentials;
 
 namespace OSDevGrp.OSIntranet.Security.Services
 {
@@ -63,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Security.Services
                 return new Scope(appliesTo.Uri.AbsoluteUri)
                 {
                     EncryptingCredentials = GetCredentialsForAppliesTo(request.AppliesTo),
-                    SigningCredentials = new X509SigningCredentials(CertificateHelper.GetCertificate(StoreName.My, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.Value))
+                    SigningCredentials = new X509SigningCredentials(CertificateHelper.GetCertificate(StoreName.My, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.SubjetName))
                 };
             }
             catch (InvalidRequestException)
@@ -93,15 +91,15 @@ namespace OSDevGrp.OSIntranet.Security.Services
         /// </summary>
         /// <param name="appliesTo"></param>
         /// <returns></returns>
-        private X509EncryptingCredentials GetCredentialsForAppliesTo(EndpointAddress appliesTo)
+        private static X509EncryptingCredentials GetCredentialsForAppliesTo(EndpointAddress appliesTo)
         {
             if (appliesTo == null || appliesTo.Uri == null || string.IsNullOrEmpty(appliesTo.Uri.AbsolutePath))
             {
                 throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustBeSuppliedInRequestSecurityToken));
             }
-            if (ConfigurationProvider.Instance.TrustedRelyingPartyCollection.OfType<NameValueConfigurationElement>().Any(trustedRelyingParty => appliesTo.Uri.AbsoluteUri.StartsWith(trustedRelyingParty.Value)))
+            if (ConfigurationProvider.Instance.TrustedRelyingPartyCollection.OfType<UriConfigurationElement>().Any(trustedRelyingParty => appliesTo.Uri.AbsoluteUri.StartsWith(trustedRelyingParty.Uri.AbsoluteUri)))
             {
-                return new X509EncryptingCredentials(CertificateHelper.GetCertificate(StoreName.TrustedPeople, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.Value));
+                return new X509EncryptingCredentials(CertificateHelper.GetCertificate(StoreName.TrustedPeople, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.SubjetName));
             }
             throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress, appliesTo.Uri.AbsoluteUri));
         }

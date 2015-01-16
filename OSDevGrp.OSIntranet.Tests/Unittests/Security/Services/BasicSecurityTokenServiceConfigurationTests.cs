@@ -21,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
             Assert.That(basicSecurityTokenServiceConfiguration, Is.Not.Null);
             Assert.That(basicSecurityTokenServiceConfiguration.TokenIssuerName, Is.Not.Null);
             Assert.That(basicSecurityTokenServiceConfiguration.TokenIssuerName, Is.Not.Empty);
-            Assert.That(basicSecurityTokenServiceConfiguration.TokenIssuerName, Is.EqualTo(ConfigurationProvider.Instance.IssuerTokenName.Value));
+            Assert.That(basicSecurityTokenServiceConfiguration.TokenIssuerName, Is.EqualTo(ConfigurationProvider.Instance.IssuerTokenName.Uri.AbsoluteUri));
             Assert.That(basicSecurityTokenServiceConfiguration.SigningCredentials, Is.Not.Null);
             Assert.That(basicSecurityTokenServiceConfiguration.SigningCredentials, Is.TypeOf<X509SigningCredentials>());
             Assert.That(basicSecurityTokenServiceConfiguration.SecurityTokenService, Is.Not.Null);
