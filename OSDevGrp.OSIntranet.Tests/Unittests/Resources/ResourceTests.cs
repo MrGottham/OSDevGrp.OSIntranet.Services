@@ -309,6 +309,51 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for CertificateWasNotFound hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForCertificateWasNotFoundHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CertificateWasNotFound);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CertificateWasNotFound, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for InvalidRelyingPartyAddress hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForInvalidRelyingPartyAddressHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for AppliesToMustBeSuppliedInRequestSecurityToken hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForAppliesToMustBeSuppliedInRequestSecurityTokenHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustBeSuppliedInRequestSecurityToken);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]

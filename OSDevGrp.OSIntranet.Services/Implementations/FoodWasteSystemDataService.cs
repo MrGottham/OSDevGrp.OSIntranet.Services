@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts;
+using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 
 namespace OSDevGrp.OSIntranet.Services.Implementations
 {
@@ -19,6 +22,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
 
         private readonly ICommandBus _commandBus;
         private readonly IQueryBus _queryBus;
+        private readonly IFaultExceptionBuilder<FoodWasteFault> _foodWasteFaultExceptionBuilder; 
 
         #endregion
 
@@ -29,7 +33,8 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// </summary>
         /// <param name="commandBus">Implementation of the command bus.</param>
         /// <param name="queryBus">Implementation of the query bus.</param>
-        public FoodWasteSystemDataService(ICommandBus commandBus, IQueryBus queryBus)
+        /// <param name="foodWasteFaultExceptionBuilder">Implementation of builder which can generate faults.</param>
+        public FoodWasteSystemDataService(ICommandBus commandBus, IQueryBus queryBus, IFaultExceptionBuilder<FoodWasteFault> foodWasteFaultExceptionBuilder)
         {
             if (commandBus == null)
             {
@@ -39,8 +44,13 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             {
                 throw new ArgumentNullException("queryBus");
             }
+            if (foodWasteFaultExceptionBuilder == null)
+            {
+                throw new ArgumentNullException("foodWasteFaultExceptionBuilder");
+            }
             _commandBus = commandBus;
             _queryBus = queryBus;
+            _foodWasteFaultExceptionBuilder = foodWasteFaultExceptionBuilder;
         }
 
         #endregion
@@ -55,7 +65,18 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual IEnumerable<TranslationInfoSystemView> TranslationInfoGetAll(TranslationInfoCollectionGetQuery query)
         {
-            throw new NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
         }
 
         #endregion

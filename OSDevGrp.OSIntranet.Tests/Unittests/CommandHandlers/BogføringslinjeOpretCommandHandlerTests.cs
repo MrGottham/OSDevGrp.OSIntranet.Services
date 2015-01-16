@@ -840,7 +840,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                                   Budgetkontonummer = regnskab.Konti.OfType<Budgetkonto>().ElementAt(1).Kontonummer,
                                   Debit = fixture.Create<decimal>(),
                                   Kredit = fixture.Create<decimal>(),
-                                  Adressekonto = fixture.Create<int>()
+                                  Adressekonto = adressekonti.Max(m => m.Nummer) + fixture.Create<int>()
                               };
             Assert.Throws<IntranetRepositoryException>(() => commandHandler.Execute(command));
         }

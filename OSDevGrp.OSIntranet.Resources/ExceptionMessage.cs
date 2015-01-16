@@ -23,6 +23,9 @@
         NoRegistrationForDelegate,
         UserAppointmentAlreadyExists,
         UserAppointmentDontExists,
-        NoCalendarUserWithThoseInitials
+        NoCalendarUserWithThoseInitials,
+        CertificateWasNotFound,
+        InvalidRelyingPartyAddress,
+        AppliesToMustBeSuppliedInRequestSecurityToken
     }
 }

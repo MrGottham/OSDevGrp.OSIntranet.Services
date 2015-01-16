@@ -111,6 +111,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.ServiceModel" />
@@ -125,10 +126,12 @@
     <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\Implementations\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\KalenderServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unittests\CommandHandlers\BogføringslinjeOpretCommandHandlerTests.cs" />
@@ -229,6 +232,7 @@
     <Compile Include="Unittests\Domain\Kalender\BrugerlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\BrugerTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
+    <Compile Include="Unittests\Infrastructure\FoodWasteFaultExceptionBuilderTests.cs" />
     <Compile Include="Unittests\Infrastructure\FoodWasteObjectMapperTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetBusinessExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
@@ -286,6 +290,9 @@
     <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
     <Compile Include="Unittests\Resources\ResourceTests.cs" />
+    <Compile Include="Unittests\Security\Configuration\ConfigurationProviderTests.cs" />
+    <Compile Include="Unittests\Security\Services\BasicSecurityTokenServiceConfigurationTests.cs" />
+    <Compile Include="Unittests\Security\Services\BasicSecurityTokenServiceTests.cs" />
     <Compile Include="Unittests\Services\AdressekartotekServiceTests.cs" />
     <Compile Include="Unittests\Services\CommonServiceTests.cs" />
     <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />

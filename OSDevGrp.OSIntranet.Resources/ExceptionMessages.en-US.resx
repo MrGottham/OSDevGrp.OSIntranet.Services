@@ -184,4 +184,15 @@
     <value>The are no calendar users with the initials '{0}'.</value>
     <comment>{0} = Initials.</comment>
   </data>
+  <data name="CertificateWasNotFound" xml:space="preserve">
+    <value>A certificate was not found the subject name '{0}'.</value>
+    <comment>{0} = Subject name for certificate.</comment>
+  </data>
+  <data name="InvalidRelyingPartyAddress" xml:space="preserve">
+    <value>Invalid relying party address: {0}</value>
+    <comment>{0} = Invalid relying party address.</comment>
+  </data>
+  <data name="AppliesToMustBeSuppliedInRequestSecurityToken" xml:space="preserve">
+    <value>AppliesTo must be supplied in the RST.</value>
+  </data>
 </root>

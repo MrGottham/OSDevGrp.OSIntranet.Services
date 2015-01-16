@@ -184,4 +184,15 @@
     <value>Der findes ingen kalenderbrugere med initialerne '{0}'.</value>
     <comment>{0} = Initialer.</comment>
   </data>
+  <data name="CertificateWasNotFound" xml:space="preserve">
+    <value>Der bliv ikke fundet et certifikat med subject navn '{0}'.</value>
+    <comment>{0} = Subject navn på certifikat.</comment>
+  </data>
+  <data name="InvalidRelyingPartyAddress" xml:space="preserve">
+    <value>Invalid relying party adresse: {0}</value>
+    <comment>{0} = Invalid relying party adresse.</comment>
+  </data>
+  <data name="AppliesToMustBeSuppliedInRequestSecurityToken" xml:space="preserve">
+    <value>AppliesTo skal medsendes i RST.</value>
+  </data>
 </root>

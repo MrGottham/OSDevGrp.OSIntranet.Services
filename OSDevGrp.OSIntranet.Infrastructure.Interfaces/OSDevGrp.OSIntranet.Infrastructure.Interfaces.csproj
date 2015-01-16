@@ -47,11 +47,13 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\IntranetBusinessException.cs" />
     <Compile Include="Exceptions\IntranetRepositoryException.cs" />
     <Compile Include="Exceptions\IntranetSystemException.cs" />
+    <Compile Include="IFaultExceptionBuilder.cs" />
     <Compile Include="IFoodWasteObjectMapper.cs" />
     <Compile Include="IObjectMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
