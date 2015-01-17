@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Authentication;
 using System.ServiceModel;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.IdentityModel.Claims;
@@ -50,6 +51,11 @@ namespace OSDevGrp.OSIntranet.Security.Services
             {
                 var argumentNullException = new ArgumentNullException("request");
                 throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
+            }
+            if (principal.Identity == null || principal.Identity.IsAuthenticated == false)
+            {
+                var authenticationException = new AuthenticationException();
+                throw new InvalidRequestException(authenticationException.Message, authenticationException);
             }
             var appliesTo = request.AppliesTo;
             if (appliesTo == null || appliesTo.Uri == null || string.IsNullOrEmpty(appliesTo.Uri.AbsoluteUri))

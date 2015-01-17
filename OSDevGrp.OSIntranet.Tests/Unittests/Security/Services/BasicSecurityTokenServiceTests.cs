@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Authentication;
 using System.Security.Principal;
 using System.ServiceModel;
 using Microsoft.IdentityModel.Claims;
@@ -94,13 +95,71 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         }
 
         /// <summary>
+        /// Tests that Issue throws an InvalidRequestException when identity on the claims principal is null.
+        /// </summary>
+        [Test]
+        public void TestThatIssueThrowsInvalidRequestExceptionIfIdentityOnClaimsPrincipalIsNull()
+        {
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(null)
+                .Repeat.Any();
+
+            var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
+            Assert.That(basicSecurityTokenService, Is.Not.Null);
+
+            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(claimPrincipalMock, new RequestSecurityToken()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo((new AuthenticationException()).Message));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<AuthenticationException>());
+        }
+
+        /// <summary>
+        /// Tests that Issue throws an InvalidRequestException when IsAuthenticated from the identity on the claims principal is false.
+        /// </summary>
+        [Test]
+        public void TestThatIssueThrowsInvalidRequestExceptionIfIsAuthenticatedFromIdentityOnClaimsPrincipalIsFalse()
+        {
+            var identifyMock = MockRepository.GenerateMock<IIdentity>();
+            identifyMock.Expect(m => m.IsAuthenticated)
+                .Return(false)
+                .Repeat.Any();
+
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(identifyMock)
+                .Repeat.Any();
+
+            var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
+            Assert.That(basicSecurityTokenService, Is.Not.Null);
+
+            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(claimPrincipalMock, new RequestSecurityToken()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo((new AuthenticationException()).Message));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<AuthenticationException>());
+        }
+
+        /// <summary>
         /// Tests that Issue throws an InvalidRequestException when AppliesTo in the request security token is null.
         /// </summary>
         [Test]
         public void TestThatIssueThrowsInvalidRequestExceptionIfAppliesToInRequestSecurityTokenIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IClaimsPrincipal>(e => e.FromFactory(() => MockRepository.GenerateMock<IClaimsPrincipal>()));
+            var identifyMock = MockRepository.GenerateMock<IIdentity>();
+            identifyMock.Expect(m => m.IsAuthenticated)
+                .Return(true)
+                .Repeat.Any();
+
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(identifyMock)
+                .Repeat.Any();
 
             var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
             Assert.That(basicSecurityTokenService, Is.Not.Null);
@@ -110,7 +169,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
                 AppliesTo = null
             };
 
-            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(fixture.Create<IClaimsPrincipal>(), request));
+            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(claimPrincipalMock, request));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -127,8 +186,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         [TestCase("http://zzz.local")]
         public void TestThatIssueThrowsInvalidRequestExceptionIfAppliesToInRequestSecurityTokenContainsNoTrustedRelyingParty(string untrustedUri)
         {
-            var fixture = new Fixture();
-            fixture.Customize<IClaimsPrincipal>(e => e.FromFactory(() => MockRepository.GenerateMock<IClaimsPrincipal>()));
+            var identifyMock = MockRepository.GenerateMock<IIdentity>();
+            identifyMock.Expect(m => m.IsAuthenticated)
+                .Return(true)
+                .Repeat.Any();
+
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(identifyMock)
+                .Repeat.Any();
 
             var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
             Assert.That(basicSecurityTokenService, Is.Not.Null);
@@ -138,7 +204,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
                 AppliesTo = new EndpointAddress(new Uri(untrustedUri))
             };
 
-            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(fixture.Create<IClaimsPrincipal>(), request));
+            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(claimPrincipalMock, request));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -159,6 +225,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
             var identifyMock = MockRepository.GenerateMock<IIdentity>();
             identifyMock.Expect(m => m.Name)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+            identifyMock.Expect(m => m.IsAuthenticated)
+                .Return(true)
                 .Repeat.Any();
 
             var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
@@ -195,17 +264,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
             identifyMock.Expect(m => m.Name)
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
+            identifyMock.Expect(m => m.IsAuthenticated)
+                .Return(true)
+                .Repeat.Any();
             
-            var claimsIdentity = MockRepository.GenerateMock<IClaimsIdentity>();
-            var claimsCollection = new ClaimCollection(claimsIdentity)
+            var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
+            var claimsCollection = new ClaimCollection(claimsIdentityMock)
             {
                 new Claim(ClaimTypes.Email, mailAddress)
             };
-            claimsIdentity.Stub(m => m.Claims)
+            claimsIdentityMock.Stub(m => m.Claims)
                 .Return(claimsCollection)
                 .Repeat.Any();
 
-            var claimsIdentityCollection = new ClaimsIdentityCollection(new List<IClaimsIdentity> {claimsIdentity});
+            var claimsIdentityCollection = new ClaimsIdentityCollection(new List<IClaimsIdentity> {claimsIdentityMock});
             var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
             claimPrincipalMock.Stub(m => m.Identity)
                 .Return(identifyMock)
