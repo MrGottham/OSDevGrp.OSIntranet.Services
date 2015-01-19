@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         public void TestThatBasicSecurityTokenServiceCanBeHosted()
         {
             var uri = new Uri("http://localhost:7000/OSIntranet/");
-            var host = new ServiceHost(typeof(BasicSecurityTokenService), new[] { uri });
+            var host = new ServiceHost(typeof (BasicSecurityTokenService), new[] {uri});
             try
             {
                 host.Open();

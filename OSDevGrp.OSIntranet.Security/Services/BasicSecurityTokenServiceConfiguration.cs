@@ -21,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Security.Services
         {
             TokenIssuerName = ConfigurationProvider.Instance.IssuerTokenName.Uri.AbsoluteUri;
             SigningCredentials = new X509SigningCredentials(CertificateHelper.GetCertificate(StoreName.My, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.SubjetName));
-            SecurityTokenService = typeof (BasicSecurityTokenService);
+            SecurityTokenService = typeof(BasicSecurityTokenService);
         }
         
         #endregion
