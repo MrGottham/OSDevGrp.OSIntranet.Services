@@ -5,11 +5,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Infrast
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0A1F688-C012-4C39-92DF-E435C33FB0A7}"
 	ProjectSection(SolutionItems) = preProject
+		OSDevGrp.OSIntranet.cer = OSDevGrp.OSIntranet.cer
 		OSDevGrp.OSIntranet.Clients.cer = OSDevGrp.OSIntranet.Clients.cer
 		OSDevGrp.OSIntranet.Clients.pfx = OSDevGrp.OSIntranet.Clients.pfx
+		OSDevGrp.OSIntranet.pfx = OSDevGrp.OSIntranet.pfx
+		OSDevGrp.OSIntranet.pvk = OSDevGrp.OSIntranet.pvk
 		OSDevGrp.OSIntranet.Services.cer = OSDevGrp.OSIntranet.Services.cer
 		OSDevGrp.OSIntranet.Services.pfx = OSDevGrp.OSIntranet.Services.pfx
 		OSDevGrp.OSIntranet.snk = OSDevGrp.OSIntranet.snk
+		OSDevGrp.OSIntranet.Tokens.cer = OSDevGrp.OSIntranet.Tokens.cer
+		OSDevGrp.OSIntranet.Tokens.pfx = OSDevGrp.OSIntranet.Tokens.pfx
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Tests", "OSDevGrp.OSIntranet.Tests\OSDevGrp.OSIntranet.Tests.csproj", "{A1EBFC92-C81D-4A5C-959E-F2FDC48E6B02}"
