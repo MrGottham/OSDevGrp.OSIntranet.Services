@@ -19,6 +19,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         {
             var basicSecurityTokenServiceConfiguration = new BasicSecurityTokenServiceConfiguration();
             Assert.That(basicSecurityTokenServiceConfiguration, Is.Not.Null);
+            Assert.That(basicSecurityTokenServiceConfiguration.DisableWsdl, Is.True);
             Assert.That(basicSecurityTokenServiceConfiguration.TokenIssuerName, Is.Not.Null);
             Assert.That(basicSecurityTokenServiceConfiguration.TokenIssuerName, Is.Not.Empty);
             Assert.That(basicSecurityTokenServiceConfiguration.TokenIssuerName, Is.EqualTo(ConfigurationProvider.Instance.IssuerTokenName.Uri.AbsoluteUri));

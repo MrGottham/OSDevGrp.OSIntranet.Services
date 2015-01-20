@@ -19,6 +19,7 @@ namespace OSDevGrp.OSIntranet.Security.Services
         public BasicSecurityTokenServiceConfiguration() :
             base(ConfigurationProvider.Instance.IssuerTokenName.Uri.AbsoluteUri)
         {
+            DisableWsdl = true;
             TokenIssuerName = ConfigurationProvider.Instance.IssuerTokenName.Uri.AbsoluteUri;
             SigningCredentials = new X509SigningCredentials(CertificateHelper.GetCertificate(StoreName.My, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.SubjetName));
             SecurityTokenService = typeof(BasicSecurityTokenService);

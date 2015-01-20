@@ -29,7 +29,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Configuration
             Assert.That(configurationProvider.SigningCertificate, Is.Not.Null);
             Assert.That(configurationProvider.SigningCertificate.SubjetName, Is.Not.Null);
             Assert.That(configurationProvider.SigningCertificate.SubjetName, Is.Not.Empty);
-            Assert.That(configurationProvider.SigningCertificate.SubjetName, Is.EqualTo("CN=OSDevGrp.OSIntranet.Services"));
+            Assert.That(configurationProvider.SigningCertificate.SubjetName, Is.EqualTo("CN=OSDevGrp.OSIntranet.Tokens"));
             Assert.That(configurationProvider.TrustedRelyingPartyCollection, Is.Not.Null);
             Assert.That(configurationProvider.TrustedRelyingPartyCollection, Is.Not.Empty);
             Assert.That(configurationProvider.TrustedRelyingPartyCollection.Count, Is.EqualTo(2));
