@@ -54,6 +54,10 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\RequiredClaimTypeAttribute.cs" />
+    <Compile Include="AuthorizationPolicies\AuthorizationPolicy.cs" />
+    <Compile Include="AuthorizationPolicies\AuthorizationPolicyHandler.cs" />
+    <Compile Include="AuthorizationPolicies\IAuthorizationPolicyHandler.cs" />
     <Compile Include="Configuration\CertificateConfigurationElement.cs" />
     <Compile Include="Configuration\ClaimConfigurationElement.cs" />
     <Compile Include="Configuration\ClaimConfigurationElementCollection.cs" />
