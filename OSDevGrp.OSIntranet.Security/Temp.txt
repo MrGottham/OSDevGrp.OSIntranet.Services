@@ -1,18 +1,2 @@
 ﻿http://msdn.microsoft.com/en-us/library/microsoft.identitymodel.securitytokenservice.securitytokenservice.aspx
 http://msdn.microsoft.com/en-us/magazine/dd347547.aspx
-
-http://msdn.microsoft.com/en-us/library/aa355062%28v=vs.110%29.aspx
-http://weblogs.asp.net/cibrax/implementing-a-secure-token-service-with-wcf
-
-http://msdn.microsoft.com/en-us/library/ms733813.aspx
-makecert -n "CN=OSDevGrp.OSIntranet" -b 01/01/2015 -e 12/31/2099 -pe -r -sv OSDevGrp.OSIntranet.pvk OSDevGrp.OSIntranet.cer
-pvk2pfx /pvk OSDevGrp.OSIntranet.pvk /spc OSDevGrp.OSIntranet.cer /pfx OSDevGrp.OSIntranet.pfx /pi Herewego1919 /po Herewego1919
-
-makecert -n "CN=OSDevGrp.OSIntranet.Services" -b 01/01/2015 -e 12/31/2099 -pe -sky exchange -iv C:\Data\DOTNET\OSDevGrp\OSDevGrp.OSIntranet\OSDevGrp.OSIntranet.pvk -ic C:\Data\DOTNET\OSDevGrp\OSDevGrp.OSIntranet\OSDevGrp.OSIntranet.cer -sv OSDevGrp.OSIntranet.Services.pvk OSDevGrp.OSIntranet.Services.cer
-pvk2pfx /pvk OSDevGrp.OSIntranet.Services.pvk /spc OSDevGrp.OSIntranet.Services.cer /pfx OSDevGrp.OSIntranet.Services.pfx /pi Herewego1919 /po Herewego1919
-
-makecert -n "CN=OSDevGrp.OSIntranet.Clients" -b 01/01/2015 -e 12/31/2099 -pe -sky exchange -iv C:\Data\DOTNET\OSDevGrp\OSDevGrp.OSIntranet\OSDevGrp.OSIntranet.pvk -ic C:\Data\DOTNET\OSDevGrp\OSDevGrp.OSIntranet\OSDevGrp.OSIntranet.cer -sv OSDevGrp.OSIntranet.Clients.pvk OSDevGrp.OSIntranet.Clients.cer
-pvk2pfx /pvk OSDevGrp.OSIntranet.Clients.pvk /spc OSDevGrp.OSIntranet.Clients.cer /pfx OSDevGrp.OSIntranet.Clients.pfx /pi Herewego1919 /po Herewego1919
-
-makecert -n "CN=OSDevGrp.OSIntranet.Tokens" -b 01/01/2015 -e 12/31/2099 -pe -sky exchange -iv C:\Data\DOTNET\OSDevGrp\OSDevGrp.OSIntranet\OSDevGrp.OSIntranet.pvk -ic C:\Data\DOTNET\OSDevGrp\OSDevGrp.OSIntranet\OSDevGrp.OSIntranet.cer -sv OSDevGrp.OSIntranet.Tokens.pvk OSDevGrp.OSIntranet.Tokens.cer
-pvk2pfx /pvk OSDevGrp.OSIntranet.Tokens.pvk /spc OSDevGrp.OSIntranet.Tokens.cer /pfx OSDevGrp.OSIntranet.Tokens.pfx /pi Herewego1919 /po Herewego1919
