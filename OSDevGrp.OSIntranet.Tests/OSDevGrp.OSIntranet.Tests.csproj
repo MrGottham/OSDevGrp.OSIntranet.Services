@@ -290,7 +290,7 @@
     <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
     <Compile Include="Unittests\Resources\ResourceTests.cs" />
-    <Compile Include="Unittests\Security\Authorization\AuthorizationPolicyHandlerTests.cs" />
+    <Compile Include="Unittests\Security\Authorization\AuthorizationHandlerTests.cs" />
     <Compile Include="Unittests\Security\Authorization\AuthorizationPolicyTests.cs" />
     <Compile Include="Unittests\Security\Claims\FoodWasteClaimTypesTests.cs" />
     <Compile Include="Unittests\Security\Configuration\ConfigurationProviderTests.cs" />

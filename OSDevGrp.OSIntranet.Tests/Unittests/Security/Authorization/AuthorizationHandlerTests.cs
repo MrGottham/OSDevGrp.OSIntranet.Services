@@ -11,10 +11,10 @@ using Rhino.Mocks;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
 {
     /// <summary>
-    /// Tests the functionality which can handle the authorization policy.
+    /// Tests the functionality which can handle the authorization.
     /// </summary>
     [TestFixture]
-    public class AuthorizationPolicyHandlerTests
+    public class AuthorizationHandlerTests
     {
         /// <summary>
         /// Private class for an unsecured service used for testing purpose.
