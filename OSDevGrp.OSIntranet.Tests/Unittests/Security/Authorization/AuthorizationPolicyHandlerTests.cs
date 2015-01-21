@@ -3,12 +3,12 @@ using Microsoft.IdentityModel.Claims;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Attributes;
-using OSDevGrp.OSIntranet.Security.AuthorizationPolicies;
+using OSDevGrp.OSIntranet.Security.Authorization;
 using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Security.Claims;
 using Rhino.Mocks;
 
-namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
+namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
 {
     /// <summary>
     /// Tests the functionality which can handle the authorization policy.

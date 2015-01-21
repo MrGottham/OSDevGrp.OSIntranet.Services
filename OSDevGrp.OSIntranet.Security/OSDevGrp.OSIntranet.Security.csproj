@@ -55,9 +55,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\RequiredClaimTypeAttribute.cs" />
-    <Compile Include="AuthorizationPolicies\AuthorizationPolicy.cs" />
-    <Compile Include="AuthorizationPolicies\AuthorizationPolicyHandler.cs" />
-    <Compile Include="AuthorizationPolicies\IAuthorizationPolicyHandler.cs" />
+    <Compile Include="Authorization\AuthorizationPolicy.cs" />
+    <Compile Include="Authorization\AuthorizationPolicyHandler.cs" />
+    <Compile Include="Authorization\IAuthorizationHandler.cs" />
     <Compile Include="Claims\FoodWasteClaimTypes.cs" />
     <Compile Include="Configuration\CertificateConfigurationElement.cs" />
     <Compile Include="Configuration\ClaimConfigurationElement.cs" />

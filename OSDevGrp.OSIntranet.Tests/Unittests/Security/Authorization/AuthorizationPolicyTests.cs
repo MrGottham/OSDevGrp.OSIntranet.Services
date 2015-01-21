@@ -9,7 +9,7 @@ using System.ServiceModel;
 using Microsoft.IdentityModel.Claims;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
-using OSDevGrp.OSIntranet.Security.AuthorizationPolicies;
+using OSDevGrp.OSIntranet.Security.Authorization;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -133,9 +133,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
         public void TestThatEvaluateThrowsArgumentNullExceptionWhenEvaluationContextIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IAuthorizationPolicyHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationPolicyHandler>()));
+            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationPolicyHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
             Assert.That(authorizationPolicy, Is.Not.Null);
 
             var state = CreateLegalState();
@@ -157,9 +157,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
         public void TestThatEvaluateThrowsFaultExceptionWhenPropertiesInEvaluationContextIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IAuthorizationPolicyHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationPolicyHandler>()));
+            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationPolicyHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
             Assert.That(authorizationPolicy, Is.Not.Null);
 
             var evaluationContext = new MyEvaluationContext(null);
@@ -185,9 +185,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
         public void TestThatEvaluateThrowsFaultExceptionWhenEvaluationContextDoesNotContainAnyIdentities()
         {
             var fixture = new Fixture();
-            fixture.Customize<IAuthorizationPolicyHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationPolicyHandler>()));
+            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationPolicyHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
             Assert.That(authorizationPolicy, Is.Not.Null);
 
             var evaluationContext = new MyEvaluationContext(new Dictionary<string, object>(0));
@@ -213,9 +213,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
         public void TestThatEvaluateThrowsFaultExceptionWhenEvaluationContextDoesNotContainObjectOfClaimBasedIdentities()
         {
             var fixture = new Fixture();
-            fixture.Customize<IAuthorizationPolicyHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationPolicyHandler>()));
+            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationPolicyHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
             Assert.That(authorizationPolicy, Is.Not.Null);
 
             var properties = new Dictionary<string, object>(1)
@@ -245,9 +245,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
         public void TestThatEvaluateThrowsFaultExceptionWhenEvaluationContextDoesNotContainAnyClaimBasedIdentities()
         {
             var fixture = new Fixture();
-            fixture.Customize<IAuthorizationPolicyHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationPolicyHandler>()));
+            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationPolicyHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
             Assert.That(authorizationPolicy, Is.Not.Null);
 
             var properties = new Dictionary<string, object>(1)
@@ -279,7 +279,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
             var fixture = new Fixture();
             fixture.Customize<IClaimsPrincipal>(e => e.FromFactory(() => MockRepository.GenerateMock<IClaimsPrincipal>()));
 
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationPolicyHandler>();
+            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
             authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
                 .Return(fixture.Create<IClaimsPrincipal>())
                 .Repeat.Any();
@@ -302,7 +302,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
             var fixture = new Fixture();
 
             var error = fixture.Create<Exception>();
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationPolicyHandler>();
+            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
             authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
                 .Throw(error)
                 .Repeat.Any();
@@ -331,7 +331,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
         public void TestThatEvaluateUpdatesPrincipalInEvaluationContext()
         {
             var claimsPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationPolicyHandler>();
+            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
             authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
                 .Return(claimsPrincipalMock)
                 .Repeat.Any();
@@ -357,7 +357,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
             var fixture = new Fixture();
             fixture.Customize<IClaimsPrincipal>(e => e.FromFactory(() => MockRepository.GenerateMock<IClaimsPrincipal>()));
 
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationPolicyHandler>();
+            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
             authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
                 .Return(fixture.Create<IClaimsPrincipal>())
                 .Repeat.Any();
