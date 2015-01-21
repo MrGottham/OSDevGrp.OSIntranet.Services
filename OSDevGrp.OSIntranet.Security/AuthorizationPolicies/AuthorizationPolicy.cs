@@ -1,6 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Claims;
 using System.IdentityModel.Policy;
+using System.Linq;
+using System.Security;
+using System.Security.Principal;
+using System.ServiceModel;
+using Microsoft.IdentityModel.Claims;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Security.AuthorizationPolicies
 {
@@ -74,11 +81,40 @@ namespace OSDevGrp.OSIntranet.Security.AuthorizationPolicies
             {
                 throw new ArgumentNullException("evaluationContext");
             }
-            if (state == null)
+            try
             {
-                throw new ArgumentNullException("state");
+                // Gets the identities.
+                if (evaluationContext.Properties == null)
+                {
+                    throw new SecurityException(Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound));
+                }
+                object identitiesObject;
+                if (evaluationContext.Properties.TryGetValue("Identities", out identitiesObject) == false)
+                {
+                    throw new SecurityException(Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound));
+                }
+                var identities = identitiesObject as IList<IIdentity>;
+                if (identities == null || identities.Any() == false)
+                {
+                    throw new SecurityException(Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound));
+                }
+
+                // Gets the service type.
+                Type serviceType = null;
+                if (OperationContext.Current != null && OperationContext.Current.Host != null && OperationContext.Current.Host.Description != null)
+                {
+                    serviceType = OperationContext.Current.Host.Description.ServiceType;
+                }
+
+                // Set the pricipal.
+                evaluationContext.Properties["Principal"] = _authorizationPolicyHandler.GetCustomPrincipal(identities.OfType<IClaimsIdentity>(), serviceType);
+
+                return true;
             }
-            throw new NotImplementedException();
+            catch (Exception ex)
+            {
+                throw new FaultException(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, ex.Message));
+            }
         }
 
         #endregion

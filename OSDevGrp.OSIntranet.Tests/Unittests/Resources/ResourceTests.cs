@@ -354,6 +354,45 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for NotAuthorizedToUseService hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForNotAuthorizedToUseServiceHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for NoIdentityWasFound hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForNoIdentityWasFoundHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for MissingClaimTypeForIdentity hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForMissingClaimTypeForIdentityHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MissingClaimTypeForIdentity);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]

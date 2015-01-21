@@ -195,4 +195,14 @@
   <data name="AppliesToMustBeSuppliedInRequestSecurityToken" xml:space="preserve">
     <value>AppliesTo skal medsendes i RST.</value>
   </data>
+  <data name="NotAuthorizedToUseService" xml:space="preserve">
+    <value>Du er ikke autoriseret til at bruge denne tjeneste: {0}</value>
+    <comment>{0} = Årsag.</comment>
+  </data>
+  <data name="NoIdentityWasFound" xml:space="preserve">
+    <value>Der blev ikke fundet en identitet.</value>
+  </data>
+  <data name="MissingClaimTypeForIdentity" xml:space="preserve">
+    <value>En specifik claim type mangler for denne identitet.</value>
+  </data>
 </root>

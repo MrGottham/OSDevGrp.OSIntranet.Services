@@ -58,6 +58,7 @@
     <Compile Include="AuthorizationPolicies\AuthorizationPolicy.cs" />
     <Compile Include="AuthorizationPolicies\AuthorizationPolicyHandler.cs" />
     <Compile Include="AuthorizationPolicies\IAuthorizationPolicyHandler.cs" />
+    <Compile Include="Claims\FoodWasteClaimTypes.cs" />
     <Compile Include="Configuration\CertificateConfigurationElement.cs" />
     <Compile Include="Configuration\ClaimConfigurationElement.cs" />
     <Compile Include="Configuration\ClaimConfigurationElementCollection.cs" />
@@ -88,6 +89,7 @@
       <Name>OSDevGrp.OSIntranet.Resources</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

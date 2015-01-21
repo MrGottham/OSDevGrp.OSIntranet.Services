@@ -59,7 +59,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
                 throw new ArgumentNullException("query");
             }
             var translationInfoCollection = _systemDataRepository.TranslationInfoGetAll();
-            return _foodWasteObjectMapper.Map<IEnumerable<ITranslationInfo>, IEnumerable<TranslationInfoSystemView>>(translationInfoCollection.Where(m => m.Identifier.HasValue));
+            return _foodWasteObjectMapper.Map<IEnumerable<ITranslationInfo>, IEnumerable<TranslationInfoSystemView>>(translationInfoCollection.Where(m => m.Identifier.HasValue).OrderBy(m => m.CultureName));
         }
 
         #endregion

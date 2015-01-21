@@ -9,6 +9,7 @@ using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Security.Attributes;
 
 namespace OSDevGrp.OSIntranet.Services.Implementations
 {
@@ -16,6 +17,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
     /// Service which can access and modify system data in the food waste domain.
     /// </summary>
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [RequiredClaimType("urn://osdevgrp/foodwaste/security/systemmanagement")]
     public class FoodWasteSystemDataService : IFoodWasteSystemDataService
     {
         #region Private variables

@@ -26,6 +26,9 @@
         NoCalendarUserWithThoseInitials,
         CertificateWasNotFound,
         InvalidRelyingPartyAddress,
-        AppliesToMustBeSuppliedInRequestSecurityToken
+        AppliesToMustBeSuppliedInRequestSecurityToken,
+        NotAuthorizedToUseService,
+        NoIdentityWasFound,
+        MissingClaimTypeForIdentity
     }
 }

@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Security.Attributes
     /// <summary>
     /// Attribute which indicate that a given claim type is required.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class RequiredClaimTypeAttribute : Attribute
     {
         #region Private variables
