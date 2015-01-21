@@ -382,6 +382,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for NoClaimsWasFound hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForNoClaimsWasFoundHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ExceptionMessage for MissingClaimTypeForIdentity hentes.
         /// </summary>
         [Test]

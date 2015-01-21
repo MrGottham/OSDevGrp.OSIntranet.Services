@@ -43,38 +43,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         }
 
         /// <summary>
-        /// Tests that GetCustomPrincipal throws a SecurityException when the collection of claim based identities is null.
+        /// Tests that Validate throws a SecurityException when the claims which should be used for validation is null.
         /// </summary>
         [Test]
-        public void TestThatGetCustomPrincipalThrowsSecurityExceptionWhenClaimsIdentitiesIsNull()
+        public void TestThatValidateThrowsSecurityExceptionWhenClaimsIsNull()
         {
-            var authorizationPolicyHandler = new AuthorizationHandler();
-            Assert.That(authorizationPolicyHandler, Is.Not.Null);
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<SecurityException>(() => authorizationPolicyHandler.GetCustomPrincipal(null, typeof (MyUnsecuredService)));
+            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.Validate(null, typeof (MyUnsecuredService)));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound)));
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound)));
             Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
-        /// Tests that GetCustomPrincipal throws a SecurityException when the collection of claim based identities does not contain any claim based identities.
+        /// Tests that Validate throws a SecurityException when the claims which should be used for validation does not contain any claims.
         /// </summary>
         [Test]
-        public void TestThatGetCustomPrincipalThrowsSecurityExceptionWhenClaimsIdentitiesDoesNotContainAnyClaimsIdentities()
+        public void TestThatValidateThrowsSecurityExceptionWhenClaimsDoesNotContainAnyClaims()
         {
-            var authorizationPolicyHandler = new AuthorizationHandler();
-            Assert.That(authorizationPolicyHandler, Is.Not.Null);
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
 
-            var claimsIdentitiesMockCollection = new List<IClaimsIdentity>(0);
+            var claimCollection = new List<Claim>(0);
 
-            var exception = Assert.Throws<SecurityException>(() => authorizationPolicyHandler.GetCustomPrincipal(claimsIdentitiesMockCollection, typeof (MyUnsecuredService)));
+            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.Validate(claimCollection, typeof (MyUnsecuredService)));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound)));
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound)));
             Assert.That(exception.InnerException, Is.Null);
         }
 

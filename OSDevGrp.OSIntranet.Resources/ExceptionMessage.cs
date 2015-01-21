@@ -29,6 +29,7 @@
         AppliesToMustBeSuppliedInRequestSecurityToken,
         NotAuthorizedToUseService,
         NoIdentityWasFound,
+        NoClaimsWasFound,
         MissingClaimTypeForIdentity
     }
 }
