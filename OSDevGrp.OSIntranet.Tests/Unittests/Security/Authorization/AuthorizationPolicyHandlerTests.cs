@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatConstructorInitializeAuthorizationPolicyHandler()
         {
-            var authorizationPolicyHandler = new AuthorizationPolicyHandler();
+            var authorizationPolicyHandler = new AuthorizationHandler();
             Assert.That(authorizationPolicyHandler, Is.Not.Null);
         }
 
@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatGetCustomPrincipalThrowsSecurityExceptionWhenClaimsIdentitiesIsNull()
         {
-            var authorizationPolicyHandler = new AuthorizationPolicyHandler();
+            var authorizationPolicyHandler = new AuthorizationHandler();
             Assert.That(authorizationPolicyHandler, Is.Not.Null);
 
             var exception = Assert.Throws<SecurityException>(() => authorizationPolicyHandler.GetCustomPrincipal(null, typeof (MyUnsecuredService)));
@@ -65,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatGetCustomPrincipalThrowsSecurityExceptionWhenClaimsIdentitiesDoesNotContainAnyClaimsIdentities()
         {
-            var authorizationPolicyHandler = new AuthorizationPolicyHandler();
+            var authorizationPolicyHandler = new AuthorizationHandler();
             Assert.That(authorizationPolicyHandler, Is.Not.Null);
 
             var claimsIdentitiesMockCollection = new List<IClaimsIdentity>(0);
@@ -84,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatGetCustomPrincipalReturnsClaimsPrincipalWhenServiceTypeIsNull()
         {
-            var authorizationPolicyHandler = new AuthorizationPolicyHandler();
+            var authorizationPolicyHandler = new AuthorizationHandler();
             Assert.That(authorizationPolicyHandler, Is.Not.Null);
 
             var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
@@ -109,7 +109,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatGetCustomPrincipalReturnsClaimsPrincipalWhenServiceTypeDoesNotHaveAnyRequiredClaimTypeAttribute()
         {
-            var authorizationPolicyHandler = new AuthorizationPolicyHandler();
+            var authorizationPolicyHandler = new AuthorizationHandler();
             Assert.That(authorizationPolicyHandler, Is.Not.Null);
 
             var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
@@ -134,7 +134,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatGetCustomPrincipalReturnsClaimsPrincipalWhenServiceTypeHasRequiredClaimTypeAttributeAndClaimsIdentityHasRequiredClaimTypes()
         {
-            var authorizationPolicyHandler = new AuthorizationPolicyHandler();
+            var authorizationPolicyHandler = new AuthorizationHandler();
             Assert.That(authorizationPolicyHandler, Is.Not.Null);
 
             var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
@@ -162,7 +162,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatGetCustomPrincipalThrowsSecurityExceptionWhenServiceTypeHasRequiredClaimTypeAttributeAndClaimsIdentityDoesNotHaveRequiredClaimTypes()
         {
-            var authorizationPolicyHandler = new AuthorizationPolicyHandler();
+            var authorizationPolicyHandler = new AuthorizationHandler();
             Assert.That(authorizationPolicyHandler, Is.Not.Null);
 
             var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
