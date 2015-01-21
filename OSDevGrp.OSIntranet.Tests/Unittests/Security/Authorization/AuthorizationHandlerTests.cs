@@ -33,13 +33,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         }
 
         /// <summary>
-        /// Tests that the constructor initalize functionality which can handle the authorization policy.
+        /// Tests that the constructor initalize functionality which can handle the authorization.
         /// </summary>
         [Test]
-        public void TestThatConstructorInitializeAuthorizationPolicyHandler()
+        public void TestThatConstructorInitializeAuthorizationHandler()
         {
-            var authorizationPolicyHandler = new AuthorizationHandler();
-            Assert.That(authorizationPolicyHandler, Is.Not.Null);
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
         }
 
         /// <summary>
