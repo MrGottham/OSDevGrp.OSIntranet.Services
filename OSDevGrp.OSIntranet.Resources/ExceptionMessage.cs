@@ -28,7 +28,6 @@
         InvalidRelyingPartyAddress,
         AppliesToMustBeSuppliedInRequestSecurityToken,
         NotAuthorizedToUseService,
-        NoIdentityWasFound,
         NoClaimsWasFound,
         MissingClaimTypeForIdentity
     }

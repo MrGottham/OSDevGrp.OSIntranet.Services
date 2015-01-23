@@ -371,17 +371,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
-        /// Tester, at ExceptionMessage for NoIdentityWasFound hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForNoIdentityWasFoundHentes()
-        {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at ExceptionMessage for NoClaimsWasFound hentes.
         /// </summary>
         [Test]

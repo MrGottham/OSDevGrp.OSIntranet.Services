@@ -199,9 +199,6 @@
     <value>You are not authorized to use this service: {0}</value>
     <comment>{0} = Reason.</comment>
   </data>
-  <data name="NoIdentityWasFound" xml:space="preserve">
-    <value>No identity was found.</value>
-  </data>
   <data name="MissingClaimTypeForIdentity" xml:space="preserve">
     <value>A required claim type is missing for the identity.</value>
   </data>

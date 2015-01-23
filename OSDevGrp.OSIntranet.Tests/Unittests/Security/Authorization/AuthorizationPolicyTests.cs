@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IdentityModel.Claims;
 using System.IdentityModel.Policy;
-using System.Linq;
-using System.Security.Principal;
 using System.ServiceModel;
-using Microsoft.IdentityModel.Claims;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Authorization;
+using OSDevGrp.OSIntranet.Security.Claims;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
-namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
+namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
 {
     /// <summary>
     /// Tests the authorization policy which can be used by WCF services.
@@ -21,82 +19,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
     [TestFixture]
     public class AuthorizationPolicyTests
     {
-        /// <summary>
-        /// Private class for an evaluation context which are used for testing purpose.
-        /// </summary>
-        private class MyEvaluationContext : EvaluationContext
-        {
-            #region Private variables
-
-            private const int GenerationValue = 0;
-            private readonly ReadOnlyCollection<ClaimSet> _claimSets = new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>());
-            private readonly IDictionary<string, object> _properties = new Dictionary<string, object>();
-
-            #endregion
-
-            #region Constructor
-
-            /// <summary>
-            /// Creates an evaluation context which are used for testing purpose.
-            /// </summary>
-            /// <param name="properties">Collection of non-claim properties which should be associated with this evaluation context.</param>
-            public MyEvaluationContext(IDictionary<string, object> properties)
-            {
-                _properties = properties;
-            }
-
-            #endregion
-
-            #region Properties
-
-            /// <summary>
-            /// Gets a read-only collection of ClaimSet objects that contains the claims added by authorization policies that have been evaluated.
-            /// </summary>
-            public override ReadOnlyCollection<ClaimSet> ClaimSets
-            {
-                get { return _claimSets; }
-            }
-
-            /// <summary>
-            /// Gets the number of times that claims have been added to the evaluation context.
-            /// </summary>
-            public override int Generation
-            {
-                get { return GenerationValue; }
-            }
-
-            /// <summary>
-            /// Gets a collection of non-claim properties associated with this evaluation context.
-            /// </summary>
-            public override IDictionary<string, object> Properties
-            {
-                get { return _properties; }
-            }
-
-            #endregion
-
-            #region Methods
-
-            /// <summary>
-            /// Adds a set of claims to the evaluation context.
-            /// </summary>
-            /// <param name="policy">Authorization policy which is adding claims to the evaluation context.</param>
-            /// <param name="claimSet">Set of claims which should be added.</param>
-            public override void AddClaimSet(IAuthorizationPolicy policy, ClaimSet claimSet)
-            {
-            }
-
-            /// <summary>
-            /// Sets the date and time at which this EvaluationContext is no longer valid.
-            /// </summary>
-            /// <param name="expirationTime">Date and time that indicates when this authorization context object is no longer valid.</param>
-            public override void RecordExpirationTime(DateTime expirationTime)
-            {
-            }
-
-            #endregion
-        }
-
         /// <summary>
         /// Tests that the constructor initialize an authorization policy which can be used by WCF services.
         /// </summary>
@@ -107,23 +29,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
             Assert.That(authorizationPolicy, Is.Not.Null);
             Assert.That(authorizationPolicy.Id, Is.Not.Null);
             Assert.That(authorizationPolicy.Id, Is.Not.Empty);
-            Assert.That(authorizationPolicy.Id, Is.EqualTo("{C4579216-DD42-4755-BB96-968EF1E54F5C}"));
             Assert.That(authorizationPolicy.Issuer, Is.Not.Null);
             Assert.That(authorizationPolicy.Issuer, Is.EqualTo(ClaimSet.System));
         }
 
         /// <summary>
-        /// Tests that the constructor throws an ArgumentNullException when the functionality which can handle the authorization policy is null.
+        /// Tests that the constructor throws an ArgumentNullException when the functionality which can handle the authorization is null.
         /// </summary>
         [Test]
-        public void TestThatConstructorThrowsArgumentNullExceptionWhenAuthorizationPolicyHandlerIsNull()
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenAuthorizationHandlerIsNull()
         {
             var exception = Assert.Throws<ArgumentNullException>(() => new AuthorizationPolicy(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("authorizationPolicyHandler"));
+            Assert.That(exception.ParamName, Is.EqualTo("authorizationHandler"));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the getter for Id returns a guid.
+        /// </summary>
+        [Test]
+        public void TestThatIdGetterReturnsGuid()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
+
+            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
+            Assert.That(authorizationPolicy, Is.Not.Null);
+
+            var guid = Guid.Parse(authorizationPolicy.Id);
+            Assert.That(guid, Is.Not.Null);
+            Assert.That(guid, Is.Not.EqualTo(Guid.Empty));
         }
 
         /// <summary>
@@ -151,168 +89,122 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
         }
 
         /// <summary>
-        /// Tests that Evaluate throws an FaultException when Properties in evaluation context is null.
+        /// Tests that Evaluate does not call GetCustomClaimSet on the functionality which handles authorization when ClaimSets in the evaluation context is null.
         /// </summary>
         [Test]
-        public void TestThatEvaluateThrowsFaultExceptionWhenPropertiesInEvaluationContextIsNull()
+        public void TestThatEvaluateDoesNotCallGetCustomClaimSetOnAuthorizationHandlerWhenClaimSetsInEvaluationContextIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
             Assert.That(authorizationPolicy, Is.Not.Null);
 
-            var evaluationContext = new MyEvaluationContext(null);
-
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(null)
+                .Repeat.Any();
             var state = CreateLegalState();
 
-            var exception = Assert.Throws<FaultException>(() => authorizationPolicy.Evaluate(evaluationContext, ref state));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.Reason, Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Empty);
-            Assert.That(exception.Reason.ToString(), Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.InnerException, Is.Null);
+            authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            authorizationHandlerMock.AssertWasNotCalled(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.Anything));
         }
 
         /// <summary>
-        /// Tests that Evaluate throws an FaultException when evaluation properties does not contain any identities.
+        /// Tests that Evaluate does not call AddClaimSet on the evaluation context when ClaimSets in the evaluation context is null.
         /// </summary>
         [Test]
-        public void TestThatEvaluateThrowsFaultExceptionWhenEvaluationContextDoesNotContainAnyIdentities()
+        public void TestThatEvaluateDoesNotCallAddClaimSetOnEvaluationContextWhenClaimSetsInEvaluationContextIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
             Assert.That(authorizationPolicy, Is.Not.Null);
 
-            var evaluationContext = new MyEvaluationContext(new Dictionary<string, object>(0));
-
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(null)
+                .Repeat.Any();
             var state = CreateLegalState();
 
-            var exception = Assert.Throws<FaultException>(() => authorizationPolicy.Evaluate(evaluationContext, ref state));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.Reason, Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Empty);
-            Assert.That(exception.Reason.ToString(), Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.InnerException, Is.Null);
+            authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            evaluationContextStub.AssertWasNotCalled(m => m.AddClaimSet(Arg<IAuthorizationPolicy>.Is.Anything, Arg<ClaimSet>.Is.Anything));
         }
 
         /// <summary>
-        /// Tests that Evaluate throws an FaultException when evaluation properties does not contain an object of claim based identities.
+        /// Tests that Evaluate returns true when ClaimSets in the evaluation context is null.
         /// </summary>
         [Test]
-        public void TestThatEvaluateThrowsFaultExceptionWhenEvaluationContextDoesNotContainObjectOfClaimBasedIdentities()
+        public void TestThatEvaluateReturnsTrueWhenClaimSetsInEvaluationContextIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
 
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
             Assert.That(authorizationPolicy, Is.Not.Null);
 
-            var properties = new Dictionary<string, object>(1)
-            {
-                {"Identities", fixture.CreateMany<string>().ToList()}
-            };
-            var evaluationContext = new MyEvaluationContext(properties);
-
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(null)
+                .Repeat.Any();
             var state = CreateLegalState();
 
-            var exception = Assert.Throws<FaultException>(() => authorizationPolicy.Evaluate(evaluationContext, ref state));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.Reason, Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Empty);
-            Assert.That(exception.Reason.ToString(), Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.InnerException, Is.Null);
+            var result = authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+            Assert.That(result, Is.True);
+
+            evaluationContextStub.AssertWasNotCalled(m => m.AddClaimSet(Arg<IAuthorizationPolicy>.Is.Anything, Arg<ClaimSet>.Is.Anything));
         }
 
         /// <summary>
-        /// Tests that Evaluate throws an FaultException when evaluation properties does not contain any claim based identities.
+        /// Tests that Evaluate calls GetCustomClaimSet on the functionality which handles authorization when ClaimSets in the evaluation context is not null.
         /// </summary>
         [Test]
-        public void TestThatEvaluateThrowsFaultExceptionWhenEvaluationContextDoesNotContainAnyClaimBasedIdentities()
+        public void TestThatEvaluateCallsGetCustomClaimSetOnAuthorizationHandlerWhenClaimSetsInEvaluationContextIsNotNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IAuthorizationHandler>(e => e.FromFactory(() => MockRepository.GenerateMock<IAuthorizationHandler>()));
-
-            var authorizationPolicy = new AuthorizationPolicy(fixture.Create<IAuthorizationHandler>());
-            Assert.That(authorizationPolicy, Is.Not.Null);
-
-            var properties = new Dictionary<string, object>(1)
-            {
-                {"Identities", new List<IIdentity>(0)}
-            };
-            var evaluationContext = new MyEvaluationContext(properties);
-
-            var state = CreateLegalState();
-
-            var exception = Assert.Throws<FaultException>(() => authorizationPolicy.Evaluate(evaluationContext, ref state));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.Reason, Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Null);
-            Assert.That(exception.Reason.ToString(), Is.Not.Empty);
-            Assert.That(exception.Reason.ToString(), Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, Resource.GetExceptionMessage(ExceptionMessage.NoIdentityWasFound))));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that Evaluate calls GetCustomPrincipal on the functionality which can handle the authorization policy.
-        /// </summary>
-        [Test]
-        public void TestThatEvaluateCallsGetCustomPrincipalOnAuthorizationPolicyHandler()
-        {
-            var fixture = new Fixture();
-            fixture.Customize<IClaimsPrincipal>(e => e.FromFactory(() => MockRepository.GenerateMock<IClaimsPrincipal>()));
-
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
-            authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
-                .Return(fixture.Create<IClaimsPrincipal>())
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new DefaultClaimSet())
                 .Repeat.Any();
 
-            var authorizationPolicy = new AuthorizationPolicy(authorizationPolicyHandlerMock);
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
             Assert.That(authorizationPolicy, Is.Not.Null);
 
+            var claimSets = new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0));
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(claimSets)
+                .Repeat.Any();
             var state = CreateLegalState();
-            authorizationPolicy.Evaluate(CreateLegalEvaluationContext(), ref state);
 
-            authorizationPolicyHandlerMock.AssertWasCalled(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything));
+            authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            authorizationHandlerMock.AssertWasCalled(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.Equal(claimSets)));
         }
 
         /// <summary>
-        /// Tests that Evaluate throws an FaultException when GetCustomPrincipal on the functionality which can handle the authorization policy fails.
+        /// Tests that Evaluate throws a FaultException when GetCustomClaimSet on the functionality which handles authorization fails.
         /// </summary>
         [Test]
-        public void TestThatEvaluateThrowsFaultExceptionWhenGetCustomPrincipalOnAuthorizationPolicyHandlerFails()
+        public void TestThatEvaluateThrowsFaultExceptionWhenCallsGetCustomClaimSetOnAuthorizationHandlerFails()
         {
             var fixture = new Fixture();
 
             var error = fixture.Create<Exception>();
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
-            authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
                 .Throw(error)
                 .Repeat.Any();
 
-            var authorizationPolicy = new AuthorizationPolicy(authorizationPolicyHandlerMock);
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
             Assert.That(authorizationPolicy, Is.Not.Null);
 
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
             var state = CreateLegalState();
 
-            var exception = Assert.Throws<FaultException>(() => authorizationPolicy.Evaluate(CreateLegalEvaluationContext(), ref state));
+            var exception = Assert.Throws<FaultException>(() => authorizationPolicy.Evaluate(evaluationContextStub, ref state));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -321,69 +213,209 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.AuthorizationPolicies
             Assert.That(exception.Reason.ToString(), Is.Not.Null);
             Assert.That(exception.Reason.ToString(), Is.Not.Empty);
             Assert.That(exception.Reason.ToString(), Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, error.Message)));
-            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
-        /// Tests that Evaluate updates Principal in the evaluation context.
+        /// Tests that Evaluate does not call AddClaimSet on the evaluation context when GetCustomClaimSet on the functionality which handles authorization returns null.
         /// </summary>
         [Test]
-        public void TestThatEvaluateUpdatesPrincipalInEvaluationContext()
+        public void TestThatEvaluateDoesNotCallAddClaimSetOnEvaluationContextWhenGetCustomClaimSetOnAuthorizationHandlerReturnsNull()
         {
-            var claimsPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
-            authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
-                .Return(claimsPrincipalMock)
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(null)
                 .Repeat.Any();
 
-            var authorizationPolicy = new AuthorizationPolicy(authorizationPolicyHandlerMock);
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
             Assert.That(authorizationPolicy, Is.Not.Null);
 
-            var evaluationContext = CreateLegalEvaluationContext();
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
             var state = CreateLegalState();
 
-            Assert.That(evaluationContext.Properties["Principal"], Is.Null);
-            authorizationPolicy.Evaluate(evaluationContext, ref state);
-            Assert.That(evaluationContext.Properties["Principal"], Is.Not.Null);
-            Assert.That(evaluationContext.Properties["Principal"], Is.EqualTo(claimsPrincipalMock));
+            authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            evaluationContextStub.AssertWasNotCalled(m => m.AddClaimSet(Arg<IAuthorizationPolicy>.Is.Anything, Arg<ClaimSet>.Is.Anything));
         }
 
         /// <summary>
-        /// Tests that Evaluate returns true if no exception occurs.
+        /// Tests that Evaluate returns true when GetCustomClaimSet on the functionality which handles authorization returns null.
         /// </summary>
         [Test]
-        public void TestThatEvaluateReturnTrueIfNoExceptionOccurs()
+        public void TestThatEvaluateReturnsTrueWhenGetCustomClaimSetOnAuthorizationHandlerReturnsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IClaimsPrincipal>(e => e.FromFactory(() => MockRepository.GenerateMock<IClaimsPrincipal>()));
-
-            var authorizationPolicyHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
-            authorizationPolicyHandlerMock.Stub(m => m.GetCustomPrincipal(Arg<IEnumerable<IClaimsIdentity>>.Is.NotNull, Arg<Type>.Is.Anything))
-                .Return(fixture.Create<IClaimsPrincipal>())
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(null)
                 .Repeat.Any();
 
-            var authorizationPolicy = new AuthorizationPolicy(authorizationPolicyHandlerMock);
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
             Assert.That(authorizationPolicy, Is.Not.Null);
 
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
             var state = CreateLegalState();
-            
-            var result = authorizationPolicy.Evaluate(CreateLegalEvaluationContext(), ref state);
+
+            var result = authorizationPolicy.Evaluate(evaluationContextStub, ref state);
             Assert.That(result, Is.True);
         }
 
         /// <summary>
-        /// Creates a legal evaluation context which can be used for testing purpose.
+        /// Tests that Evaluate does not call AddClaimSet on the evaluation context when GetCustomClaimSet on the functionality which handles authorization returns an empty claim set.
         /// </summary>
-        /// <returns>Legal evaluation context which can be used for testing purpose.</returns>
-        private static EvaluationContext CreateLegalEvaluationContext()
+        [Test]
+        public void TestThatEvaluateDoesNotCallAddClaimSetOnEvaluationContextWhenGetCustomClaimSetOnAuthorizationHandlerReturnsEmptyClaimSet()
         {
-            var claimsIdentity = MockRepository.GenerateMock<IClaimsIdentity>();
-            var properties = new Dictionary<string, object>(2)
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new DefaultClaimSet())
+                .Repeat.Any();
+
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
+            Assert.That(authorizationPolicy, Is.Not.Null);
+
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            evaluationContextStub.AssertWasNotCalled(m => m.AddClaimSet(Arg<IAuthorizationPolicy>.Is.Anything, Arg<ClaimSet>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that Evaluate returns true when GetCustomClaimSet on the functionality which handles authorization returns an empty claim set.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateReturnsTrueWhenGetCustomClaimSetOnAuthorizationHandlerReturnsEmptyClaimSet()
+        {
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new DefaultClaimSet())
+                .Repeat.Any();
+
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
+            Assert.That(authorizationPolicy, Is.Not.Null);
+
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            var result = authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that Evaluate calls AddClaimSet on the evaluation context when GetCustomClaimSet on the functionality which handles authorization returns an claim set with claims.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateCallsAddClaimSetOnEvaluationContextWhenGetCustomClaimSetOnAuthorizationHandlerReturnsClaimSetWithClaims()
+        {
+            var fixture = new Fixture();
+            var claims = new List<Claim>
             {
-                {"Identities", new[] {claimsIdentity}},
-                {"Principal", null}
+                new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty, fixture.Create<string>()),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty, fixture.Create<string>())
             };
-            return new MyEvaluationContext(properties);
+            var customClaimSet = new DefaultClaimSet(claims);
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(customClaimSet)
+                .Repeat.Any();
+
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
+            Assert.That(authorizationPolicy, Is.Not.Null);
+
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            evaluationContextStub.AssertWasCalled(m => m.AddClaimSet(Arg<AuthorizationPolicy>.Is.TypeOf, Arg<ClaimSet>.Is.Equal(customClaimSet)));
+        }
+
+        /// <summary>
+        /// Tests that Evaluate throws a FaultException when AddClaimSet on the evaluation context fails.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateThrowsFaultExceptionWhenCallsAddClaimSetOnEvaluationContextFails()
+        {
+            var fixture = new Fixture();
+            var claims = new List<Claim>
+            {
+                new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty, fixture.Create<string>()),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty, fixture.Create<string>())
+            };
+            var customClaimSet = new DefaultClaimSet(claims);
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(customClaimSet)
+                .Repeat.Any();
+
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
+            Assert.That(authorizationPolicy, Is.Not.Null);
+
+            var error = fixture.Create<Exception>();
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
+            evaluationContextStub.Stub(m => m.AddClaimSet(Arg<IAuthorizationPolicy>.Is.NotNull, Arg<ClaimSet>.Is.NotNull))
+                .Throw(error)
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            var exception = Assert.Throws<FaultException>(() => authorizationPolicy.Evaluate(evaluationContextStub, ref state));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, error.Message)));
+            Assert.That(exception.Reason, Is.Not.Null);
+            Assert.That(exception.Reason.ToString(), Is.Not.Null);
+            Assert.That(exception.Reason.ToString(), Is.Not.Empty);
+            Assert.That(exception.Reason.ToString(), Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, error.Message)));
+        }
+
+        /// <summary>
+        /// Tests that Evaluate returns true when GetCustomClaimSet on the functionality which handles authorization returns an claim set with claims..
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateReturnsTrueWhenGetCustomClaimSetOnAuthorizationHandlerReturnsClaimSetWithClaims()
+        {
+            var fixture = new Fixture();
+            var claims = new List<Claim>
+            {
+                new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty, fixture.Create<string>()),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty, fixture.Create<string>())
+            };
+            var customClaimSet = new DefaultClaimSet(claims);
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetCustomClaimSet(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(customClaimSet)
+                .Repeat.Any();
+
+            var authorizationPolicy = new AuthorizationPolicy(authorizationHandlerMock);
+            Assert.That(authorizationPolicy, Is.Not.Null);
+
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            var result = authorizationPolicy.Evaluate(evaluationContextStub, ref state);
+            Assert.That(result, Is.True);
         }
 
         /// <summary>

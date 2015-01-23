@@ -1,12 +1,12 @@
 ﻿using System.Security;
+using System.Collections.Generic;
 using Microsoft.IdentityModel.Claims;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Attributes;
 using OSDevGrp.OSIntranet.Security.Authorization;
-using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Security.Claims;
-using Rhino.Mocks;
+using ClaimSet=System.IdentityModel.Claims.ClaimSet;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
 {
@@ -40,6 +40,37 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         {
             var authorizationHandler = new AuthorizationHandler();
             Assert.That(authorizationHandler, Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Tests that GetCustomClaimSet throws a SecurityException when the claim sets added by authorization policies that have been evaluated is null.
+        /// </summary>
+        [Test]
+        public void TestThatGetCustomClaimSetThrowsSecurityExceptionWhenClaimSetsIsNull()
+        {
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
+
+            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.GetCustomClaimSet(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that GetCustomClaimSet returns an empty claim set to add.
+        /// </summary>
+        [Test]
+        public void TestThatGetCustomClaimSetReturnsClaimSetWithoutClaims()
+        {
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
+
+            var result = authorizationHandler.GetCustomClaimSet(new List<ClaimSet>(0));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -79,103 +110,74 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         }
 
         /// <summary>
-        /// Tests that GetCustomPrincipal returns a custom claim based principal when the service type is null.
+        /// Tests that Validate returns when the service type is null.
         /// </summary>
         [Test]
-        public void TestThatGetCustomPrincipalReturnsClaimsPrincipalWhenServiceTypeIsNull()
+        public void TestThatValidateReturnsWhenServiceTypeIsNull()
         {
-            var authorizationPolicyHandler = new AuthorizationHandler();
-            Assert.That(authorizationPolicyHandler, Is.Not.Null);
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
 
-            var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
-
-            var claimsIdentitiesMockCollection = new List<IClaimsIdentity>
+            var claimCollection = new List<Claim>
             {
-                claimsIdentityMock
+                new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty),
             };
 
-            var claimsPrincipal = authorizationPolicyHandler.GetCustomPrincipal(claimsIdentitiesMockCollection, null);
-            Assert.That(claimsPrincipal, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identity, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identity, Is.EqualTo(claimsIdentityMock));
-            Assert.That(claimsPrincipal.Identities, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identities, Is.Not.Empty);
-            Assert.That(claimsPrincipal.Identities, Is.EqualTo(claimsIdentitiesMockCollection));
+            authorizationHandler.Validate(claimCollection, null);
         }
 
         /// <summary>
-        /// Tests that GetCustomPrincipal returns a custom claim based principal when the service type does not have any required claim type attributes.
+        /// Tests that Validate returns when the service type does not have any required claim type attributes.
         /// </summary>
         [Test]
-        public void TestThatGetCustomPrincipalReturnsClaimsPrincipalWhenServiceTypeDoesNotHaveAnyRequiredClaimTypeAttribute()
+        public void TestThatValidateReturnsWhenServiceTypeDoesNotHaveAnyRequiredClaimTypeAttribute()
         {
-            var authorizationPolicyHandler = new AuthorizationHandler();
-            Assert.That(authorizationPolicyHandler, Is.Not.Null);
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
 
-            var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
-
-            var claimsIdentitiesMockCollection = new List<IClaimsIdentity>
+            var claimCollection = new List<Claim>
             {
-                claimsIdentityMock
+                new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty),
             };
 
-            var claimsPrincipal = authorizationPolicyHandler.GetCustomPrincipal(claimsIdentitiesMockCollection, typeof (MyUnsecuredService));
-            Assert.That(claimsPrincipal, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identity, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identity, Is.EqualTo(claimsIdentityMock));
-            Assert.That(claimsPrincipal.Identities, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identities, Is.Not.Empty);
-            Assert.That(claimsPrincipal.Identities, Is.EqualTo(claimsIdentitiesMockCollection));
+            authorizationHandler.Validate(claimCollection, typeof (MyUnsecuredService));
         }
 
         /// <summary>
-        /// Tests that GetCustomPrincipal returns a custom claim based principal when the service type has required claim type attributes and the identity has these claims.
+        /// Tests that Validate returns when the service type has required claim type attributes and the identity has these claims.
         /// </summary>
         [Test]
-        public void TestThatGetCustomPrincipalReturnsClaimsPrincipalWhenServiceTypeHasRequiredClaimTypeAttributeAndClaimsIdentityHasRequiredClaimTypes()
+        public void TestThatValidateReturnsWhenServiceTypeHasRequiredClaimTypeAttributeAndClaimsIdentityHasRequiredClaimTypes()
         {
-            var authorizationPolicyHandler = new AuthorizationHandler();
-            Assert.That(authorizationPolicyHandler, Is.Not.Null);
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
 
-            var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
-            claimsIdentityMock.Stub(m => m.Claims)
-                .Return(new ClaimCollection(claimsIdentityMock) {new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty), new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty)})
-                .Repeat.Any();
-
-            var claimsIdentitiesMockCollection = new List<IClaimsIdentity>
+            var claimCollection = new List<Claim>
             {
-                claimsIdentityMock
+                new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty),
             };
 
-            var claimsPrincipal = authorizationPolicyHandler.GetCustomPrincipal(claimsIdentitiesMockCollection, typeof (MySecuredService));
-            Assert.That(claimsPrincipal, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identity, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identity, Is.EqualTo(claimsIdentityMock));
-            Assert.That(claimsPrincipal.Identities, Is.Not.Null);
-            Assert.That(claimsPrincipal.Identities, Is.Not.Empty);
-            Assert.That(claimsPrincipal.Identities, Is.EqualTo(claimsIdentitiesMockCollection));
+            authorizationHandler.Validate(claimCollection, typeof (MySecuredService));
         }
 
         /// <summary>
-        /// Tests that GetCustomPrincipal throws a SecurityException when the service type has required claim type attributes and the identity does not have these claims.
+        /// Tests that Validate throws a SecurityException when the service type has required claim type attributes and the identity does not have these claims.
         /// </summary>
         [Test]
-        public void TestThatGetCustomPrincipalThrowsSecurityExceptionWhenServiceTypeHasRequiredClaimTypeAttributeAndClaimsIdentityDoesNotHaveRequiredClaimTypes()
+        public void TestThatValidateThrowsSecurityExceptionWhenServiceTypeHasRequiredClaimTypeAttributeAndClaimsIdentityDoesNotHaveRequiredClaimTypes()
         {
-            var authorizationPolicyHandler = new AuthorizationHandler();
-            Assert.That(authorizationPolicyHandler, Is.Not.Null);
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
 
-            var claimsIdentityMock = MockRepository.GenerateMock<IClaimsIdentity>();
-            claimsIdentityMock.Stub(m => m.Claims)
-                .Return(new ClaimCollection(claimsIdentityMock) {new Claim(FoodWasteClaimTypes.SystemManagement, string.Empty)})
-                .Repeat.Any();
-
-            var claimsIdentitiesMockCollection = new List<IClaimsIdentity>
+            var claimCollection = new List<Claim>
             {
-                claimsIdentityMock
+                new Claim(FoodWasteClaimTypes.ValidatedUser, string.Empty),
             };
 
-            var exception = Assert.Throws<SecurityException>(() => authorizationPolicyHandler.GetCustomPrincipal(claimsIdentitiesMockCollection, typeof (MySecuredService)));
+            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.Validate(claimCollection, typeof (MySecuredService)));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);

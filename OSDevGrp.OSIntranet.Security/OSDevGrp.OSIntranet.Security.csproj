@@ -58,6 +58,7 @@
     <Compile Include="Authorization\AuthorizationPolicy.cs" />
     <Compile Include="Authorization\AuthorizationHandler.cs" />
     <Compile Include="Authorization\IAuthorizationHandler.cs" />
+    <Compile Include="Authorization\ServiceAuthorizationManager.cs" />
     <Compile Include="Claims\FoodWasteClaimTypes.cs" />
     <Compile Include="Configuration\CertificateConfigurationElement.cs" />
     <Compile Include="Configuration\ClaimConfigurationElement.cs" />
