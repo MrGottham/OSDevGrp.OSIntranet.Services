@@ -45,6 +45,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel<IFoodWasteSystemDataService>(ClientEndpointName);
             try
             {
+
                 var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
                 var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
                 Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
