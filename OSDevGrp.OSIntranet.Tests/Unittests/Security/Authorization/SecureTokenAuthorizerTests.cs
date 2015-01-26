@@ -5,19 +5,19 @@ using OSDevGrp.OSIntranet.Security.Authorization;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
 {
     /// <summary>
-    /// Tests the manager which checks authorization access checking for service operations.
+    /// Tests the functionality which checks authorization access for a secure token on each service operation.
     /// </summary>
     [TestFixture]
-    public class ServiceAuthorizationManagerTests
+    public class SecureTokenAuthorizerTests
     {
         /// <summary>
-        /// Tests that the constructor initialize a manager which checks authorization access checking for service operations.
+        /// Tests that the constructor initialize functionality which checks authorization access for a secure token on each service operation..
         /// </summary>
         [Test]
-        public void TestThatConstructorInitializeServiceAuthorizationManager()
+        public void TestThatConstructorInitializeServiceSecureTokenAuthorizer()
         {
-            var serviceAuthorizationManager = new ServiceAuthorizationManager();
-            Assert.That(serviceAuthorizationManager, Is.Not.Null);
+            var secureTokenAuthorizer = new SecureTokenAuthorizer();
+            Assert.That(secureTokenAuthorizer, Is.Not.Null);
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         [Test]
         public void TestThatConstructorThrowsArgumentNullExceptionIfAuthorizationHandlerIsNull()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new ServiceAuthorizationManager(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new SecureTokenAuthorizer(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);

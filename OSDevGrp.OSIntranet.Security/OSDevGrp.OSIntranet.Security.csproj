@@ -55,10 +55,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\RequiredClaimTypeAttribute.cs" />
-    <Compile Include="Authorization\AuthorizationPolicy.cs" />
+    <Compile Include="Authorization\ClaimsAuthorizationPolicy.cs" />
     <Compile Include="Authorization\AuthorizationHandler.cs" />
     <Compile Include="Authorization\IAuthorizationHandler.cs" />
-    <Compile Include="Authorization\ServiceAuthorizationManager.cs" />
+    <Compile Include="Authorization\SecureTokenAuthorizer.cs" />
     <Compile Include="Claims\FoodWasteClaimTypes.cs" />
     <Compile Include="Configuration\CertificateConfigurationElement.cs" />
     <Compile Include="Configuration\ClaimConfigurationElement.cs" />
@@ -76,9 +76,6 @@
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Temp.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.Infrastructure.Interfaces\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj">
