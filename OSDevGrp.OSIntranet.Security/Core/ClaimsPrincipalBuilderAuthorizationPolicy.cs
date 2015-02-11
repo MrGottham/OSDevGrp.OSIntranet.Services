@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IdentityModel.Claims;
 using System.IdentityModel.Policy;
+using System.ServiceModel;
+using Microsoft.IdentityModel.Claims;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Security.Core
 {
@@ -10,6 +13,9 @@ namespace OSDevGrp.OSIntranet.Security.Core
     public class ClaimsPrincipalBuilderAuthorizationPolicy : IAuthorizationPolicy
     {
         #region Private variables
+
+        private readonly Guid _id = Guid.NewGuid();
+
         #endregion
 
         #region Properties
@@ -19,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Security.Core
         /// </summary>
         public virtual string Id
         {
-            get { throw new NotImplementedException(); }
+            get { return _id.ToString(); }
         }
 
         /// <summary>
@@ -27,7 +33,7 @@ namespace OSDevGrp.OSIntranet.Security.Core
         /// </summary>
         public virtual ClaimSet Issuer
         {
-            get { throw new NotImplementedException(); }
+            get { return ClaimSet.System; }
         }
 
         #endregion
@@ -42,7 +48,37 @@ namespace OSDevGrp.OSIntranet.Security.Core
         /// <returns>False if the method for this authorization policy must be called if additional claims are added by other authorization policies to evaluationContext otherwise, true to state no additional evaluation is required by this authorization policy.</returns>
         public bool Evaluate(EvaluationContext evaluationContext, ref object state)
         {
-            throw new NotImplementedException();
+            if (evaluationContext == null)
+            {
+                throw new ArgumentNullException("evaluationContext");
+            }
+            try
+            {
+                object principalObject;
+                if (evaluationContext.Properties.TryGetValue("Principal", out principalObject) == false)
+                {
+                    principalObject = new ClaimsPrincipal();
+                    evaluationContext.Properties.Add("Principal", principalObject);
+                }
+
+                var claimsPrincipal = principalObject as IClaimsPrincipal;
+                if (claimsPrincipal == null)
+                {
+                    return false;
+                }
+
+                if (evaluationContext.ClaimSets == null)
+                {
+                    evaluationContext.Properties["Principal"] = claimsPrincipal;
+                    return true;
+                }
+                evaluationContext.Properties["Principal"] = claimsPrincipal;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new FaultException(Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, ex.Message));
+            }
         }
 
         #endregion
