@@ -67,6 +67,7 @@
     <Compile Include="Configuration\UriConfigurationElementCollection.cs" />
     <Compile Include="Core\AuthorizationHandler.cs" />
     <Compile Include="Core\CertificateHelper.cs" />
+    <Compile Include="Core\ClaimsPrincipalBuilderAuthorizationPolicy.cs" />
     <Compile Include="Core\CommonValidation.cs" />
     <Compile Include="Core\IAuthorizationHandler.cs" />
     <Compile Include="Core\ICommonValidation.cs" />
