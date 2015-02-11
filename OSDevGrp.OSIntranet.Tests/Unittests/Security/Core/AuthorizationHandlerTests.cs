@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Claims;
 using System.Security;
+using Microsoft.IdentityModel.Claims;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Attributes;
@@ -107,8 +107,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
 
             var claims = new List<Claim>
             {
-                new Claim(FoodWasteClaimTypes.SystemManagement, fixture.Create<object>(), Rights.PossessProperty),
-                new Claim(FoodWasteClaimTypes.ValidatedUser, fixture.Create<object>(), Rights.PossessProperty)
+                new Claim(FoodWasteClaimTypes.SystemManagement, fixture.Create<string>(), ClaimValueTypes.String),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, fixture.Create<string>(), ClaimValueTypes.String)
             };
 
             authorizationHandler.Authorize(claims, typeof (MyUnsecuredService));
@@ -127,8 +127,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
 
             var claims = new List<Claim>
             {
-                new Claim(FoodWasteClaimTypes.SystemManagement, fixture.Create<object>(), Rights.PossessProperty),
-                new Claim(FoodWasteClaimTypes.ValidatedUser, fixture.Create<object>(), Rights.PossessProperty)
+                new Claim(FoodWasteClaimTypes.SystemManagement, fixture.Create<string>(), ClaimValueTypes.String),
+                new Claim(FoodWasteClaimTypes.ValidatedUser, fixture.Create<string>(), ClaimValueTypes.String)
             };
 
             authorizationHandler.Authorize(claims, typeof (MySecuredService));
@@ -147,10 +147,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
 
             var claims = new List<Claim>
             {
-                new Claim(FoodWasteClaimTypes.ValidatedUser, fixture.Create<object>(), Rights.PossessProperty)
+                new Claim(FoodWasteClaimTypes.ValidatedUser, fixture.Create<string>(), ClaimValueTypes.String)
             };
 
-            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.Authorize(claims, typeof (MySecuredService)));
+            var exception =Assert.Throws<SecurityException>(() => authorizationHandler.Authorize(claims, typeof (MySecuredService)));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);

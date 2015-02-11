@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Claims;
 using System.Linq;
 using System.Security;
+using Microsoft.IdentityModel.Claims;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Attributes;
 

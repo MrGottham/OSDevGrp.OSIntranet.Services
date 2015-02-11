@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Claims;
+using Microsoft.IdentityModel.Claims;
 
 namespace OSDevGrp.OSIntranet.Security.Core
 {

@@ -56,8 +56,6 @@
   <ItemGroup>
     <Compile Include="Attributes\RequiredClaimTypeAttribute.cs" />
     <Compile Include="Authorization\ClaimsPrincipalBuilderAuthorizationPolicy.cs" />
-    <Compile Include="Authorization\AuthorizationHandler.cs" />
-    <Compile Include="Authorization\IAuthorizationHandler.cs" />
     <Compile Include="Authorization\SecureTokenAuthorizer.cs" />
     <Compile Include="Claims\FoodWasteClaimTypes.cs" />
     <Compile Include="Configuration\CertificateConfigurationElement.cs" />
