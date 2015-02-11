@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using Microsoft.IdentityModel.Claims;
 using Microsoft.IdentityModel.Protocols.WSTrust;
 using Microsoft.IdentityModel.SecurityTokenService;
@@ -178,13 +179,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         }
 
         /// <summary>
-        /// Tests that Issue throws an InvalidRequestException when AppliesTo in the request security token contains an untrusted relying party.
+        /// Tests that Issue throws an InvalidRequestException when Identity on AppliesTo in the request security token is null.
         /// </summary>
         [Test]
-        [TestCase("http://xxx.local")]
-        [TestCase("http://yyy.local")]
-        [TestCase("http://zzz.local")]
-        public void TestThatIssueThrowsInvalidRequestExceptionIfAppliesToInRequestSecurityTokenContainsNoTrustedRelyingParty(string untrustedUri)
+        [TestCase("http://localhost")]
+        [TestCase("http://mother")]
+        public void TestThatIssueThrowsInvalidRequestExceptionIfIdentityOnAppliesToInRequestSecurityTokenIsNull(string trustedUri)
         {
             var identifyMock = MockRepository.GenerateMock<IIdentity>();
             identifyMock.Expect(m => m.IsAuthenticated)
@@ -201,7 +201,76 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
 
             var request = new RequestSecurityToken
             {
-                AppliesTo = new EndpointAddress(new Uri(untrustedUri))
+                AppliesTo = new EndpointAddress(new Uri(trustedUri), null, new AddressHeaderCollection())
+            };
+
+            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(claimPrincipalMock, request));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustHaveX509CertificateEndpointIdentity)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Issue throws an InvalidRequestException when Identity on AppliesTo in the request security token is not type of X509CertificateEndpointIdentity.
+        /// </summary>
+        [Test]
+        [TestCase("http://localhost")]
+        [TestCase("http://mother")]
+        public void TestThatIssueThrowsInvalidRequestExceptionIfIdentityOnAppliesToInRequestSecurityTokenIsNotTypeOfX509CertificateEndpointIdentity(string trustedUri)
+        {
+            var identifyMock = MockRepository.GenerateMock<IIdentity>();
+            identifyMock.Expect(m => m.IsAuthenticated)
+                .Return(true)
+                .Repeat.Any();
+
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(identifyMock)
+                .Repeat.Any();
+
+            var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
+            Assert.That(basicSecurityTokenService, Is.Not.Null);
+
+            var request = new RequestSecurityToken
+            {
+                AppliesTo = new EndpointAddress(new Uri(trustedUri), new DnsEndpointIdentity(string.Empty), new AddressHeaderCollection())
+            };
+
+            var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(claimPrincipalMock, request));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustHaveX509CertificateEndpointIdentity)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Issue throws an InvalidRequestException when AppliesTo in the request security token contains an untrusted relying party.
+        /// </summary>
+        [Test]
+        [TestCase("http://xxx.local", "CN=OSDevGrp.OSIntranet.Tokens")]
+        [TestCase("http://yyy.local", "CN=OSDevGrp.OSIntranet.Tokens")]
+        [TestCase("http://zzz.local", "CN=OSDevGrp.OSIntranet.Tokens")]
+        public void TestThatIssueThrowsInvalidRequestExceptionIfAppliesToInRequestSecurityTokenContainsNoTrustedRelyingParty(string untrustedUri, string identityCertificate)
+        {
+            var identifyMock = MockRepository.GenerateMock<IIdentity>();
+            identifyMock.Expect(m => m.IsAuthenticated)
+                .Return(true)
+                .Repeat.Any();
+
+            var claimPrincipalMock = MockRepository.GenerateMock<IClaimsPrincipal>();
+            claimPrincipalMock.Stub(m => m.Identity)
+                .Return(identifyMock)
+                .Repeat.Any();
+
+            var basicSecurityTokenService = new BasicSecurityTokenService(new BasicSecurityTokenServiceConfiguration());
+            Assert.That(basicSecurityTokenService, Is.Not.Null);
+
+            var request = new RequestSecurityToken
+            {
+                AppliesTo = new EndpointAddress(new Uri(untrustedUri), new X509CertificateEndpointIdentity(TestHelper.GetCertificate(identityCertificate)), new AddressHeaderCollection())
             };
 
             var exception = Assert.Throws<InvalidRequestException>(() => basicSecurityTokenService.Issue(claimPrincipalMock, request));
@@ -216,9 +285,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         /// Tests that Issue returns when AppliesTo in the request security token contains a trusted relying party.
         /// </summary>
         [Test]
-        [TestCase("http://localhost")]
-        [TestCase("http://mother")]
-        public void TestThatIssueRetursIfAppliesToInRequestSecurityTokenContainsTrustedRelyingParty(string trustedUri)
+        [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens")]
+        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens")]
+        public void TestThatIssueRetursIfAppliesToInRequestSecurityTokenContainsTrustedRelyingParty(string trustedUri, string identityCertificate)
         {
             var fixture = new Fixture();
 
@@ -243,7 +312,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
 
             var request = new RequestSecurityToken
             {
-                AppliesTo = new EndpointAddress(new Uri(trustedUri))
+                AppliesTo = new EndpointAddress(new Uri(trustedUri), new X509CertificateEndpointIdentity(TestHelper.GetCertificate(identityCertificate)), new AddressHeaderCollection())
             };
 
             var response = basicSecurityTokenService.Issue(claimPrincipalMock, request);
@@ -251,12 +320,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         }
 
         /// <summary>
-        /// Tests that Issue returns a claims identity with appended claims.
+        /// Tests that Issue appends claims to the calling claims principal.
         /// </summary>
         [Test]
-        [TestCase("mrgottham@gmail.com", 2)]
-        [TestCase("ole.sorensen@osdevgrp.dk", 1)]
-        public void TestThatIssueRetursClaimsIdentityWithAppendedClaims(string mailAddress, int expectedAppendedClaims)
+        [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 2)]
+        [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 1)]
+        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 2)]
+        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 1)]
+        public void TestThatIssueAppendsClaimsToCallingClaimsPrincipal(string trustedUri, string identityCertificate, string mailAddress, int expectedAppendedClaims)
         {
             var fixture = new Fixture();
 
@@ -291,7 +362,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
 
             var request = new RequestSecurityToken
             {
-                AppliesTo = new EndpointAddress(new Uri("http://localhost"))
+                AppliesTo = new EndpointAddress(new Uri(trustedUri), new X509CertificateEndpointIdentity(TestHelper.GetCertificate(identityCertificate)), new AddressHeaderCollection())
             };
 
             var response = basicSecurityTokenService.Issue(claimPrincipalMock, request);

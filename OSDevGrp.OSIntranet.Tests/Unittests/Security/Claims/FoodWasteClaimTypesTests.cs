@@ -10,27 +10,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Claims
     public class FoodWasteClaimTypesTests
     {
         /// <summary>
-        /// Tests that the getter of SystemManagement returns the claim type for system management.
+        /// Tests that SystemManagement returns the claim type for system management.
         /// </summary>
         [Test]
-        public void TestThatSystemManagementGetterReturnClaimType()
+        public void TestThatSystemManagementReturnClaimType()
         {
-            var claimType = FoodWasteClaimTypes.SystemManagement;
-            Assert.That(claimType, Is.Not.Null);
-            Assert.That(claimType, Is.Not.Empty);
-            Assert.That(claimType, Is.EqualTo("urn://osdevgrp/foodwaste/security/systemmanagement"));
+            Assert.That(FoodWasteClaimTypes.SystemManagement, Is.Not.Null);
+            Assert.That(FoodWasteClaimTypes.SystemManagement, Is.Not.Empty);
+            Assert.That(FoodWasteClaimTypes.SystemManagement, Is.EqualTo("http://osdevgrp.local/foodwaste/security/systemmanagement"));
         }
 
         /// <summary>
-        /// Tests that the getter of ValidatedUser returns the claim type for validated user.
+        /// Tests that ValidatedUser returns the claim type for validated user.
         /// </summary>
         [Test]
-        public void TestThatValidatedUserGetterReturnClaimType()
+        public void TestThatValidatedUserReturnClaimType()
         {
-            var claimType = FoodWasteClaimTypes.ValidatedUser;
-            Assert.That(claimType, Is.Not.Null);
-            Assert.That(claimType, Is.Not.Empty);
-            Assert.That(claimType, Is.EqualTo("urn://osdevgrp/foodwaste/security/user"));
+            Assert.That(FoodWasteClaimTypes.ValidatedUser, Is.Not.Null);
+            Assert.That(FoodWasteClaimTypes.ValidatedUser, Is.Not.Empty);
+            Assert.That(FoodWasteClaimTypes.ValidatedUser, Is.EqualTo("http://osdevgrp.local/foodwaste/security/user"));
         }
     }
 }

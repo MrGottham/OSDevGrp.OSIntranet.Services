@@ -6,7 +6,6 @@ using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Attributes;
 using OSDevGrp.OSIntranet.Security.Authorization;
 using OSDevGrp.OSIntranet.Security.Claims;
-using ClaimSet=System.IdentityModel.Claims.ClaimSet;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
 {
@@ -26,8 +25,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         /// <summary>
         /// Private class for a secured service used for testing purpose.
         /// </summary>
-        [RequiredClaimTypeAttribute("urn://osdevgrp/foodwaste/security/systemmanagement")]
-        [RequiredClaimTypeAttribute("urn://osdevgrp/foodwaste/security/user")]
+        [RequiredClaimTypeAttribute(FoodWasteClaimTypes.SystemManagement)]
+        [RequiredClaimTypeAttribute(FoodWasteClaimTypes.ValidatedUser)]
         private class MySecuredService
         {
         }
@@ -40,37 +39,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Authorization
         {
             var authorizationHandler = new AuthorizationHandler();
             Assert.That(authorizationHandler, Is.Not.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetCustomClaimSet throws a SecurityException when the claim sets added by authorization policies that have been evaluated is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetCustomClaimSetThrowsSecurityExceptionWhenClaimSetsIsNull()
-        {
-            var authorizationHandler = new AuthorizationHandler();
-            Assert.That(authorizationHandler, Is.Not.Null);
-
-            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.GetCustomClaimSet(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound)));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetCustomClaimSet returns an empty claim set to add.
-        /// </summary>
-        [Test]
-        public void TestThatGetCustomClaimSetReturnsClaimSetWithoutClaims()
-        {
-            var authorizationHandler = new AuthorizationHandler();
-            Assert.That(authorizationHandler, Is.Not.Null);
-
-            var result = authorizationHandler.GetCustomClaimSet(new List<ClaimSet>(0));
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count, Is.EqualTo(0));
         }
 
         /// <summary>

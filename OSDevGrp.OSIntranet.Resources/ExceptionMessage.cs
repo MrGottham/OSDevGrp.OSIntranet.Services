@@ -27,8 +27,11 @@
         CertificateWasNotFound,
         InvalidRelyingPartyAddress,
         AppliesToMustBeSuppliedInRequestSecurityToken,
+        AppliesToMustHaveX509CertificateEndpointIdentity,
         NotAuthorizedToUseService,
         NoClaimsWasFound,
-        MissingClaimTypeForIdentity
+        MissingClaimTypeForIdentity,
+        SecurityTokenCouldNotBeValidated,
+        UserNameAndPasswordCouldNotBeValidated
     }
 }

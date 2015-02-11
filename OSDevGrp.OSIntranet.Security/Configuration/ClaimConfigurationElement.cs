@@ -16,7 +16,7 @@ namespace OSDevGrp.OSIntranet.Security.Configuration
         /// <summary>
         /// Gets the claim type.
         /// </summary>
-        [ConfigurationProperty("claimType", DefaultValue = "urn:osdevgrp:osintranet:security:1.0.0", IsRequired = true)]
+        [ConfigurationProperty("claimType", DefaultValue = "http://osdevgrp.local/osintranet/security", IsRequired = true)]
         [RegexStringValidator(@"((?<=\()[A-Za-z][A-Za-z0-9\+\.\-]*:([A-Za-z0-9\.\-_~:/\?#\[\]@!\$&'\(\)\*\+,;=]|%[A-Fa-f0-9]{2})+(?=\)))|([A-Za-z][A-Za-z0-9\+\.\-]*:([A-Za-z0-9\.\-_~:/\?#\[\]@!\$&'\(\)\*\+,;=]|%[A-Fa-f0-9]{2})+)")]
         public virtual string ClaimType
         {
@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Security.Configuration
         /// <summary>
         /// Gets the claim value.
         /// </summary>
-        [ConfigurationProperty("claimValue", DefaultValue = "", IsRequired = false)]
+        [ConfigurationProperty("claimValue", DefaultValue = "", IsRequired = true)]
         public virtual string ClaimValue
         {
             get { return (string) this["claimValue"]; }
@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Security.Configuration
         {
             get
             {
-                return new Claim(ClaimType, ClaimValue);
+                return new Claim(ClaimType, ClaimValue, ClaimValueTypes.String, ConfigurationProvider.Instance.IssuerTokenName.Address);
             }
         }
 
@@ -67,14 +67,14 @@ namespace OSDevGrp.OSIntranet.Security.Configuration
             {
                 return false;
             }
-            if (claimsIdentity.Claims.Any(c => string.Compare(c.ClaimType, ClaimType, StringComparison.InvariantCulture) == 0))
+            if (claimsIdentity.Claims.Any(c => string.Compare(c.ClaimType, ClaimType, StringComparison.Ordinal) == 0))
             {
                 return false;
             }
             foreach (var condition in Conditions.OfType<RegularExpressionConfigurationElement>())
             {
                 var currentCondition = condition;
-                foreach (var valueClaim in claimsIdentity.Claims.Where(c => string.Compare(c.ClaimType, currentCondition.ValueClaimType, StringComparison.InvariantCulture) == 0))
+                foreach (var valueClaim in claimsIdentity.Claims.Where(c => string.Compare(c.ClaimType, currentCondition.ValueClaimType, StringComparison.Ordinal) == 0))
                 {
                     if (string.IsNullOrEmpty(valueClaim.Value))
                     {

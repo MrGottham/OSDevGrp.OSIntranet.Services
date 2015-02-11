@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
 using System.ServiceModel;
@@ -9,7 +10,7 @@ using Microsoft.IdentityModel.Protocols.WSTrust;
 using Microsoft.IdentityModel.SecurityTokenService;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Configuration;
-using OSDevGrp.OSIntranet.Security.Helper;
+using OSDevGrp.OSIntranet.Security.Core;
 
 namespace OSDevGrp.OSIntranet.Security.Services
 {
@@ -57,16 +58,16 @@ namespace OSDevGrp.OSIntranet.Security.Services
                 var authenticationException = new AuthenticationException();
                 throw new InvalidRequestException(authenticationException.Message, authenticationException);
             }
-            var appliesTo = request.AppliesTo;
-            if (appliesTo == null || appliesTo.Uri == null || string.IsNullOrEmpty(appliesTo.Uri.AbsoluteUri))
-            {
-                throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustBeSuppliedInRequestSecurityToken));
-            }
             try
             {
+                var appliesTo = request.AppliesTo;
+                if (appliesTo == null || appliesTo.Uri == null || string.IsNullOrEmpty(appliesTo.Uri.AbsoluteUri))
+                {
+                    throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustBeSuppliedInRequestSecurityToken));
+                }
                 return new Scope(appliesTo.Uri.AbsoluteUri)
                 {
-                    EncryptingCredentials = GetCredentialsForAppliesTo(request.AppliesTo),
+                    EncryptingCredentials = GetCredentialsForAppliesTo(appliesTo),
                     SigningCredentials = new X509SigningCredentials(CertificateHelper.GetCertificate(StoreName.My, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.SubjetName))
                 };
             }
@@ -99,13 +100,31 @@ namespace OSDevGrp.OSIntranet.Security.Services
                 var argumentNullException = new ArgumentNullException("request");
                 throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
             }
-            if (principal.Identities != null && principal.Identities.Any())
+            if (scope == null)
             {
-                return AppendClaims(principal.Identities.First());
+                var argumentNullException = new ArgumentNullException("scope");
+                throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
             }
-            var claimsIdentity = new ClaimsIdentity();
-            claimsIdentity.Claims.Add(new Claim(ClaimTypes.Name, principal.Identity.Name));
-            return AppendClaims(claimsIdentity);
+            try
+            {
+                IClaimsIdentity claimsIdentity;
+                if (principal.Identities != null && principal.Identities.Any())
+                {
+                    claimsIdentity = AppendClaims(principal.Identities.First());
+                    return CreateOutgoingClaimsIdentity(scope.EncryptingCredentials as X509EncryptingCredentials, claimsIdentity.Claims);
+                }
+                claimsIdentity = new ClaimsIdentity();
+                claimsIdentity.Claims.Add(new Claim(ClaimTypes.Name, principal.Identity.Name));
+                return CreateOutgoingClaimsIdentity(scope.EncryptingCredentials as X509EncryptingCredentials, claimsIdentity.Claims);
+            }
+            catch (InvalidRequestException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidRequestException(ex.Message, ex);
+            }
         }
 
         /// <summary>
@@ -115,29 +134,65 @@ namespace OSDevGrp.OSIntranet.Security.Services
         /// <returns>Credentials for the scope.</returns>
         private static X509EncryptingCredentials GetCredentialsForAppliesTo(EndpointAddress appliesTo)
         {
-            if (appliesTo == null || appliesTo.Uri == null || string.IsNullOrEmpty(appliesTo.Uri.AbsolutePath))
+            if (appliesTo == null || appliesTo.Uri == null || string.IsNullOrEmpty(appliesTo.Uri.AbsoluteUri))
             {
                 throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustBeSuppliedInRequestSecurityToken));
             }
+            var appliesToIdentity = appliesTo.Identity as X509CertificateEndpointIdentity;
+            if (appliesToIdentity == null || appliesToIdentity.Certificates == null || appliesToIdentity.Certificates.Count <= 0)
+            {
+                throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustHaveX509CertificateEndpointIdentity));
+            }
             if (ConfigurationProvider.Instance.TrustedRelyingPartyCollection.OfType<UriConfigurationElement>().Any(trustedRelyingParty => appliesTo.Uri.AbsoluteUri.StartsWith(trustedRelyingParty.Uri.AbsoluteUri)))
             {
-                return new X509EncryptingCredentials(CertificateHelper.GetCertificate(StoreName.TrustedPeople, StoreLocation.LocalMachine, ConfigurationProvider.Instance.SigningCertificate.SubjetName));
+                return new X509EncryptingCredentials(appliesToIdentity.Certificates[0]);
             }
             throw new InvalidRequestException(Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress, appliesTo.Uri.AbsoluteUri));
         }
 
         /// <summary>
-        /// Appends the claims which should be associated with the claims identify.
+        /// Appends the claims which should be associated with the claims identity.
         /// </summary>
         /// <param name="claimsIdentity">Claims identity.</param>
         /// <returns>Claims identity with associated claims.</returns>
         private static IClaimsIdentity AppendClaims(IClaimsIdentity claimsIdentity)
         {
+            if (claimsIdentity == null)
+            {
+                var argumentNullException = new ArgumentNullException("claimsIdentity");
+                throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
+            }
             foreach (var claimConfigurationElement in ConfigurationProvider.Instance.ClaimCollection.OfType<ClaimConfigurationElement>().Where(claimConfigurationElement => claimConfigurationElement.Validate(claimsIdentity)))
             {
                 claimsIdentity.Claims.Add(claimConfigurationElement.Claim);
             }
             return claimsIdentity;
+        }
+
+        /// <summary>
+        /// Creates the outgoing claims identity.
+        /// </summary>
+        /// <param name="encryptingCredentials">Encrypting credentials for the endpoint to call.</param>
+        /// <param name="claims">Claims from the calling claims identity.</param>
+        /// <returns>Outgoing claims identity.</returns>
+        private static IClaimsIdentity CreateOutgoingClaimsIdentity(X509EncryptingCredentials encryptingCredentials, IEnumerable<Claim> claims)
+        {
+            if (encryptingCredentials == null)
+            {
+                var argumentNullException = new ArgumentNullException("encryptingCredentials");
+                throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
+            }
+            if (claims == null)
+            {
+                var argumentNullException = new ArgumentNullException("claims");
+                throw new InvalidRequestException(argumentNullException.Message, argumentNullException);
+            }
+            var outgoingClaimsIdentity = new ClaimsIdentity(encryptingCredentials.Certificate, encryptingCredentials.Certificate.Issuer);
+            foreach (var missingClaim in claims.Where(claim => outgoingClaimsIdentity.Claims.Any(hasClaim => string.Compare(claim.ClaimType, hasClaim.ClaimType, StringComparison.Ordinal) == 0) == false))
+            {
+                outgoingClaimsIdentity.Claims.Add(new Claim(missingClaim.ClaimType, missingClaim.Value, missingClaim.ValueType, encryptingCredentials.Certificate.Issuer, encryptingCredentials.Certificate.Issuer));
+            }
+            return outgoingClaimsIdentity;
         }
 
         #endregion

@@ -1,7 +1,6 @@
-﻿using NUnit.Framework;
-using OSDevGrp.OSIntranet.CommonLibrary.IoC;
+﻿using System.ServiceModel;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
-using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 
@@ -22,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
 
         #region Private variables
 
-        private IChannelFactory _channelFactory;
+        private ChannelFactory<IFoodWasteSystemDataService> _channelFactory;
 
         #endregion
 
@@ -32,8 +31,14 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         [TestFixtureSetUp]
         public void TestSetUp()
         {
-            var container = ContainerFactory.Create();
-            _channelFactory = container.Resolve<IChannelFactory>();
+            _channelFactory = new ChannelFactory<IFoodWasteSystemDataService>(ClientEndpointName);
+            if (_channelFactory.Credentials == null)
+            {
+                return;
+            }
+            _channelFactory.Credentials.UserName.UserName = "test@osdevgrp.dk";
+
+            // TODO: https://msdn.microsoft.com/en-us/library/ms751506(v=vs.110).aspx
         }
 
         /// <summary>
@@ -42,7 +47,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         [Test]
         public void TestThatTranslationInfoGetAllGetsTranslationInfoSystemViewCollection()
         {
-            var client = _channelFactory.CreateChannel<IFoodWasteSystemDataService>(ClientEndpointName);
+            var client = _channelFactory.CreateChannel();
             try
             {
                 var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();

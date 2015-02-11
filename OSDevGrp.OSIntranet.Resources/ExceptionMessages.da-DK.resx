@@ -205,4 +205,13 @@
   <data name="NoClaimsWasFound" xml:space="preserve">
     <value>Der blev ikke fundet nogle claims.</value>
   </data>
+  <data name="AppliesToMustHaveX509CertificateEndpointIdentity" xml:space="preserve">
+    <value>AppliesTo skal have en identitiet af typen X509CertificateEndpointIdentity, som indeholder et certifikat.</value>
+  </data>
+  <data name="UserNameAndPasswordCouldNotBeValidated" xml:space="preserve">
+    <value>Brugernavnet og koden kunne ikke valideres.</value>
+  </data>
+  <data name="SecurityTokenCouldNotBeValidated" xml:space="preserve">
+    <value>Sikkerhedstoken kunne ikke valideres.</value>
+  </data>
 </root>

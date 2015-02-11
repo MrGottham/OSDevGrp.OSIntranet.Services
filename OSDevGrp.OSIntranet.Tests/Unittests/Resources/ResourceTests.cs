@@ -354,6 +354,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for AppliesToMustHaveX509CertificateEndpointIdentity hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForAppliesToMustHaveX509CertificateEndpointIdentityHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustHaveX509CertificateEndpointIdentity);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ExceptionMessage for NotAuthorizedToUseService hentes.
         /// </summary>
         [Test]
@@ -388,6 +399,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         public void TestAtExceptionMessageForMissingClaimTypeForIdentityHentes()
         {
             var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MissingClaimTypeForIdentity);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for SecurityTokenCouldNotBeValidated hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForSecurityTokenCouldNotBeValidatedHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.SecurityTokenCouldNotBeValidated);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for UserNameAndPasswordCouldNotBeValidated hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForUserNameAndPasswordCouldNotBeValidatedHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UserNameAndPasswordCouldNotBeValidated);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }

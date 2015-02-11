@@ -205,4 +205,13 @@
   <data name="NoClaimsWasFound" xml:space="preserve">
     <value>No claims was found.</value>
   </data>
+  <data name="AppliesToMustHaveX509CertificateEndpointIdentity" xml:space="preserve">
+    <value>AppliesTo must have an identity of the type X509CertificateEndpointIdentity which contains a certificate.</value>
+  </data>
+  <data name="UserNameAndPasswordCouldNotBeValidated" xml:space="preserve">
+    <value>The username and password could not be validated.</value>
+  </data>
+  <data name="SecurityTokenCouldNotBeValidated" xml:space="preserve">
+    <value>The security token could not be validated.</value>
+  </data>
 </root>
