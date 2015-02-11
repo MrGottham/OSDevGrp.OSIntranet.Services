@@ -73,6 +73,7 @@
     <Compile Include="Core\IdentityBuilder.cs" />
     <Compile Include="Core\IIdentityBuilder.cs" />
     <Compile Include="Core\IIdentityProvider.cs" />
+    <Compile Include="Core\SecureTokenAuthorizer.cs" />
     <Compile Include="Core\UserNameAsMailAddressAuthorizationPolicy.cs" />
     <Compile Include="Core\UserNameAsMailAddressSecurityTokenAuthenticator.cs" />
     <Compile Include="Core\UserNameAsMailAddressSecurityTokenHandler.cs" />

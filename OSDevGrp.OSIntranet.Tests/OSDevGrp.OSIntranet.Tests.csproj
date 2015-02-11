@@ -298,6 +298,7 @@
     <Compile Include="Unittests\Security\Core\ClaimsPrincipalBuilderAuthorizationPolicyTest.cs" />
     <Compile Include="Unittests\Security\Core\CommonValidationTests.cs" />
     <Compile Include="Unittests\Security\Core\IdentityBuilderTests.cs" />
+    <Compile Include="Unittests\Security\Core\SecureTokenAuthorizerTests.cs" />
     <Compile Include="Unittests\Security\Core\UserNameAsMailAddressAuthorizationPolicyTests.cs" />
     <Compile Include="Unittests\Security\Core\UserNameAsMailAddressSecurityTokenAuthenticatorTests.cs" />
     <Compile Include="Unittests\Security\Core\UserNameAsMailAddressSecurityTokenHandlerTests.cs" />
