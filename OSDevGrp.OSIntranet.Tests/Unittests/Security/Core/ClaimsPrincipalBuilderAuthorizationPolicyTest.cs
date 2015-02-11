@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IdentityModel.Policy;
+using System.Linq;
 using System.ServiceModel;
 using Microsoft.IdentityModel.Claims;
 using NUnit.Framework;
@@ -215,6 +216,61 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         }
 
         /// <summary>
+        /// Tests that Evaluate sets a principal with a claim identity without claims in properties on evaluation context when ClaimSets in the evaluation context is null.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateSetsPrincipalWithClaimIdentityWithoutClaimsInPropertiesOnEvaluationContextWhenClaimSetsInEvaluationContextIsNull()
+        {
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
+
+            var properties = new Dictionary<string, object>(0);
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.Properties)
+                .Return(properties)
+                .Repeat.Any();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(null)
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            claimsPrincipalBuilderAuthorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            var claimPrincipal = (ClaimsPrincipal) properties["Principal"];
+            Assert.That(claimPrincipal, Is.Not.Null);
+            Assert.That(claimPrincipal.Identity, Is.Not.Null);
+            Assert.That(claimPrincipal.Identity, Is.TypeOf<ClaimsIdentity>());
+            Assert.That(claimPrincipal.Identities, Is.Not.Null);
+            Assert.That(claimPrincipal.Identities, Is.Not.Empty);
+            Assert.That(claimPrincipal.Identities.Count, Is.EqualTo(1));
+            Assert.That(claimPrincipal.Identities.ElementAt(0), Is.Not.Null);
+            Assert.That(claimPrincipal.Identities.ElementAt(0).Claims, Is.Not.Null);
+            Assert.That(claimPrincipal.Identities.ElementAt(0).Claims, Is.Empty);
+        }
+
+        /// <summary>
+        /// Tests that Evaluate returns true when ClaimSets in the evaluation context is null.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateReturnsTrueWhenClaimSetsInEvaluationContextIsNull()
+        {
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
+
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.Properties)
+                .Return(new Dictionary<string, object>(0))
+                .Repeat.Any();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(null)
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            var result = claimsPrincipalBuilderAuthorizationPolicy.Evaluate(evaluationContextStub, ref state);
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
         /// Tests that Evaluate does not call AddClaimSet on the evaluation context when ClaimSets in the evaluation context is not null.
         /// </summary>
         [Test]
@@ -258,6 +314,64 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
             claimsPrincipalBuilderAuthorizationPolicy.Evaluate(evaluationContextStub, ref state);
 
             evaluationContextStub.AssertWasCalled(m => m.Properties[Arg<string>.Is.Equal("Principal")] = Arg<ClaimsPrincipal>.Is.TypeOf);
+        }
+
+        /// <summary>
+        /// Tests that Evaluate sets a principal with a claim identity containing claims from a X509 certificate in properties on evaluation context when ClaimSets in the evaluation context is not null.
+        /// </summary>
+        [Test]
+        [TestCase("CN=OSDevGrp.OSIntranet.Services")]
+        [TestCase("CN=OSDevGrp.OSIntranet.Clients")]
+        [TestCase("CN=OSDevGrp.OSIntranet.Tokens")]
+        public void TestThatEvaluateSetsPrincipalWithClaimIdentityWithClaimsFromX509CertificateInPropertiesOnEvaluationContextWhenClaimSetsInEvaluationContextIsNotNull(string certificateSubjectName)
+        {
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
+
+            var properties = new Dictionary<string, object>(0);
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.Properties)
+                .Return(properties)
+                .Repeat.Any();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet> {new X509CertificateClaimSet(TestHelper.GetCertificate(certificateSubjectName))}))
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            claimsPrincipalBuilderAuthorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            var claimPrincipal = (ClaimsPrincipal) properties["Principal"];
+            Assert.That(claimPrincipal, Is.Not.Null);
+            Assert.That(claimPrincipal.Identity, Is.Not.Null);
+            Assert.That(claimPrincipal.Identity, Is.TypeOf<ClaimsIdentity>());
+            Assert.That(claimPrincipal.Identities, Is.Not.Null);
+            Assert.That(claimPrincipal.Identities, Is.Not.Empty);
+            Assert.That(claimPrincipal.Identities.Count, Is.EqualTo(1));
+            Assert.That(claimPrincipal.Identities.ElementAt(0), Is.Not.Null);
+            Assert.That(claimPrincipal.Identities.ElementAt(0).Claims, Is.Not.Null);
+            Assert.That(claimPrincipal.Identities.ElementAt(0).Claims, Is.Not.Empty);
+        }
+
+        /// <summary>
+        /// Tests that Evaluate returns true when ClaimSets in the evaluation context is not null.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateReturnsTrueWhenClaimSetsInEvaluationContextIsNotNull()
+        {
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
+
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.Properties)
+                .Return(new Dictionary<string, object>(0))
+                .Repeat.Any();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0)))
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            var result = claimsPrincipalBuilderAuthorizationPolicy.Evaluate(evaluationContextStub, ref state);
+            Assert.That(result, Is.True);
         }
 
         /// <summary>
