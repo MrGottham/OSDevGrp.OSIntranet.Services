@@ -48,18 +48,18 @@ namespace OSDevGrp.OSIntranet.Security.Core
                 throw new ArgumentNullException("serviceType");
             }
 
+            if (serviceType.GetCustomAttributes(typeof (RequiredClaimTypeAttribute), true).Any() == false)
+            {
+                return;
+            }
+
             var claimSetArray = claimSets.ToArray();
             if (claimSetArray.Length == 0)
             {
                 throw new SecurityException(Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound));
             }
 
-            if (serviceType.GetCustomAttributes(typeof (RequiredClaimTypeAttribute), true).Any() == false)
-            {
-                return;
-            }
-
-            serviceType.GetCustomAttributes(typeof (RequiredClaimTypeAttribute), true)
+            serviceType.GetCustomAttributes(typeof(RequiredClaimTypeAttribute), true)
                 .Cast<RequiredClaimTypeAttribute>()
                 .Where(requiredClaimTypeAttribute => string.IsNullOrEmpty(requiredClaimTypeAttribute.RequiredClaimType) == false)
                 .ToList()

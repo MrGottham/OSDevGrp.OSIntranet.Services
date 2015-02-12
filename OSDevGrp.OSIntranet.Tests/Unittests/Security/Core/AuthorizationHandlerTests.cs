@@ -133,7 +133,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         }
 
         /// <summary>
-        /// Tests that Authorize throws an ArgumentNullException when the service typeis null.
+        /// Tests that Authorize throws an ArgumentNullException when the service type is null.
         /// </summary>
         [Test]
         public void TestThatAuthorizeThrowsArgumentNullExceptionWhenServiceTypeIsNull()
@@ -150,34 +150,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         }
 
         /// <summary>
-        /// Tests that Authorize throws a SecurityException when the collection of trusted claims sets is empty.
-        /// </summary>
-        [Test]
-        public void TestThatAuthorizeThrowsSecurityExceptionWhenClaimSetIsEmpty()
-        {
-            var authorizationHandler = new AuthorizationHandler();
-            Assert.That(authorizationHandler, Is.Not.Null);
-
-            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.Authorize(new List<ClaimSet>(0), typeof (MyUnsecuredService)));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound)));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
         /// Tests that Authorize returns when the service type does not have any required claim type attributes.
         /// </summary>
         [Test]
         public void TestThatAuthorizeReturnWhenServiceTypeDoesNotHaveAnyRequiredClaimTypeAttributes()
         {
-            var claimSetStub = MockRepository.GenerateStub<ClaimSet>();
-
             var authorizationHandler = new AuthorizationHandler();
             Assert.That(authorizationHandler, Is.Not.Null);
 
-            authorizationHandler.Authorize(new List<ClaimSet> {claimSetStub}, typeof (MyUnsecuredService));
+            authorizationHandler.Authorize(new List<ClaimSet>(0), typeof (MyUnsecuredService));
+        }
+
+        /// <summary>
+        /// Tests that Authorize throws a SecurityException when the collection of trusted claims sets is empty and the service type has required claim types.
+        /// </summary>
+        [Test]
+        public void TestThatAuthorizeThrowsSecurityExceptionWhenClaimSetIsEmptyAndServiceTypeHasRequiredClaimTypes()
+        {
+            var authorizationHandler = new AuthorizationHandler();
+            Assert.That(authorizationHandler, Is.Not.Null);
+
+            var exception = Assert.Throws<SecurityException>(() => authorizationHandler.Authorize(new List<ClaimSet>(0), typeof (MySecuredService)));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
