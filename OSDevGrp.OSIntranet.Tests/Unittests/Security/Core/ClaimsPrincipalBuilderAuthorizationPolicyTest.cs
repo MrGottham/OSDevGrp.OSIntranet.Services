@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IdentityModel.Claims;
 using System.IdentityModel.Policy;
 using System.Linq;
 using System.ServiceModel;
@@ -7,8 +9,6 @@ using Microsoft.IdentityModel.Claims;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Core;
-using System;
-using System.IdentityModel.Claims;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -35,12 +35,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         }
 
         /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the functionality which can handle authorization is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenAuthorizationHandlerIsNull()
+        {
+            var exception = Assert.Throws<ArgumentNullException>(() => new ClaimsPrincipalBuilderAuthorizationPolicy(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("authorizationHandler"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
         /// Tests that the getter for Id returns a guid.
         /// </summary>
         [Test]
         public void TestThatIdGetterReturnsGuid()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var guid = Guid.Parse(claimsPrincipalBuilderAuthorizationPolicy.Id);
@@ -54,7 +70,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateThrowsArgumentNullExceptionWhenEvaluationContextIsNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var state = CreateLegalState();
@@ -75,7 +93,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateAddsPrincipalToPropertiesOnEvaluationContextWhenPropertiesDoesNotContainsPrincipal()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var properties = new Dictionary<string, object>(0);
@@ -99,7 +119,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateReturnsTrueWhenPropertiesOnEvaluationContextDoesNotContainsPrincipal()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
@@ -121,7 +143,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateReturnsTrueWhenPropertiesOnEvaluationContextContainsClaimsPrincipal()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var properties = new Dictionary<string, object>
@@ -148,8 +172,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         public void TestThatEvaluateReturnsFalseWhenPropertiesOnEvaluationContextContainsPrincipalWhichAreNotClaimsPrincipal()
         {
             var fixture = new Fixture();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
 
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var properties = new Dictionary<string, object>
@@ -175,7 +200,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateDoesNotCallAddClaimSetOnEvaluationContextWhenClaimSetsInEvaluationContextIsNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
@@ -193,12 +220,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         }
 
         /// <summary>
+        /// Tests that Evaluate does not call GetTrustedClaimSets on the functionality which can handle authorization when ClaimSets in the evaluation context is null.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateDoesNotCallGetTrustedClaimSetsOnAuthorizationHandlerWhenClaimSetsInEvaluationContextIsNull()
+        {
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
+            Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
+
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.Properties)
+                .Return(new Dictionary<string, object>(0))
+                .Repeat.Any();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(null)
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            claimsPrincipalBuilderAuthorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            authorizationHandlerMock.AssertWasNotCalled(m => m.GetTrustedClaimSets(Arg<IEnumerable<ClaimSet>>.Is.Anything));
+        }
+
+        /// <summary>
         /// Tests that Evaluate sets a principal in properties on evaluation context when ClaimSets in the evaluation context is null.
         /// </summary>
         [Test]
         public void TestThatEvaluateSetsPrincipalInPropertiesOnEvaluationContextWhenClaimSetsInEvaluationContextIsNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
@@ -221,7 +275,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateSetsPrincipalWithClaimIdentityWithoutClaimsInPropertiesOnEvaluationContextWhenClaimSetsInEvaluationContextIsNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var properties = new Dictionary<string, object>(0);
@@ -254,7 +310,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateReturnsTrueWhenClaimSetsInEvaluationContextIsNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
@@ -276,7 +334,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateDoesNotCallAddClaimSetOnEvaluationContextWhenClaimSetsInEvaluationContextIsNotNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetTrustedClaimSets(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new List<ClaimSet>(0))
+                .Repeat.Any();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
@@ -294,12 +357,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         }
 
         /// <summary>
+        /// Tests that Evaluate calls GetTrustedClaimSets on the functionality which can handle authorization when ClaimSets in the evaluation context is not null.
+        /// </summary>
+        [Test]
+        public void TestThatEvaluateCallsGetTrustedClaimSetsOnAuthorizationHandlerWhenClaimSetsInEvaluationContextIsNotNull()
+        {
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetTrustedClaimSets(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new List<ClaimSet>(0))
+                .Repeat.Any();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
+            Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
+
+            var claimSets = new ReadOnlyCollection<ClaimSet>(new List<ClaimSet>(0));
+            var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
+            evaluationContextStub.Stub(m => m.Properties)
+                .Return(new Dictionary<string, object>(0))
+                .Repeat.Any();
+            evaluationContextStub.Stub(m => m.ClaimSets)
+                .Return(claimSets)
+                .Repeat.Any();
+            var state = CreateLegalState();
+
+            claimsPrincipalBuilderAuthorizationPolicy.Evaluate(evaluationContextStub, ref state);
+
+            authorizationHandlerMock.AssertWasCalled(m => m.GetTrustedClaimSets(Arg<IEnumerable<ClaimSet>>.Is.Equal(claimSets)));
+        }
+
+        /// <summary>
         /// Tests that Evaluate sets a principal in properties on evaluation context when ClaimSets in the evaluation context is not null.
         /// </summary>
         [Test]
         public void TestThatEvaluateSetsPrincipalInPropertiesOnEvaluationContextWhenClaimSetsInEvaluationContextIsNotNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetTrustedClaimSets(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new List<ClaimSet>(0))
+                .Repeat.Any();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
@@ -317,15 +414,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         }
 
         /// <summary>
-        /// Tests that Evaluate sets a principal with a claim identity containing claims from a X509 certificate in properties on evaluation context when ClaimSets in the evaluation context is not null.
+        /// Tests that Evaluate sets a principal with a claim identity containing claims from the trusted claim sets in properties on evaluation context when ClaimSets in the evaluation context is not null.
         /// </summary>
         [Test]
         [TestCase("CN=OSDevGrp.OSIntranet.Services")]
         [TestCase("CN=OSDevGrp.OSIntranet.Clients")]
         [TestCase("CN=OSDevGrp.OSIntranet.Tokens")]
-        public void TestThatEvaluateSetsPrincipalWithClaimIdentityWithClaimsFromX509CertificateInPropertiesOnEvaluationContextWhenClaimSetsInEvaluationContextIsNotNull(string certificateSubjectName)
+        public void TestThatEvaluateSetsPrincipalWithClaimIdentityWithTrustedClaimSetsInPropertiesOnEvaluationContextWhenClaimSetsInEvaluationContextIsNotNull(string certificateSubjectName)
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var certificateClaimSet = new X509CertificateClaimSet(TestHelper.GetCertificate(certificateSubjectName));
+
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetTrustedClaimSets(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new List<ClaimSet> {certificateClaimSet})
+                .Repeat.Any();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var properties = new Dictionary<string, object>(0);
@@ -334,7 +438,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
                 .Return(properties)
                 .Repeat.Any();
             evaluationContextStub.Stub(m => m.ClaimSets)
-                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet> {new X509CertificateClaimSet(TestHelper.GetCertificate(certificateSubjectName))}))
+                .Return(new ReadOnlyCollection<ClaimSet>(new List<ClaimSet> {MockRepository.GenerateStub<ClaimSet>()}))
                 .Repeat.Any();
             var state = CreateLegalState();
 
@@ -350,6 +454,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
             Assert.That(claimPrincipal.Identities.ElementAt(0), Is.Not.Null);
             Assert.That(claimPrincipal.Identities.ElementAt(0).Claims, Is.Not.Null);
             Assert.That(claimPrincipal.Identities.ElementAt(0).Claims, Is.Not.Empty);
+            Assert.That(claimPrincipal.Identities.ElementAt(0).Claims.Count, Is.EqualTo(certificateClaimSet.Count(claim => string.Compare(claim.Right, Rights.PossessProperty, StringComparison.Ordinal) == 0)));
         }
 
         /// <summary>
@@ -358,7 +463,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         [Test]
         public void TestThatEvaluateReturnsTrueWhenClaimSetsInEvaluationContextIsNotNull()
         {
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
+            authorizationHandlerMock.Stub(m => m.GetTrustedClaimSets(Arg<IEnumerable<ClaimSet>>.Is.NotNull))
+                .Return(new List<ClaimSet>(0))
+                .Repeat.Any();
+
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var evaluationContextStub = MockRepository.GenerateStub<EvaluationContext>();
@@ -381,8 +491,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         public void TestThatEvaluateThrowsFaultExceptionWhenExceptionOccurs()
         {
             var fixture = new Fixture();
+            var authorizationHandlerMock = MockRepository.GenerateMock<IAuthorizationHandler>();
 
-            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy();
+            var claimsPrincipalBuilderAuthorizationPolicy = new ClaimsPrincipalBuilderAuthorizationPolicy(authorizationHandlerMock);
             Assert.That(claimsPrincipalBuilderAuthorizationPolicy, Is.Not.Null);
 
             var error = fixture.Create<Exception>();

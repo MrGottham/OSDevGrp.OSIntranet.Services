@@ -1,8 +1,5 @@
 ﻿using System;
-using System.IdentityModel.Claims;
-using System.Linq;
 using System.ServiceModel;
-using Microsoft.IdentityModel.Claims;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Security.Core
@@ -67,14 +64,8 @@ namespace OSDevGrp.OSIntranet.Security.Core
                     return false;
                 }
 
-                var certificateClaimSets = operationContext.ServiceSecurityContext.AuthorizationContext.ClaimSets
-                    .Where(claimSet => claimSet.Issuer as X509CertificateClaimSet != null)
-                    .Select(claimSet => (X509CertificateClaimSet) claimSet.Issuer);
-                var claimsIdentities = certificateClaimSets
-                    .Where(claimSet => claimSet.X509Certificate != null)
-                    .Select(claimSet => new ClaimsIdentity(claimSet.X509Certificate, claimSet.X509Certificate.Issuer))
-                    .ToList();
-                _authorizationHandler.Authorize(claimsIdentities.SelectMany(m => m.Claims), operationContext.Host.Description.ServiceType);
+                var trustedClaimSets = _authorizationHandler.GetTrustedClaimSets(operationContext.ServiceSecurityContext.AuthorizationContext.ClaimSets);
+                _authorizationHandler.Authorize(trustedClaimSets, operationContext.Host.Description.ServiceType);
 
                 return true;
             }

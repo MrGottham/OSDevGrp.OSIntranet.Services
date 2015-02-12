@@ -36,9 +36,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             {
                 return;
             }
-            _channelFactory.Credentials.UserName.UserName = "test@osdevgrp.dk";
-
-            // TODO: https://msdn.microsoft.com/en-us/library/ms751506(v=vs.110).aspx
+            _channelFactory.Credentials.UserName.UserName = "mrgottham@gmail.com";
         }
 
         /// <summary>

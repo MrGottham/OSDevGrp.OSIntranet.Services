@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.IdentityModel.Claims;
+using System.IdentityModel.Claims;
 
 namespace OSDevGrp.OSIntranet.Security.Core
 {
@@ -10,10 +10,17 @@ namespace OSDevGrp.OSIntranet.Security.Core
     public interface IAuthorizationHandler
     {
         /// <summary>
-        /// Authorize claims against a service type.
+        /// Gets the trusted claim sets from a collection of claim sets.
         /// </summary>
-        /// <param name="claims">Claims from a claims identity.</param>
+        /// <param name="claimSets">Collection of claim sets from which to get the trusted claim sets.</param>
+        /// <returns>Trusted claim sets.</returns>
+        IEnumerable<ClaimSet> GetTrustedClaimSets(IEnumerable<ClaimSet> claimSets); 
+
+        /// <summary>
+        /// Authorize trusted claim sets against a service type.
+        /// </summary>
+        /// <param name="claimSets">Collection of trusted claims sets.</param>
         /// <param name="serviceType">Service type.</param>
-        void Authorize(IEnumerable<Claim> claims, Type serviceType);
+        void Authorize(IEnumerable<ClaimSet> claimSets, Type serviceType);
     }
 }
