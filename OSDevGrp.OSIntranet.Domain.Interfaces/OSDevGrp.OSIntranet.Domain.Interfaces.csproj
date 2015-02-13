@@ -64,6 +64,7 @@
     <Compile Include="FoodWaste\IFoodGroup.cs" />
     <Compile Include="FoodWaste\IIdentifiable.cs" />
     <Compile Include="FoodWaste\ITranslatable.cs" />
+    <Compile Include="FoodWaste\ITranslation.cs" />
     <Compile Include="FoodWaste\ITranslationInfo.cs" />
     <Compile Include="Fælles\IBrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\ISystem.cs" />

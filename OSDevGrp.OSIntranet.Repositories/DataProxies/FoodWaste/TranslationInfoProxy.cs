@@ -2,6 +2,7 @@
 using System.Globalization;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -14,6 +15,90 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class TranslationInfoProxy : TranslationInfo, ITranslationInfoProxy
     {
+        #region Constructors
+
+        /// <summary>
+        /// Creates a data proxy for translation information which are used for translation.
+        /// </summary>
+        public TranslationInfoProxy()
+        {
+        }
+
+        /// <summary>
+        /// Creates a data proxy for translation information which are used for translation.
+        /// </summary>
+        /// <param name="cultureName">Name for the culture on which the translation information should be based.</param>
+        public TranslationInfoProxy(string cultureName) 
+            : base(cultureName)
+        {
+        }
+
+        #endregion
+
+        #region IMySqlDataProxy<ITranslationInfo> Members
+
+        /// <summary>
+        /// Gets the unique identification for the translation information.
+        /// </summary>
+        public virtual string UniqueId
+        {
+            get
+            {
+                if (Identifier.HasValue)
+                {
+                    return Identifier.ToString().ToUpper();
+                }
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+        }
+
+        /// <summary>
+        /// Gets the SQL statement for selecting a given translation information.
+        /// </summary>
+        /// <param name="translationInfo">Translation information for which to get the SQL statement for selecting..</param>
+        /// <returns>SQL statement for selecting a given translation information.</returns>
+        public virtual string GetSqlQueryForId(ITranslationInfo translationInfo)
+        {
+            if (translationInfo == null)
+            {
+                throw new ArgumentNullException("translationInfo");
+            }
+            if (translationInfo.Identifier.HasValue)
+            {
+                return string.Format("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfo.Identifier.ToString().ToUpper());
+            }
+            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translationInfo.Identifier, "Identifier"));
+        }
+
+        /// <summary>
+        /// Gets the SQL statement to insert this translation information.
+        /// </summary>
+        /// <returns>SQL statement to insert this translation information.</returns>
+        public virtual string GetSqlCommandForInsert()
+        {
+            return string.Format("INSERT INTO TranslationInfos (TranslationInfoIdentifier,CultureName) VALUES('{0}','{1}')", UniqueId, CultureName);
+        }
+
+        /// <summary>
+        /// Gets the SQL statement to update this translation information.
+        /// </summary>
+        /// <returns>SQL statement to update this translation information.</returns>
+        public virtual string GetSqlCommandForUpdate()
+        {
+            return string.Format("UPDATE TranslationInfos SET CultureName='{1}' WHERE TranslationInfoIdentifier='{0}'", UniqueId, CultureName);
+        }
+
+        /// <summary>
+        /// Gets the SQL statement to delete this translation information.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetSqlCommandForDelete()
+        {
+            return string.Format("DELETE FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", UniqueId);
+        }
+
+        #endregion
+
         #region IDataProxyBase Members
 
         /// <summary>

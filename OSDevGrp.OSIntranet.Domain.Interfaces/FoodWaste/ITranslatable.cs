@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
 {
@@ -7,6 +8,16 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
     /// </summary>
     public interface ITranslatable : IIdentifiable
     {
+        /// <summary>
+        /// Gets the current translation after Translate has been called.
+        /// </summary>
+        ITranslation Translation { get; }
+
+        /// <summary>
+        /// Gets the translations for the translatable domain object.
+        /// </summary>
+        IEnumerable<ITranslation> Translations { get; }
+
         /// <summary>
         /// Make translation for the domain object.
         /// </summary>

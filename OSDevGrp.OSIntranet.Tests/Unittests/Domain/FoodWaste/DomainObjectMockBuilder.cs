@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -39,6 +40,60 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 result.Add(BuildFoodGroupMock());
             }
             return result;
+        }
+
+        /// <summary>
+        /// Build a mockup for a translation.
+        /// </summary>
+        /// <returns>Mockup for a translation.</returns>
+        public static ITranslation BuildTranslationMock()
+        {
+            return BuildTranslationMock(Thread.CurrentThread.CurrentUICulture.Name);
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some translations.
+        /// </summary>
+        /// <returns>Collection of mockups for some translations.</returns>
+        public static IEnumerable<ITranslation> BuildTranslationCollection()
+        {
+            return new List<ITranslation>
+            {
+                BuildTranslationMock("da-DK"),
+                BuildTranslationMock("en-US")
+            };
+        }
+
+        /// <summary>
+        /// Build a mockup for a translation.
+        /// </summary>
+        /// <returns>Mockup for a translation.</returns>
+        public static ITranslation BuildTranslationMock(string cultureName)
+        {
+            var fixture = new Fixture();
+            var translationMock = MockRepository.GenerateMock<ITranslation>();
+            translationMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            translationMock.Stub(m => m.TranslationOfIdentifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            translationMock.Stub(m => m.TranslationInfo)
+                .Return(BuildTranslationInfoMock(cultureName))
+                .Repeat.Any();
+            translationMock.Stub(m => m.Value)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            return translationMock;
+        }
+
+        /// <summary>
+        /// Build a mockup for translation informations for the current cultue.
+        /// </summary>
+        /// <returns>Mockup for translation informations for the current culture.</returns>
+        public static ITranslationInfo BuildTranslationInfoMock()
+        {
+            return BuildTranslationInfoMock(Thread.CurrentThread.CurrentUICulture.Name);
         }
 
         /// <summary>

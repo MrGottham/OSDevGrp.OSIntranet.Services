@@ -26,6 +26,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var translatable = new MyTranslatable();
             Assert.That(translatable, Is.Not.Null);
             Assert.That(translatable.Identifier.HasValue, Is.False);
+            Assert.That(translatable.Translation, Is.Null);
+            Assert.That(translatable.Translations, Is.Not.Null);
+            Assert.That(translatable.Translations, Is.Empty);
         }
 
         /// <summary>

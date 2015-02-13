@@ -222,6 +222,7 @@
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\TranslationTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\BrevhovedlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemTests.cs" />
