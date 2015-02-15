@@ -46,3 +46,24 @@ DELIMITER ;
 CALL InsertDataIntoTranslationInfos();
 DROP PROCEDURE InsertDataIntoTranslationInfos;
 
+CREATE TABLE IF NOT EXISTS Translations (
+	TranslationIdentifier VARCHAR(40) NOT NULL,
+	OfIdentifier VARCHAR(40) NOT NULL,
+	InfoIdentifier VARCHAR(40) NOT NULL,
+	Value VARCHAR(4096) NOT NULL,
+	PRIMARY KEY (TranslationIdentifier),
+	UNIQUE INDEX IX_Translations_OfIdentifier_InfoIdentifier (OfIdentifier,InfoIdentifier),
+	FOREIGN KEY FK_Translations_InfoIdentifier (InfoIdentifier) REFERENCES TranslationInfos (TranslationInfoIdentifier) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForTranslations;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForTranslations(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Translations TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForTranslations(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForTranslations;
