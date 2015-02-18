@@ -23,7 +23,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public void Initialize()
             {
-                Translations = DomainObjectMockBuilder.BuildTranslationCollection();
+                Translations = DomainObjectMockBuilder.BuildTranslationMockCollection();
             }
 
             /// <summary>

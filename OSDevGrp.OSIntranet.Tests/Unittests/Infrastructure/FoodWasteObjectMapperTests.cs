@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
 using Rhino.Mocks;
@@ -162,6 +163,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps Translation to TranslationProxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsTranslationToTranslationProxy()
+        {
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var translationProxy = foodWasteObjectMapper.Map<ITranslation, ITranslationProxy>(translationMock);
+            Assert.That(translationProxy.Identifier, Is.Not.Null);
+            Assert.That(translationProxy.Identifier, Is.EqualTo(translationMock.Identifier));
+            Assert.That(translationProxy.TranslationOfIdentifier, Is.EqualTo(translationMock.TranslationOfIdentifier));
+            Assert.That(translationProxy.TranslationInfo, Is.Not.Null);
+            Assert.That(translationProxy.TranslationInfo, Is.Not.TypeOf<ITranslationInfoProxy>());
+            Assert.That(translationProxy.Value, Is.Not.Null);
+            Assert.That(translationProxy.Value, Is.Not.Empty);
+            Assert.That(translationProxy.Value, Is.EqualTo(translationMock.Value));
+        }
+
+        /// <summary>
         /// Tests that Map maps TranslationInfo to TranslationInfoSystemView.
         /// </summary>
         [Test]
@@ -180,6 +203,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(translationInfoSystemView.CultureName, Is.Not.Null);
             Assert.That(translationInfoSystemView.CultureName, Is.Not.Empty);
             Assert.That(translationInfoSystemView.CultureName, Is.EqualTo(cultureName));
+        }
+
+        /// <summary>
+        /// Tests that Map maps TranslationInfo to TranslationInfoProxy.
+        /// </summary>
+        [Test]
+        [TestCase("da-DK")]
+        [TestCase("en-US")]
+        public void TestThatMapMapsTranslationInfoToTranslationInfoProxy(string cultureName)
+        {
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock(cultureName);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var translationInfoProxy = foodWasteObjectMapper.Map<ITranslationInfo, ITranslationInfoProxy>(translationInfoMock);
+            Assert.That(translationInfoProxy.Identifier, Is.Not.Null);
+            Assert.That(translationInfoProxy.Identifier, Is.EqualTo(translationInfoMock.Identifier));
+            Assert.That(translationInfoProxy.CultureName, Is.Not.Null);
+            Assert.That(translationInfoProxy.CultureName, Is.Not.Empty);
+            Assert.That(translationInfoProxy.CultureName, Is.EqualTo(cultureName));
+            Assert.That(translationInfoProxy.CultureInfo, Is.Not.Null);
+            Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Null);
+            Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Empty);
+            Assert.That(translationInfoProxy.CultureInfo.Name, Is.EqualTo(cultureName));
         }
     }
 }

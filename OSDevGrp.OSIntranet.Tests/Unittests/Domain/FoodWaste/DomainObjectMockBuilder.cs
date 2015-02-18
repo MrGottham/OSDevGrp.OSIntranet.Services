@@ -23,6 +23,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             foodGroupMock.Stub(m => m.Identifier)
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
+            foodGroupMock.Stub(m => m.Translation)
+                .Return(BuildTranslationMock())
+                .Repeat.Any();
+            foodGroupMock.Stub(m => m.Translations)
+                .Return(BuildTranslationMockCollection())
+                .Repeat.Any();
             return foodGroupMock;
         }
 
@@ -55,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a collection of mockups for some translations.
         /// </summary>
         /// <returns>Collection of mockups for some translations.</returns>
-        public static IEnumerable<ITranslation> BuildTranslationCollection()
+        public static IEnumerable<ITranslation> BuildTranslationMockCollection()
         {
             return new List<ITranslation>
             {

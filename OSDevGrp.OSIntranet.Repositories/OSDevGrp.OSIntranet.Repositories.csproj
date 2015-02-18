@@ -94,12 +94,14 @@
     <Compile Include="DataProviders\MySqlDataProvider.cs" />
     <Compile Include="DataProxies\DataProxyHelper.cs" />
     <Compile Include="DataProxies\FoodWaste\TranslationInfoProxy.cs" />
+    <Compile Include="DataProxies\FoodWaste\TranslationProxy.cs" />
     <Compile Include="DataProxies\Fælles\SystemProxy.cs" />
     <Compile Include="DataProxies\Kalender\AftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\BrugeraftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\BrugerProxy.cs" />
     <Compile Include="DomainObjectBuilder.cs" />
     <Compile Include="FinansstyringRepository.cs" />
+    <Compile Include="FoodWaste\DataRepositoryBase.cs" />
     <Compile Include="FoodWaste\SystemDataRepository.cs" />
     <Compile Include="FællesRepository.cs" />
     <Compile Include="KalenderRepository.cs" />

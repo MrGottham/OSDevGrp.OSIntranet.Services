@@ -7,6 +7,8 @@ using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Infrastructure
@@ -27,9 +29,22 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<IFoodGroup, object>()
                 .ConvertUsing(s => new object());
 
+            Mapper.CreateMap<ITranslation, ITranslationProxy>()
+                .ConvertUsing(m =>
+                {
+                    var translationInfoProxy = Mapper.Map<ITranslationInfo, ITranslationInfoProxy>(m.TranslationInfo);
+                    return new TranslationProxy(m.TranslationOfIdentifier, translationInfoProxy, m.Value)
+                    {
+                        Identifier = m.Identifier
+                    };
+                });
+
             Mapper.CreateMap<ITranslationInfo, TranslationInfoSystemView>()
                 .ForMember(m => m.TranslationInfoIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                 .ForMember(m => m.CultureName, opt => opt.MapFrom(s => s.CultureName));
+
+            Mapper.CreateMap<ITranslationInfo, ITranslationInfoProxy>()
+                .ConvertUsing(m => new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
 
             Mapper.AssertConfigurationIsValid();
         }

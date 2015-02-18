@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that getter for UniqueId throws an IntranetRepositoryException when the translation information has no identifier.
         /// </summary>
         [Test]
-        public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenTranslationInformationHasNoIdentifier()
+        public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenTranslationInfoHasNoIdentifier()
         {
             var translationInfoProxy = new TranslationInfoProxy
             {
@@ -76,7 +76,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given translation information is null.
         /// </summary>
         [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenTranslationInformationIsNull()
+        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenTranslationInfoIsNull()
         {
             var translationInfoProxy = new TranslationInfoProxy();
 
@@ -91,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given translation information has no value..
+        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given translation information has no value.
         /// </summary>
         [Test]
         public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnTranslationInfoHasNoValue()
@@ -150,7 +150,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to update this translation information..
+        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update this translation information.
         /// </summary>
         [Test]
         public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
@@ -167,7 +167,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete this translation information..
+        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete this translation information.
         /// </summary>
         [Test]
         public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()

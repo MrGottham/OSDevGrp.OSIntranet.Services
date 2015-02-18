@@ -55,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <summary>
         /// Gets the SQL statement for selecting a given translation information.
         /// </summary>
-        /// <param name="translationInfo">Translation information for which to get the SQL statement for selecting..</param>
+        /// <param name="translationInfo">Translation information for which to get the SQL statement for selecting.</param>
         /// <returns>SQL statement for selecting a given translation information.</returns>
         public virtual string GetSqlQueryForId(ITranslationInfo translationInfo)
         {
@@ -91,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <summary>
         /// Gets the SQL statement to delete this translation information.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>SQL statement to delete this translation information.</returns>
         public virtual string GetSqlCommandForDelete()
         {
             return string.Format("DELETE FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", UniqueId);
