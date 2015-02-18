@@ -78,7 +78,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public virtual string GetSqlCommandForInsert()
         {
             var infoIdentifier = TranslationInfo.Identifier.HasValue ? TranslationInfo.Identifier.Value : Guid.Empty;
-            return string.Format("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('{0}','{1}','{2}','{3}')", UniqueId, TranslationOfIdentifier, infoIdentifier.ToString().ToUpper(), Value);
+            return string.Format("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('{0}','{1}','{2}','{3}')", UniqueId, TranslationOfIdentifier.ToString().ToUpper(), infoIdentifier.ToString().ToUpper(), Value);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public virtual string GetSqlCommandForUpdate()
         {
             var infoIdentifier = TranslationInfo.Identifier.HasValue ? TranslationInfo.Identifier.Value : Guid.Empty;
-            return string.Format("UPDATE Translations SET OfIdentifier='{1}',InfoIdentifier='{2}',Value={3} WHERE TranslationIdentifier='{0}'", UniqueId, TranslationOfIdentifier, infoIdentifier.ToString().ToUpper(), Value);
+            return string.Format("UPDATE Translations SET OfIdentifier='{1}',InfoIdentifier='{2}',Value='{3}' WHERE TranslationIdentifier='{0}'", UniqueId, TranslationOfIdentifier.ToString().ToUpper(), infoIdentifier.ToString().ToUpper(), Value);
         }
 
         /// <summary>

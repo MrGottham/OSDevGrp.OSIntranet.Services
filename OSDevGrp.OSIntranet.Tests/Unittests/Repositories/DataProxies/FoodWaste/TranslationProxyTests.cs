@@ -154,7 +154,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('{0}','{1}','{2}','{3}')", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier, translationInfoMock.Identifier.Value.ToString().ToUpper(), translationProxy.Value)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('{0}','{1}','{2}','{3}')", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier.ToString().ToUpper(), translationInfoMock.Identifier.Value.ToString().ToUpper(), translationProxy.Value)));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -180,7 +180,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Translations SET OfIdentifier='{1}',InfoIdentifier='{2}',Value={3} WHERE TranslationIdentifier='{0}'", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier, translationInfoMock.Identifier.Value.ToString().ToUpper(), translationProxy.Value)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Translations SET OfIdentifier='{1}',InfoIdentifier='{2}',Value='{3}' WHERE TranslationIdentifier='{0}'", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier.ToString().ToUpper(), translationInfoMock.Identifier.Value.ToString().ToUpper(), translationProxy.Value)));
             // ReSharper restore PossibleInvalidOperationException
         }
 

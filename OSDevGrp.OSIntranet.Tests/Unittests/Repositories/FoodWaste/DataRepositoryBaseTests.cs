@@ -4,6 +4,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
@@ -112,13 +113,43 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Tests that Get does not throw any exceptions
+        /// Tests that Get calls Get on the data provider which can access data in the food waste repository.
         /// </summary>
         [Test]
-        public void TestThatGetDoesNotThrowAnyException()
+        public void TestThatGetCallsGetOnFoodWasteDataProvider()
         {
-            TestThatGetDoesNotThrowAnyException<ITranslation>(Guid.NewGuid());
-            TestThatGetDoesNotThrowAnyException<ITranslationInfo>(Guid.NewGuid());
+            TestThatGetCallsGetOnFoodWasteDataProvider<ITranslation, TranslationProxy>(Guid.NewGuid());
+            TestThatGetCallsGetOnFoodWasteDataProvider<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
+        }
+
+        /// <summary>
+        /// Tests that Get returns the received data proxy from the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatGetReturnsReceivedDataProxy()
+        {
+            TestThatGetReturnsReceivedDataProxy<ITranslation, TranslationProxy>(Guid.NewGuid());
+            TestThatGetReturnsReceivedDataProxy<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
+        }
+
+        /// <summary>
+        /// Tests that Get throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
+        /// </summary>
+        [Test]
+        public void TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
+        {
+            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<ITranslation, TranslationProxy>(Guid.NewGuid());
+            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
+        }
+
+        /// <summary>
+        /// Tests that Get throws an IntranetRepositoryException when an Exception occurs.
+        /// </summary>
+        [Test]
+        public void TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
+        {
+            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<ITranslation, TranslationProxy>(Guid.NewGuid());
+            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
         }
 
         /// <summary>
@@ -322,26 +353,100 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Tests that Get does not throw any exceptions.
+        /// Tests that Get calls Get on the data provider which can access data in the food waste repository.
         /// </summary>
-        private static void TestThatGetDoesNotThrowAnyException<TIdentifiable>(Guid identifier) where TIdentifiable : IIdentifiable
+        private static void TestThatGetCallsGetOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.Get(Arg<TDataProxy>.Is.NotNull))
+                .Return(new TDataProxy())
+                .Repeat.Any();
+
             var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
             var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
             Assert.That(dataRepositoryBase, Is.Not.Null);
 
             dataRepositoryBase.Get<TIdentifiable>(identifier);
+
+            foodWasteDataProviderMock.AssertWasCalled(m => m.Get(Arg<TDataProxy>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tests that Get returns the received data proxy from the food waste repository.
+        /// </summary>
+        private static void TestThatGetReturnsReceivedDataProxy<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        {
+            var dataProxy = new TDataProxy();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.Get(Arg<TDataProxy>.Is.NotNull))
+                .Return(dataProxy)
+                .Repeat.Any();
+
+            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
+            Assert.That(dataRepositoryBase, Is.Not.Null);
+
+            var result = dataRepositoryBase.Get<TIdentifiable>(identifier);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(dataProxy));
+        }
+
+        /// <summary>
+        /// Tests that Get throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
+        /// </summary>
+        private static void TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        {
+            var fixture = new Fixture();
+            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.Get(Arg<TDataProxy>.Is.NotNull))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
+            Assert.That(dataRepositoryBase, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Get<TIdentifiable>(identifier));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+        }
+
+        /// <summary>
+        /// Tests that Get throws an IntranetRepositoryException when an Exception occurs.
+        /// </summary>
+        private static void TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        {
+            var fixture = new Fixture();
+            var exceptionToThrow = fixture.Create<Exception>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.Get(Arg<TDataProxy>.Is.NotNull))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
+            Assert.That(dataRepositoryBase, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Get<TIdentifiable>(identifier));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Get", exceptionToThrow.Message)));
+            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
         }
 
         /// <summary>
         /// Tests that Insert calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
-        private static void TestThatInsertCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatInsertCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
                 .Return(dataProxyMock)
                 .Repeat.Any();
 
@@ -361,10 +466,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Insert calls Add on the data provider which can access data in the food waste repository.
         /// </summary>
-        private static void TestThatInsertCallsAddOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatInsertCallsAddOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
                 .Return(dataProxyMock)
                 .Repeat.Any();
 
@@ -378,16 +483,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             dataRepositoryBase.Insert(identifiable);
 
-            foodWasteDataProviderMock.AssertWasCalled(m => m.Add(Arg<IMySqlDataProxy<TIdentifiable>>.Is.Equal(dataProxyMock)));
+            foodWasteDataProviderMock.AssertWasCalled(m => m.Add(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
         }
 
         /// <summary>
         /// Tests that Insert returns the inserted data proxy.
         /// </summary>
-        private static void TestThatInsertReturnsInsertedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatInsertReturnsInsertedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
                 .Return(dataProxyMock)
                 .Repeat.Any();
 
@@ -407,12 +512,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Insert throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
-        private static void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var fixture = new Fixture();
             var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 
@@ -432,12 +537,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Insert throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
-        private static void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var fixture = new Fixture();
             var exceptionToThrow = fixture.Create<Exception>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 
@@ -460,10 +565,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Update calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
-        private static void TestThatUpdateCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatUpdateCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
                 .Return(dataProxyMock)
                 .Repeat.Any();
 
@@ -483,10 +588,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Update calls Save on the data provider which can access data in the food waste repository.
         /// </summary>
-        private static void TestThatUpdateCallsSaveOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatUpdateCallsSaveOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
                 .Return(dataProxyMock)
                 .Repeat.Any();
 
@@ -500,16 +605,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             dataRepositoryBase.Update(identifiable);
 
-            foodWasteDataProviderMock.AssertWasCalled(m => m.Save(Arg<IMySqlDataProxy<TIdentifiable>>.Is.Equal(dataProxyMock)));
+            foodWasteDataProviderMock.AssertWasCalled(m => m.Save(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
         }
 
         /// <summary>
         /// Tests that Update returns the updated data proxy.
         /// </summary>
-        private static void TestThatUpdateReturnsUpdatedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatUpdateReturnsUpdatedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
                 .Return(dataProxyMock)
                 .Repeat.Any();
 
@@ -529,12 +634,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Update throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
-        private static void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var fixture = new Fixture();
             var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 
@@ -554,12 +659,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Update throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
-        private static void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var fixture = new Fixture();
             var exceptionToThrow = fixture.Create<Exception>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 
@@ -582,7 +687,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Delete calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
-        private static void TestThatDeleteCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatDeleteCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
 
@@ -602,7 +707,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Delete calls Delete on the data provider which can access data in the food waste repository.
         /// </summary>
-        private static void TestThatDeleteCallsDeleteOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatDeleteCallsDeleteOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
 
@@ -616,18 +721,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             dataRepositoryBase.Delete(identifiable);
 
-            foodWasteDataProviderMock.AssertWasCalled(m => m.Delete(Arg<IMySqlDataProxy<TIdentifiable>>.Is.Equal(dataProxyMock)));
+            foodWasteDataProviderMock.AssertWasCalled(m => m.Delete(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
         }
 
         /// <summary>
         /// Tests that Delete throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
-        private static void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var fixture = new Fixture();
             var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Delete(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Delete(Arg<TDataProxy>.Is.NotNull))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 
@@ -647,12 +752,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Delete throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
-        private static void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private static void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             var fixture = new Fixture();
             var exceptionToThrow = fixture.Create<Exception>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Delete(Arg<IMySqlDataProxy<TIdentifiable>>.Is.NotNull))
+            foodWasteDataProviderMock.Stub(m => m.Delete(Arg<TDataProxy>.Is.NotNull))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 

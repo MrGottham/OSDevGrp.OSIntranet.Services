@@ -191,7 +191,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <typeparam name="TDataProxy">Type of the data proxy for the identifiable domain object.</typeparam>
         /// <param name="identifiable">Identifiable domain object to insert.</param>
         /// <returns>The inserted identifiable domain object.</returns>
-        protected virtual TIdentifiable Insert<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        protected virtual TIdentifiable Insert<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             if (Equals(identifiable, null))
             {
@@ -199,12 +199,12 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             }
             try
             {
-                var dataProxy = _foodWasteObjectMapper.Map<TIdentifiable, TDataProxy>(identifiable);
-                if (dataProxy.Identifier.HasValue == false)
+                if (identifiable.Identifier.HasValue == false)
                 {
-                    dataProxy.Identifier = Guid.NewGuid();
+                    identifiable.Identifier = Guid.NewGuid();
                 }
-                return (TIdentifiable) _foodWasteDataProvider.Add<IMySqlDataProxy<TIdentifiable>>(dataProxy);
+                var dataProxy = _foodWasteObjectMapper.Map<TIdentifiable, TDataProxy>(identifiable);
+                return _foodWasteDataProvider.Add(dataProxy);
             }
             catch (IntranetRepositoryException)
             {
@@ -223,7 +223,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <typeparam name="TDataProxy">Type of the data proxy for the identifiable domain object.</typeparam>
         /// <param name="identifiable">Identifiable domain object to update.</param>
         /// <returns>The updated identifiable domain object.</returns>
-        protected virtual TIdentifiable Update<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        protected virtual TIdentifiable Update<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             if (Equals(identifiable, null))
             {
@@ -232,7 +232,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             try
             {
                 var dataProxy = _foodWasteObjectMapper.Map<TIdentifiable, TDataProxy>(identifiable);
-                return (TIdentifiable) _foodWasteDataProvider.Save<IMySqlDataProxy<TIdentifiable>>(dataProxy);
+                return _foodWasteDataProvider.Save(dataProxy);
             }
             catch (IntranetRepositoryException)
             {
@@ -250,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <typeparam name="TIdentifiable">Type of the identifiable domain object.</typeparam>
         /// <typeparam name="TDataProxy">Type of the data proxy for the identifiable domain object.</typeparam>
         /// <param name="identifiable">Identifiable domain object to delete.</param>
-        protected virtual void Delete<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        protected virtual void Delete<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
         {
             if (Equals(identifiable, null))
             {
@@ -259,7 +259,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             try
             {
                 var dataProxy = _foodWasteObjectMapper.Map<TIdentifiable, TDataProxy>(identifiable);
-                _foodWasteDataProvider.Delete<IMySqlDataProxy<TIdentifiable>>(dataProxy);
+                _foodWasteDataProvider.Delete(dataProxy);
             }
             catch (IntranetRepositoryException)
             {
