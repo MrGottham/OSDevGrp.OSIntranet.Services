@@ -8,6 +8,8 @@ using OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.Windsor;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
+using OSDevGrp.OSIntranet.Infrastructure.Validation;
 using OSDevGrp.OSIntranet.Repositories;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
@@ -41,6 +43,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<IFoodWasteObjectMapper>().ImplementedBy<FoodWasteObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<IFaultExceptionBuilder<FoodWasteFault>>().ImplementedBy<FoodWasteFaultExceptionBuilder>().LifeStyle.Singleton);
+            container.Register(Component.For<ISpecification>().ImplementedBy<Specification>().LifeStyle.Transient);
             container.Register(Component.For<ICommandBus>().ImplementedBy<CommandBus>().LifeStyle.Transient);
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);
             container.Register(Component.For<ICommonValidations>().ImplementedBy<CommonValidations>().LifeStyle.Singleton);

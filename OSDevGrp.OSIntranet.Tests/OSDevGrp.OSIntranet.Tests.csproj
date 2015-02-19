@@ -138,6 +138,7 @@
     <Compile Include="Unittests\CommandHandlers\Core\AdressekartotekCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\CommandHandlerBaseExtensionsTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FinansstyringCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Core\FoodWasteSystemDataCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
@@ -242,6 +243,7 @@
     <Compile Include="Unittests\Infrastructure\IntranetRepositoryExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
+    <Compile Include="Unittests\Infrastructure\Validation\SpecificationTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressegrupperGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BrevhovederGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\AdressekartotekQueryHandlerBaseTests.cs" />

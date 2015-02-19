@@ -1,9 +1,31 @@
-﻿namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
+﻿using System;
+
+namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
 {
     /// <summary>
     /// Interface for common validations.
     /// </summary>
     public interface ICommonValidations
     {
+        /// <summary>
+        /// Checks whether a GUID is legal.
+        /// </summary>
+        /// <param name="guid">GUID to check.</param>
+        /// <returns>True if the GUID is legal otherwise false.</returns>
+        bool IsGuidLegal(Guid guid);
+
+        /// <summary>
+        /// Checks whether a string has a value.
+        /// </summary>
+        /// <param name="value">Value.</param>
+        /// <returns>True if the string has a value otherwise false.</returns>
+        bool HasValue(string value);
+
+        /// <summary>
+        /// Checks whether a string contains an illegal char.
+        /// </summary>
+        /// <param name="value">Value.</param>
+        /// <returns>True if the string contains an illegal char otherwise false.</returns>
+        bool ContainsIllegalChar(string value);
     }
 }

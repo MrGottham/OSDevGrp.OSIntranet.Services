@@ -1,5 +1,8 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Linq;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
 {
@@ -17,6 +20,114 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
         {
             var commonValidations = new CommonValidations();
             Assert.That(commonValidations, Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Tests that IsGuidLegal returns true, when the GUID is legal.
+        /// </summary>
+        [Test]
+        public void TestThatIsGuidLegalReturnsTrueWhenGuidIsLegal()
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.IsGuidLegal(Guid.NewGuid()), Is.EqualTo(true));
+        }
+
+        /// <summary>
+        /// Tests that IsGuidLegal returns false, when the GUID is illegal.
+        /// </summary>
+        [Test]
+        public void TestThatIsGuidLegalReturnsFalseWhenGuidIsIllegal()
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.IsGuidLegal(Guid.Empty), Is.EqualTo(false));
+        }
+
+        /// <summary>
+        /// Tests that HasValue returns true, when the string has a value.
+        /// </summary>
+        [Test]
+        public void TestThatHasValueReturnsTrueWhenStringHasValue()
+        {
+            var fixture = new Fixture();
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.HasValue(fixture.Create<string>()), Is.EqualTo(true));
+        }
+
+        /// <summary>
+        /// Tests that HasValue returns false, when the string has no value.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("   ")]
+        public void TestThatHasValueReturnsFalseWhenStringHasNoValue(string emptyValue)
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.HasValue(emptyValue), Is.EqualTo(false));
+        }
+
+        /// <summary>
+        /// Tests that ContainsIllegalChar returns false, when the string has no value.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("   ")]
+        public void TestThatContainsIllegalCharReturnsFalseWhenStringHasNoValue(string emptyValue)
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.ContainsIllegalChar(emptyValue), Is.EqualTo(false));
+        }
+
+        /// <summary>
+        /// Tests that ContainsIllegalChar returns false, when the string does not contain any illegal chars.
+        /// </summary>
+        [Test]
+        public void TestThatContainsIllegalCharReturnsFalseWhenStringDoesNotContainAnyIllegalChars()
+        {
+            var fixture = new Fixture();
+            var value = fixture.Create<string>();
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.ContainsIllegalChar(CommonValidations.IllegalChars.Aggregate(value, (current, illegalChar) => current.Replace(Convert.ToString(illegalChar), null))), Is.EqualTo(false));
+        }
+
+        /// <summary>
+        /// Tests that ContainsIllegalChar returns true, when the string contains one of the illegal chars.
+        /// </summary>
+        [Test]
+        public void TestThatContainsIllegalCharReturnsTrueWhenStringContainsIllegalChars()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            foreach (var illegalChar in CommonValidations.IllegalChars)
+            {
+                var value = fixture.Create<string>();
+                var pos = random.Next(0, value.Length - 1);
+
+                Assert.That(commonValidations.ContainsIllegalChar(value.Substring(0, pos) + illegalChar + value.Substring(pos)), Is.EqualTo(true));
+            }
         }
     }
 }
