@@ -141,7 +141,9 @@
     <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Validation\CommonValidationsTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
+    <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\DataContractTestHelper.cs" />
     <Compile Include="Unittests\Contracts\Faults\FoodWasteFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
@@ -177,6 +179,7 @@
     <Compile Include="Unittests\Contracts\Queries\TranslationInfoCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringsadvarselResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringslinjeOpretResponseTests.cs" />
+    <Compile Include="Unittests\Contracts\Responses\ServiceReceiptResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressegruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontolisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontoViewTests.cs" />

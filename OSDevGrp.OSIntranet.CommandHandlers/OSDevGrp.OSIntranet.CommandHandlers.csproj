@@ -61,10 +61,14 @@
     <Compile Include="Core\AdressekartotekCommandHandlerBase.cs" />
     <Compile Include="Core\CommandHandlerBaseExtensions.cs" />
     <Compile Include="Core\FinansstyringCommandHandlerBase.cs" />
+    <Compile Include="Core\FoodWasteSystemDataCommandHandlerBase.cs" />
     <Compile Include="Core\FællesElementCommandHandlerBase.cs" />
     <Compile Include="Core\KalenderCommandHandlerBase.cs" />
     <Compile Include="Core\RegnskabCommandHandlerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TranslationAddCommandHandler.cs" />
+    <Compile Include="Validation\CommonValidations.cs" />
+    <Compile Include="Validation\ICommonValidations.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />
@@ -95,6 +99,7 @@
       <Name>OSDevGrp.OSIntranet.Resources</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

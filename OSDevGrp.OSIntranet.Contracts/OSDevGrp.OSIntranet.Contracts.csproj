@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\BogføringslinjeOpretCommand.cs" />
+    <Compile Include="Commands\TranslationAddCommand.cs" />
     <Compile Include="Faults\FoodWasteFault.cs" />
     <Compile Include="Faults\FoodWasteFaultType.cs" />
     <Compile Include="Queries\AdressegrupperGetQuery.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Queries\TranslationInfoCollectionGetQuery.cs" />
     <Compile Include="Responses\BogføringsadvarselResponse.cs" />
     <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
+    <Compile Include="Responses\ServiceReceiptResponse.cs" />
     <Compile Include="Services\IAdressekartotekService.cs" />
     <Compile Include="Services\ICommonService.cs" />
     <Compile Include="Services\IFinansstyringService.cs" />

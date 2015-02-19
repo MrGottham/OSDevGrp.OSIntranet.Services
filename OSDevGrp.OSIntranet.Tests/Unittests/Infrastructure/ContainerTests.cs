@@ -9,6 +9,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 {
@@ -40,7 +41,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at container konfiguraiton kan indlæses og typer kan resolves.
         /// </summary>
         [Test]
-        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof (IContainer), typeof (IDomainObjectBuilder), typeof (IObjectMapper), typeof (IFoodWasteObjectMapper), typeof (IFaultExceptionBuilder<FoodWasteFault>), typeof (ICommandBus), typeof (IQueryBus), typeof (IMySqlDataProvider), typeof (IFoodWasteDataProvider), typeof (IAdresseRepository), typeof (IFinansstyringRepository), typeof (IKalenderRepository), typeof (IFællesRepository), typeof (ISystemDataRepository), typeof (IKonfigurationRepository), typeof (IAdressekartotekService), typeof (IFinansstyringService), typeof (IKalenderService), typeof (ICommonService), typeof (IFoodWasteSystemDataService))] Type type)
+        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof (IContainer), typeof (IDomainObjectBuilder), typeof (IObjectMapper), typeof (IFoodWasteObjectMapper), typeof (IFaultExceptionBuilder<FoodWasteFault>), typeof (ICommandBus), typeof (IQueryBus), typeof (ICommonValidations), typeof (IMySqlDataProvider), typeof (IFoodWasteDataProvider), typeof (IAdresseRepository), typeof (IFinansstyringRepository), typeof (IKalenderRepository), typeof (IFællesRepository), typeof (ISystemDataRepository), typeof (IKonfigurationRepository), typeof (IAdressekartotekService), typeof (IFinansstyringService), typeof (IKalenderService), typeof (ICommonService), typeof (IFoodWasteSystemDataService))] Type type)
         {
             var resolvedType = _container.Resolve(type);
             Assert.That(resolvedType, Is.Not.Null);
