@@ -1,9 +1,11 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 {
@@ -69,6 +71,101 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             }
             
             #endregion
+        }
+
+        /// <summary>
+        /// Tests that the constructor initialize the basic functionality for command handlers which handles commands for system data in the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorInitializeFoodWasteSystemDataCommandHandler()
+        {
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var systemDataCommandHandlerBase = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(systemDataCommandHandlerBase, Is.Not.Null);
+            Assert.That(systemDataCommandHandlerBase.GetSystemDataRepository(), Is.Not.Null);
+            Assert.That(systemDataCommandHandlerBase.GetSystemDataRepository(), Is.EqualTo(systemDataRepositoryMock));
+            Assert.That(systemDataCommandHandlerBase.GetObjectMapper(), Is.Not.Null);
+            Assert.That(systemDataCommandHandlerBase.GetObjectMapper(), Is.EqualTo(foodWasteObjectMapperMock));
+            Assert.That(systemDataCommandHandlerBase.GetSpecification(), Is.Not.Null);
+            Assert.That(systemDataCommandHandlerBase.GetSpecification(), Is.EqualTo(specificationMock));
+            Assert.That(systemDataCommandHandlerBase.GetCommonValidations(), Is.Not.Null);
+            Assert.That(systemDataCommandHandlerBase.GetCommonValidations(), Is.EqualTo(commonValidationsMock));
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the repository which can access system data for the food waste domain is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenSystemDataRepositoryIsNull()
+        {
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(null, foodWasteObjectMapperMock, specificationMock, commonValidationsMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("systemDataRepository"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the object mapper which can map objects in the food waste domain is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenFoodWasteObjectMapperIsNull()
+        {
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, null, specificationMock, commonValidationsMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("foodWasteObjectMapper"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the specification which encapsulates validation rules is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenSpecificationIsNull()
+        {
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, null, commonValidationsMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("specification"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the common validations is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenCommonValidationsIsNull()
+        {
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("commonValidations"));
+            Assert.That(exception.InnerException, Is.Null);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using OSDevGrp.OSIntranet.CommandHandlers.Validation;
+﻿using System;
+using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.Core;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
@@ -31,6 +32,22 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <param name="commonValidations">Implementation of the common validations.</param>
         protected FoodWasteSystemDataCommandHandlerBase(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations)
         {
+            if (systemDataRepository == null)
+            {
+                throw new ArgumentNullException("systemDataRepository");
+            }
+            if (foodWasteObjectMapper == null)
+            {
+                throw new ArgumentNullException("foodWasteObjectMapper");
+            }
+            if (specification == null)
+            {
+                throw new ArgumentNullException("specification");
+            }
+            if (commonValidations == null)
+            {
+                throw new ArgumentNullException("commonValidations");
+            }
             _systemDataRepository = systemDataRepository;
             _foodWasteObjectMapper = foodWasteObjectMapper;
             _specification = specification;
@@ -52,7 +69,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <summary>
         /// Gets the object mapper which can map objects in the food waste domain.
         /// </summary>
-        protected virtual IFoodWasteObjectMapper ObjectMapper { get { return _foodWasteObjectMapper; } }
+        protected virtual IFoodWasteObjectMapper ObjectMapper
+        {
+            get { return _foodWasteObjectMapper; }
+        }
 
         /// <summary>
         /// Gets the specification which encapsulates validation rules.

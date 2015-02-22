@@ -142,6 +142,7 @@
     <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\TranslationAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Validation\CommonValidationsTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
