@@ -214,4 +214,8 @@
   <data name="SecurityTokenCouldNotBeValidated" xml:space="preserve">
     <value>The security token could not be validated.</value>
   </data>
+  <data name="ValueMustBeGivenForProperty" xml:space="preserve">
+    <value>A value must be given for the property named '{0}'.</value>
+    <comment>{0} = Name of property.</comment>
+  </data>
 </root>

@@ -4,6 +4,7 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -40,7 +41,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <returns>Service receipt.</returns>
         public virtual ServiceReceiptResponse Execute(TranslationAddCommand command)
         {
-            throw new NotImplementedException();
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+
+            var translationInfo = SystemDataRepository.Get<ITranslationInfo>(command.TranslationInfoIdentifier);
+
+            return null;
         }
 
         /// <summary>
@@ -50,6 +58,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="exception">Exception.</param>
         public virtual void HandleException(TranslationAddCommand command, Exception exception)
         {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
             throw new NotImplementedException();
         }
 

@@ -214,4 +214,8 @@
   <data name="SecurityTokenCouldNotBeValidated" xml:space="preserve">
     <value>Sikkerhedstoken kunne ikke valideres.</value>
   </data>
+  <data name="ValueMustBeGivenForProperty" xml:space="preserve">
+    <value>Der skal angiven en værdi til egenskaben med navnet '{0}'.</value>
+    <comment>{0} = Navn på egenskab.</comment>
+  </data>
 </root>

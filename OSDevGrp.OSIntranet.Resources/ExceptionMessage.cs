@@ -32,6 +32,7 @@
         NoClaimsWasFound,
         MissingClaimTypeForIdentity,
         SecurityTokenCouldNotBeValidated,
-        UserNameAndPasswordCouldNotBeValidated
+        UserNameAndPasswordCouldNotBeValidated,
+        ValueMustBeGivenForProperty
     }
 }
