@@ -218,4 +218,12 @@
     <value>Der skal angiven en værdi til egenskaben med navnet '{0}'.</value>
     <comment>{0} = Navn på egenskab.</comment>
   </data>
+  <data name="IdentifierUnknownToSystem" xml:space="preserve">
+    <value>Den unikke identifikation '{0}' er ukendt for systemet.</value>
+    <comment>{0} = Unik identifikation.</comment>
+  </data>
+  <data name="ValueForPropertyContainsIllegalChars" xml:space="preserve">
+    <value>Værdien i egenskaben med navnet '{0}' indeholder ulovlige tegn.</value>
+    <comment>{0} = Navn på egenskab.</comment>
+  </data>
 </root>

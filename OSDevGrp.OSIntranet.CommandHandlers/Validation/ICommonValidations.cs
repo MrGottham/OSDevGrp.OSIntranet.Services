@@ -27,5 +27,12 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
         /// <param name="value">Value.</param>
         /// <returns>True if the string contains an illegal char otherwise false.</returns>
         bool ContainsIllegalChar(string value);
+
+        /// <summary>
+        /// Checks whether an object is not null.
+        /// </summary>
+        /// <param name="value">Object.</param>
+        /// <returns>True when the object is not null otherwise false.</returns>
+        bool IsNotNull(object value);
     }
 }

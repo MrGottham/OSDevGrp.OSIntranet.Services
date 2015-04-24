@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure;
@@ -228,6 +229,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Null);
             Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Empty);
             Assert.That(translationInfoProxy.CultureInfo.Name, Is.EqualTo(cultureName));
+        }
+
+        /// <summary>
+        /// Tests that Map maps an identifiable to ServiceReceiptResponse.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsIIdentifiableToServiceReceiptResponse()
+        {
+            var identifiableMock = DomainObjectMockBuilder.BuildIdentifiableMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var serviceReceiptResponse = foodWasteObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(identifiableMock);
+            Assert.That(serviceReceiptResponse.Identifier, Is.EqualTo(identifiableMock.Identifier));
+            Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(1).Seconds);
         }
     }
 }

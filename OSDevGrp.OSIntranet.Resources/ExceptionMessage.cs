@@ -33,6 +33,8 @@
         MissingClaimTypeForIdentity,
         SecurityTokenCouldNotBeValidated,
         UserNameAndPasswordCouldNotBeValidated,
-        ValueMustBeGivenForProperty
+        IdentifierUnknownToSystem,
+        ValueMustBeGivenForProperty,
+        ValueForPropertyContainsIllegalChars
     }
 }

@@ -426,6 +426,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for IdentifierUnknownToSystem hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForIdentifierUnknownToSystemHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ExceptionMessage for ValueMustBeGivenForProperty hentes.
         /// </summary>
         [Test]
@@ -438,6 +455,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for ValueForPropertyContainsIllegalChars hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForValueForPropertyContainsIllegalCharsHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }

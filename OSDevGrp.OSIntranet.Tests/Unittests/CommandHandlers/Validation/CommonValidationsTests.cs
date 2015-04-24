@@ -129,5 +129,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
                 Assert.That(commonValidations.ContainsIllegalChar(value.Substring(0, pos) + illegalChar + value.Substring(pos)), Is.EqualTo(true));
             }
         }
+
+        /// <summary>
+        /// Tests that IsNotNull returns true when the object is not null.
+        /// </summary>
+        [Test]
+        public void TestThatIsNotNullReturnsTrueWhenObjectIsNotNull()
+        {
+            var fixture = new Fixture();
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.IsNotNull(fixture.Create<object>()), Is.True);
+        }
+
+        /// <summary>
+        /// Tests that IsNotNull returns false when the object is null.
+        /// </summary>
+        [Test]
+        public void TestThatIsNotNullReturnsFalseWhenObjectIsNull()
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.IsNotNull(null), Is.False);
+        }
     }
 }

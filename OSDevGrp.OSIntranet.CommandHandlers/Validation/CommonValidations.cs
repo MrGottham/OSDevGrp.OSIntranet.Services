@@ -51,6 +51,16 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
             return IllegalChars.Any(illegalChar => value.Contains(Convert.ToString(illegalChar)));
         }
 
+        /// <summary>
+        /// Checks whether an object is not null.
+        /// </summary>
+        /// <param name="value">Object.</param>
+        /// <returns>True when the object is not null otherwise false.</returns>
+        public virtual bool IsNotNull(object value)
+        {
+            return value != null;
+        }
+
         #endregion
     }
 }

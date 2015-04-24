@@ -137,5 +137,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 BuildTranslationInfoMock("en-US")
             };
         }
+
+        /// <summary>
+        /// Build a mockup for an identifiable domain object in the food waste domain.
+        /// </summary>
+        /// <returns>Mockup for an identifiable domain object in the food waste domain.</returns>
+        public static IIdentifiable BuildIdentifiableMock()
+        {
+            var identifibaleMock = MockRepository.GenerateMock<IIdentifiable>();
+            identifibaleMock.Expect(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            return identifibaleMock;
+        }
     }
 }

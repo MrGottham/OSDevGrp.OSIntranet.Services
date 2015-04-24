@@ -4,10 +4,13 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.CommandHandlers
 {
@@ -47,6 +50,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             }
 
             var translationInfo = SystemDataRepository.Get<ITranslationInfo>(command.TranslationInfoIdentifier);
+
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(translationInfo), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.TranslationInfoIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.HasValue(command.TranslationValue), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "TranslationValue")))
+                .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.TranslationValue) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "TranslationValue")))
+                .Evaluate();
+
+            var translation = SystemDataRepository.Insert<ITranslation>(new Translation(command.TranslationOfIdentifier, translationInfo, command.TranslationValue));
 
             return null;
         }

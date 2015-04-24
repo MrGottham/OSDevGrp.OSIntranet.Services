@@ -218,4 +218,12 @@
     <value>A value must be given for the property named '{0}'.</value>
     <comment>{0} = Name of property.</comment>
   </data>
+  <data name="IdentifierUnknownToSystem" xml:space="preserve">
+    <value>The identifier '{0}' is unknown to the system.</value>
+    <comment>{0} = Identifier.</comment>
+  </data>
+  <data name="ValueForPropertyContainsIllegalChars" xml:space="preserve">
+    <value>The value for the property named '{0}' contains illegal chars.</value>
+    <comment>{0} = Name of property.</comment>
+  </data>
 </root>
