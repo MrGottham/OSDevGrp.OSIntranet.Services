@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using AutoMapper;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
@@ -45,6 +46,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
 
             Mapper.CreateMap<ITranslationInfo, ITranslationInfoProxy>()
                 .ConvertUsing(m => new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
+
+            Mapper.CreateMap<IIdentifiable, ServiceReceiptResponse>()
+                .ForMember(m => m.Identifier, opt => opt.MapFrom(s => s.Identifier))
+                .ForMember(m => m.EventDate, opt => opt.UseValue(DateTime.Now));
 
             Mapper.AssertConfigurationIsValid();
         }
