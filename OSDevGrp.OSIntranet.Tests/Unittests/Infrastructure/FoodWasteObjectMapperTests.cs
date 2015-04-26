@@ -244,7 +244,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var serviceReceiptResponse = foodWasteObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(identifiableMock);
             Assert.That(serviceReceiptResponse.Identifier, Is.EqualTo(identifiableMock.Identifier));
-            Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(1).Seconds);
+            Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
         }
     }
 }
