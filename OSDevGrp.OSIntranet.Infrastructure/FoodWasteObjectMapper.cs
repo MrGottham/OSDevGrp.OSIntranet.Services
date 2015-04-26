@@ -48,8 +48,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ConvertUsing(m => new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
 
             Mapper.CreateMap<IIdentifiable, ServiceReceiptResponse>()
-                .ForMember(m => m.Identifier, opt => opt.MapFrom(s => s.Identifier))
-                .ForMember(m => m.EventDate, opt => opt.UseValue(DateTime.Now));
+                .ConvertUsing(m => new ServiceReceiptResponse
+                {
+                    Identifier = m.Identifier,
+                    EventDate = DateTime.Now
+                });
 
             Mapper.AssertConfigurationIsValid();
         }
