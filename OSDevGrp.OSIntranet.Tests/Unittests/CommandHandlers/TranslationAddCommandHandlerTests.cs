@@ -379,6 +379,94 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Test that Execute calls Map for the inserted translation on the object mapper for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsMapForInsertedTranslationOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var insertedTranslationMock = DomainObjectMockBuilder.BuildTranslationMock();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.NotNull))
+                .Return(insertedTranslationMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var translationAddCommand = fixture.Build<TranslationAddCommand>()
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+                .With(m => m.TranslationValue, fixture.Create<string>())
+                .Create();
+
+            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationAddCommandHandler, Is.Not.Null);
+
+            translationAddCommandHandler.Execute(translationAddCommand);
+
+            foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(insertedTranslationMock), Arg<CultureInfo>.Is.Null));
+        }
+
+        /// <summary>
+        /// Test that Execute returns the service receipt created Map for the inserted translation on the object mapper for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteReturnsServiceReceiptFromMapOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.NotNull))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var serviceReceipt = fixture.Build<ServiceReceiptResponse>()
+                .With(m => m.Identifier, Guid.NewGuid())
+                .With(m => m.EventDate, DateTime.Now)
+                .Create();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var translationAddCommand = fixture.Build<TranslationAddCommand>()
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+                .With(m => m.TranslationValue, fixture.Create<string>())
+                .Create();
+
+            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationAddCommandHandler, Is.Not.Null);
+
+            var result = translationAddCommandHandler.Execute(translationAddCommand);
+
+            Assert.That(result == serviceReceipt);
+        }
+
+        /// <summary>
         /// Tests that HandleException throws an ArgumentNullException if the command for adding a translation is null.
         /// </summary>
         [Test]
