@@ -1,8 +1,11 @@
-﻿using System.ServiceModel;
+﻿using System.Linq;
+using System.ServiceModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Commands;
+using System;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
 {
@@ -37,6 +40,51 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 return;
             }
             _channelFactory.Credentials.UserName.UserName = "mrgottham@gmail.com";
+        }
+
+        /// <summary>
+        /// Tests the commands acting on translations.
+        /// </summary>
+        [Test]
+        public void TestTranslationCommands()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+                Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
+                Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+
+                var translationAddCommand = new TranslationAddCommand
+                {
+                    TranslationOfIdentifier = Guid.NewGuid(),
+                    TranslationInfoIdentifier = translationInfoSystemViewCollection.First().TranslationInfoIdentifier,
+                    TranslationValue = "Test"
+                };
+                var translationAddResult = client.TranslationAdd(translationAddCommand);
+                try
+                {
+                    var translationModifyCommand = new TranslationModifyCommand
+                    {
+                        TranslationIdentifier = translationAddResult.Identifier ?? Guid.Empty,
+                        TranslationValue = "Test, test"
+                    };
+                    client.TranslationModify(translationModifyCommand);
+                }
+                finally
+                {
+                    var translationDeleteCommand = new TranslationDeleteCommand
+                    {
+                        TranslationIdentifier = translationAddResult.Identifier ?? Guid.Empty
+                    };
+                    client.TranslationDelete(translationDeleteCommand);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
         }
 
         /// <summary>

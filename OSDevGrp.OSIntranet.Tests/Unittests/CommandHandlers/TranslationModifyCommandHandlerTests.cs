@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.CommandHandlers;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
@@ -14,46 +15,45 @@ using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
-using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 {
     /// <summary>
-    /// Tests the command handler which handles a command for adding a translation.
+    /// Tests the command handler which handles a command for modifying a translation.
     /// </summary>
     [TestFixture]
-    public class TranslationAddCommandHandlerTests
+    public class TranslationModifyCommandHandlerTests
     {
         /// <summary>
-        /// Tests that the constructor initialize a command handler which handles a command for adding a translation.
+        /// Tests that the constructor initialize a command handler which handles a command for modifying a translation.
         /// </summary>
         [Test]
-        public void TestThatConstructorInitializeTranslationAddCommandHandler()
+        public void TestThatConstructorInitializeTranslationModifyCommandHandler()
         {
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
         }
 
         /// <summary>
-        /// Tests that Execute throws an ArgumentNullException if the command for adding a translation is null.
+        /// Tests that Execute throws an ArgumentNullException if the command for modifying a translation is null.
         /// </summary>
         [Test]
-        public void TestThatExecuteThrowsArgumentNullExceptionIfTranslationAddCommandIsNull()
+        public void TestThatExecuteThrowsArgumentNullExceptionIfTranslationModifyCommandIsNull()
         {
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationAddCommandHandler.Execute(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => translationModifyCommandHandler.Execute(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -62,19 +62,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that Execute calls Get to get the translation information on the repository which can access system data for the food waste domain.
+        /// Tests that Execute calls Get to get the translation on the repository which can access system data for the food waste domain.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsGetForTranslationInfoOnSystemDataRepository()
+        public void TestThatExecuteCallsGetForTranslationOnSystemDataRepository()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -88,35 +88,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
-            systemDataRepositoryMock.AssertWasCalled(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Equal(translationAddCommand.TranslationInfoIdentifier)));
+            systemDataRepositoryMock.AssertWasCalled(m => m.Get<ITranslation>(Arg<Guid>.Is.Equal(translationModifyCommand.TranslationIdentifier)));
         }
 
         /// <summary>
-        /// Test that Execute calls IsNotNull for the translation information on the common validations.
+        /// Test that Execute calls IsNotNull for the translation on the common validations.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsIsNotNullForTranslationInfoOnCommonValidations()
+        public void TestThatExecuteCallsIsNotNullForTranslationOnCommonValidations()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(translationInfoMock)
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(translationMock)
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -135,18 +134,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
-            commonValidationsMock.AssertWasCalled(m => m.IsNotNull(Arg<ITranslationInfo>.Is.Equal(translationInfoMock)));
+            commonValidationsMock.AssertWasCalled(m => m.IsNotNull(Arg<ITranslation>.Is.Equal(translationMock)));
         }
 
         /// <summary>
@@ -159,10 +157,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -181,18 +179,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
-            commonValidationsMock.AssertWasCalled(m => m.HasValue(Arg<string>.Is.Equal(translationAddCommand.TranslationValue)));
+            commonValidationsMock.AssertWasCalled(m => m.HasValue(Arg<string>.Is.Equal(translationModifyCommand.TranslationValue)));
         }
 
         /// <summary>
@@ -205,10 +202,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -227,18 +224,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
-            commonValidationsMock.AssertWasCalled(m => m.ContainsIllegalChar(Arg<string>.Is.Equal(translationAddCommand.TranslationValue)));
+            commonValidationsMock.AssertWasCalled(m => m.ContainsIllegalChar(Arg<string>.Is.Equal(translationModifyCommand.TranslationValue)));
         }
 
         /// <summary>
@@ -251,10 +247,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -268,16 +264,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
             specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(3));
         }
@@ -292,10 +287,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -309,49 +304,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
             specificationMock.AssertWasCalled(m => m.Evaluate());
         }
 
         /// <summary>
-        /// Test that Execute calls Insert on the repository which can access system data for the food waste domain.
+        /// Test that Execute sets the value for Value with the translation value from the command.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsInsertOnSystemDataRepository()
+        public void TestThatExecuteSetsValueWithTranslationValueFromCommand()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
-            var translationOfIdentifier = Guid.NewGuid();
-            var translationValue = fixture.Create<string>();
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(translationInfoMock)
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(translationMock)
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.NotNull))
-                .WhenCalled(e =>
-                {
-                    var translation = (ITranslation) e.Arguments.ElementAt(0);
-                    Assert.That(translation, Is.Not.Null);
-                    Assert.That(translation.Identifier.HasValue, Is.False);
-                    Assert.That(translation.TranslationOfIdentifier, Is.EqualTo(translationOfIdentifier));
-                    Assert.That(translation.TranslationInfo, Is.Not.Null);
-                    Assert.That(translation.TranslationInfo, Is.EqualTo(translationInfoMock));
-                    Assert.That(translation.Value, Is.Not.Null);
-                    Assert.That(translation.Value, Is.Not.Empty);
-                    Assert.That(translation.Value, Is.EqualTo(translationValue));
-                })
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -365,36 +345,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, translationOfIdentifier)
-                .With(m => m.TranslationValue, translationValue)
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
+                .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
-            systemDataRepositoryMock.AssertWasCalled(m => m.Insert(Arg<ITranslation>.Is.NotNull));
+            translationMock.AssertWasCalled(m => m.Value = Arg<string>.Is.Equal(translationModifyCommand.TranslationValue));
         }
 
         /// <summary>
-        /// Test that Execute calls Map for the inserted translation on the object mapper for the food waste domain.
+        /// Test that Execute calls Update on the repository which can access system data for the food waste domain.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsMapForInsertedTranslationOnFoodWasteObjectMapper()
+        public void TestThatExecuteCallsUpdateOnSystemDataRepository()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var insertedTranslationMock = DomainObjectMockBuilder.BuildTranslationMock();
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(translationMock)
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.NotNull))
-                .Return(insertedTranslationMock)
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -407,18 +386,58 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            translationAddCommandHandler.Execute(translationAddCommand);
+            translationModifyCommandHandler.Execute(translationModifyCommand);
 
-            foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(insertedTranslationMock), Arg<CultureInfo>.Is.Null));
+            systemDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<ITranslation>.Is.Equal(translationMock)));
+        }
+
+        /// <summary>
+        /// Test that Execute calls Map for the updated translation on the object mapper for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsMapForUpdatedTranslationOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var updatedTranslationMock = DomainObjectMockBuilder.BuildTranslationMock();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
+                .Return(updatedTranslationMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
+                .With(m => m.TranslationValue, fixture.Create<string>())
+                .Create();
+
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
+
+            translationModifyCommandHandler.Execute(translationModifyCommand);
+
+            foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(updatedTranslationMock), Arg<CultureInfo>.Is.Null));
         }
 
         /// <summary>
@@ -431,10 +450,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslation>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
-            systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.NotNull))
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<ITranslation>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationMock())
                 .Repeat.Any();
 
@@ -452,25 +471,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var translationAddCommand = fixture.Build<TranslationAddCommand>()
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.TranslationOfIdentifier, Guid.NewGuid())
+            var translationModifyCommand = fixture.Build<TranslationModifyCommand>()
+                .With(m => m.TranslationIdentifier, Guid.NewGuid())
                 .With(m => m.TranslationValue, fixture.Create<string>())
                 .Create();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            var result = translationAddCommandHandler.Execute(translationAddCommand);
+            var result = translationModifyCommandHandler.Execute(translationModifyCommand);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(serviceReceipt));
         }
 
         /// <summary>
-        /// Tests that HandleException throws an ArgumentNullException if the command for adding a translation is null.
+        /// Tests that HandleException throws an ArgumentNullException if the command for modifying a translation is null.
         /// </summary>
         [Test]
-        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfTranslationAddCommandIsNull()
+        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfTranslationModifyCommandIsNull()
         {
             var fixture = new Fixture();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -478,10 +496,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationAddCommandHandler.HandleException(null, fixture.Create<Exception>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => translationModifyCommandHandler.HandleException(null, fixture.Create<Exception>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -501,10 +519,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationAddCommandHandler.HandleException(fixture.Create<TranslationAddCommand>(), null));
+            var exception = Assert.Throws<ArgumentNullException>(() => translationModifyCommandHandler.HandleException(fixture.Create<TranslationModifyCommand>(), null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -524,12 +542,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<IntranetRepositoryException>();
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => translationAddCommandHandler.HandleException(fixture.Create<TranslationAddCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => translationModifyCommandHandler.HandleException(fixture.Create<TranslationModifyCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception, Is.EqualTo(incomingException));
         }
@@ -546,12 +564,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<IntranetBusinessException>();
 
-            var exception = Assert.Throws<IntranetBusinessException>(() => translationAddCommandHandler.HandleException(fixture.Create<TranslationAddCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetBusinessException>(() => translationModifyCommandHandler.HandleException(fixture.Create<TranslationModifyCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception, Is.EqualTo(incomingException));
         }
@@ -568,12 +586,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<IntranetSystemException>();
 
-            var exception = Assert.Throws<IntranetSystemException>(() => translationAddCommandHandler.HandleException(fixture.Create<TranslationAddCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetSystemException>(() => translationModifyCommandHandler.HandleException(fixture.Create<TranslationModifyCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception, Is.EqualTo(incomingException));
         }
@@ -590,16 +608,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var translationAddCommandHandler = new TranslationAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(translationAddCommandHandler, Is.Not.Null);
+            var translationModifyCommandHandler = new TranslationModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(translationModifyCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<Exception>();
 
-            var exception = Assert.Throws<IntranetSystemException>(() => translationAddCommandHandler.HandleException(fixture.Create<TranslationAddCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetSystemException>(() => translationModifyCommandHandler.HandleException(fixture.Create<TranslationModifyCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, typeof (TranslationAddCommand).Name, typeof (ServiceReceiptResponse).Name, incomingException.Message)));
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, typeof (TranslationModifyCommand).Name, typeof (ServiceReceiptResponse).Name, incomingException.Message)));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(incomingException));
         }

@@ -144,9 +144,13 @@
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationAddCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\TranslationDeleteCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\TranslationModifyCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Validation\CommonValidationsTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
+    <Compile Include="Unittests\Contracts\Commands\TranslationDeleteCommandTest.cs" />
+    <Compile Include="Unittests\Contracts\Commands\TranslationModifyCommandTests.cs" />
     <Compile Include="Unittests\Contracts\DataContractTestHelper.cs" />
     <Compile Include="Unittests\Contracts\Faults\FoodWasteFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
@@ -223,6 +227,7 @@
     <Compile Include="Unittests\Domain\Finansstyring\BudgetkontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\DataProviderTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectMockBuilder.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />

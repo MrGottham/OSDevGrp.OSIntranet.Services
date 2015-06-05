@@ -49,6 +49,43 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Build a mockup for a data provider.
+        /// </summary>
+        /// <returns>Mockup for a data provider.</returns>
+        public static IDataProvider BuildDataProviderMock()
+        {
+            var fixture = new Fixture();
+            var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
+            dataProviderMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Name)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.DataSourceStatementIdentifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.DataSourceStatements)
+                .Return(BuildTranslationMockCollection())
+                .Repeat.Any();
+            return dataProviderMock;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some data providers.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<IDataProvider> BuildDataProviderMockCollection()
+        {
+            return new List<IDataProvider>
+            {
+                BuildDataProviderMock(),
+                BuildDataProviderMock(),
+                BuildDataProviderMock()
+            };
+        }
+
+        /// <summary>
         /// Build a mockup for a translation.
         /// </summary>
         /// <returns>Mockup for a translation.</returns>

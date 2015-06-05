@@ -67,6 +67,8 @@
     <Compile Include="Core\RegnskabCommandHandlerBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TranslationAddCommandHandler.cs" />
+    <Compile Include="TranslationDeleteCommandHandler.cs" />
+    <Compile Include="TranslationModifyCommandHandler.cs" />
     <Compile Include="Validation\CommonValidations.cs" />
     <Compile Include="Validation\ICommonValidations.cs" />
   </ItemGroup>

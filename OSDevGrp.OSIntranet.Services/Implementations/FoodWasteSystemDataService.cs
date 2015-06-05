@@ -4,8 +4,10 @@ using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
@@ -59,6 +61,72 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Adds a translation.
+        /// </summary>
+        /// <param name="command">Command for adding a translation.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse TranslationAdd(TranslationAddCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<TranslationAddCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
+        /// Modify a translation.
+        /// </summary>
+        /// <param name="command">Command for modifying a translation.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse TranslationModify(TranslationModifyCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<TranslationModifyCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
+        /// Delete a translation.
+        /// </summary>
+        /// <param name="command">Command for deleting a translation.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse TranslationDelete(TranslationDeleteCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<TranslationDeleteCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
 
         /// <summary>
         /// Gets all the translation informations which can be used for translations.

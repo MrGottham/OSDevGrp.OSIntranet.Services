@@ -67,3 +67,23 @@ END $$
 DELIMITER ;
 CALL GrantRightsForTranslations(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForTranslations;
+
+CREATE TABLE IF NOT EXISTS DataProviders (
+	DataProviderIdentifier VARCHAR(40) NOT NULL,
+	Name VARCHAR(256) NOT NULL,
+	DataSourceStatementIdentifier VARCHAR(40) NOT NULL,
+	PRIMARY KEY (DataProviderIdentifier),
+	UNIQUE INDEX IX_DataProviders_DataSourceStatementIdentifier (DataSourceStatementIdentifier),
+);
+
+DROP PROCEDURE IF EXISTS InsertDataIntoDataProviders;
+DELIMITER $$
+CREATE PROCEDURE InsertDataIntoDataProviders()
+BEGIN
+	IF((SELECT COUNT(*) FROM DataProviders WHERE DataProviderIdentifier = '5A1B9283-6406-44DF-91C5-F2FB83CC9A42') = 0) THEN
+		INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('5A1B9283-6406-44DF-91C5-F2FB83CC9A42','DTU Fødevareinstituttet','4980BD1C-17D5-4E77-ABA5-BC6E065E6155');
+	END IF;
+END $$
+DELIMITER ;
+CALL InsertDataIntoDataProviders();
+DROP PROCEDURE InsertDataIntoDataProviders;

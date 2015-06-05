@@ -1,5 +1,8 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Linq;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 
@@ -26,6 +29,43 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             var container = ContainerFactory.Create();
             _foodWasteSystemDataService = container.Resolve<IFoodWasteSystemDataService>();
+        }
+
+        /// <summary>
+        /// Tests the commands acting on translations.
+        /// </summary>
+        [Test]
+        public void TestTranslationCommands()
+        {
+            var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+            var translationInfoSystemViewCollection = _foodWasteSystemDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+            Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
+            Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+
+            var translationAddCommand = new TranslationAddCommand
+            {
+                TranslationOfIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = translationInfoSystemViewCollection.First().TranslationInfoIdentifier,
+                TranslationValue = "Test"
+            };
+            var translationAddResult = _foodWasteSystemDataService.TranslationAdd(translationAddCommand);
+            try
+            {
+                var translationModifyCommand = new TranslationModifyCommand
+                {
+                    TranslationIdentifier = translationAddResult.Identifier ?? Guid.Empty,
+                    TranslationValue = "Test, test"
+                };
+                _foodWasteSystemDataService.TranslationModify(translationModifyCommand);
+            }
+            finally
+            {
+                var translationDeleteCommand = new TranslationDeleteCommand
+                {
+                    TranslationIdentifier = translationAddResult.Identifier ?? Guid.Empty
+                };
+                _foodWasteSystemDataService.TranslationDelete(translationDeleteCommand);
+            }
         }
 
         /// <summary>
