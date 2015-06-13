@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<TranslationProxy>(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", identifiableDomainObject.Identifier.Value.ToString().ToUpper()));
+                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTransactions(identifiableDomainObject.Identifier.Value));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }

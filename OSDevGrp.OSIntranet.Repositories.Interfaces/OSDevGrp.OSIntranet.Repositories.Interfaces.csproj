@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="DataProviders\IFoodWasteDataProvider.cs" />
     <Compile Include="DataProviders\IMySqlDataProvider.cs" />
+    <Compile Include="DataProxies\FoodWaste\IDataProviderProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationInfoProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationProxy.cs" />
     <Compile Include="DataProxies\Fælles\ISystemProxy.cs" />
