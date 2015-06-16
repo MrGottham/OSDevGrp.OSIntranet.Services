@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -58,7 +61,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for selection af given data provider.</returns>
         public virtual string GetSqlQueryForId(IDataProvider dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (dataProvider.Identifier.HasValue)
+            {
+                return string.Format("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProvider.Identifier.Value.ToString().ToUpper());
+            }
+            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
         }
 
         /// <summary>
@@ -67,7 +78,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this data provider.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new NotImplementedException();
+            return string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('{0}','{1}','{2}')", UniqueId, Name, DataSourceStatementIdentifier.ToString().ToUpper());
         }
 
         /// <summary>
@@ -76,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this data provider,</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new NotImplementedException();
+            return string.Format("UPDATE DataProviders SET Name='{1}',DataSourceStatementIdentifier='{2}' WHERE DataProviderIdentifier='{0}'", UniqueId, Name, DataSourceStatementIdentifier.ToString().ToUpper());
         }
 
         /// <summary>
@@ -85,7 +96,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to delete this data provider.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new NotImplementedException();
+            return string.Format("DELETE FROM DataProviders WHERE DataProviderIdentifier='{0}'", UniqueId);
         }
 
         #endregion
@@ -99,7 +110,47 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException("dataReader");
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
+            }
+
+            Identifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
+            Name = mySqlDataReader.GetString("Name");
+            DataSourceStatementIdentifier = new Guid(mySqlDataReader.GetString("DataSourceStatementIdentifier"));
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                DataSourceStatements = subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTransactions(DataSourceStatementIdentifier));
+            }
+        }
+
+        #endregion
+
+        #region IDataProviderProxy Members
+
+        /// <summary>
+        /// Adds a data proxy for a data source statement to the given data provider.
+        /// </summary>
+        /// <param name="dataSourceStatementProxy">Data proxy for the data source statement to add.</param>
+        public virtual void AddDataSourceStatement(ITranslationProxy dataSourceStatementProxy)
+        {
+            if (dataSourceStatementProxy == null)
+            {
+                throw new ArgumentNullException("dataSourceStatementProxy");
+            }
+            var dataSourceStatements = DataSourceStatements.ToList();
+            dataSourceStatements.Add(dataSourceStatementProxy);
+            DataSourceStatements = dataSourceStatements;
         }
 
         #endregion

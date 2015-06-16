@@ -115,6 +115,7 @@
     <Compile Include="Views\BudgetkontoplanView.cs" />
     <Compile Include="Views\BudgetkontoView.cs" />
     <Compile Include="Views\BudgetoplysningerView.cs" />
+    <Compile Include="Views\DataProviderSystemView.cs" />
     <Compile Include="Views\DebitorListeView.cs" />
     <Compile Include="Views\DebitorView.cs" />
     <Compile Include="Views\FirmaView.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Views\TabelView.cs" />
     <Compile Include="Views\TelefonlisteView.cs" />
     <Compile Include="Views\TranslationInfoSystemView.cs" />
+    <Compile Include="Views\TranslationSystemView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />

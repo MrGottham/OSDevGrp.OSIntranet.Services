@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -32,6 +33,26 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Gets all the data providers.
+        /// </summary>
+        /// <returns>All the data providers.</returns>
+        public virtual IEnumerable<IDataProvider> DataProviderGetAll()
+        {
+            try
+            {
+                return DataProvider.GetCollection<DataProviderProxy>("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Gets all the translations for a given domain object.
         /// </summary>
         /// <param name="identifiableDomainObject">The identifiable domain object on which all the translations should be returned.</param>
@@ -56,7 +77,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "TranslationsForDomainObjectGet", ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
         }
 
@@ -76,7 +97,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "TranslationInfoGetAll", ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
         }
 

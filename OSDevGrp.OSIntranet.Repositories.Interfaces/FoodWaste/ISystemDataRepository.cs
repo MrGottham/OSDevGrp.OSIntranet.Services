@@ -9,6 +9,12 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
     public interface ISystemDataRepository : IDataRepository
     {
         /// <summary>
+        /// Gets all the data providers.
+        /// </summary>
+        /// <returns>All the data providers.</returns>
+        IEnumerable<IDataProvider> DataProviderGetAll();
+
+        /// <summary>
         /// Gets all the translations for a given domain object.
         /// </summary>
         /// <param name="identifiableDomainObject">The identifiable domain object on which all the translations should be returned.</param>

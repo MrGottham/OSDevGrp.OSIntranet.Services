@@ -30,6 +30,26 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<IFoodGroup, object>()
                 .ConvertUsing(s => new object());
 
+            Mapper.CreateMap<IDataProvider, IDataProviderProxy>()
+                .ConvertUsing(m =>
+                {
+                    var dataProviderProxy = new DataProviderProxy(m.Name, m.DataSourceStatementIdentifier)
+                    {
+                        Identifier = m.Identifier,
+                    };
+                    foreach (var dataSourceStatement in m.DataSourceStatements)
+                    {
+                        dataProviderProxy.AddDataSourceStatement(Mapper.Map<ITranslation, ITranslationProxy>(dataSourceStatement));
+                    }
+                    return dataProviderProxy;
+                });
+
+            Mapper.CreateMap<ITranslation, TranslationSystemView>()
+                .ForMember(m => m.TranslationIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.TranslationOfIdentifier, opt => opt.MapFrom(s => s.TranslationOfIdentifier))
+                .ForMember(m => m.TranslationInfo, opt => opt.MapFrom(s => Mapper.Map<ITranslationInfo, TranslationInfoSystemView>(s.TranslationInfo)))
+                .ForMember(m => m.Translation, opt => opt.MapFrom(s => s.Value));
+
             Mapper.CreateMap<ITranslation, ITranslationProxy>()
                 .ConvertUsing(m =>
                 {

@@ -32,6 +32,18 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that DataProviderGetAll returns all the data providers.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderGetAllReturnsDataProviders()
+        {
+            var dataProviders = _systemDataRepository.DataProviderGetAll();
+            Assert.That(dataProviders, Is.Not.Null);
+            Assert.That(dataProviders, Is.Not.Empty);
+            Assert.That(dataProviders.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
         /// Tests that TranslationsForDomainObjectGet gets translations for a given identifiable domain object.
         /// </summary>
         [Test]

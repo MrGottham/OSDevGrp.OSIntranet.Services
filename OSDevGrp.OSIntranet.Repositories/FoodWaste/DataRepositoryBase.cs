@@ -76,6 +76,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>The identifiable domain object.</returns>
         public virtual TIdentifiable Get<TIdentifiable>(Guid identifier) where TIdentifiable : IIdentifiable
         {
+            if (typeof (TIdentifiable) == typeof (IDataProvider))
+            {
+                return (TIdentifiable) Get<IDataProvider, DataProviderProxy>(identifier);
+            }
             if (typeof (TIdentifiable) == typeof (ITranslation))
             {
                 return (TIdentifiable) Get<ITranslation, TranslationProxy>(identifier);
@@ -98,6 +102,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IDataProvider)
+            {
+                return (TIdentifiable) Insert<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
             }
             if (identifiable is ITranslation)
             {
@@ -122,6 +130,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 throw new ArgumentNullException("identifiable");
             }
+            if (identifiable is IDataProvider)
+            {
+                return (TIdentifiable) Update<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
+            }
             if (identifiable is ITranslation)
             {
                 return (TIdentifiable) Update<ITranslation, ITranslationProxy>(identifiable as ITranslation);
@@ -143,6 +155,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IDataProvider)
+            {
+                Delete<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
+                return;
             }
             if (identifiable is ITranslation)
             {

@@ -215,6 +215,7 @@
     <Compile Include="Unittests\Contracts\Views\SystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TelefonlisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TranslationInfoSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\TranslationSystemViewTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\AdressegruppelisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\AdresselisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Adressekartotek\BetalingsbetingelselisteHelperTests.cs" />
