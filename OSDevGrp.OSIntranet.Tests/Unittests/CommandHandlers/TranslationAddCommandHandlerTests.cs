@@ -75,7 +75,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -117,7 +117,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(translationInfoMock)
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -163,7 +163,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -209,7 +209,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -255,7 +255,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -296,7 +296,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.Anything))
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -352,7 +352,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     Assert.That(translation.Value, Is.Not.Empty);
                     Assert.That(translation.Value, Is.EqualTo(translationValue));
                 })
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -388,7 +388,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var insertedTranslationMock = DomainObjectMockBuilder.BuildTranslationMock();
+            var insertedTranslationMock = DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid());
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
@@ -435,7 +435,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Insert(Arg<ITranslation>.Is.NotNull))
-                .Return(DomainObjectMockBuilder.BuildTranslationMock())
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid()))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();

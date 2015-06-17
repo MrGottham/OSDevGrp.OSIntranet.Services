@@ -25,10 +25,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(dataProvider, Is.Not.Null);
             Assert.That(dataProvider.Identifier, Is.Null);
             Assert.That(dataProvider.Identifier.HasValue, Is.False);
+            Assert.That(dataProvider.Translation, Is.Null);
+            Assert.That(dataProvider.Translations, Is.Not.Null);
+            Assert.That(dataProvider.Translations, Is.Empty);
             Assert.That(dataProvider.Name, Is.Not.Null);
             Assert.That(dataProvider.Name, Is.Not.Empty);
             Assert.That(dataProvider.Name, Is.EqualTo(name));
             Assert.That(dataProvider.DataSourceStatementIdentifier, Is.EqualTo(dataSourceStatementIdentifier));
+            Assert.That(dataProvider.DataSourceStatement, Is.Null);
             Assert.That(dataProvider.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProvider.DataSourceStatements, Is.Empty);
         }
@@ -47,6 +51,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("name"));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Translate sets the translation for the data source statement.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateSetsDataSourceStatement()
+        {
+            var fixture = new Fixture();
+            var dataSourceStatementIdentifier = Guid.NewGuid();
+
+            var dataProvider = new DataProvider(fixture.Create<string>(), dataSourceStatementIdentifier);
+            Assert.That(dataProvider, Is.Not.Null);
+            Assert.That(dataProvider.DataSourceStatementIdentifier, Is.EqualTo(dataSourceStatementIdentifier));
+            Assert.That(dataProvider.DataSourceStatement, Is.Null);
+            Assert.That(dataProvider.DataSourceStatements, Is.Not.Null);
+            Assert.That(dataProvider.DataSourceStatements, Is.Empty);
+
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock(dataSourceStatementIdentifier);
+            dataProvider.TranslationAdd(translationMock);
+            Assert.That(dataProvider.DataSourceStatementIdentifier, Is.EqualTo(dataSourceStatementIdentifier));
+            Assert.That(dataProvider.DataSourceStatement, Is.Null);
+            Assert.That(dataProvider.DataSourceStatements, Is.Not.Null);
+            Assert.That(dataProvider.DataSourceStatements, Is.Not.Empty);
+
+            dataProvider.Translate(translationMock.TranslationInfo.CultureInfo);
+            Assert.That(dataProvider.DataSourceStatement, Is.Not.Null);
+            Assert.That(dataProvider.DataSourceStatement, Is.EqualTo(translationMock));
         }
     }
 }

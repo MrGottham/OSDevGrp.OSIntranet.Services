@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -128,29 +128,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             Identifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
             Name = mySqlDataReader.GetString("Name");
             DataSourceStatementIdentifier = new Guid(mySqlDataReader.GetString("DataSourceStatementIdentifier"));
+
+            var translationCollection = new List<ITranslation>();
             using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
             {
-                DataSourceStatements = subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTransactions(DataSourceStatementIdentifier));
+                translationCollection.AddRange(subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTransactions(DataSourceStatementIdentifier)));
             }
-        }
-
-        #endregion
-
-        #region IDataProviderProxy Members
-
-        /// <summary>
-        /// Adds a data proxy for a data source statement to the given data provider.
-        /// </summary>
-        /// <param name="dataSourceStatementProxy">Data proxy for the data source statement to add.</param>
-        public virtual void AddDataSourceStatement(ITranslationProxy dataSourceStatementProxy)
-        {
-            if (dataSourceStatementProxy == null)
-            {
-                throw new ArgumentNullException("dataSourceStatementProxy");
-            }
-            var dataSourceStatements = DataSourceStatements.ToList();
-            dataSourceStatements.Add(dataSourceStatementProxy);
-            DataSourceStatements = dataSourceStatements;
+            Translations = translationCollection;
         }
 
         #endregion

@@ -8,7 +8,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     /// <summary>
     /// System view for a data provider.
     /// </summary>
-    [DataContract(Name = "DataProvider", Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [DataContract(Name = "DataProviderSystemView", Namespace = SoapNamespaces.FoodWasteNamespace)]
     public class DataProviderSystemView : IView
     {
         /// <summary>
@@ -33,6 +33,6 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         /// Gets or sets the the translations of the data providers data source statement.
         /// </summary>
         [DataMember(IsRequired = true)]
-        public IEnumerable<TranslationInfoSystemView> DataSourceStatements { get; set; }
+        public IEnumerable<TranslationSystemView> DataSourceStatements { get; set; }
     }
 }

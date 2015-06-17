@@ -19,6 +19,12 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         IEnumerable<ITranslation> Translations { get; }
 
         /// <summary>
+        /// Adds an translation for the domain object.
+        /// </summary>
+        /// <param name="translation">Translation for the domain object.</param>
+        void TranslationAdd(ITranslation translation);
+
+        /// <summary>
         /// Make translation for the domain object.
         /// </summary>
         /// <param name="translationCulture">Culture information which are used for translation.</param>

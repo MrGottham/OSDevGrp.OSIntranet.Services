@@ -22,6 +22,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     public class TranslationInfoCollectionGetQueryHandlerTests
     {
         /// <summary>
+        /// Test that the constructor initialize the functionality which handles the query for getting a collection of translation informations.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorInitializeTranslationInfoCollectionGetQueryHandler()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ISystemDataRepository>(e => e.FromFactory(() => MockRepository.GenerateMock<ISystemDataRepository>()));
+            fixture.Customize<IFoodWasteObjectMapper>(e => e.FromFactory(() => MockRepository.GenerateMock<IFoodWasteObjectMapper>()));
+
+            var translationInfoCollectionGetQueryHandler = new TranslationInfoCollectionGetQueryHandler(fixture.Create<ISystemDataRepository>(), fixture.Create<IFoodWasteObjectMapper>());
+            Assert.That(translationInfoCollectionGetQueryHandler, Is.Not.Null);
+        }
+
+        /// <summary>
         /// Tests that the constructor throws an ArgumentNullException when the repository which can access system data in the food waste domain is null.
         /// </summary>
         [Test]
@@ -122,6 +136,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
                 .WhenCalled(e => ((IEnumerable<ITranslationInfo>) e.Arguments.ElementAt(0)).ToList().ForEach(n => Assert.IsTrue(translationInfoMockCollection.Contains(n))))
                 .Return(fixture.CreateMany<TranslationInfoSystemView>(translationInfoMockCollection.Count).ToList())
                 .Repeat.Any();
+
             var translationInfoCollectionGetQueryHandler = new TranslationInfoCollectionGetQueryHandler(systemDataRepository, foodWasteObjectMapper);
             Assert.That(translationInfoCollectionGetQueryHandler, Is.Not.Null);
 

@@ -7,7 +7,6 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
-using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -30,8 +29,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(dataProviderProxy, Is.Not.Null);
             Assert.That(dataProviderProxy.Identifier, Is.Null);
             Assert.That(dataProviderProxy.Identifier.HasValue, Is.False);
+            Assert.That(dataProviderProxy.Translation, Is.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Empty);
             Assert.That(dataProviderProxy.Name, Is.Null);
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(Guid.Empty));
+            Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Empty);
         }
@@ -264,6 +267,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataMapsDataIntoProxy()
         {
             var fixture = new Fixture();
+            fixture.Customize<TranslationProxy>(e => e.FromFactory(() => new TranslationProxy(new Guid("1AFF5DC2-26B4-4E0B-ACFF-71E669B5CDCB"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>())));
 
             var translationProxyCollection = fixture.CreateMany<TranslationProxy>(2).ToList();
             var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
@@ -273,7 +277,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.NotNull))
                 .Return(translationProxyCollection)
                 .Repeat.Any();
-                
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
@@ -290,6 +293,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(dataProviderProxy, Is.Not.Null);
             Assert.That(dataProviderProxy.Identifier, Is.Null);
             Assert.That(dataProviderProxy.Identifier.HasValue, Is.False);
+            Assert.That(dataProviderProxy.Translation, Is.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Empty);
             Assert.That(dataProviderProxy.Name, Is.Null);
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(Guid.Empty));
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
@@ -301,53 +307,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(dataProviderProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("DataProviderIdentifier")));
             // ReSharper restore PossibleInvalidOperationException
+            Assert.That(dataProviderProxy.Translation, Is.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Empty);
+            Assert.That(dataProviderProxy.Translations, Is.EqualTo(translationProxyCollection));
             Assert.That(dataProviderProxy.Name, Is.Not.Null);
             Assert.That(dataProviderProxy.Name, Is.Not.Empty);
             Assert.That(dataProviderProxy.Name, Is.EqualTo(dataReader.GetString("Name")));
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.Not.EqualTo(Guid.Empty));
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("DataSourceStatementIdentifier")));
+            Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.EqualTo(translationProxyCollection));
             
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
             dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("DataSourceStatementIdentifier").ToUpper()))));
-        }
-
-        /// <summary>
-        /// Tests that AddDataSourceStatement throws an ArgumentNullException when the data proxy for the data source statement is null.
-        /// </summary>
-        [Test]
-        public void TestThatAddDataSourceStatementThrowsArgumentNullExceptionWhenDataSourceStatementProxyIsNull()
-        {
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
-
-            var exception = Assert.Throws<ArgumentNullException>(() => dataProviderProxy.AddDataSourceStatement(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataSourceStatementProxy"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that AddDataSourceStatement adds the data proxy for the data source statement.
-        /// </summary>
-        [Test]
-        public void TestThatAddDataSourceStatementAddsDataSourceStatementProxy()
-        {
-            var dataSourceStatementMock = MockRepository.GenerateMock<ITranslationProxy>();
-
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Empty);
-
-            dataProviderProxy.AddDataSourceStatement(dataSourceStatementMock);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
-            Assert.That(dataProviderProxy.DataSourceStatements.Contains(dataSourceStatementMock), Is.True);
         }
     }
 }

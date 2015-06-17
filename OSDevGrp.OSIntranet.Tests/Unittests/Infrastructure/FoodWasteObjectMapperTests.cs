@@ -164,6 +164,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps DataProvider to DataProviderSystemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsDataProviderToDataProviderSystemView()
+        {
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var dataProviderSystemView = foodWasteObjectMapper.Map<IDataProvider, DataProviderSystemView>(dataProviderMock);
+            Assert.That(dataProviderSystemView.DataProviderIdentifier, Is.Not.Null);
+            Assert.That(dataProviderSystemView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier.HasValue ? dataProviderMock.Identifier.Value : Guid.Empty));
+            Assert.That(dataProviderSystemView.Name, Is.Not.Null);
+            Assert.That(dataProviderSystemView.Name, Is.Not.Empty);
+            Assert.That(dataProviderSystemView.Name, Is.EqualTo(dataProviderMock.Name));
+            Assert.That(dataProviderSystemView.DataSourceStatementIdentifier, Is.EqualTo(dataProviderMock.DataSourceStatementIdentifier));
+            Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Null);
+            Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Empty);
+            Assert.That(dataProviderSystemView.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
+        }
+
+        /// <summary>
         /// Tests that Map maps DataProvider to DataProviderProxy.
         /// </summary>
         [Test]
@@ -177,10 +200,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var dataProviderProxy = foodWasteObjectMapper.Map<IDataProvider, IDataProviderProxy>(dataProviderMock);
             Assert.That(dataProviderProxy.Identifier, Is.Not.Null);
             Assert.That(dataProviderProxy.Identifier, Is.EqualTo(dataProviderMock.Identifier));
+            Assert.That(dataProviderProxy.Translation, Is.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Empty);
+            Assert.That(dataProviderProxy.Translations.Count(), Is.EqualTo(dataProviderMock.Translations.Count()));
             Assert.That(dataProviderProxy.Name, Is.Not.Null);
             Assert.That(dataProviderProxy.Name, Is.Not.Empty);
             Assert.That(dataProviderProxy.Name, Is.EqualTo(dataProviderMock.Name));
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(dataProviderMock.DataSourceStatementIdentifier));
+            Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
             Assert.That(dataProviderProxy.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
@@ -192,7 +220,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsTranslationToTranslationSystemView()
         {
-            var translationMock = DomainObjectMockBuilder.BuildTranslationMock();
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid());
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
@@ -218,7 +246,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsTranslationToTranslationProxy()
         {
-            var translationMock = DomainObjectMockBuilder.BuildTranslationMock();
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid());
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);

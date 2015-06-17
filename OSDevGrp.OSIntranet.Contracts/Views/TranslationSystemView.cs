@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     /// <summary>
     /// System view for a translation of a domain object.
     /// </summary>
-    [DataContract(Name = "Translation", Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [DataContract(Name = "TranslationSystemView", Namespace = SoapNamespaces.FoodWasteNamespace)]
     public class TranslationSystemView : IView
     {
         /// <summary>

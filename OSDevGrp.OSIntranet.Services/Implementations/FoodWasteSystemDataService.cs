@@ -63,6 +63,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Gets all the data providers.
+        /// </summary>
+        /// <param name="query">Query for getting all the data providers.</param>
+        /// <returns>Collection of all the data providers.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual IEnumerable<DataProviderSystemView> DataProviderGetAll(DataProviderCollectionGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Adds a translation.
         /// </summary>
         /// <param name="command">Command for adding a translation.</param>

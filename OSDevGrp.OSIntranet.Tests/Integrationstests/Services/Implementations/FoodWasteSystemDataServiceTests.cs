@@ -32,6 +32,18 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tests that DataProviderGetAll gets all the data providers.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderGetAllGetsDataProviderSystemViewCollection()
+        {
+            var dataProviderCollectionGetQuery = new DataProviderCollectionGetQuery();
+            var dataProviderSystemViewCollection = _foodWasteSystemDataService.DataProviderGetAll(dataProviderCollectionGetQuery);
+            Assert.That(dataProviderSystemViewCollection, Is.Not.Null);
+            Assert.That(dataProviderSystemViewCollection, Is.Not.Empty);
+        }
+
+        /// <summary>
         /// Tests the commands acting on translations.
         /// </summary>
         [Test]

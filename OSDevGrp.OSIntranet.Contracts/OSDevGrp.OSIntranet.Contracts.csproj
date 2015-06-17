@@ -74,6 +74,7 @@
     <Compile Include="Queries\BudgetkontoGetQuery.cs" />
     <Compile Include="Queries\BudgetkontogrupperGetQuery.cs" />
     <Compile Include="Queries\BudgetkontoplanGetQuery.cs" />
+    <Compile Include="Queries\DataProviderCollectionGetQuery.cs" />
     <Compile Include="Queries\DebitorGetQuery.cs" />
     <Compile Include="Queries\DebitorlisteGetQuery.cs" />
     <Compile Include="Queries\FirmaGetQuery.cs" />

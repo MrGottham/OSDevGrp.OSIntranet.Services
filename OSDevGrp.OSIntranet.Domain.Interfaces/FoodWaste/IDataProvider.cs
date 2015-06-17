@@ -6,7 +6,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
     /// <summary>
     /// Interface for a data provider.
     /// </summary>
-    public interface IDataProvider : IIdentifiable
+    public interface IDataProvider : ITranslatable
     {
         /// <summary>
         /// Gets the name for the data provider.
@@ -17,6 +17,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// Gets the identifier for the data source statement.
         /// </summary>
         Guid DataSourceStatementIdentifier { get; }
+
+        /// <summary>
+        /// Translation for the data source statement.
+        /// </summary>
+        ITranslation DataSourceStatement { get; }
 
         /// <summary>
         /// Gets the translations of the data source statement.

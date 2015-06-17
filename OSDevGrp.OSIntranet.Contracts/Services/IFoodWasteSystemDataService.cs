@@ -15,6 +15,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteSystemDataService : IIntranetService
     {
         /// <summary>
+        /// Gets all the data providers.
+        /// </summary>
+        /// <param name="query">Query for getting all the data providers.</param>
+        /// <returns>Collection of all the data providers.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<DataProviderSystemView> DataProviderGetAll(DataProviderCollectionGetQuery query);
+
+        /// <summary>
         /// Adds a translation.
         /// </summary>
         /// <param name="command">Command for adding a translation.</param>

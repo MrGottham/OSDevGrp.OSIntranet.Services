@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Domain.FoodWaste
@@ -7,13 +9,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
     /// <summary>
     /// Data provider.
     /// </summary>
-    public class DataProvider : IdentifiableBase, IDataProvider
+    public class DataProvider : TranslatableBase, IDataProvider
     {
         #region Private variables
 
         private string _name;
         private Guid _dataSourceStatementIdentifier;
-        private IEnumerable<ITranslation> _dataSourceStatements = new List<ITranslation>(0); 
 
         #endregion
 
@@ -80,22 +81,30 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Translation for the data source statement.
+        /// </summary>
+        public ITranslation DataSourceStatement { get; private set; }
+
+        /// <summary>
         /// Gets the translations of the data source statement.
         /// </summary>
         public virtual IEnumerable<ITranslation> DataSourceStatements
         {
-            get
-            {
-                return _dataSourceStatements;
-            }
-            protected set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
-                _dataSourceStatements = value;
-            }
+            get { return Translations.Where(m => m.TranslationOfIdentifier == DataSourceStatementIdentifier).ToList(); }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Finish up the translation for the data provider.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        protected override void OnTranslation(CultureInfo translationCulture)
+        {
+            base.OnTranslation(translationCulture);
+            DataSourceStatement = Translate(translationCulture, DataSourceStatementIdentifier);
         }
 
         #endregion

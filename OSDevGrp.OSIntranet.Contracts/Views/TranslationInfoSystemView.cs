@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     /// <summary>
     /// System view for translation informations which are used for translation.
     /// </summary>
-    [DataContract(Name = "TranslationInfo", Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [DataContract(Name = "TranslationInfoSystemView", Namespace = SoapNamespaces.FoodWasteNamespace)]
     public class TranslationInfoSystemView : IView
     {
         /// <summary>

@@ -67,6 +67,7 @@
     <Compile Include="BudgetkontoGetQueryHandler.cs" />
     <Compile Include="Core\KalenderQueryHandlerBase.cs" />
     <Compile Include="Core\RegnskabQueryHandlerBase.cs" />
+    <Compile Include="DataProviderCollectionGetQueryHandler.cs" />
     <Compile Include="DebitorGetQueryHandler.cs" />
     <Compile Include="DebitorlisteGetQueryHandler.cs" />
     <Compile Include="Core\FinansstyringQueryHandlerBase.cs" />

@@ -99,7 +99,110 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationAdd throws an ArgumentNullException when the command for adding a translation is null.
+        /// Tests that DataProviderGetAll throws an ArgumentNullException when the query for getting all the data providers is null.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderGetAllThrowsArgumentNullExceptionIfDataProviderCollectionGetQueryIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.DataProviderGetAll(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("query"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DataProviderGetAll calls Query on the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderGetAlllCallsQueryOnQueryBus()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.NotNull))
+                .Return(fixture.CreateMany<DataProviderSystemView>(random.Next(1, 25)).ToList())
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var query = fixture.Create<DataProviderCollectionGetQuery>();
+            foodWasteSystemDataService.DataProviderGetAll(query);
+
+            queryBusMock.AssertWasCalled(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.Equal(query)));
+        }
+
+        /// <summary>
+        /// Tests that DataProviderGetAll returns the result from the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderGetAllReturnsResultFromQueryBus()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var dataProviderSystemViewCollection = fixture.CreateMany<DataProviderSystemView>(random.Next(1, 25)).ToList();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.NotNull))
+                .Return(dataProviderSystemViewCollection)
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var result = foodWasteSystemDataService.DataProviderGetAll(fixture.Create<DataProviderCollectionGetQuery>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(dataProviderSystemViewCollection));
+        }
+
+        /// <summary>
+        /// Tests that DataProviderGetAll throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderGetAllThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.DataProviderGetAll(fixture.Create<DataProviderCollectionGetQuery>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tests that TranslationAdd throws an ArgumentNullException when the command for adding a translation is null.
         /// </summary>
         [Test]
         public void TestThatTranslationAddThrowsArgumentNullExceptionIfTranslationAddCommandIsNull()
@@ -121,7 +224,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationAdd calls Publish on the command bus.
+        /// Tests that TranslationAdd calls Publish on the command bus.
         /// </summary>
         [Test]
         public void TestThatTranslationAddCallsPublishOnCommandBus()
@@ -146,7 +249,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationAdd returns the result from the command bus.
+        /// Tests that TranslationAdd returns the result from the command bus.
         /// </summary>
         [Test]
         public void TestThatTranslationAddReturnsResultFromCommandBus()
@@ -172,7 +275,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationAdd throws an FaultException if an error occurs.
+        /// Tests that TranslationAdd throws an FaultException if an error occurs.
         /// </summary>
         [Test]
         public void TestThatTranslationAddThrowsFaultExceptionWhenExceptionOccurs()
@@ -204,7 +307,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationModify throws an ArgumentNullException when the command for modifying a translation is null.
+        /// Tests that TranslationModify throws an ArgumentNullException when the command for modifying a translation is null.
         /// </summary>
         [Test]
         public void TestThatTranslationModifyThrowsArgumentNullExceptionIfTranslationModifyCommandIsNull()
@@ -226,7 +329,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationModify calls Publish on the command bus.
+        /// Tests that TranslationModify calls Publish on the command bus.
         /// </summary>
         [Test]
         public void TestThatTranslationModifyCallsPublishOnCommandBus()
@@ -251,7 +354,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationModify returns the result from the command bus.
+        /// Tests that TranslationModify returns the result from the command bus.
         /// </summary>
         [Test]
         public void TestThatTranslationModifyReturnsResultFromCommandBus()
@@ -277,7 +380,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationModify throws an FaultException if an error occurs.
+        /// Tests that TranslationModify throws an FaultException if an error occurs.
         /// </summary>
         [Test]
         public void TestThatTranslationModifyThrowsFaultExceptionWhenExceptionOccurs()
@@ -309,7 +412,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationDelete throws an ArgumentNullException when the command for deleting a translation is null.
+        /// Tests that TranslationDelete throws an ArgumentNullException when the command for deleting a translation is null.
         /// </summary>
         [Test]
         public void TestThatTranslationDeleteThrowsArgumentNullExceptionIfTranslationDeleteCommandIsNull()
@@ -331,7 +434,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationDelete calls Publish on the command bus.
+        /// Tests that TranslationDelete calls Publish on the command bus.
         /// </summary>
         [Test]
         public void TestThatTranslationDeleteCallsPublishOnCommandBus()
@@ -356,7 +459,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationDelete returns the result from the command bus.
+        /// Tests that TranslationDelete returns the result from the command bus.
         /// </summary>
         [Test]
         public void TestThatTranslationDeleteReturnsResultFromCommandBus()
@@ -382,7 +485,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationDelete throws an FaultException if an error occurs.
+        /// Tests that TranslationDelete throws an FaultException if an error occurs.
         /// </summary>
         [Test]
         public void TestThatTranslationDeleteThrowsFaultExceptionWhenExceptionOccurs()
@@ -414,7 +517,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationInfoGetAll throws an ArgumentNullException when the query for for getting all the translation informations which can be used for translations is null.
+        /// Tests that TranslationInfoGetAll throws an ArgumentNullException when the query for getting all the translation informations which can be used for translations is null.
         /// </summary>
         [Test]
         public void TestThatTranslationInfoGetAllThrowsArgumentNullExceptionIfTranslationInfoCollectionGetQueryIsNull()
@@ -436,7 +539,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationInfoGetAll calls Query on the query bus.
+        /// Tests that TranslationInfoGetAll calls Query on the query bus.
         /// </summary>
         [Test]
         public void TestThatTranslationInfoGetAllCallsQueryOnQueryBus()
@@ -461,7 +564,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationInfoGetAll returns the result from the query bus.
+        /// Tests that TranslationInfoGetAll returns the result from the query bus.
         /// </summary>
         [Test]
         public void TestThatTranslationInfoGetAllReturnsResultFromQueryBus()
@@ -487,7 +590,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that the TranslationInfoGetAll throws an FaultException if an error occurs.
+        /// Tests that TranslationInfoGetAll throws an FaultException if an error occurs.
         /// </summary>
         [Test]
         public void TestThatTranslationInfoGetAllThrowsFaultExceptionWhenExceptionOccurs()

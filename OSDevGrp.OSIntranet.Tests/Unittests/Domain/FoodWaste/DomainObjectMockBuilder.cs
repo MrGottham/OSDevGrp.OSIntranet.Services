@@ -19,15 +19,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <returns>Mockup for a food group.</returns>
         public static IFoodGroup BuildFoodGroupMock()
         {
+            var identifier = Guid.NewGuid();
             var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
             foodGroupMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
+                .Return(identifier)
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.Translation)
-                .Return(BuildTranslationMock())
+                .Return(BuildTranslationMock(identifier))
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.Translations)
-                .Return(BuildTranslationMockCollection())
+                .Return(BuildTranslationMockCollection(identifier))
                 .Repeat.Any();
             return foodGroupMock;
         }
@@ -55,18 +56,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         public static IDataProvider BuildDataProviderMock()
         {
             var fixture = new Fixture();
+            var dataSourceStatementIdentifier = Guid.NewGuid();
             var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
             dataProviderMock.Stub(m => m.Identifier)
                 .Return(Guid.NewGuid())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Translation)
+                .Return(BuildTranslationMock(dataSourceStatementIdentifier))
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Translations)
+                .Return(BuildTranslationMockCollection(dataSourceStatementIdentifier))
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.Name)
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.DataSourceStatementIdentifier)
-                .Return(Guid.NewGuid())
+                .Return(dataSourceStatementIdentifier)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.DataSourceStatement)
+                .Return(BuildTranslationMock(dataSourceStatementIdentifier))
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.DataSourceStatements)
-                .Return(BuildTranslationMockCollection())
+                .Return(BuildTranslationMockCollection(dataSourceStatementIdentifier))
                 .Repeat.Any();
             return dataProviderMock;
         }
@@ -88,30 +99,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <summary>
         /// Build a mockup for a translation.
         /// </summary>
+        /// <param name="translationOfIdentifier">Identifier for the domain object which are translated by the translation.</param>
         /// <returns>Mockup for a translation.</returns>
-        public static ITranslation BuildTranslationMock()
+        public static ITranslation BuildTranslationMock(Guid translationOfIdentifier)
         {
-            return BuildTranslationMock(Thread.CurrentThread.CurrentUICulture.Name);
-        }
-
-        /// <summary>
-        /// Build a collection of mockups for some translations.
-        /// </summary>
-        /// <returns>Collection of mockups for some translations.</returns>
-        public static IEnumerable<ITranslation> BuildTranslationMockCollection()
-        {
-            return new List<ITranslation>
-            {
-                BuildTranslationMock("da-DK"),
-                BuildTranslationMock("en-US")
-            };
+            return BuildTranslationMock(Thread.CurrentThread.CurrentUICulture.Name, translationOfIdentifier);
         }
 
         /// <summary>
         /// Build a mockup for a translation.
         /// </summary>
+        /// <param name="cultureName">Name for the culture which are used for translation.</param>
+        /// <param name="translationOfIdentifier">Identifier for the domain object which are translated by the translation.</param>
         /// <returns>Mockup for a translation.</returns>
-        public static ITranslation BuildTranslationMock(string cultureName)
+        public static ITranslation BuildTranslationMock(string cultureName, Guid translationOfIdentifier)
         {
             var fixture = new Fixture();
             var translationMock = MockRepository.GenerateMock<ITranslation>();
@@ -119,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
             translationMock.Stub(m => m.TranslationOfIdentifier)
-                .Return(Guid.NewGuid())
+                .Return(translationOfIdentifier)
                 .Repeat.Any();
             translationMock.Stub(m => m.TranslationInfo)
                 .Return(BuildTranslationInfoMock(cultureName))
@@ -128,6 +129,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
             return translationMock;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some translations.
+        /// </summary>
+        /// <param name="translationOfIdentifier">Identifier for the domain object which are translated by the translations.</param>
+        /// <returns>Collection of mockups for some translations.</returns>
+        public static IEnumerable<ITranslation> BuildTranslationMockCollection(Guid translationOfIdentifier)
+        {
+            return new List<ITranslation>
+            {
+                BuildTranslationMock("da-DK", translationOfIdentifier),
+                BuildTranslationMock("en-US", translationOfIdentifier)
+            };
         }
 
         /// <summary>
