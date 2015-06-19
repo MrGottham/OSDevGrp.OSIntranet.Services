@@ -93,3 +93,28 @@ END $$
 DELIMITER ;
 CALL InsertDataIntoDataProviders();
 DROP PROCEDURE InsertDataIntoDataProviders;
+
+CREATE TABLE IF NOT EXISTS ForeignKeys (
+	ForeignKeyIdentifier VARCHAR(40) NOT NULL,
+	DataProviderIdentifier VARCHAR(40) NOT NULL,
+	ForeignKeyForIdentifier VARCHAR(40) NOT NULL,
+	ForeignKeyForTypes VARCHAR(512) NOT NULL,
+	ForeignKeyValue VARCHAR(512) NOT NULL,
+	PRIMARY KEY (ForeignKeyIdentifier),
+	UNIQUE INDEX IX_ForeignKeys_ForeignKeyForTypes (DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes),
+	UNIQUE INDEX IX_ForeignKeys_ForeignKeyValue (DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyValue),
+	FOREIGN KEY FK_ForeignKeys_DataProviderIdentifier (DataProviderIdentifier) REFERENCES DataProviders (DataProviderIdentifier) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForForeignKeys;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForForeignKeys(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.ForeignKeys TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForForeignKeys(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForForeignKeys;
+
