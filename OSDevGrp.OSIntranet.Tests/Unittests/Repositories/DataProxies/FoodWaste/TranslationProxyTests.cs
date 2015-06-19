@@ -69,7 +69,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var uniqueId = translationProxy.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            Assert.That(uniqueId, Is.EqualTo(translationProxy.Identifier.ToString().ToUpper()));
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(uniqueId, Is.EqualTo(translationProxy.Identifier.Value.ToString("D").ToUpper()));
+            // ReSharper restore PossibleInvalidOperationException
         }
 
         /// <summary>
@@ -129,7 +131,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var sqlQueryForId = translationProxy.GetSqlQueryForId(translationMock);
             Assert.That(sqlQueryForId, Is.Not.Null);
             Assert.That(sqlQueryForId, Is.Not.Empty);
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.TranslationIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier", translationMock.Identifier.ToString().ToUpper())));
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.TranslationIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier", translationMock.Identifier.Value.ToString("D").ToUpper())));
+            // ReSharper restore PossibleInvalidOperationException
         }
 
         /// <summary>
@@ -154,7 +158,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('{0}','{1}','{2}','{3}')", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier.ToString().ToUpper(), translationInfoMock.Identifier.Value.ToString().ToUpper(), translationProxy.Value)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('{0}','{1}','{2}','{3}')", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier.ToString("D").ToUpper(), translationInfoMock.Identifier.Value.ToString("D").ToUpper(), translationProxy.Value)));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -180,7 +184,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Translations SET OfIdentifier='{1}',InfoIdentifier='{2}',Value='{3}' WHERE TranslationIdentifier='{0}'", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier.ToString().ToUpper(), translationInfoMock.Identifier.Value.ToString().ToUpper(), translationProxy.Value)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Translations SET OfIdentifier='{1}',InfoIdentifier='{2}',Value='{3}' WHERE TranslationIdentifier='{0}'", translationProxy.UniqueId, translationProxy.TranslationOfIdentifier.ToString("D").ToUpper(), translationInfoMock.Identifier.Value.ToString("D").ToUpper(), translationProxy.Value)));
             // ReSharper restore PossibleInvalidOperationException
         }
 

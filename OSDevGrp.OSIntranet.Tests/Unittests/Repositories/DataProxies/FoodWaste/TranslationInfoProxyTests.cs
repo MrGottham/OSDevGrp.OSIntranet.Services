@@ -69,7 +69,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var uniqueId = translationInfoProxy.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            Assert.That(uniqueId, Is.EqualTo(translationInfoProxy.Identifier.ToString().ToUpper()));
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(uniqueId, Is.EqualTo(translationInfoProxy.Identifier.Value.ToString("D").ToUpper()));
+            // ReSharper restore PossibleInvalidOperationException
         }
 
         /// <summary>
@@ -129,7 +131,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var sqlQueryForId = translationInfoProxy.GetSqlQueryForId(translationInfoMock);
             Assert.That(sqlQueryForId, Is.Not.Null);
             Assert.That(sqlQueryForId, Is.Not.Empty);
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfoMock.Identifier.ToString().ToUpper())));
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfoMock.Identifier.Value.ToString("D").ToUpper())));
+            // ReSharper restore PossibleInvalidOperationException
         }
 
         /// <summary>

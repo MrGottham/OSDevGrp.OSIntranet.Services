@@ -164,6 +164,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps ForeignKey to ForeignKeyProxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsForeignKeyToForeignKeyProxy()
+        {
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var dataProviderProxy = foodWasteObjectMapper.Map<IForeignKey, IForeignKeyProxy>(dataProviderMock);
+            Assert.That(dataProviderProxy.Identifier, Is.Not.Null);
+            Assert.That(dataProviderProxy.Identifier, Is.EqualTo(dataProviderMock.Identifier));
+            Assert.That(dataProviderProxy.Translation, Is.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
+            Assert.That(dataProviderProxy.Translations, Is.Not.Empty);
+            Assert.That(dataProviderProxy.Translations.Count(), Is.EqualTo(dataProviderMock.Translations.Count()));
+            Assert.That(dataProviderProxy.Name, Is.Not.Null);
+            Assert.That(dataProviderProxy.Name, Is.Not.Empty);
+            Assert.That(dataProviderProxy.Name, Is.EqualTo(dataProviderMock.Name));
+            Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(dataProviderMock.DataSourceStatementIdentifier));
+            Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
+            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
+            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
+            Assert.That(dataProviderProxy.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
+        }
+
+        /// <summary>
         /// Tests that Map maps DataProvider to DataProviderView.
         /// </summary>
         [Test]

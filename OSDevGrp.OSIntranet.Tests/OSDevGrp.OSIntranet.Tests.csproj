@@ -297,6 +297,7 @@
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\DataProxyHelperTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\DataProviderProxyTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\ForeignKeyProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\TranslationInfoProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\TranslationProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Fælles\SystemProxyTests.cs" />

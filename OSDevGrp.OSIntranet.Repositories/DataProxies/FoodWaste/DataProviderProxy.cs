@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 if (Identifier.HasValue)
                 {
-                    return Identifier.Value.ToString().ToUpper();
+                    return Identifier.Value.ToString("D").ToUpper();
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
@@ -67,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             if (dataProvider.Identifier.HasValue)
             {
-                return string.Format("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProvider.Identifier.Value.ToString().ToUpper());
+                return string.Format("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProvider.Identifier.Value.ToString("D").ToUpper());
             }
             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
         }
@@ -78,7 +78,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this data provider.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            return string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('{0}','{1}','{2}')", UniqueId, Name, DataSourceStatementIdentifier.ToString().ToUpper());
+            return string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('{0}','{1}','{2}')", UniqueId, Name, DataSourceStatementIdentifier.ToString("D").ToUpper());
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this data provider,</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            return string.Format("UPDATE DataProviders SET Name='{1}',DataSourceStatementIdentifier='{2}' WHERE DataProviderIdentifier='{0}'", UniqueId, Name, DataSourceStatementIdentifier.ToString().ToUpper());
+            return string.Format("UPDATE DataProviders SET Name='{1}',DataSourceStatementIdentifier='{2}' WHERE DataProviderIdentifier='{0}'", UniqueId, Name, DataSourceStatementIdentifier.ToString("D").ToUpper());
         }
 
         /// <summary>

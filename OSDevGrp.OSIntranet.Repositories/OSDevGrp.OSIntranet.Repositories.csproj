@@ -97,6 +97,7 @@
     <Compile Include="DataProviders\MySqlDataProvider.cs" />
     <Compile Include="DataProxies\DataProxyHelper.cs" />
     <Compile Include="DataProxies\FoodWaste\DataProviderProxy.cs" />
+    <Compile Include="DataProxies\FoodWaste\ForeignKeyProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\TranslationInfoProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\TranslationProxy.cs" />
     <Compile Include="DataProxies\Fælles\SystemProxy.cs" />

@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 if (Identifier.HasValue)
                 {
-                    return Identifier.ToString().ToUpper();
+                    return Identifier.Value.ToString("D").ToUpper();
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
@@ -65,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             if (translationInfo.Identifier.HasValue)
             {
-                return string.Format("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfo.Identifier.ToString().ToUpper());
+                return string.Format("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfo.Identifier.Value.ToString("D").ToUpper());
             }
             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translationInfo.Identifier, "Identifier"));
         }

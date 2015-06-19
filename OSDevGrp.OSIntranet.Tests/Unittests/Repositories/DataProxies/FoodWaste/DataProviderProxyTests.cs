@@ -74,7 +74,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var uniqueId = dataProviderProxy.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            Assert.That(uniqueId, Is.EqualTo(dataProviderProxy.Identifier.ToString().ToUpper()));
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(uniqueId, Is.EqualTo(dataProviderProxy.Identifier.Value.ToString("D").ToUpper()));
+            // ReSharper restore PossibleInvalidOperationException
         }
 
         /// <summary>
@@ -134,7 +136,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var sqlQueryForId = dataProviderProxy.GetSqlQueryForId(dataProviderMock);
             Assert.That(sqlQueryForId, Is.Not.Null);
             Assert.That(sqlQueryForId, Is.Not.Empty);
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProviderMock.Identifier.ToString().ToUpper())));
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProviderMock.Identifier.Value.ToString("D").ToUpper())));
+            // ReSharper restore PossibleInvalidOperationException
         }
 
         /// <summary>
@@ -154,7 +158,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('{0}','{1}','{2}')", dataProviderProxy.UniqueId, dataProviderProxy.Name, dataProviderProxy.DataSourceStatementIdentifier.ToString().ToUpper())));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('{0}','{1}','{2}')", dataProviderProxy.UniqueId, dataProviderProxy.Name, dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -175,7 +179,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE DataProviders SET Name='{1}',DataSourceStatementIdentifier='{2}' WHERE DataProviderIdentifier='{0}'", dataProviderProxy.UniqueId, dataProviderProxy.Name, dataProviderProxy.DataSourceStatementIdentifier.ToString().ToUpper())));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE DataProviders SET Name='{1}',DataSourceStatementIdentifier='{2}' WHERE DataProviderIdentifier='{0}'", dataProviderProxy.UniqueId, dataProviderProxy.Name, dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 

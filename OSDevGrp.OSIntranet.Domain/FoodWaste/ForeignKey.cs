@@ -51,7 +51,9 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             }
             _dataProvider = dataProvider;
             _foreignKeyForIdentifier = foreignKeyForIdentifier;
-            _foreignKeyForTypes = foreignKeyForType.GetInterfaces().ToArray();
+            _foreignKeyForTypes = foreignKeyForType.GetInterfaces()
+                .Where(m => !m.IsGenericType && m.IsPublic && typeof (IDomainObject).IsAssignableFrom(m))
+                .ToArray();
             _foreignKeyValue = foreignKeyValue;
         }
 
