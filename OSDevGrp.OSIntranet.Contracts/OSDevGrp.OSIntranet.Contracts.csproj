@@ -117,6 +117,7 @@
     <Compile Include="Views\BudgetkontoView.cs" />
     <Compile Include="Views\BudgetoplysningerView.cs" />
     <Compile Include="Views\DataProviderSystemView.cs" />
+    <Compile Include="Views\DataProviderView.cs" />
     <Compile Include="Views\DebitorListeView.cs" />
     <Compile Include="Views\DebitorView.cs" />
     <Compile Include="Views\FirmaView.cs" />

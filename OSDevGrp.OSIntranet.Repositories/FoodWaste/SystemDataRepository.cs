@@ -16,6 +16,13 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
     /// </summary>
     public class SystemDataRepository : DataRepositoryBase, ISystemDataRepository
     {
+        #region Private variables
+
+        private readonly Guid _dataProviderForFoodsIdentifier = new Guid("5A1B9283-6406-44DF-91C5-F2FB83CC9A42");
+        private readonly Guid _dataProviderForFoodGroupsIdentifier = new Guid("5A1B9283-6406-44DF-91C5-F2FB83CC9A42");
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -31,6 +38,54 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Gets the default data provider for foods.
+        /// </summary>
+        /// <returns>Default data provider for foods</returns>
+        public virtual IDataProvider DataProviderForFoodsGet()
+        {
+            try
+            {
+                var dataProviderProxy = new DataProviderProxy
+                {
+                    Identifier = _dataProviderForFoodsIdentifier
+                };
+                return DataProvider.Get(dataProviderProxy);
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the default data provider for food groups.
+        /// </summary>
+        /// <returns>Default data provider for food groups.</returns>
+        public virtual IDataProvider DataProviderForFoodGroupsGet()
+        {
+            try
+            {
+                var dataProviderProxy = new DataProviderProxy
+                {
+                    Identifier = _dataProviderForFoodGroupsIdentifier
+                };
+                return DataProvider.Get(dataProviderProxy);
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
 
         /// <summary>
         /// Gets all the data providers.

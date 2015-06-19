@@ -30,6 +30,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<IFoodGroup, object>()
                 .ConvertUsing(s => new object());
 
+            Mapper.CreateMap<IDataProvider, DataProviderView>()
+                .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
+                .ForMember(m => m.DataSourceStatement, opt => opt.MapFrom(s => s.DataSourceStatement != null ? s.DataSourceStatement.Value : string.Empty));
+
             Mapper.CreateMap<IDataProvider, DataProviderSystemView>()
                 .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                 .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))

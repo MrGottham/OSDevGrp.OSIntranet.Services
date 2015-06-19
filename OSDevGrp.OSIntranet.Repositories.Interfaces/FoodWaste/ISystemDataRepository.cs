@@ -9,6 +9,18 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
     public interface ISystemDataRepository : IDataRepository
     {
         /// <summary>
+        /// Gets the default data provider for foods.
+        /// </summary>
+        /// <returns>Default data provider for foods</returns>
+        IDataProvider DataProviderForFoodsGet();
+
+        /// <summary>
+        /// Gets the default data provider for food groups.
+        /// </summary>
+        /// <returns>Default data provider for food groups.</returns>
+        IDataProvider DataProviderForFoodGroupsGet();
+
+        /// <summary>
         /// Gets all the data providers.
         /// </summary>
         /// <returns>All the data providers.</returns>

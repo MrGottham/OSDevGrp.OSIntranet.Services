@@ -43,6 +43,26 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that DataProviderGetAll gets all the data providers.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderGetAllGetsDataProviderSystemViewCollection()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var dataProviderCollectionGetQuery = new DataProviderCollectionGetQuery();
+                var dataProviderSystemViewCollection = client.DataProviderGetAll(dataProviderCollectionGetQuery);
+                Assert.That(dataProviderSystemViewCollection, Is.Not.Null);
+                Assert.That(dataProviderSystemViewCollection, Is.Not.Empty);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests the commands acting on translations.
         /// </summary>
         [Test]

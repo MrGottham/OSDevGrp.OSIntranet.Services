@@ -32,6 +32,26 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that DataProviderForFoodsGet returns the default data provider for foods.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderForFoodsGetReturnsDataProvider()
+        {
+            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            Assert.That(dataProvider, Is.Not.Null);
+        }
+
+        /// <summary>
+        /// Tests that DataProviderForFoodGroupsGet returns the default data provider for food groups.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderForFoodGroupsGetReturnsDataProvider()
+        {
+            var dataProvider = _systemDataRepository.DataProviderForFoodGroupsGet();
+            Assert.That(dataProvider, Is.Not.Null);
+        }
+
+        /// <summary>
         /// Tests that DataProviderGetAll returns all the data providers.
         /// </summary>
         [Test]

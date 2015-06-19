@@ -200,6 +200,7 @@
     <Compile Include="Unittests\Contracts\Views\BudgetkontoViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetoplysningerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\DataProviderSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\DataProviderViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\DebitorlisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\DebitorViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FirmaViewTests.cs" />

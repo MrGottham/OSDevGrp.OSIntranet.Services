@@ -164,6 +164,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps DataProvider to DataProviderView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsDataProviderToDataProviderView()
+        {
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var dataProviderView = foodWasteObjectMapper.Map<IDataProvider, DataProviderView>(dataProviderMock);
+            Assert.That(dataProviderView.DataProviderIdentifier, Is.Not.Null);
+            Assert.That(dataProviderView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier.HasValue ? dataProviderMock.Identifier.Value : Guid.Empty));
+            Assert.That(dataProviderView.Name, Is.Not.Null);
+            Assert.That(dataProviderView.Name, Is.Not.Empty);
+            Assert.That(dataProviderView.Name, Is.EqualTo(dataProviderMock.Name));
+            Assert.That(dataProviderView.DataSourceStatement, Is.Not.Null);
+            Assert.That(dataProviderView.DataSourceStatement, Is.Not.Empty);
+            Assert.That(dataProviderView.DataSourceStatement, Is.EqualTo(dataProviderMock.DataSourceStatement != null ? dataProviderMock.DataSourceStatement.Value : string.Empty));
+        }
+
+        /// <summary>
         /// Tests that Map maps DataProvider to DataProviderSystemView.
         /// </summary>
         [Test]
