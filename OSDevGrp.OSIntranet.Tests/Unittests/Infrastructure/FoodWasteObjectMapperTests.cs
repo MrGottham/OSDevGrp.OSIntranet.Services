@@ -9,6 +9,7 @@ using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
@@ -169,26 +170,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsForeignKeyToForeignKeyProxy()
         {
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof (IDataProvider));
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
 
-            var dataProviderProxy = foodWasteObjectMapper.Map<IForeignKey, IForeignKeyProxy>(dataProviderMock);
-            Assert.That(dataProviderProxy.Identifier, Is.Not.Null);
-            Assert.That(dataProviderProxy.Identifier, Is.EqualTo(dataProviderMock.Identifier));
-            Assert.That(dataProviderProxy.Translation, Is.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Not.Empty);
-            Assert.That(dataProviderProxy.Translations.Count(), Is.EqualTo(dataProviderMock.Translations.Count()));
-            Assert.That(dataProviderProxy.Name, Is.Not.Null);
-            Assert.That(dataProviderProxy.Name, Is.Not.Empty);
-            Assert.That(dataProviderProxy.Name, Is.EqualTo(dataProviderMock.Name));
-            Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(dataProviderMock.DataSourceStatementIdentifier));
-            Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
-            Assert.That(dataProviderProxy.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
+            var foreignKeyProxy = foodWasteObjectMapper.Map<IForeignKey, IForeignKeyProxy>(foreignKeyMock);
+            Assert.That(foreignKeyProxy.Identifier, Is.Not.Null);
+            Assert.That(foreignKeyProxy.Identifier, Is.EqualTo(foreignKeyMock.Identifier));
+            Assert.That(foreignKeyProxy.DataProvider, Is.Not.Null);
+            Assert.That(foreignKeyProxy.DataProvider, Is.TypeOf<DataProviderProxy>());
+            Assert.That(foreignKeyProxy.ForeignKeyForIdentifier, Is.EqualTo(foreignKeyMock.ForeignKeyForIdentifier));
+            Assert.That(foreignKeyProxy.ForeignKeyForTypes, Is.Not.Null);
+            Assert.That(foreignKeyProxy.ForeignKeyForTypes, Is.Not.Empty);
+            Assert.That(foreignKeyProxy.ForeignKeyForTypes.Count(), Is.EqualTo(foreignKeyMock.ForeignKeyForTypes.Count()));
+            foreach (var foreignKeyType in foreignKeyProxy.ForeignKeyForTypes)
+            {
+                Assert.That(foreignKeyType, Is.Not.Null);
+                Assert.That(foreignKeyProxy.ForeignKeyForTypes.Contains(foreignKeyType), Is.True);
+            }
+            Assert.That(foreignKeyProxy.ForeignKeyValue, Is.Not.Null);
+            Assert.That(foreignKeyProxy.ForeignKeyValue, Is.Not.Empty);
+            Assert.That(foreignKeyProxy.ForeignKeyValue, Is.EqualTo(foreignKeyMock.ForeignKeyValue));
         }
 
         /// <summary>
@@ -234,6 +237,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Empty);
             Assert.That(dataProviderSystemView.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
+            foreach (var dataSourceStatement in dataProviderSystemView.DataSourceStatements)
+            {
+                Assert.That(dataSourceStatement, Is.Not.Null);
+                Assert.That(dataSourceStatement, Is.TypeOf<TranslationSystemView>());
+            }
         }
 
         /// <summary>
@@ -254,6 +262,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(dataProviderProxy.Translations, Is.Not.Null);
             Assert.That(dataProviderProxy.Translations, Is.Not.Empty);
             Assert.That(dataProviderProxy.Translations.Count(), Is.EqualTo(dataProviderMock.Translations.Count()));
+            foreach (var translation in dataProviderProxy.Translations)
+            {
+                Assert.That(translation, Is.Not.Null);
+                Assert.That(translation, Is.TypeOf<TranslationProxy>());
+            }
             Assert.That(dataProviderProxy.Name, Is.Not.Null);
             Assert.That(dataProviderProxy.Name, Is.Not.Empty);
             Assert.That(dataProviderProxy.Name, Is.EqualTo(dataProviderMock.Name));
@@ -262,6 +275,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
             Assert.That(dataProviderProxy.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
+            foreach (var dataSourceStatement in dataProviderProxy.DataSourceStatements)
+            {
+                Assert.That(dataSourceStatement, Is.Not.Null);
+                Assert.That(dataSourceStatement, Is.TypeOf<TranslationProxy>());
+            }
         }
 
         /// <summary>
@@ -280,11 +298,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(translationInfoSystemView.TranslationIdentifier, Is.EqualTo(translationMock.Identifier.HasValue ? translationMock.Identifier.Value : Guid.Empty));
             Assert.That(translationInfoSystemView.TranslationOfIdentifier, Is.EqualTo(translationMock.TranslationOfIdentifier));
             Assert.That(translationInfoSystemView.TranslationInfo, Is.Not.Null);
-            Assert.That(translationInfoSystemView.TranslationInfo.TranslationInfoIdentifier, Is.Not.Null);
-            Assert.That(translationInfoSystemView.TranslationInfo.TranslationInfoIdentifier, Is.EqualTo(translationMock.TranslationInfo.Identifier.HasValue ? translationMock.TranslationInfo.Identifier.Value : Guid.Empty));
-            Assert.That(translationInfoSystemView.TranslationInfo.CultureName, Is.Not.Null);
-            Assert.That(translationInfoSystemView.TranslationInfo.CultureName, Is.Not.Empty);
-            Assert.That(translationInfoSystemView.TranslationInfo.CultureName, Is.EqualTo(translationMock.TranslationInfo.CultureInfo.Name));
+            Assert.That(translationInfoSystemView.TranslationInfo, Is.TypeOf<TranslationInfoSystemView>());
             Assert.That(translationInfoSystemView.Translation, Is.Not.Null);
             Assert.That(translationInfoSystemView.Translation, Is.Not.Empty);
             Assert.That(translationInfoSystemView.Translation, Is.EqualTo(translationMock.Value));
@@ -306,7 +320,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(translationProxy.Identifier, Is.EqualTo(translationMock.Identifier));
             Assert.That(translationProxy.TranslationOfIdentifier, Is.EqualTo(translationMock.TranslationOfIdentifier));
             Assert.That(translationProxy.TranslationInfo, Is.Not.Null);
-            Assert.That(translationProxy.TranslationInfo, Is.Not.TypeOf<ITranslationInfoProxy>());
+            Assert.That(translationProxy.TranslationInfo, Is.TypeOf<TranslationInfoProxy>());
             Assert.That(translationProxy.Value, Is.Not.Null);
             Assert.That(translationProxy.Value, Is.Not.Empty);
             Assert.That(translationProxy.Value, Is.EqualTo(translationMock.Value));

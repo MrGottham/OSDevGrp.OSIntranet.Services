@@ -37,6 +37,18 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
         }
 
+        /// <summary>
+        /// Creates a data proxy to a given foreign key to a domain object in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Data provider who own the foreign key.</param>
+        /// <param name="foreignKeyForIdentifier">Identifier for the domain object which has this foreign key.</param>
+        /// <param name="foreignKeyForTypes">Types which has this foreign key.</param>
+        /// <param name="foreignKeyValue">Value of the foreign key.</param>
+        public ForeignKeyProxy(IDataProvider dataProvider, Guid foreignKeyForIdentifier, IEnumerable<Type> foreignKeyForTypes, string foreignKeyValue)
+            : base(dataProvider, foreignKeyForIdentifier, foreignKeyForTypes, foreignKeyValue)
+        {
+        }
+
         #endregion
 
         #region IMySqlDataProxy<IForeignKey>
@@ -137,8 +149,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 // ReSharper disable EmptyGeneralCatchClause
                 try
                 {
-                    var assembly = typeof(IDomainObject).Assembly;
-                    var type = assembly.GetType(foreignKeyForTypeName);
+                    var assembly = typeof (IDomainObject).Assembly;
+                    var type = assembly.GetTypes().SingleOrDefault(m => string.Compare(m.Name, foreignKeyForTypeName, StringComparison.Ordinal) == 0);
                     if (type != null)
                     {
                         foreignKeyForTypes.Add(type);
@@ -150,6 +162,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 }
                 // ReSharper restore EmptyGeneralCatchClause
             }
+            ForeignKeyForTypes = foreignKeyForTypes;
 
             var dataProviderIdentifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
             using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())

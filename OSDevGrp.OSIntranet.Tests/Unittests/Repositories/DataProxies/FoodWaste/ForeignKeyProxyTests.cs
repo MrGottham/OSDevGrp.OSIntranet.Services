@@ -332,7 +332,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foreignKeyProxy.ForeignKeyForTypes.Contains(typeof (IDataProvider)), Is.True);
             Assert.That(foreignKeyProxy.ForeignKeyValue, Is.Not.Null);
             Assert.That(foreignKeyProxy.ForeignKeyValue, Is.Not.Empty);
-            Assert.That(foreignKeyProxy.ForeignKeyValue, Is.EqualTo(dataReader.GetString("DataProviderIdentifier")));
+            Assert.That(foreignKeyProxy.ForeignKeyValue, Is.EqualTo(dataReader.GetString("ForeignKeyValue")));
 
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
             dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<DataProviderProxy>.Is.NotNull));

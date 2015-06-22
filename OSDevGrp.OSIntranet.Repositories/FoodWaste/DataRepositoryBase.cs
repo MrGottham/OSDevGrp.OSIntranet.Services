@@ -76,6 +76,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>The identifiable domain object.</returns>
         public virtual TIdentifiable Get<TIdentifiable>(Guid identifier) where TIdentifiable : IIdentifiable
         {
+            if (typeof (TIdentifiable) == typeof (IForeignKey))
+            {
+                return (TIdentifiable) Get<IForeignKey, ForeignKeyProxy>(identifier);
+            }
             if (typeof (TIdentifiable) == typeof (IDataProvider))
             {
                 return (TIdentifiable) Get<IDataProvider, DataProviderProxy>(identifier);

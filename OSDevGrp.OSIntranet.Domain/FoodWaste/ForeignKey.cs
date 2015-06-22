@@ -14,7 +14,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 
         private IDataProvider _dataProvider;
         private Guid _foreignKeyForIdentifier;
-        private IEnumerable<Type> _foreignKeyForTypes;
+        private IList<Type> _foreignKeyForTypes;
         private string _foreignKeyValue;
 
         #endregion
@@ -53,7 +53,36 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             _foreignKeyForIdentifier = foreignKeyForIdentifier;
             _foreignKeyForTypes = foreignKeyForType.GetInterfaces()
                 .Where(m => !m.IsGenericType && m.IsPublic && typeof (IDomainObject).IsAssignableFrom(m))
-                .ToArray();
+                .ToList();
+            _foreignKeyValue = foreignKeyValue;
+        }
+
+        /// <summary>
+        /// Creates a foreign key for a domain object i the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Data provider who own the foreign key.</param>
+        /// <param name="foreignKeyForIdentifier">Identifier for the domain object which has this foreign key.</param>
+        /// <param name="foreignKeyForTypes">Types which has this foreign key.</param>
+        /// <param name="foreignKeyValue">Value of the foreign key.</param>
+        protected ForeignKey(IDataProvider dataProvider, Guid foreignKeyForIdentifier, IEnumerable<Type> foreignKeyForTypes, string foreignKeyValue)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (foreignKeyForTypes == null)
+            {
+                throw new ArgumentNullException("foreignKeyForTypes");
+            }
+            if (string.IsNullOrEmpty(foreignKeyValue))
+            {
+                throw new ArgumentNullException("foreignKeyValue");
+            }
+            _dataProvider = dataProvider;
+            _foreignKeyForIdentifier = foreignKeyForIdentifier;
+            _foreignKeyForTypes = foreignKeyForTypes
+                .Where(m => m.IsInterface && !m.IsGenericType && m.IsPublic && typeof (IDomainObject).IsAssignableFrom(m))
+                .ToList();
             _foreignKeyValue = foreignKeyValue;
         }
 
@@ -104,7 +133,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 {
                     throw new ArgumentNullException("value");
                 }
-                _foreignKeyForTypes = value;
+                _foreignKeyForTypes = value.ToList();
             }
         }
 

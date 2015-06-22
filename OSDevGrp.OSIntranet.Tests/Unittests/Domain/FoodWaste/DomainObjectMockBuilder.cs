@@ -50,6 +50,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Build a collection of mockups for a foreign key to a domain object in the food waste domain.
+        /// </summary>
+        /// <param name="foreignKeyForIdentifier">Identifier for the domain object which has the foreign keys.</param>
+        /// <param name="foreignKeyForType">Type on which has the foreign keys.</param>
+        /// <returns>Collection of mockups for a foreign key to a domain object in the food waste domain.</returns>
+        public static IEnumerable<IForeignKey> BuildForeignKeyMockCollection(Guid foreignKeyForIdentifier, Type foreignKeyForType)
+        {
+            return new List<IForeignKey>
+            {
+                BuildForeignKeyMock(foreignKeyForIdentifier, foreignKeyForType),
+                BuildForeignKeyMock(foreignKeyForIdentifier, foreignKeyForType),
+                BuildForeignKeyMock(foreignKeyForIdentifier, foreignKeyForType)
+            };
+        }
+
+        /// <summary>
+        /// Build a mockup for a foreign key to a domain object in the food waste domain.
+        /// </summary>
+        /// <param name="foreignKeyForIdentifier">Identifier for the domain object which has the foreign key.</param>
+        /// <param name="foreignKeyForType">Type on which has the foreign key.</param>
+        /// <returns>Mockup for a foreign key to a to a domain object in the food waste domain.</returns>
+        public static IForeignKey BuildForeignKeyMock(Guid foreignKeyForIdentifier, Type foreignKeyForType)
+        {
+            if (foreignKeyForType == null)
+            {
+                throw new ArgumentNullException("foreignKeyForType");
+            }
+            var fixture = new Fixture();
+            var foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
+            foreignKeyMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            foreignKeyMock.Stub(m => m.DataProvider)
+                .Return(BuildDataProviderMock())
+                .Repeat.Any();
+            foreignKeyMock.Stub(m => m.ForeignKeyForIdentifier)
+                .Return(foreignKeyForIdentifier)
+                .Repeat.Any();
+            foreignKeyMock.Stub(m => m.ForeignKeyForTypes)
+                .Return(new List<Type> {typeof (IDomainObject), typeof (IIdentifiable), foreignKeyForType})
+                .Repeat.Any();
+            foreignKeyMock.Stub(m => m.ForeignKeyValue)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            return foreignKeyMock;
+        }
+
+            /// <summary>
         /// Build a mockup for a data provider.
         /// </summary>
         /// <returns>Mockup for a data provider.</returns>

@@ -30,6 +30,17 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<IFoodGroup, object>()
                 .ConvertUsing(s => new object());
 
+            Mapper.CreateMap<IForeignKey, IForeignKeyProxy>()
+                .ConvertUsing(m =>
+                {
+                    var dataProider = Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
+                    var foreignKeyProxy = new ForeignKeyProxy(dataProider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
+                    {
+                        Identifier = m.Identifier
+                    };
+                    return foreignKeyProxy;
+                });
+
             Mapper.CreateMap<IDataProvider, DataProviderView>()
                 .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                 .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
