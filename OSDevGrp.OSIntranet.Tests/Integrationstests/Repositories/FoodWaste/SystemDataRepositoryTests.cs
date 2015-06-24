@@ -32,6 +32,81 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that ForeignKeysForDomainObjectGet gets foreign keys for a given identifiable domain object.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysForDomainObjectGetGetsForeignKeysForIdentifiableDomainObject()
+        {
+            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var foreignKeyFor = new ForeignKey(dataProvider, Guid.NewGuid(), typeof (ForeignKey), "Test")
+            {
+                Identifier = Guid.NewGuid()
+            };
+            // ReSharper disable PossibleInvalidOperationException
+            var foreignKey = _systemDataRepository.Insert(new ForeignKey(dataProvider, foreignKeyFor.Identifier.Value, foreignKeyFor.GetType(), "Test"));
+            // ReSharper restore PossibleInvalidOperationException
+            try
+            {
+                var result = _systemDataRepository.ForeignKeysForDomainObjectGet(foreignKeyFor);
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result, Is.Not.Empty);
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foreignKey);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Get gets a given foreign key.
+        /// </summary>
+        [Test]
+        public void TestThatGetGetsForeignKey()
+        {
+            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var foreignKey = _systemDataRepository.Insert(new ForeignKey(dataProvider, Guid.NewGuid(), typeof (ForeignKey), "Test"));
+            try
+            {
+                // ReSharper disable PossibleInvalidOperationException
+                var result = _systemDataRepository.Get<IForeignKey>(foreignKey.Identifier.Value);
+                // ReSharper restore PossibleInvalidOperationException
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Identifier, Is.EqualTo(foreignKey.Identifier));
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foreignKey);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Update updates a given foreign key.
+        /// </summary>
+        [Test]
+        public void TestThatUpdateUpdatesForeignKey()
+        {
+            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var foreignKey = _systemDataRepository.Insert(new ForeignKey(dataProvider, Guid.NewGuid(), typeof(ForeignKey), "Test"));
+            try
+            {
+                foreignKey.ForeignKeyValue = "Testing";
+                _systemDataRepository.Update(foreignKey);
+
+                // ReSharper disable PossibleInvalidOperationException
+                var result = _systemDataRepository.Get<IForeignKey>(foreignKey.Identifier.Value);
+                // ReSharper restore PossibleInvalidOperationException
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.ForeignKeyValue, Is.Not.Null);
+                Assert.That(result.ForeignKeyValue, Is.Not.Empty);
+                Assert.That(result.ForeignKeyValue, Is.EqualTo(foreignKey.ForeignKeyValue));
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foreignKey);
+            }
+        }
+
+        /// <summary>
         /// Tests that DataProviderForFoodsGet returns the default data provider for foods.
         /// </summary>
         [Test]
@@ -92,7 +167,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Tests that Get gets a given translation
+        /// Tests that Get gets a given translation.
         /// </summary>
         [Test]
         public void TestThatGetGetsTranslation()
@@ -114,7 +189,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Tests that Update updates a given translation
+        /// Tests that Update updates a given translation.
         /// </summary>
         [Test]
         public void TestThatUpdateUpdatesTranslation()

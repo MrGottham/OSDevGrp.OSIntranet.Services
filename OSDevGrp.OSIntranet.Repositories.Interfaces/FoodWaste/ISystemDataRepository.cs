@@ -9,6 +9,13 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
     public interface ISystemDataRepository : IDataRepository
     {
         /// <summary>
+        /// Gets all the foreign keys for a given domain object.
+        /// </summary>
+        /// <param name="identifiableDomainObject">The identifiable domain object on which all the foreign keys should be returned.</param>
+        /// <returns>All the foreign keys for the given domain object.</returns>
+        IEnumerable<IForeignKey> ForeignKeysForDomainObjectGet(IIdentifiable identifiableDomainObject);
+
+        /// <summary>
         /// Gets the default data provider for foods.
         /// </summary>
         /// <returns>Default data provider for foods</returns>

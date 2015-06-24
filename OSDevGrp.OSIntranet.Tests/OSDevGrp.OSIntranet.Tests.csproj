@@ -143,11 +143,13 @@
     <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\ForeignKeyAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationModifyCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Validation\CommonValidationsTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
+    <Compile Include="Unittests\Contracts\Commands\ForeignKeyAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationDeleteCommandTest.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationModifyCommandTests.cs" />
@@ -234,6 +236,7 @@
     <Compile Include="Unittests\Domain\FoodWaste\DataProviderTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectMockBuilder.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\FoodGroupTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\ForeignKeyTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />

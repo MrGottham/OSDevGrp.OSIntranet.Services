@@ -66,6 +66,171 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that ForeignKeysForDomainObjectGet throws an ArgumentNullException when the identifiable domain object is null.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysForDomainObjectGetThrowsArgumentNullExceptionWhenIdentifiableDomainObjectIsNull()
+        {
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => systemDataRepository.ForeignKeysForDomainObjectGet(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("identifiableDomainObject"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that ForeignKeysForDomainObjectGet throws an IntranetRepositoryException when the identifier on the identifiable domain object has no value.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysForDomainObjectGetThrowsIntranetRepositoryExceptionWhenIdentifierOnIdentifiableDomainObjectHasNoValue()
+        {
+            var identifiableDomainObjectMock = MockRepository.GenerateMock<IIdentifiable>();
+            identifiableDomainObjectMock.Stub(m => m.Identifier)
+                .Return(null)
+                .Repeat.Any();
+
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObjectMock.Identifier, "Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that ForeignKeysForDomainObjectGet calls GetCollection on the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysForDomainObjectGetCallsGetCollectionOnFoodWasteDataProvider()
+        {
+            var identifiableDomainObjectMock = MockRepository.GenerateMock<IIdentifiable>();
+            identifiableDomainObjectMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>(0))
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            systemDataRepository.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock);
+
+            // ReSharper disable PossibleInvalidOperationException
+            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Equal(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", identifiableDomainObjectMock.Identifier.Value.ToString("D").ToUpper()))));
+            // ReSharper restore PossibleInvalidOperationException
+        }
+
+        /// <summary>
+        /// Tests that ForeignKeysForDomainObjectGet returns the result from the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysForDomainObjectGetReturnsResultFromFoodWasteDataProvider()
+        {
+            var fixture = new Fixture();
+
+            var identifiableDomainObjectMock = MockRepository.GenerateMock<IIdentifiable>();
+            identifiableDomainObjectMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foreignKeyCollection = fixture.CreateMany<ForeignKeyProxy>(25).ToList();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(foreignKeyCollection)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var result = systemDataRepository.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(foreignKeyCollection));
+        }
+
+        /// <summary>
+        /// Tests that ForeignKeysForDomainObjectGet throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysForDomainObjectGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
+        {
+            var fixture = new Fixture();
+
+            var identifiableDomainObjectMock = MockRepository.GenerateMock<IIdentifiable>();
+            identifiableDomainObjectMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that ForeignKeysForDomainObjectGet throws an IntranetRepositoryException when an Exception occurs.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysForDomainObjectGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+
+            var identifiableDomainObjectMock = MockRepository.GenerateMock<IIdentifiable>();
+            identifiableDomainObjectMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var exceptionToThrow = fixture.Create<Exception>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "ForeignKeysForDomainObjectGet", exceptionToThrow.Message)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+        }
+
+        /// <summary>
         /// Tests that DataProviderForFoodsGet calls Get on the data provider which can access data in the food waste repository.
         /// </summary>
         [Test]

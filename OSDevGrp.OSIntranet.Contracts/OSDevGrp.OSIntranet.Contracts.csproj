@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\BogføringslinjeOpretCommand.cs" />
+    <Compile Include="Commands\ForeignKeyAddCommand.cs" />
     <Compile Include="Commands\TranslationAddCommand.cs" />
     <Compile Include="Commands\TranslationDeleteCommand.cs" />
     <Compile Include="Commands\TranslationModifyCommand.cs" />

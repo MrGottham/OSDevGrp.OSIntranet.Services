@@ -107,6 +107,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 throw new ArgumentNullException("identifiable");
             }
+            if (identifiable is IForeignKey)
+            {
+                return (TIdentifiable) Insert<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+            }
             if (identifiable is IDataProvider)
             {
                 return (TIdentifiable) Insert<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
@@ -134,6 +138,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 throw new ArgumentNullException("identifiable");
             }
+            if (identifiable is IForeignKey)
+            {
+                return (TIdentifiable) Update<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+            }
             if (identifiable is IDataProvider)
             {
                 return (TIdentifiable) Update<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
@@ -159,6 +167,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IForeignKey)
+            {
+                Delete<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+                return;
             }
             if (identifiable is IDataProvider)
             {

@@ -40,6 +40,35 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Gets all the foreign keys for a given domain object.
+        /// </summary>
+        /// <param name="identifiableDomainObject">The identifiable domain object on which all the foreign keys should be returned.</param>
+        /// <returns>All the foreign keys for the given domain object.</returns>
+        public virtual IEnumerable<IForeignKey> ForeignKeysForDomainObjectGet(IIdentifiable identifiableDomainObject)
+        {
+            if (identifiableDomainObject == null)
+            {
+                throw new ArgumentNullException("identifiableDomainObject");
+            }
+            try
+            {
+                if (identifiableDomainObject.Identifier.HasValue)
+                {
+                    return DataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(identifiableDomainObject.Identifier.Value));
+                }
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Gets the default data provider for foods.
         /// </summary>
         /// <returns>Default data provider for foods</returns>
