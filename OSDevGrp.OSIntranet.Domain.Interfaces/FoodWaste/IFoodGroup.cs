@@ -5,5 +5,9 @@
     /// </summary>
     public interface IFoodGroup : ITranslatable, IForeignKeyable
     {
+        /// <summary>
+        /// Food group which has this food group as a child.
+        /// </summary>
+        IFoodGroup Parent { get; set; }
     }
 }

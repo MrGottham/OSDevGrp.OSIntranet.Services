@@ -24,11 +24,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             foodGroupMock.Stub(m => m.Identifier)
                 .Return(identifier)
                 .Repeat.Any();
+            foodGroupMock.Stub(m => m.Parent)
+                .Return(null)
+                .Repeat.Any();
             foodGroupMock.Stub(m => m.Translation)
                 .Return(BuildTranslationMock(identifier))
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.Translations)
                 .Return(BuildTranslationMockCollection(identifier))
+                .Repeat.Any();
+            foodGroupMock.Stub(m => m.ForeignKeys)
+                .Return(BuildForeignKeyMockCollection(identifier, typeof (IFoodGroup)))
                 .Repeat.Any();
             return foodGroupMock;
         }

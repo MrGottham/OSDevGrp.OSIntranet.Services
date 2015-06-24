@@ -13,6 +13,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Private variables
 
         private IList<IForeignKey> _foreignKeys = new List<IForeignKey>(0);
+        private IFoodGroup _parent;
 
         #endregion
 
@@ -35,6 +36,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 }
                 _foreignKeys = value.ToList();
             }
+        }
+
+        /// <summary>
+        /// Food group which has this food group as a child.
+        /// </summary>
+        public virtual IFoodGroup Parent
+        {
+            get { return _parent; }
+            set { _parent = value; }
         }
 
         #endregion
