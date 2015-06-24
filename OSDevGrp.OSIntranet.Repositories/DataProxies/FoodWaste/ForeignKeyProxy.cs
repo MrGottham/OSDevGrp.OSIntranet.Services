@@ -54,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region IMySqlDataProxy<IForeignKey>
 
         /// <summary>
-        ///  Gets the unique identification for the foreign key.
+        /// Gets the unique identification for the foreign key.
         /// </summary>
         public virtual string UniqueId
         {
@@ -72,7 +72,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Gets the SQL statement for selecting a given foreign key.
         /// </summary>
         /// <param name="foreignKey">Foreign key for which to get the SQL statement for selecting.</param>
-        /// <returns>SQL statement for selection af given foreign key.</returns>
+        /// <returns>SQL statement for selection a given foreign key.</returns>
         public virtual string GetSqlQueryForId(IForeignKey foreignKey)
         {
             if (foreignKey == null)

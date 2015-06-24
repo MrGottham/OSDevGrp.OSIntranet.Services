@@ -1,4 +1,6 @@
-﻿namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
+﻿using System.Collections.Generic;
+
+namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
 {
     /// <summary>
     /// Interface for a food group.
@@ -9,5 +11,10 @@
         /// Food group which has this food group as a child.
         /// </summary>
         IFoodGroup Parent { get; set; }
+
+        /// <summary>
+        /// Foods groups which has this food group as a parent. 
+        /// </summary>
+        IEnumerable<IFoodGroup> Children { get; } 
     }
 }

@@ -55,6 +55,7 @@
     <Compile Include="DataProviders\IFoodWasteDataProvider.cs" />
     <Compile Include="DataProviders\IMySqlDataProvider.cs" />
     <Compile Include="DataProxies\FoodWaste\IDataProviderProxy.cs" />
+    <Compile Include="DataProxies\FoodWaste\IFoodGroupProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\IForeignKeyProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationInfoProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationProxy.cs" />

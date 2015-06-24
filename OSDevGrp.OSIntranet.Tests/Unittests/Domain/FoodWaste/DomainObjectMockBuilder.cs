@@ -16,8 +16,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <summary>
         /// Build a mockup for a food group.
         /// </summary>
+        /// <param name="parentMock">Mockup for the parent food group.</param>
         /// <returns>Mockup for a food group.</returns>
-        public static IFoodGroup BuildFoodGroupMock()
+        public static IFoodGroup BuildFoodGroupMock(IFoodGroup parentMock = null)
         {
             var identifier = Guid.NewGuid();
             var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
@@ -25,7 +26,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(identifier)
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.Parent)
-                .Return(null)
+                .Return(parentMock)
+                .Repeat.Any();
+            foodGroupMock.Stub(m => m.Children)
+                .Return(parentMock != null ? new List<IFoodGroup>(0) : BuildFoodGroupMockCollection(foodGroupMock))
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.Translation)
                 .Return(BuildTranslationMock(identifier))
@@ -42,15 +46,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <summary>
         /// Build a collection of mockups for some food groups.
         /// </summary>
+        /// <param name="parentMock">Mockup for the parent food group.</param>
         /// <returns>Collection of mockups for some food groups.</returns>
-        public static IEnumerable<IFoodGroup> BuildFoodGroupMockCollection()
+        public static IEnumerable<IFoodGroup> BuildFoodGroupMockCollection(IFoodGroup parentMock = null)
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
             var result = new List<IFoodGroup>(random.Next(1, 25));
             while (result.Count < result.Capacity)
             {
-                result.Add(BuildFoodGroupMock());
+                result.Add(BuildFoodGroupMock(parentMock));
             }
             return result;
         }

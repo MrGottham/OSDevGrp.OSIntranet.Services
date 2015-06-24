@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 {
@@ -12,13 +13,70 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
     {
         #region Private variables
 
-        private IList<IForeignKey> _foreignKeys = new List<IForeignKey>(0);
         private IFoodGroup _parent;
+        private IList<IFoodGroup> _children = new List<IFoodGroup>(0); 
+        private IList<IForeignKey> _foreignKeys = new List<IForeignKey>(0);
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Food group which has this food group as a child.
+        /// </summary>
+        public virtual IFoodGroup Parent
+        {
+            get
+            {
+                return _parent;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    _parent = null;
+                    return;
+                }
+                if (value.Identifier.HasValue == false)
+                {
+                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Identifier"), "value");
+                }
+                if (value.Identifier.Equals(Identifier) || value.Equals(this))
+                {
+                    throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"), "value");
+                }
+                var parent = value.Parent;
+                while (parent != null)
+                {
+                    if ((parent.Identifier.HasValue && parent.Identifier.Equals(Identifier)) || parent.Equals(this))
+                    {
+                        throw new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"), "value");
+                    }
+                    parent = parent.Parent;
+                }
+                _parent = value;
+            }
+        }
+
+        /// <summary>
+        /// Foods groups which has this food group as a parent. 
+        /// </summary>
+        public virtual IEnumerable<IFoodGroup> Children
+        {
+            get
+            {
+                return _children;
+            }
+            protected set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _children = value.ToList();
+            }
+        }
+        
         /// <summary>
         /// Foreign keys for the food group.
         /// </summary>
@@ -36,15 +94,6 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 }
                 _foreignKeys = value.ToList();
             }
-        }
-
-        /// <summary>
-        /// Food group which has this food group as a child.
-        /// </summary>
-        public virtual IFoodGroup Parent
-        {
-            get { return _parent; }
-            set { _parent = value; }
         }
 
         #endregion

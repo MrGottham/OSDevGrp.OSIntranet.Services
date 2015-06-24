@@ -2,7 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
@@ -23,6 +23,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(foodGroup.Identifier, Is.Null);
             Assert.That(foodGroup.Identifier.HasValue, Is.False);
             Assert.That(foodGroup.Parent, Is.Null);
+            Assert.That(foodGroup.Children, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Empty);
             Assert.That(foodGroup.Translation, Is.Null);
             Assert.That(foodGroup.Translations, Is.Not.Null);
             Assert.That(foodGroup.Translations, Is.Empty);
@@ -65,35 +67,105 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the setter to Parent throws an IntranetSystemException when the new value has no identifier.
+        /// Tests that the setter to Parent throws an ArgumentException when the new value has no identifier.
         /// </summary>
         [Test]
-        public void TestThatParentSetterThrowsIntranetSystemExceptionWhenValueHasNoIdentifier()
+        public void TestThatParentSetterThrowsArgumentExceptionWhenValueHasNoIdentifier()
         {
             var foodGroup = new FoodGroup();
             Assert.That(foodGroup, Is.Not.Null);
             Assert.That(foodGroup.Parent, Is.Null);
 
-            var exception = Assert.Throws<IntranetSystemException>(() => foodGroup.Parent = new FoodGroup {Identifier = null});
+            var exception = Assert.Throws<ArgumentException>(() => foodGroup.Parent = new FoodGroup {Identifier = null});
             Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(""));
+            // ReSharper disable NotResolvedInText
+            Assert.That(exception.Message, Is.EqualTo((new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Identifier"), "value")).Message));
+            // ReSharper restore NotResolvedInText
             Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
-        /// Test that the setter to Parent throws IntranetSystemException when new value equals the food group which updates Parent.
+        /// Tests that the setter to Parent throws an ArgumentException when the new value equels the food group which updates Parent.
         /// </summary>
         [Test]
-        public void TestThatParentSetterThrowsIntranetSystemExceptionWhenValueEqualsFoodGroupWhichUpdatesParent()
+        public void TestThatParentSetterThrowsArgumentExceptionWhenValueEqualsFoodGroupWhichUpdatesParent()
         {
             var foodGroup = new FoodGroup
             {
-                Parent = DomainObjectMockBuilder.BuildFoodGroupMock()
+                Identifier = Guid.NewGuid()
             };
             Assert.That(foodGroup, Is.Not.Null);
-            Assert.That(foodGroup.Parent, Is.Not.Null);
+            Assert.That(foodGroup.Identifier, Is.Not.Null);
+            Assert.That(foodGroup.Identifier.HasValue, Is.True);
+            Assert.That(foodGroup.Parent, Is.Null);
+
+            var exception = Assert.Throws<ArgumentException>(() => foodGroup.Parent = foodGroup);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            // ReSharper disable NotResolvedInText
+            Assert.That(exception.Message, Is.EqualTo((new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroup, "value"), "value")).Message));
+            // ReSharper restore NotResolvedInText
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the setter to Parent throws an ArgumentException when the new value makes a circular reference.
+        /// </summary>
+        [Test]
+        public void TestThatParentSetterThrowsArgumentExceptionWhenValueMakesCurcularReference()
+        {
+            var foodGroupLevel1 = new FoodGroup
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodGroupLevel1, Is.Not.Null);
+            Assert.That(foodGroupLevel1.Identifier, Is.Not.Null);
+            Assert.That(foodGroupLevel1.Identifier.HasValue, Is.True);
+            Assert.That(foodGroupLevel1.Parent, Is.Null);
+
+            var foodGroupLevel2 = new FoodGroup
+            {
+                Identifier = Guid.NewGuid(),
+                Parent = foodGroupLevel1
+            };
+            Assert.That(foodGroupLevel2, Is.Not.Null);
+            Assert.That(foodGroupLevel2.Identifier, Is.Not.Null);
+            Assert.That(foodGroupLevel2.Identifier.HasValue, Is.True);
+            Assert.That(foodGroupLevel2.Parent, Is.Not.Null);
+            Assert.That(foodGroupLevel2.Parent, Is.EqualTo(foodGroupLevel1));
+
+            var foodGroupLevel3 = new FoodGroup
+            {
+                Identifier = Guid.NewGuid(),
+                Parent = foodGroupLevel2
+            };
+            Assert.That(foodGroupLevel3, Is.Not.Null);
+            Assert.That(foodGroupLevel3.Identifier, Is.Not.Null);
+            Assert.That(foodGroupLevel3.Identifier.HasValue, Is.True);
+            Assert.That(foodGroupLevel3.Parent, Is.Not.Null);
+            Assert.That(foodGroupLevel3.Parent, Is.EqualTo(foodGroupLevel2));
+
+
+            var exception = Assert.Throws<ArgumentException>(() => foodGroupLevel1.Parent = foodGroupLevel3);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            // ReSharper disable NotResolvedInText
+            Assert.That(exception.Message, Is.EqualTo((new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroupLevel3, "value"), "value").Message)));
+            // ReSharper restore NotResolvedInText
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
