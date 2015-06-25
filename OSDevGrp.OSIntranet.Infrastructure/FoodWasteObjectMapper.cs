@@ -26,9 +26,56 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
-            // TODO: Fix this and fix unit tests.
-            Mapper.CreateMap<IFoodGroup, object>()
-                .ConvertUsing(s => new object());
+            Mapper.CreateMap<IFoodGroup, IFoodGroupProxy>()
+                .ConvertUsing(m =>
+                {
+                    if (m as IFoodGroupProxy != null)
+                    {
+                        return (IFoodGroupProxy) m;
+                    }
+                    var parentFoodGroupProxy = m.Parent == null ? null : (m.Parent as IFoodGroupProxy) != null ? (IFoodGroupProxy) m.Parent : Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.Parent);
+                    var childFoodGroupProxyCollection = new List<IFoodGroupProxy>();
+                    foreach (var child in m.Children)
+                    {
+                        if (child as IFoodGroupProxy != null)
+                        {
+                            childFoodGroupProxyCollection.Add((IFoodGroupProxy) child);
+                            continue;
+                        }
+                        var childFoodGroupProxy = new FoodGroupProxy
+                        {
+                            Identifier = m.Identifier,
+                            Parent = parentFoodGroupProxy,
+                            IsActive = m.IsActive
+                        };
+                        childFoodGroupProxyCollection.Add(childFoodGroupProxy);
+                    }
+                    var foodGroupProxy = new FoodGroupProxy(childFoodGroupProxyCollection)
+                    {
+                        Identifier = m.Identifier,
+                        Parent = parentFoodGroupProxy,
+                        IsActive = m.IsActive
+                    };
+                    foreach (var translation in m.Translations)
+                    {
+                        if (translation as ITranslationProxy != null)
+                        {
+                            foodGroupProxy.TranslationAdd(translation);
+                            continue;
+                        }
+                        foodGroupProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                    }
+                    foreach (var foreignKey in m.ForeignKeys)
+                    {
+                        if (foreignKey as IForeignKeyProxy != null)
+                        {
+                            foodGroupProxy.ForeignKeyAdd(foreignKey);
+                            continue;
+                        }
+                        foodGroupProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
+                    }
+                    return foodGroupProxy;
+                });
 
             Mapper.CreateMap<IForeignKey, IForeignKeyProxy>()
                 .ConvertUsing(m =>
@@ -37,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return (IForeignKeyProxy) m;
                     }
-                    var dataProider = (m.DataProvider is IDataProviderProxy) ? (IDataProviderProxy) m.DataProvider : Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
+                    var dataProider = (m.DataProvider as IDataProviderProxy) != null ? (IDataProviderProxy) m.DataProvider : Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
                     var foreignKeyProxy = new ForeignKeyProxy(dataProider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
                     {
                         Identifier = m.Identifier

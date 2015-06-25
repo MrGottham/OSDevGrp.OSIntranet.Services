@@ -26,6 +26,26 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
+        #region Constructors
+
+        /// <summary>
+        /// Creates a data proxy to a given food group.
+        /// </summary>
+        public FoodGroupProxy()
+        {
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a given food group.
+        /// </summary>
+        /// <param name="children">Foods groups which has this food group as a parent. </param>
+        public FoodGroupProxy(IEnumerable<IFoodGroup> children) 
+            : base(children)
+        {
+        }
+
+        #endregion
+
         #region Properties
 
         /// <summary>

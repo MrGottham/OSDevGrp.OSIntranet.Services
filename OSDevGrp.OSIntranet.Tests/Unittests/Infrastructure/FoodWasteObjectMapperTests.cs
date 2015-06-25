@@ -165,6 +165,52 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps FoodGroup to FoodGroupProxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupToFoodGroupProxy()
+        {
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupProxy = foodWasteObjectMapper.Map<IFoodGroup, IFoodGroupProxy>(foodGroupMock);
+            Assert.That(foodGroupProxy.Identifier, Is.Not.Null);
+            Assert.That(foodGroupProxy.Identifier, Is.EqualTo(foodGroupMock.Identifier));
+            Assert.That(foodGroupProxy.Parent, Is.Not.Null);
+            Assert.That(foodGroupProxy.Parent, Is.TypeOf<FoodGroupProxy>());
+            Assert.That(foodGroupProxy.Parent.Children, Is.Not.Null);
+            Assert.That(foodGroupProxy.Parent.Children, Is.Not.Empty);
+            Assert.That(foodGroupProxy.Parent.Children.Count(), Is.EqualTo(foodGroupMock.Parent.Children.Count()));
+            foreach (var childFoodGroup in foodGroupProxy.Parent.Children)
+            {
+                Assert.That(childFoodGroup, Is.Not.Null);
+                Assert.That(childFoodGroup, Is.TypeOf<FoodGroupProxy>());
+            }
+            Assert.That(foodGroupProxy.IsActive, Is.EqualTo(foodGroupMock.IsActive));
+            Assert.That(foodGroupProxy.Children, Is.Not.Null);
+            Assert.That(foodGroupProxy.Children, Is.Empty);
+            Assert.That(foodGroupProxy.Translation, Is.Null);
+            Assert.That(foodGroupProxy.Translations, Is.Not.Null);
+            Assert.That(foodGroupProxy.Translations, Is.Not.Empty);
+            Assert.That(foodGroupProxy.Translations.Count(), Is.EqualTo(foodGroupMock.Translations.Count()));
+            foreach (var translation in foodGroupProxy.Translations)
+            {
+                Assert.That(translation, Is.Not.Null);
+                Assert.That(translation, Is.TypeOf<TranslationProxy>());
+            }
+            Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Null);
+            Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Empty);
+            Assert.That(foodGroupProxy.ForeignKeys.Count(), Is.EqualTo(foodGroupMock.ForeignKeys.Count()));
+            foreach (var foreignKey in foodGroupProxy.ForeignKeys)
+            {
+                Assert.That(foreignKey, Is.Not.Null);
+                Assert.That(foreignKey, Is.TypeOf<ForeignKeyProxy>());
+            }
+        }
+
+        /// <summary>
         /// Tests that Map maps ForeignKey to ForeignKeyProxy.
         /// </summary>
         [Test]

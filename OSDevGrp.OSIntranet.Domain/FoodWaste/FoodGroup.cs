@@ -19,6 +19,30 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 
         #endregion
 
+        #region Constructors
+
+        /// <summary>
+        /// Creates a food group.
+        /// </summary>
+        public FoodGroup()
+        {
+        }
+
+        /// <summary>
+        /// Creates a food group.
+        /// </summary>
+        /// <param name="children">Foods groups which has this food group as a parent. </param>
+        protected FoodGroup(IEnumerable<IFoodGroup> children)
+        {
+            if (children == null)
+            {
+                throw new ArgumentNullException("children");
+            }
+            _children = children.ToList();
+        }
+
+        #endregion
+
         #region Properties
 
         /// <summary>
