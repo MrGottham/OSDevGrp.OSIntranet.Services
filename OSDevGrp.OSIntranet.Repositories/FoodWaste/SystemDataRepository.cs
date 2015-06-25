@@ -151,7 +151,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTransactions(identifiableDomainObject.Identifier.Value));
+                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(identifiableDomainObject.Identifier.Value));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }

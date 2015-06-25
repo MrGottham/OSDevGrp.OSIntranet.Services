@@ -132,7 +132,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var translationCollection = new List<ITranslation>();
             using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
             {
-                translationCollection.AddRange(subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTransactions(DataSourceStatementIdentifier)));
+                translationCollection.AddRange(subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(DataSourceStatementIdentifier)));
             }
             Translations = translationCollection;
         }

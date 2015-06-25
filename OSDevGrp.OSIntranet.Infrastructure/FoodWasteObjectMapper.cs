@@ -33,7 +33,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<IForeignKey, IForeignKeyProxy>()
                 .ConvertUsing(m =>
                 {
-                    var dataProider = Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
+                    if (m as IForeignKeyProxy != null)
+                    {
+                        return (IForeignKeyProxy) m;
+                    }
+                    var dataProider = (m.DataProvider is IDataProviderProxy) ? (IDataProviderProxy) m.DataProvider : Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
                     var foreignKeyProxy = new ForeignKeyProxy(dataProider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
                     {
                         Identifier = m.Identifier
@@ -55,12 +59,21 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<IDataProvider, IDataProviderProxy>()
                 .ConvertUsing(m =>
                 {
+                    if (m as IDataProviderProxy != null)
+                    {
+                        return (IDataProviderProxy) m;
+                    }
                     var dataProviderProxy = new DataProviderProxy(m.Name, m.DataSourceStatementIdentifier)
                     {
                         Identifier = m.Identifier,
                     };
                     foreach (var translation in m.Translations)
                     {
+                        if (translation as ITranslationProxy != null)
+                        {
+                            dataProviderProxy.TranslationAdd(translation);
+                            continue;
+                        }
                         dataProviderProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
                     }
                     return dataProviderProxy;
@@ -75,7 +88,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             Mapper.CreateMap<ITranslation, ITranslationProxy>()
                 .ConvertUsing(m =>
                 {
-                    var translationInfoProxy = Mapper.Map<ITranslationInfo, ITranslationInfoProxy>(m.TranslationInfo);
+                    if (m as ITranslationProxy != null)
+                    {
+                        return (ITranslationProxy) m;
+                    }
+                    var translationInfoProxy = (m.TranslationInfo as ITranslationInfoProxy) != null ? (ITranslationInfoProxy) m.TranslationInfo : Mapper.Map<ITranslationInfo, ITranslationInfoProxy>(m.TranslationInfo);
                     return new TranslationProxy(m.TranslationOfIdentifier, translationInfoProxy, m.Value)
                     {
                         Identifier = m.Identifier
@@ -87,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 .ForMember(m => m.CultureName, opt => opt.MapFrom(s => s.CultureName));
 
             Mapper.CreateMap<ITranslationInfo, ITranslationInfoProxy>()
-                .ConvertUsing(m => new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
+                .ConvertUsing(m => (m as ITranslationInfoProxy) != null ? (ITranslationInfoProxy) m : new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
 
             Mapper.CreateMap<IIdentifiable, ServiceReceiptResponse>()
                 .ConvertUsing(m => new ServiceReceiptResponse

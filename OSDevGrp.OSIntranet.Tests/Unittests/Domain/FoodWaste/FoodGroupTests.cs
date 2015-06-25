@@ -23,6 +23,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(foodGroup.Identifier, Is.Null);
             Assert.That(foodGroup.Identifier.HasValue, Is.False);
             Assert.That(foodGroup.Parent, Is.Null);
+            Assert.That(foodGroup.IsActive, Is.False);
             Assert.That(foodGroup.Children, Is.Not.Null);
             Assert.That(foodGroup.Children, Is.Empty);
             Assert.That(foodGroup.Translation, Is.Null);
@@ -166,6 +167,40 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(exception.Message, Is.EqualTo((new ArgumentException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroupLevel3, "value"), "value").Message)));
             // ReSharper restore NotResolvedInText
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the setter to IsActive sets new value to true.
+        /// </summary>
+        [Test]
+        public void TestThatIsActiveSetterSetsValueToTrue()
+        {
+            var foodGroup = new FoodGroup
+            {
+                IsActive = false
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.IsActive, Is.False);
+
+            foodGroup.IsActive = true;
+            Assert.That(foodGroup.IsActive, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that the setter to IsActive sets new value to false.
+        /// </summary>
+        [Test]
+        public void TestThatIsActiveSetterSetsValueToFalse()
+        {
+            var foodGroup = new FoodGroup
+            {
+                IsActive = true
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.IsActive, Is.True);
+
+            foodGroup.IsActive = false;
+            Assert.That(foodGroup.IsActive, Is.False);
         }
 
         /// <summary>

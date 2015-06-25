@@ -28,6 +28,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             foodGroupMock.Stub(m => m.Parent)
                 .Return(parentMock)
                 .Repeat.Any();
+            foodGroupMock.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
             foodGroupMock.Stub(m => m.Children)
                 .Return(parentMock != null ? new List<IFoodGroup>(0) : BuildFoodGroupMockCollection(foodGroupMock))
                 .Repeat.Any();

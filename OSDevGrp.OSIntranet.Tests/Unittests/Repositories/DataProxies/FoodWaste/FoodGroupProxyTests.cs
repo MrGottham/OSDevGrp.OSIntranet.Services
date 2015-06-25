@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using MySql.Data.MySqlClient;
@@ -31,6 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.Identifier, Is.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.False);
             Assert.That(foodGroupProxy.Parent, Is.Null);
+            Assert.That(foodGroupProxy.IsActive, Is.False);
             Assert.That(foodGroupProxy.Children, Is.Not.Null);
             Assert.That(foodGroupProxy.Children, Is.Empty);
             Assert.That(foodGroupProxy.Translation, Is.Null);
@@ -138,7 +140,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlQueryForId, Is.Not.Null);
             Assert.That(sqlQueryForId, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier FROM FoodGroups WHERE FoodGroupIdentifier='{0}'", foodGroupMock.Identifier.Value.ToString("D").ToUpper())));
+            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE FoodGroupIdentifier='{0}'", foodGroupMock.Identifier.Value.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -148,17 +150,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert()
         {
+            var fixture = new Fixture();
+
             var foodGroupProxy = new FoodGroupProxy
             {
                 Identifier = Guid.NewGuid(),
-                Parent = DomainObjectMockBuilder.BuildFoodGroupMock()
+                Parent = DomainObjectMockBuilder.BuildFoodGroupMock(),
+                IsActive = fixture.Create<bool>()
             };
 
             var sqlCommand = foodGroupProxy.GetSqlCommandForInsert();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO XYZ (XYZ) VALUES('{0}')", foodGroupProxy.UniqueId)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO FoodGroups (FoodGroupIdentifier,ParentIdentifier,IsActive) VALUES('{0}','{1}',{2})", foodGroupProxy.UniqueId, foodGroupProxy.Parent.Identifier.Value.ToString("D").ToUpper(), Convert.ToInt32(foodGroupProxy.IsActive))));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -168,17 +173,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
         {
+            var fixture = new Fixture();
+
             var foodGroupProxy = new FoodGroupProxy
             {
                 Identifier = Guid.NewGuid(),
-                Parent = DomainObjectMockBuilder.BuildFoodGroupMock()
+                Parent = DomainObjectMockBuilder.BuildFoodGroupMock(),
+                IsActive = fixture.Create<bool>()
             };
 
             var sqlCommand = foodGroupProxy.GetSqlCommandForUpdate();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE XYZ SET XYZ='{1}' WHERE XYZ='{0}'", foodGroupProxy.UniqueId, null)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE FoodGroups SET ParentIdentifier='{1}',IsActive={2} WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.UniqueId, foodGroupProxy.Parent.Identifier.Value.ToString("D").ToUpper(), Convert.ToInt32(foodGroupProxy.IsActive))));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -190,14 +198,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             var foodGroupProxy = new FoodGroupProxy
             {
-                Identifier = Guid.NewGuid(),
-                Parent = DomainObjectMockBuilder.BuildFoodGroupMock()
+                Identifier = Guid.NewGuid()
             };
 
             var sqlCommand = foodGroupProxy.GetSqlCommandForDelete();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("DELETE FROM XYZ WHERE XYZ='{0}'", foodGroupProxy.UniqueId)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("DELETE FROM FoodGroups WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.UniqueId)));
         }
 
         /// <summary>
@@ -270,39 +277,59 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             var fixture = new Fixture();
 
-            var dataProviderProxyMock = fixture.Create<DataProviderProxy>();
+            var parentFoodGroupProxy = fixture.Build<FoodGroupProxy>()
+                .With(m => m.Parent, null)
+                .Create();
+            var childrenFoodGroupProxyCollection = new List<FoodGroupProxy>
+            {
+                fixture.Build<FoodGroupProxy>()
+                    .With(m => m.Parent, null)
+                    .Create(),
+                fixture.Build<FoodGroupProxy>()
+                    .With(m => m.Parent, null)
+                    .Create(),
+                fixture.Build<FoodGroupProxy>()
+                    .With(m => m.Parent, null)
+                    .Create()
+            };
+            var translationProxyCollection = fixture.CreateMany<TranslationProxy>(3).ToList();
+            var foreignKeyProxyCollection = fixture.CreateMany<ForeignKeyProxy>(5).ToList();
+
             var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
                 .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.Get(Arg<DataProviderProxy>.Is.NotNull))
+            dataProviderBaseMock.Stub(m => m.Get(Arg<FoodGroupProxy>.Is.NotNull))
                 .WhenCalled(e =>
                 {
-                    var proxy = (DataProviderProxy)e.Arguments.ElementAt(0);
+                    var proxy = (FoodGroupProxy) e.Arguments.ElementAt(0);
                     Assert.That(proxy.Identifier, Is.Not.Null);
                     Assert.That(proxy.Identifier.HasValue, Is.True);
                     // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(proxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo("797B684C-21D4-4BBD-87A1-40523132AC01"));
+                    Assert.That(proxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo("59C97C78-A496-42B9-A978-7DFCBB2C2039"));
                     // ReSharper restore PossibleInvalidOperationException
                 })
-                .Return(dataProviderProxyMock)
+                .Return(parentFoodGroupProxy)
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+                .Return(childrenFoodGroupProxyCollection)
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(translationProxyCollection)
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(foreignKeyProxyCollection)
                 .Repeat.Any();
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ForeignKeyIdentifier")))
-                .Return("C92A2126-B9E2-4293-AA1D-2F197FA12042")
+            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("FoodGroupIdentifier")))
+                .Return("68016998-2A2F-40CB-B691-41379B7C5778")
                 .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
-                .Return("797B684C-21D4-4BBD-87A1-40523132AC01")
+            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ParentIdentifier")))
+                .Return("59C97C78-A496-42B9-A978-7DFCBB2C2039")
                 .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ForeignKeyForIdentifier")))
-                .Return("BA05ADE9-895F-4F59-BE2C-5D60BE48BA40")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ForeignKeyForTypes")))
-                .Return("IDomainObject;IIdentifiable;IDataProvider")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ForeignKeyValue")))
-                .Return(fixture.Create<string>())
+            dataReader.Stub(m => m.GetByte(Arg<string>.Is.Equal("IsActive")))
+                .Return(1)
                 .Repeat.Any();
 
             var foodGroupProxy = new FoodGroupProxy();
@@ -310,6 +337,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.Identifier, Is.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.False);
             Assert.That(foodGroupProxy.Parent, Is.Null);
+            Assert.That(foodGroupProxy.IsActive, Is.False);
             Assert.That(foodGroupProxy.Children, Is.Not.Null);
             Assert.That(foodGroupProxy.Children, Is.Empty);
             Assert.That(foodGroupProxy.Translation, Is.Null);
@@ -323,11 +351,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.Identifier, Is.Not.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.True);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(foodGroupProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("ForeignKeyIdentifier")));
+            Assert.That(foodGroupProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("FoodGroupIdentifier")));
             // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodGroupProxy.Parent, Is.Not.Null);
+            Assert.That(foodGroupProxy.Parent, Is.EqualTo(parentFoodGroupProxy));
+            Assert.That(foodGroupProxy.IsActive, Is.True);
+            Assert.That(foodGroupProxy.Children, Is.Not.Null);
+            Assert.That(foodGroupProxy.Children, Is.Not.Empty);
+            Assert.That(foodGroupProxy.Children.Count(), Is.EqualTo(childrenFoodGroupProxyCollection.Count));
+            foreach (var childFoodGroupProxy in childrenFoodGroupProxyCollection)
+            {
+                Assert.That(foodGroupProxy.Children.Contains(childFoodGroupProxy), Is.True);
+            }
+            Assert.That(foodGroupProxy.Translation, Is.Null);
+            Assert.That(foodGroupProxy.Translations, Is.Not.Null);
+            Assert.That(foodGroupProxy.Translations, Is.Not.Empty);
+            Assert.That(foodGroupProxy.Translations.Count(), Is.EqualTo(translationProxyCollection.Count));
+            foreach (var translationProxy in translationProxyCollection)
+            {
+                Assert.That(foodGroupProxy.Translations.Contains(translationProxy), Is.True);
+            }
+            Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Null);
+            Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Empty);
+            Assert.That(foodGroupProxy.ForeignKeys.Count(), Is.EqualTo(foreignKeyProxyCollection.Count));
+            foreach (var foreignKeyProxy in foreignKeyProxyCollection)
+            {
+                Assert.That(foodGroupProxy.ForeignKeys.Contains(foreignKeyProxy), Is.True);
+            }
 
-            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
-            dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<DataProviderProxy>.Is.NotNull));
+            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(4));
+            dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<FoodGroupProxy>.Is.NotNull));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", dataReader.GetString("FoodGroupIdentifier")))));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("FoodGroupIdentifier")))));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", dataReader.GetString("FoodGroupIdentifier"))));
         }
     }
 }

@@ -59,6 +59,11 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Indicates whether the food group is active.
+        /// </summary>
+        public virtual bool IsActive { get; set; }
+
+        /// <summary>
         /// Foods groups which has this food group as a parent. 
         /// </summary>
         public virtual IEnumerable<IFoodGroup> Children
