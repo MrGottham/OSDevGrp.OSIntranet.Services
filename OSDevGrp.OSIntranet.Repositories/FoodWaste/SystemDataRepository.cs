@@ -40,6 +40,46 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Gets all the food groups.
+        /// </summary>
+        /// <returns>All food groups.</returns>
+        public virtual IEnumerable<IFoodGroup> FoodGroupGetAll()
+        {
+            try
+            {
+                return DataProvider.GetCollection<FoodGroupProxy>("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets all the food groups at the root.
+        /// </summary>
+        /// <returns>All food groups at the root.</returns>
+        public virtual IEnumerable<IFoodGroup> FoodGroupGetAllOnRoot()
+        {
+            try
+            {
+                return DataProvider.GetCollection<FoodGroupProxy>("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier IS NULL");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Gets all the foreign keys for a given domain object.
         /// </summary>
         /// <param name="identifiableDomainObject">The identifiable domain object on which all the foreign keys should be returned.</param>

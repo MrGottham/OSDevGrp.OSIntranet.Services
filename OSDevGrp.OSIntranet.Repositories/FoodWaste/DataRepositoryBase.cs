@@ -76,6 +76,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>The identifiable domain object.</returns>
         public virtual TIdentifiable Get<TIdentifiable>(Guid identifier) where TIdentifiable : IIdentifiable
         {
+            if (typeof (TIdentifiable) == typeof (IFoodGroup))
+            {
+                return (TIdentifiable) Get<IFoodGroup, FoodGroupProxy>(identifier);
+            }
             if (typeof (TIdentifiable) == typeof (IForeignKey))
             {
                 return (TIdentifiable) Get<IForeignKey, ForeignKeyProxy>(identifier);
@@ -106,6 +110,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IFoodGroup)
+            {
+                return (TIdentifiable) Insert<IFoodGroup, IFoodGroupProxy>(identifiable as IFoodGroup);
             }
             if (identifiable is IForeignKey)
             {
@@ -138,6 +146,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 throw new ArgumentNullException("identifiable");
             }
+            if (identifiable is IFoodGroup)
+            {
+                return (TIdentifiable) Update<IFoodGroup, IFoodGroupProxy>(identifiable as IFoodGroup);
+            }
             if (identifiable is IForeignKey)
             {
                 return (TIdentifiable) Update<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
@@ -167,6 +179,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IFoodGroup)
+            {
+                Delete<IFoodGroup, IFoodGroupProxy>(identifiable as IFoodGroup);
+                return;
             }
             if (identifiable is IForeignKey)
             {
