@@ -240,9 +240,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
 
             Identifier = new Guid(mySqlDataReader.GetString("FoodGroupIdentifier"));
-            IsActive = Convert.ToBoolean(mySqlDataReader.GetByte("IsActive"));
+            IsActive = Convert.ToBoolean(mySqlDataReader.GetInt32("IsActive"));
 
-            _parentIdentifier = string.IsNullOrWhiteSpace(mySqlDataReader.GetString("ParentIdentifier")) ? (Guid?) null : new Guid(mySqlDataReader.GetString("ParentIdentifier"));
+            _parentIdentifier = null;
+            var parentIdentifierOrdinal = mySqlDataReader.GetOrdinal("ParentIdentifier");
+            if (mySqlDataReader.IsDBNull(parentIdentifierOrdinal) == false)
+            {
+                _parentIdentifier = string.IsNullOrWhiteSpace(mySqlDataReader.GetString(parentIdentifierOrdinal)) ? (Guid?) null : new Guid(mySqlDataReader.GetString(parentIdentifierOrdinal));
+            }
+
             _dataProvider = dataProvider;
         }
 

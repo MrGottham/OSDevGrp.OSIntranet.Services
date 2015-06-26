@@ -32,6 +32,126 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that FoodGroupGetAll gets all the food groups.
+        /// </summary>
+        [Test]
+        public void TestThatFoodGroupGetAllGetsFoodGroups()
+        {
+            var foodGroupAtRoot = _systemDataRepository.Insert(new FoodGroup { Parent = null, IsActive = true });
+            try
+            {
+                var foodGroupWithParent = _systemDataRepository.Insert(new FoodGroup { Parent = foodGroupAtRoot, IsActive = true });
+                try
+                {
+                    var result = _systemDataRepository.FoodGroupGetAll().ToList();
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result, Is.Not.Empty);
+                    Assert.That(result.Any(m => m.Identifier.HasValue && m.Identifier.Equals(foodGroupAtRoot.Identifier)), Is.True);
+                    Assert.That(result.Any(m => m.Identifier.HasValue && m.Identifier.Equals(foodGroupWithParent.Identifier)), Is.True);
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodGroupWithParent);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foodGroupAtRoot);
+            }
+        }
+
+        /// <summary>
+        /// Tests that FoodGroupGetAllOnRoot gets all the food groups at the root level.
+        /// </summary>
+        [Test]
+        public void TestThatFoodGroupGetAllOnRootGetsFoodGroupsAtRootLevel()
+        {
+            var foodGroupAtRoot = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodGroupWithParent = _systemDataRepository.Insert(new FoodGroup {Parent = foodGroupAtRoot, IsActive = true});
+                try
+                {
+                    var result = _systemDataRepository.FoodGroupGetAllOnRoot().ToList();
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result, Is.Not.Empty);
+                    Assert.That(result.Any(m => m.Identifier.HasValue && m.Identifier.Equals(foodGroupAtRoot.Identifier)), Is.True);
+                    Assert.That(result.Any(m => m.Identifier.HasValue && m.Identifier.Equals(foodGroupWithParent.Identifier)), Is.False);
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodGroupWithParent);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foodGroupAtRoot);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Get gets a given food group.
+        /// </summary>
+        [Test]
+        public void TestThatGetGetsFoodGroup()
+        {
+            var foodGroupAtRoot = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodGroupWithParent = _systemDataRepository.Insert(new FoodGroup {Parent = foodGroupAtRoot, IsActive = true});
+                try
+                {
+                    // ReSharper disable PossibleInvalidOperationException
+                    var result = _systemDataRepository.Get<IFoodGroup>(foodGroupWithParent.Identifier.Value);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(result.Parent, Is.Not.Null);
+                    Assert.That(result.IsActive, Is.True);
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodGroupWithParent);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foodGroupAtRoot);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Update updates a given food group.
+        /// </summary>
+        [Test]
+        public void TestThatUpdateUpdatesFoodGroup()
+        {
+            var foodGroupAtRoot = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodGroupWithParent = _systemDataRepository.Insert(new FoodGroup {Parent = foodGroupAtRoot, IsActive = true});
+                try
+                {
+                    foodGroupWithParent.Parent = null;
+                    foodGroupWithParent.IsActive = false;
+                    _systemDataRepository.Update(foodGroupWithParent);
+                    
+                    // ReSharper disable PossibleInvalidOperationException
+                    var result = _systemDataRepository.Get<IFoodGroup>(foodGroupWithParent.Identifier.Value);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(result.Parent, Is.Null);
+                    Assert.That(result.IsActive, Is.False);
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodGroupWithParent);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foodGroupAtRoot);
+            }
+        }
+
+        /// <summary>
         /// Tests that ForeignKeysForDomainObjectGet gets foreign keys for a given identifiable domain object.
         /// </summary>
         [Test]

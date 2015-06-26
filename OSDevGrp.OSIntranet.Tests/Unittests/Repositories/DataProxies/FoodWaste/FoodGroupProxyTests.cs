@@ -325,10 +325,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("FoodGroupIdentifier")))
                 .Return("68016998-2A2F-40CB-B691-41379B7C5778")
                 .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ParentIdentifier")))
+            dataReader.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("ParentIdentifier")))
+                .Return(2)
+                .Repeat.Any();
+            dataReader.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(2)))
+                .Return(false)
+                .Repeat.Any();
+            dataReader.Stub(m => m.GetString(Arg<int>.Is.Equal(2)))
                 .Return("59C97C78-A496-42B9-A978-7DFCBB2C2039")
                 .Repeat.Any();
-            dataReader.Stub(m => m.GetByte(Arg<string>.Is.Equal("IsActive")))
+            dataReader.Stub(m => m.GetInt32(Arg<string>.Is.Equal("IsActive")))
                 .Return(1)
                 .Repeat.Any();
 

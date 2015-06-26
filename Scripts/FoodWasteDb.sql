@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS Translations (
 	Value VARCHAR(4096) NOT NULL,
 	PRIMARY KEY (TranslationIdentifier),
 	UNIQUE INDEX IX_Translations_OfIdentifier_InfoIdentifier (OfIdentifier,InfoIdentifier),
-	FOREIGN KEY FK_Translations_InfoIdentifier (InfoIdentifier) REFERENCES TranslationInfos (TranslationInfoIdentifier) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE
+	FOREIGN KEY FK_Translations_InfoIdentifier (InfoIdentifier) REFERENCES TranslationInfos (TranslationInfoIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP PROCEDURE IF EXISTS GrantRightsForTranslations;
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS ForeignKeys (
 	PRIMARY KEY (ForeignKeyIdentifier),
 	UNIQUE INDEX IX_ForeignKeys_ForeignKeyForTypes (DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes),
 	UNIQUE INDEX IX_ForeignKeys_ForeignKeyValue (DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyValue),
-	FOREIGN KEY FK_ForeignKeys_DataProviderIdentifier (DataProviderIdentifier) REFERENCES DataProviders (DataProviderIdentifier) MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE
+	FOREIGN KEY FK_ForeignKeys_DataProviderIdentifier (DataProviderIdentifier) REFERENCES DataProviders (DataProviderIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 DROP PROCEDURE IF EXISTS GrantRightsForForeignKeys;
@@ -118,3 +118,23 @@ DELIMITER ;
 CALL GrantRightsForForeignKeys(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForForeignKeys;
 
+CREATE TABLE IF NOT EXISTS FoodGroups (
+	FoodGroupIdentifier VARCHAR(40) NOT NULL,
+	ParentIdentifier VARCHAR(40),
+	IsActive BIT NOT NULL,
+	PRIMARY KEY (FoodGroupIdentifier),
+	INDEX IX_FoodGroups_ParentIdentifier (ParentIdentifier),
+	FOREIGN KEY FK_FoodGroups_ParentIdentifier (ParentIdentifier) REFERENCES FoodGroups (FoodGroupIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForFoodGroups;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForFoodGroups(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.FoodGroups TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForFoodGroups(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForFoodGroups;
