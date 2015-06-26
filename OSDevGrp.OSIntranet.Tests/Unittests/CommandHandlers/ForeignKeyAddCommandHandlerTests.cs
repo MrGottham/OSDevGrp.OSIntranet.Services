@@ -129,6 +129,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Test that Execute calls IsNotNull for the data provider on the common validations.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsIsNotNullForDataProviderOnCommonValidations()
+        {
+            
+        }
+
+        /// <summary>
         /// Tests that HandleException throws an ArgumentNullException if the command for adding a foreign key is null.
         /// </summary>
         [Test]

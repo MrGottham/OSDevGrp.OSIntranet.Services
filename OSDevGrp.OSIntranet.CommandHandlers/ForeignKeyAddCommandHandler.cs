@@ -91,18 +91,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .ToList();
             foreach (var foreignKeyableInterface in foreignKeyableInterfaces)
             {
-                var systemDataRepositoryType = SystemDataRepository.GetType();
-
-
-                var x = typeof (IDataRepository).GetMethods();
-
-                var getMethod = systemDataRepositoryType.GetMethod("Get", new[] {typeof (Guid)});
-                if (getMethod == null && systemDataRepositoryType.BaseType != null)
-                {
-                    getMethod = systemDataRepositoryType.BaseType.GetMethod("Get", new[] {typeof (Guid)});
-                }
-
-
+                var getMethod = typeof (IDataRepository).GetMethod("Get", new[] {typeof (Guid)}).MakeGenericMethod(new[] {foreignKeyableInterface});
                 try
                 {
                     var foreignKeyableDomainObject = getMethod.Invoke(SystemDataRepository, new object[] {foreignKeyForIdentifier}) as IForeignKeyable;
