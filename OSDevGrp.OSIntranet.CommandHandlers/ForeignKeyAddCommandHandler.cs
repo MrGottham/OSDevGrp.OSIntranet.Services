@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
@@ -46,7 +49,11 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 throw new ArgumentNullException("command");
             }
-            throw new NotImplementedException();
+
+            var dataProvider = SystemDataRepository.Get<IDataProvider>(command.DataProviderIdentifier);
+            var foreignKeyForDomainObject = GetForeignKeyForDomainObject(command.ForeignKeyForIdentifier);
+
+            return null;
         }
 
         /// <summary>
@@ -69,6 +76,54 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 throw exception;
             }
             throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, command.GetType().Name, typeof (ServiceReceiptResponse).Name, exception.Message), exception);
+        }
+
+        /// <summary>
+        /// Gets the domain object which has the foreign key.
+        /// </summary>
+        /// <param name="foreignKeyForIdentifier">Identifier for the domain object which has the foreign key.</param>
+        /// <returns>Domain object which has the foreign key.</returns>
+        private IForeignKeyable GetForeignKeyForDomainObject(Guid foreignKeyForIdentifier)
+        {
+            var foreignKeyableInterfaces = typeof (IForeignKeyable).Assembly
+                .GetTypes()
+                .Where(m => m.IsInterface && m.IsGenericType == false && m.IsPublic && m != typeof (IForeignKeyable) && typeof (IForeignKeyable).IsAssignableFrom(m))
+                .ToList();
+            foreach (var foreignKeyableInterface in foreignKeyableInterfaces)
+            {
+                var systemDataRepositoryType = SystemDataRepository.GetType();
+
+
+                var x = typeof (IDataRepository).GetMethods();
+
+                var getMethod = systemDataRepositoryType.GetMethod("Get", new[] {typeof (Guid)});
+                if (getMethod == null && systemDataRepositoryType.BaseType != null)
+                {
+                    getMethod = systemDataRepositoryType.BaseType.GetMethod("Get", new[] {typeof (Guid)});
+                }
+
+
+                try
+                {
+                    var foreignKeyableDomainObject = getMethod.Invoke(SystemDataRepository, new object[] {foreignKeyForIdentifier}) as IForeignKeyable;
+                    if (foreignKeyableDomainObject != null)
+                    {
+                        return foreignKeyableDomainObject;
+                    }
+                }
+                catch (TargetInvocationException ex)
+                {
+                    if (ex.InnerException is IntranetRepositoryException)
+                    {
+                        continue;
+                    }
+                    throw;
+                }
+                catch (IntranetRepositoryException)
+                {
+                }
+            }
+            return null;
         }
 
         #endregion
