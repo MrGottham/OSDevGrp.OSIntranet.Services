@@ -53,6 +53,12 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             var dataProvider = SystemDataRepository.Get<IDataProvider>(command.DataProviderIdentifier);
             var foreignKeyForDomainObject = GetForeignKeyForDomainObject(command.ForeignKeyForIdentifier);
 
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(dataProvider), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.DataProviderIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.IsNotNull(foreignKeyForDomainObject), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.ForeignKeyForIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.HasValue(command.ForeignKeyValue), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "ForeignKeyValue")))
+                .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.ForeignKeyValue) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "ForeignKeyValue")))
+                .Evaluate();
+
             return null;
         }
 
