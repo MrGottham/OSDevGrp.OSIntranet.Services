@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -58,6 +59,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .IsSatisfiedBy(() => CommonValidations.HasValue(command.ForeignKeyValue), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "ForeignKeyValue")))
                 .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.ForeignKeyValue) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "ForeignKeyValue")))
                 .Evaluate();
+
+            // ReSharper disable PossibleInvalidOperationException
+            var foreignKey = SystemDataRepository.Insert<IForeignKey>(new ForeignKey(dataProvider, foreignKeyForDomainObject.Identifier.Value, foreignKeyForDomainObject.GetType(), command.ForeignKeyValue));
+            // ReSharper restore PossibleInvalidOperationException
 
             return null;
         }
