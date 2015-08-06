@@ -4,9 +4,12 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.CommandHandlers
 {
@@ -40,7 +43,19 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <returns>Service receipt.</returns>
         public virtual ServiceReceiptResponse Execute(ForeignKeyModifyCommand command)
         {
-            throw new NotImplementedException();
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+
+            var foreignKey = SystemDataRepository.Get<IForeignKey>(command.ForeignKeyIdentifier);
+
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(foreignKey), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.ForeignKeyIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.HasValue(command.ForeignKeyValue), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "ForeignKeyValue")))
+                .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.ForeignKeyValue) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "ForeignKeyValue")))
+                .Evaluate();
+
+            return null;
         }
 
         /// <summary>
@@ -50,7 +65,19 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="exception">Exception.</param>
         public virtual void HandleException(ForeignKeyModifyCommand command, Exception exception)
         {
-            throw new NotImplementedException();
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+            if (exception.GetType() == typeof (IntranetRepositoryException) || exception.GetType() == typeof (IntranetBusinessException) || exception.GetType() == typeof (IntranetSystemException))
+            {
+                throw exception;
+            }
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, command.GetType().Name, typeof (ServiceReceiptResponse).Name, exception.Message), exception);
         }
 
         #endregion
