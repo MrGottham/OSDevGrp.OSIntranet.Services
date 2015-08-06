@@ -10,7 +10,6 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
-using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
@@ -69,7 +68,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsGetForDataProviderIdentifierOnSystemDataRepository()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -89,6 +87,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
@@ -112,7 +115,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsGetForForeignKeyForIdentifierOnSystemDataRepository()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -132,6 +134,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
@@ -155,7 +162,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsNotNullForDataProviderOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
@@ -183,6 +189,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
                 .With(m => m.DataProviderIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyForIdentifier, Guid.NewGuid())
@@ -204,7 +215,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsNotNullForForeignKeyForOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -229,6 +239,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
@@ -252,7 +267,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHasValueForForeignKeyValueOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -279,14 +293,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
                 .With(m => m.DataProviderIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyForIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyValue, fixture.Create<string>())
                 .Create();
 
-            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock,
-                foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
             Assert.That(foreignKeyAddCommandHandler, Is.Not.Null);
 
             foreignKeyAddCommandHandler.Execute(foreignKeyAddCommand);
@@ -301,7 +319,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsContainsIllegalCharForForeignKeyValueOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -328,14 +345,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
                 .With(m => m.DataProviderIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyForIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyValue, fixture.Create<string>())
                 .Create();
 
-            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock,
-                foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
             Assert.That(foreignKeyAddCommandHandler, Is.Not.Null);
 
             foreignKeyAddCommandHandler.Execute(foreignKeyAddCommand);
@@ -350,7 +371,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsSatisfiedByOnSpecification4Times()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -378,8 +398,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .With(m => m.ForeignKeyValue, fixture.Create<string>())
                 .Create();
 
-            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock,
-                foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
             Assert.That(foreignKeyAddCommandHandler, Is.Not.Null);
 
             foreignKeyAddCommandHandler.Execute(foreignKeyAddCommand);
@@ -394,7 +418,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsEvaluateOnSpecification()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -416,14 +439,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
                 .With(m => m.DataProviderIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyForIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyValue, fixture.Create<string>())
                 .Create();
 
-            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock,
-                foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
             Assert.That(foreignKeyAddCommandHandler, Is.Not.Null);
 
             foreignKeyAddCommandHandler.Execute(foreignKeyAddCommand);
@@ -438,7 +465,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsInsertOnSystemDataRepository()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foreignKeyValue = fixture.Create<string>();
@@ -479,14 +505,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
             var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
                 .With(m => m.DataProviderIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyForIdentifier, Guid.NewGuid())
                 .With(m => m.ForeignKeyValue, foreignKeyValue)
                 .Create();
 
-            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock,
-                foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
             Assert.That(foreignKeyAddCommandHandler, Is.Not.Null);
 
             foreignKeyAddCommandHandler.Execute(foreignKeyAddCommand);
@@ -495,10 +525,108 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Test that Execute calls Map for the inserted foreign key on the object mapper for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsMapForInsertedForeignKeyOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            // ReSharper disable PossibleInvalidOperationException
+            var insertedForeignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType());
+            // ReSharper restore PossibleInvalidOperationException
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<IFoodGroup>(Arg<Guid>.Is.Anything))
+                .Return(foodGroupMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IForeignKey>.Is.NotNull))
+                .Return(insertedForeignKeyMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.ForeignKeyForIdentifier, Guid.NewGuid())
+                .With(m => m.ForeignKeyValue, fixture.Create<string>())
+                .Create();
+
+            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(foreignKeyAddCommandHandler, Is.Not.Null);
+
+            foreignKeyAddCommandHandler.Execute(foreignKeyAddCommand);
+
+            foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(insertedForeignKeyMock), Arg<CultureInfo>.Is.Null));
+        }
+
+        /// <summary>
+        /// Test that Execute returns the service receipt created by Map for the inserted foreign key on the object mapper for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteReturnsServiceReceiptFromMapOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<IFoodGroup>(Arg<Guid>.Is.Anything))
+                .Return(foodGroupMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IForeignKey>.Is.NotNull))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(serviceReceipt)
+                .Repeat.Any();
+
+            var foreignKeyAddCommand = fixture.Build<ForeignKeyAddCommand>()
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.ForeignKeyForIdentifier, Guid.NewGuid())
+                .With(m => m.ForeignKeyValue, fixture.Create<string>())
+                .Create();
+
+            var foreignKeyAddCommandHandler = new ForeignKeyAddCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(foreignKeyAddCommandHandler, Is.Not.Null);
+
+            var result = foreignKeyAddCommandHandler.Execute(foreignKeyAddCommand);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(serviceReceipt));
+        }
+
+        /// <summary>
         /// Tests that HandleException throws an ArgumentNullException if the command for adding a foreign key is null.
         /// </summary>
         [Test]
-        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfForeignKeyCommandIsNull()
+        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfForeignKeyAddCommandIsNull()
         {
             var fixture = new Fixture();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();

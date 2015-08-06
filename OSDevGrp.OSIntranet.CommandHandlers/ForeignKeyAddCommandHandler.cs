@@ -64,7 +64,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             var foreignKey = SystemDataRepository.Insert<IForeignKey>(new ForeignKey(dataProvider, foreignKeyForDomainObject.Identifier.Value, foreignKeyForDomainObject.GetType(), command.ForeignKeyValue));
             // ReSharper restore PossibleInvalidOperationException
 
-            return null;
+            return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(foreignKey);
         }
 
         /// <summary>
