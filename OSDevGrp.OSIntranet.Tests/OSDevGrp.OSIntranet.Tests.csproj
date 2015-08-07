@@ -142,6 +142,7 @@
     <Compile Include="Unittests\CommandHandlers\Core\FoodWasteSystemDataCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Core\LogicExecuterTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyDeleteCommandHandlerTests.cs" />

@@ -63,7 +63,9 @@
     <Compile Include="Core\FinansstyringCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteSystemDataCommandHandlerBase.cs" />
     <Compile Include="Core\FællesElementCommandHandlerBase.cs" />
+    <Compile Include="Core\ILogicExecuter.cs" />
     <Compile Include="Core\KalenderCommandHandlerBase.cs" />
+    <Compile Include="Core\LogicExecuter.cs" />
     <Compile Include="Core\RegnskabCommandHandlerBase.cs" />
     <Compile Include="ForeignKeyAddCommandHandler.cs" />
     <Compile Include="ForeignKeyDeleteCommandHandler.cs" />
