@@ -63,6 +63,72 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Adds a dataproviders foreign key to a given domain object in the food waste domain.
+        /// </summary>
+        /// <param name="command">Command for adding a dataproviders foreign key to a given domain object in the food waste domain.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse ForeignKeyAdd(ForeignKeyAddCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<ForeignKeyAddCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
+        /// Modifies a dataproviders foreign key to a given domain object in the food waste domain.
+        /// </summary>
+        /// <param name="command">Command for modifying a dataproviders foreign key to a given domain object in the food waste domain.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse ForeignKeyModify(ForeignKeyModifyCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<ForeignKeyModifyCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
+        /// Deletes a dataproviders foreign key to a given domain object in the food waste domain.
+        /// </summary>
+        /// <param name="command">Command for deleting a dataproviders foreign key to a given domain object in the food waste domain.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse ForeignKeyDelete(ForeignKeyDeleteCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<ForeignKeyDeleteCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets all the data providers.
         /// </summary>
         /// <param name="query">Query for getting all the data providers.</param>

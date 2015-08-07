@@ -15,6 +15,36 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteSystemDataService : IIntranetService
     {
         /// <summary>
+        /// Adds a dataproviders foreign key to a given domain object in the food waste domain.
+        /// </summary>
+        /// <param name="command">Command for adding a dataproviders foreign key to a given domain object in the food waste domain.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse ForeignKeyAdd(ForeignKeyAddCommand command);
+
+        /// <summary>
+        /// Modifies a dataproviders foreign key to a given domain object in the food waste domain.
+        /// </summary>
+        /// <param name="command">Command for modifying a dataproviders foreign key to a given domain object in the food waste domain.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse ForeignKeyModify(ForeignKeyModifyCommand command);
+
+        /// <summary>
+        /// Deletes a dataproviders foreign key to a given domain object in the food waste domain.
+        /// </summary>
+        /// <param name="command">Command for deleting a dataproviders foreign key to a given domain object in the food waste domain.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse ForeignKeyDelete(ForeignKeyDeleteCommand command);
+
+        /// <summary>
         /// Gets all the data providers.
         /// </summary>
         /// <param name="query">Query for getting all the data providers.</param>
