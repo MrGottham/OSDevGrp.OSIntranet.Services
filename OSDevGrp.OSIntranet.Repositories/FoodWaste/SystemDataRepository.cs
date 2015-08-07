@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
@@ -68,6 +69,40 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             try
             {
                 return DataProvider.GetCollection<FoodGroupProxy>("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier IS NULL");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets a food group by a given data providers foreign key.
+        /// </summary>
+        /// <param name="dataProvider">Data provider.</param>
+        /// <param name="foreignKeyValue">Foreign key value.</param>
+        /// <returns>Food group.</returns>
+        public virtual IFoodGroup FoodGroupGetByForeignKey(IDataProvider dataProvider, string foreignKeyValue)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (string.IsNullOrEmpty(foreignKeyValue))
+            {
+                throw new ArgumentNullException("foreignKeyValue");
+            }
+            try
+            {
+                if (dataProvider.Identifier.HasValue)
+                {
+                    return DataProvider.GetCollection<FoodGroupProxy>(string.Format("SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{0}' AND fk.ForeignKeyForTypes LIKE '%{1}%' AND fk.ForeignKeyValue='{2}'", dataProvider.Identifier.Value.ToString("D").ToUpper(), typeof (IFoodGroup).Name, foreignKeyValue)).FirstOrDefault();
+                }
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
             }
             catch (IntranetRepositoryException)
             {

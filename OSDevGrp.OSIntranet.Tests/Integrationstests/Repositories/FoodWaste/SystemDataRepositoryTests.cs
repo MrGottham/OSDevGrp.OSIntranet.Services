@@ -90,6 +90,38 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Test that FoodGroupGetByForeignKey returns the food group for the given data providers foreign key.
+        /// </summary>
+        [Test]
+        public void TestThatFoodGroupGetByForeignKeyReturnsFoodGroup()
+        {
+            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            Assert.That(dataProvider, Is.Not.Null);
+
+            var foodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                // ReSharper disable PossibleInvalidOperationException
+                var foreignKey = _systemDataRepository.Insert(new ForeignKey(dataProvider, foodGroup.Identifier.Value, foodGroup.GetType(), "ForeignKeyToFoodGroup"));
+                // ReSharper restore PossibleInvalidOperationException
+                try
+                {
+                    var result = _systemDataRepository.FoodGroupGetByForeignKey(dataProvider, "ForeignKeyToFoodGroup");
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result.Identifier, Is.EqualTo(foodGroup.Identifier));
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foreignKey);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(foodGroup);
+            }
+        }
+
+        /// <summary>
         /// Tests that Get gets a given food group.
         /// </summary>
         [Test]

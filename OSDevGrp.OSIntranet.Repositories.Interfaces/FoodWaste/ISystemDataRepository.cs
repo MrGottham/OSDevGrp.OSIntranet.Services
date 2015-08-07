@@ -21,6 +21,14 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
         IEnumerable<IFoodGroup> FoodGroupGetAllOnRoot();
 
         /// <summary>
+        /// Gets a food group by a given data providers foreign key.
+        /// </summary>
+        /// <param name="dataProvider">Data provider.</param>
+        /// <param name="foreignKeyValue">Foreign key value.</param>
+        /// <returns>Food group.</returns>
+        IFoodGroup FoodGroupGetByForeignKey(IDataProvider dataProvider, string foreignKeyValue);
+
+        /// <summary>
         /// Gets all the foreign keys for a given domain object.
         /// </summary>
         /// <param name="identifiableDomainObject">The identifiable domain object on which all the foreign keys should be returned.</param>
