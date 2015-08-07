@@ -546,8 +546,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
             Assert.That(foreignKeyModifyCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyModifyCommandHandler
-                .HandleException(null, fixture.Create<Exception>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyModifyCommandHandler.HandleException(null, fixture.Create<Exception>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);

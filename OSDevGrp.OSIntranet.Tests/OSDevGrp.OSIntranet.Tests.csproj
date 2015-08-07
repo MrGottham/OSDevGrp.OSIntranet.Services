@@ -144,6 +144,7 @@
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyAddCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\ForeignKeyDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyModifyCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationDeleteCommandHandlerTests.cs" />
