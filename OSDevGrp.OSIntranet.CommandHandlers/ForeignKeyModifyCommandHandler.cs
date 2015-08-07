@@ -55,7 +55,11 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.ForeignKeyValue) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "ForeignKeyValue")))
                 .Evaluate();
 
-            return null;
+            foreignKey.ForeignKeyValue = command.ForeignKeyValue;
+
+            var updatedForeignKey = SystemDataRepository.Update(foreignKey);
+
+            return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(updatedForeignKey);
         }
 
         /// <summary>

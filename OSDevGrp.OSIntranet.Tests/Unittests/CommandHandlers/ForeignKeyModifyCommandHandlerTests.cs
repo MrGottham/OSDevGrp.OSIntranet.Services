@@ -68,7 +68,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsGetForForeignKeyIdentifierOnSystemDataRepository()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -78,10 +77,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
                 // ReSharper restore PossibleInvalidOperationException
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
@@ -104,7 +113,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsNotNullForForeignKeyOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -115,6 +123,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<IForeignKey>(Arg<Guid>.Is.Anything))
                 .Return(foreignKeyMock)
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
@@ -124,6 +137,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
@@ -146,12 +164,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHasValueForForeignKeyValueOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IForeignKey>(Arg<Guid>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
                 // ReSharper disable PossibleInvalidOperationException
                 .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
                 // ReSharper restore PossibleInvalidOperationException
@@ -165,6 +187,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
@@ -187,12 +214,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsContainsIllegalCharForForeignKeyValueOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IForeignKey>(Arg<Guid>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
                 // ReSharper disable PossibleInvalidOperationException
                 .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
                 // ReSharper restore PossibleInvalidOperationException
@@ -206,6 +237,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
@@ -228,7 +264,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsSatisfiedByOnSpecification3Times()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -238,10 +273,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
                 // ReSharper restore PossibleInvalidOperationException
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
@@ -264,7 +309,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsEvaluateOnSpecification()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -274,10 +318,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
                 // ReSharper restore PossibleInvalidOperationException
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
@@ -300,21 +354,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteSetsForeignKeyValueWithForeignKeyValueFromCommand()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             // ReSharper disable PossibleInvalidOperationException
-            var foreginKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType());
+            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType());
             // ReSharper restore PossibleInvalidOperationException
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IForeignKey>(Arg<Guid>.Is.Anything))
-                .Return(foreginKeyMock)
+                .Return(foreignKeyMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
@@ -327,7 +390,145 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             foreignKeyModifyCommandHandler.Execute(foreignKeyModifyCommand);
 
-            foreginKeyMock.AssertWasCalled(m => m.ForeignKeyValue = Arg<string>.Is.Equal(foreignKeyModifyCommand.ForeignKeyValue));
+            foreignKeyMock.AssertWasCalled(m => m.ForeignKeyValue = Arg<string>.Is.Equal(foreignKeyModifyCommand.ForeignKeyValue));
+        }
+
+        /// <summary>
+        /// Test that Execute calls Update on the repository which can access system data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsUpdateOnSystemDataRepository()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            // ReSharper disable PossibleInvalidOperationException
+            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType());
+            // ReSharper restore PossibleInvalidOperationException
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IForeignKey>(Arg<Guid>.Is.Anything))
+                .Return(foreignKeyMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(foreignKeyModifyCommandHandler, Is.Not.Null);
+
+            var foreignKeyModifyCommand = fixture.Build<ForeignKeyModifyCommand>()
+                .With(m => m.ForeignKeyIdentifier, Guid.NewGuid())
+                .With(m => m.ForeignKeyValue, fixture.Create<string>())
+                .Create();
+
+            foreignKeyModifyCommandHandler.Execute(foreignKeyModifyCommand);
+
+            systemDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<IForeignKey>.Is.Equal(foreignKeyMock)));
+        }
+
+        /// <summary>
+        /// Test that Execute calls Map for the updated foreign key on the object mapper for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsMapForUpdatedForeignKeyOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            // ReSharper disable PossibleInvalidOperationException
+            var updatedForeignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType());
+            // ReSharper restore PossibleInvalidOperationException
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IForeignKey>(Arg<Guid>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                .Return(updatedForeignKeyMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(foreignKeyModifyCommandHandler, Is.Not.Null);
+
+            var foreignKeyModifyCommand = fixture.Build<ForeignKeyModifyCommand>()
+                .With(m => m.ForeignKeyIdentifier, Guid.NewGuid())
+                .With(m => m.ForeignKeyValue, fixture.Create<string>())
+                .Create();
+
+            foreignKeyModifyCommandHandler.Execute(foreignKeyModifyCommand);
+
+            foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(updatedForeignKeyMock), Arg<CultureInfo>.Is.Null));
+        }
+
+        /// <summary>
+        /// Test that Execute returns the service receipt created by Map for the updated foreign key on the object mapper for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteReturnsServiceReceiptFromMapOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IForeignKey>(Arg<Guid>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IForeignKey>.Is.Anything))
+                // ReSharper disable PossibleInvalidOperationException
+                .Return(DomainObjectMockBuilder.BuildForeignKeyMock(foodGroupMock.Identifier.Value, foodGroupMock.GetType()))
+                // ReSharper restore PossibleInvalidOperationException
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(serviceReceipt)
+                .Repeat.Any();
+
+            var foreignKeyModifyCommandHandler = new ForeignKeyModifyCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            Assert.That(foreignKeyModifyCommandHandler, Is.Not.Null);
+
+            var foreignKeyModifyCommand = fixture.Build<ForeignKeyModifyCommand>()
+                .With(m => m.ForeignKeyIdentifier, Guid.NewGuid())
+                .With(m => m.ForeignKeyValue, fixture.Create<string>())
+                .Create();
+
+            var result = foreignKeyModifyCommandHandler.Execute(foreignKeyModifyCommand);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(serviceReceipt));
         }
 
         /// <summary>

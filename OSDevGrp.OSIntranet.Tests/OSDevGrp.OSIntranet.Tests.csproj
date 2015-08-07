@@ -151,6 +151,7 @@
     <Compile Include="Unittests\CommandHandlers\Validation\CommonValidationsTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyAddCommandTests.cs" />
+    <Compile Include="Unittests\Contracts\Commands\ForeignKeyDeleteCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyModifyCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationDeleteCommandTest.cs" />
