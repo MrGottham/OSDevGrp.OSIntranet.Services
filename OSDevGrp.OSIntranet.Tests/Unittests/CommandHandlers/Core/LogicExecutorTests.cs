@@ -18,7 +18,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
     /// Tests the logic executor which can execute basic logic.
     /// </summary>
     [TestFixture]
-    public class LogicExecuterTests
+    public class LogicExecutorTests
     {
         /// <summary>
         /// Tests that the constructor initialize the logic executor which can execute basic logic.
@@ -28,7 +28,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
 
-            var logicExecutor = new LogicExecuter(commandBusMock);
+            var logicExecutor = new LogicExecutor(commandBusMock);
             Assert.That(logicExecutor, Is.Not.Null);
         }
 
@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestThatConstructorThrowsArgumentNullExceptionWhenCommandBusIsNull()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new LogicExecuter(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new LogicExecutor(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -54,10 +54,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => logicExecuter.ForeignKeyAdd(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => logicExecutor.ForeignKeyAdd(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -94,10 +94,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            logicExecuter.ForeignKeyAdd(foreignKeyMock);
+            logicExecutor.ForeignKeyAdd(foreignKeyMock);
 
             commandBusMock.AssertWasCalled(m => m.Publish<ForeignKeyAddCommand, ServiceReceiptResponse>(Arg<ForeignKeyAddCommand>.Is.NotNull));
         }
@@ -121,10 +121,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var result = logicExecuter.ForeignKeyAdd(foreignKeyMock);
+            var result = logicExecutor.ForeignKeyAdd(foreignKeyMock);
             Assert.That(result, Is.EqualTo(serviceReceipt.Identifier));
         }
 
@@ -136,10 +136,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => logicExecuter.ForeignKeyModify(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => logicExecutor.ForeignKeyModify(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -160,10 +160,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(null)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetSystemException>(() => logicExecuter.ForeignKeyModify(foreignKeyMock));
+            var exception = Assert.Throws<IntranetSystemException>(() => logicExecutor.ForeignKeyModify(foreignKeyMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -199,10 +199,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            logicExecuter.ForeignKeyModify(foreignKeyMock);
+            logicExecutor.ForeignKeyModify(foreignKeyMock);
 
             commandBusMock.AssertWasCalled(m => m.Publish<ForeignKeyModifyCommand, ServiceReceiptResponse>(Arg<ForeignKeyModifyCommand>.Is.NotNull));
         }
@@ -226,10 +226,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var result = logicExecuter.ForeignKeyModify(foreignKeyMock);
+            var result = logicExecutor.ForeignKeyModify(foreignKeyMock);
             Assert.That(result, Is.EqualTo(serviceReceipt.Identifier));
         }
 
@@ -241,10 +241,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => logicExecuter.ForeignKeyDelete(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => logicExecutor.ForeignKeyDelete(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -265,10 +265,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(null)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetSystemException>(() => logicExecuter.ForeignKeyDelete(foreignKeyMock));
+            var exception = Assert.Throws<IntranetSystemException>(() => logicExecutor.ForeignKeyDelete(foreignKeyMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -301,10 +301,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            logicExecuter.ForeignKeyDelete(foreignKeyMock);
+            logicExecutor.ForeignKeyDelete(foreignKeyMock);
 
             commandBusMock.AssertWasCalled(m => m.Publish<ForeignKeyDeleteCommand, ServiceReceiptResponse>(Arg<ForeignKeyDeleteCommand>.Is.NotNull));
         }
@@ -328,10 +328,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var result = logicExecuter.ForeignKeyDelete(foreignKeyMock);
+            var result = logicExecutor.ForeignKeyDelete(foreignKeyMock);
             Assert.That(result, Is.EqualTo(serviceReceipt.Identifier));
         }
 
@@ -343,10 +343,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => logicExecuter.TranslationAdd(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => logicExecutor.TranslationAdd(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -380,10 +380,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            logicExecuter.TranslationAdd(translationMock);
+            logicExecutor.TranslationAdd(translationMock);
 
             commandBusMock.AssertWasCalled(m => m.Publish<TranslationAddCommand, ServiceReceiptResponse>(Arg<TranslationAddCommand>.Is.NotNull));
         }
@@ -404,10 +404,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var result = logicExecuter.TranslationAdd(translationMock);
+            var result = logicExecutor.TranslationAdd(translationMock);
             Assert.That(result, Is.EqualTo(serviceReceipt.Identifier));
         }
 
@@ -419,10 +419,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => logicExecuter.TranslationModify(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => logicExecutor.TranslationModify(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -443,10 +443,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(null)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetSystemException>(() => logicExecuter.TranslationModify(translationMock));
+            var exception = Assert.Throws<IntranetSystemException>(() => logicExecutor.TranslationModify(translationMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -479,10 +479,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            logicExecuter.TranslationModify(translationMock);
+            logicExecutor.TranslationModify(translationMock);
 
             commandBusMock.AssertWasCalled(m => m.Publish<TranslationModifyCommand, ServiceReceiptResponse>(Arg<TranslationModifyCommand>.Is.NotNull));
         }
@@ -503,10 +503,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var result = logicExecuter.TranslationModify(translationMock);
+            var result = logicExecutor.TranslationModify(translationMock);
             Assert.That(result, Is.EqualTo(serviceReceipt.Identifier));
         }
 
@@ -518,10 +518,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => logicExecuter.TranslationDelete(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => logicExecutor.TranslationDelete(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -542,10 +542,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(null)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetSystemException>(() => logicExecuter.TranslationDelete(translationMock));
+            var exception = Assert.Throws<IntranetSystemException>(() => logicExecutor.TranslationDelete(translationMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -575,10 +575,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            logicExecuter.TranslationDelete(translationMock);
+            logicExecutor.TranslationDelete(translationMock);
 
             commandBusMock.AssertWasCalled(m => m.Publish<TranslationDeleteCommand, ServiceReceiptResponse>(Arg<TranslationDeleteCommand>.Is.NotNull));
         }
@@ -599,10 +599,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var logicExecuter = new LogicExecuter(commandBusMock);
-            Assert.That(logicExecuter, Is.Not.Null);
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
 
-            var result = logicExecuter.TranslationDelete(translationMock);
+            var result = logicExecutor.TranslationDelete(translationMock);
             Assert.That(result, Is.EqualTo(serviceReceipt.Identifier));
         }
     }

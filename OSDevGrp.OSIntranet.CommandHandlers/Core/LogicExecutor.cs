@@ -12,7 +12,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
     /// <summary>
     /// Logic executor which can execute basic logic.
     /// </summary>
-    public class LogicExecuter : ILogicExecuter
+    public class LogicExecutor : ILogicExecutor
     {
         #region Private variables
 
@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// Creates a logic executor which can execute basic logic.
         /// </summary>
         /// <param name="commandBus">Implementation of a command bus which can publish commands.</param>
-        public LogicExecuter(ICommandBus commandBus)
+        public LogicExecutor(ICommandBus commandBus)
         {
             if (commandBus == null)
             {

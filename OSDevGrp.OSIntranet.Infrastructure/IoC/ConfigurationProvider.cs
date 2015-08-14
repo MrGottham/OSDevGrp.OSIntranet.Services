@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<ICommandBus>().ImplementedBy<CommandBus>().LifeStyle.Transient);
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);
             container.Register(Component.For<ICommonValidations>().ImplementedBy<CommonValidations>().LifeStyle.Singleton);
-            container.Register(Component.For<ILogicExecuter>().ImplementedBy<LogicExecuter>().LifeStyle.Transient);
+            container.Register(Component.For<ILogicExecutor>().ImplementedBy<LogicExecutor>().LifeStyle.Transient);
             container.Register(Component.For<IKonfigurationRepository>().Instance(konfigurationRepository).LifeStyle.Transient);
 
             container.Register(Component.For<IMySqlDataProvider>().Instance(new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName])).LifeStyle.Transient);

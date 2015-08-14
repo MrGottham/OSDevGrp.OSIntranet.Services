@@ -6,7 +6,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
     /// <summary>
     /// Interface for a logic executor which can execute basic logic.
     /// </summary>
-    public interface ILogicExecuter
+    public interface ILogicExecutor
     {
         /// <summary>
         /// Executes functionality which adds a foreign key to a domain object.
