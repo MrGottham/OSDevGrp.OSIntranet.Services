@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Commands
         /// Gets or sets the identifier for the translation informations which should be used to translate the name of the food group.
         /// </summary>
         [DataMember(IsRequired = true)]
-        public string TranslationInfoIdentifier { get; set; }
+        public Guid TranslationInfoIdentifier { get; set; }
 
         /// <summary>
         /// Gets or sets the data providers primary key for the food group.
