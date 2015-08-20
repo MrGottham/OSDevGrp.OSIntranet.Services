@@ -17,8 +17,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a food group.
         /// </summary>
         /// <param name="parentMock">Mockup for the parent food group.</param>
+        /// <param name="translations">Collection for translation mockups for the food group.</param>
         /// <returns>Mockup for a food group.</returns>
-        public static IFoodGroup BuildFoodGroupMock(IFoodGroup parentMock = null)
+        public static IFoodGroup BuildFoodGroupMock(IFoodGroup parentMock = null, IEnumerable<ITranslation> translations = null)
         {
             var identifier = Guid.NewGuid();
             var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
@@ -38,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(BuildTranslationMock(identifier))
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.Translations)
-                .Return(BuildTranslationMockCollection(identifier))
+                .Return(translations ?? BuildTranslationMockCollection(identifier))
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.ForeignKeys)
                 .Return(BuildForeignKeyMockCollection(identifier, typeof (IFoodGroup)))
@@ -111,7 +112,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             return foreignKeyMock;
         }
 
-            /// <summary>
+        /// <summary>
         /// Build a mockup for a data provider.
         /// </summary>
         /// <returns>Mockup for a data provider.</returns>

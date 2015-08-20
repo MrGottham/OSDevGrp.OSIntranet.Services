@@ -7,8 +7,8 @@ namespace OSDevGrp.OSIntranet.Contracts.Commands
     /// <summary>
     /// Command for importing a food group from a given data provider.
     /// </summary>
-    [DataContract(Name = "ImportFoodGroupFromDataProviderCommand", Namespace = SoapNamespaces.FoodWasteNamespace)]
-    public class ImportFoodGroupFromDataProviderCommand : ICommand
+    [DataContract(Name = "FoodGroupImportFromDataProviderCommand", Namespace = SoapNamespaces.FoodWasteNamespace)]
+    public class FoodGroupImportFromDataProviderCommand : ICommand
     {
         /// <summary>
         /// Gets or sets the identifier for the data provider who imports the food group.

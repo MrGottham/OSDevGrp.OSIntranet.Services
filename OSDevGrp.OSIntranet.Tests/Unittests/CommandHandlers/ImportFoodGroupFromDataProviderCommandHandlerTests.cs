@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers;
@@ -6,6 +8,7 @@ using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -89,9 +92,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsGetForDataProviderIdentifierOnSystemDataRepository()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -101,10 +102,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -132,9 +152,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsGetForTranslationInfoIdentifierOnSystemDataRepository()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -144,10 +162,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -177,9 +214,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteDontCallFoodGroupGetByForeignKeyForParentKeyOnSystemDataRepositoryWhenParentKeyHasNoValue(string noValue)
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
@@ -190,10 +225,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -221,9 +275,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsFoodGroupGetByForeignKeyForParentKeyOnSystemDataRepositoryWhenParentKeyHasValue()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var parentKey = fixture.Create<string>();
@@ -235,13 +287,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(parentKey)))
                 .Return(DomainObjectMockBuilder.BuildFoodGroupMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -269,9 +340,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsNotNullForDataProviderOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
@@ -282,6 +351,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
@@ -291,6 +366,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -318,9 +406,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsNotNullForTranslationInfoOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
@@ -331,6 +417,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(translationInfoMock)
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
@@ -340,6 +432,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -367,9 +472,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHasValueForKeyOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -378,6 +481,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -388,6 +497,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -415,9 +537,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsContainsIllegalCharForKeyOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -426,6 +546,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -436,6 +562,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -463,9 +602,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHasValueForNameOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -474,6 +611,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -484,6 +627,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -511,9 +667,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsContainsIllegalCharForNameOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -522,6 +676,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -532,6 +692,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -559,9 +732,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsNotNullForParentFoodGroupOnCommonValidations()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var parentKey = fixture.Create<string>();
@@ -573,8 +744,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
             systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(parentKey)))
                 .Return(parentFoodGroup)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -585,6 +762,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     func.Invoke();
                 })
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -612,9 +802,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsSatisfiedByOnSpecification7Times()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -624,10 +812,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -655,9 +862,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsEvaluateOnSpecification()
         {
             var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
             var key = fixture.Create<string>();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -667,10 +872,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
                 .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
@@ -689,6 +913,922 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
 
             specificationMock.AssertWasCalled(m => m.Evaluate());
+        }
+
+        /// <summary>
+        /// Test that Execute calls FoodGroupGetByForeignKey to get the food group on the repository which can access system data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsFoodGroupGetByForeignKeyForKeyOnSystemDataRepository()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            systemDataRepositoryMock.AssertWasCalled(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Equal(dataProviderMock), Arg<string>.Is.Equal(importFoodGroupFromDataProviderCommand.Key)));
+        }
+
+        /// <summary>
+        /// Test that Execute calls Insert on the repository which can access system data for the food waste domain when a food group for the key does not exist.
+        /// </summary>
+        [Test]
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestThatExecuteCallsInsertOnSystemDataRepositoryWhenFoodGroupForKeyDoesNotExist(bool hasParent)
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var parentKey = fixture.Create<string>();
+            var parentFoodGroup = DomainObjectMockBuilder.BuildFoodGroupMock();
+            var isActive = fixture.Create<bool>();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(parentKey)))
+                .Return(parentFoodGroup)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var foodGroup = (IFoodGroup) e.Arguments.ElementAt(0);
+                    Assert.That(foodGroup, Is.Not.Null);
+                    Assert.That(foodGroup.Identifier, Is.Null);
+                    Assert.That(foodGroup.Identifier.HasValue, Is.False);
+                    Assert.That(foodGroup.IsActive, Is.EqualTo(isActive));
+                    if (hasParent)
+                    {
+                        Assert.That(foodGroup.Parent, Is.Not.Null);
+                        Assert.That(foodGroup.Parent, Is.EqualTo(parentFoodGroup));
+                    }
+                    else
+                    {
+                        Assert.That(foodGroup.Parent, Is.Null);
+                    }
+                })
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0)))
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = isActive,
+                ParentKey = hasParent ? parentKey : null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            systemDataRepositoryMock.AssertWasCalled(m => m.Insert(Arg<IFoodGroup>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Test that Execute calls ForeignKeyAdd on the logic exeuctor when a food group for the key does not exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsForeignKeyAddOnLogicExecutorWhenFoodGroupForKeyDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            var insertedFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<Translation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(insertedFoodGroupMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var foreignKey = (IForeignKey) e.Arguments.ElementAt(0);
+                    Assert.That(foreignKey, Is.Not.Null);
+                    Assert.That(foreignKey.Identifier, Is.Null);
+                    Assert.That(foreignKey.Identifier.HasValue, Is.False);
+                    Assert.That(foreignKey.DataProvider, Is.Not.Null);
+                    Assert.That(foreignKey.DataProvider, Is.EqualTo(dataProviderMock));
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(foreignKey.ForeignKeyForIdentifier, Is.EqualTo(insertedFoodGroupMock.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(foreignKey.ForeignKeyForTypes, Is.Not.Null);
+                    Assert.That(foreignKey.ForeignKeyForTypes, Is.Not.Empty);
+                    Assert.That(foreignKey.ForeignKeyForTypes.Contains(typeof (IFoodGroup)), Is.True);
+                    Assert.That(foreignKey.ForeignKeyValue, Is.Not.Null);
+                    Assert.That(foreignKey.ForeignKeyValue, Is.Not.Empty);
+                    Assert.That(foreignKey.ForeignKeyValue, Is.EqualTo(key));
+                })
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            logicExecutor.AssertWasCalled(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Test that Execute calls TranslationAdd on the logic exeuctor when a food group for the key does not exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsTranslationAddOnLogicExecutorWhenFoodGroupForKeyDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var insertedFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(insertedFoodGroupMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var name = fixture.Create<string>();
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var translation = (ITranslation) e.Arguments.ElementAt(0);
+                    Assert.That(translation, Is.Not.Null);
+                    Assert.That(translation.Identifier, Is.Null);
+                    Assert.That(translation.Identifier.HasValue, Is.False);
+                    Assert.That(translation.TranslationInfo, Is.Not.Null);
+                    Assert.That(translation.TranslationInfo, Is.EqualTo(translationInfoMock));
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(translation.TranslationOfIdentifier, Is.EqualTo(insertedFoodGroupMock.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(translation.Value, Is.Not.Null);
+                    Assert.That(translation.Value, Is.Not.Empty);
+                    Assert.That(translation.Value, Is.EqualTo(name));
+                })
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = name,
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            logicExecutor.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Test that Execute calls Map for the inserted food group on the object mapper for the food waste domain when a food group for the key does not exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsMapForInsertedFoodGroupOnFoodWasteObjectMapperWhenFoodGroupForKeyDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var insertedFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(insertedFoodGroupMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(insertedFoodGroupMock), Arg<CultureInfo>.Is.Null));
+        }
+
+        /// <summary>
+        /// Test that Execute returns the service receipt created by Map for the inserted food group on the object mapper for the food waste domain when a food group for the key does not exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteReturnsServiceReceiptFromMapOnFoodWasteObjectMapperWhenFoodGroupForKeyDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(serviceReceipt)
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            var result = importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(serviceReceipt));
+        }
+
+        /// <summary>
+        /// Test that Execute sets the value for IsActive with the value from the command when a food group for the key does exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteSetsIsActiveWithIsActiveFromCommandWhenFoodGroupForKeyDoesExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(foodGroupMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            foodGroupMock.AssertWasCalled(m => m.IsActive = Arg<bool>.Is.Equal(importFoodGroupFromDataProviderCommand.IsActive));
+        }
+
+        /// <summary>
+        /// Test that Execute sets the value for Parent when a food group for the key does exist.
+        /// </summary>
+        [Test]
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestThatExecuteSetsParentWhenFoodGroupForKeyDoesExist(bool hasParent)
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var parentKey = fixture.Create<string>();
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0));
+            var parentFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(foodGroupMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(parentKey)))
+                .Return(parentFoodGroupMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = hasParent ? parentKey : null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            foodGroupMock.AssertWasCalled(m => m.Parent = Arg<IFoodGroup>.Is.Equal(hasParent ? parentFoodGroupMock : null));
+        }
+
+        /// <summary>
+        /// Test that Execute calls Update on the repository which can access system data for the food waste domain when a food group for the key does exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsUpdateOnSystemDataRepositoryWhenFoodGroupForKeyDoesExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(foodGroupMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            systemDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<IFoodGroup>.Is.Equal(foodGroupMock)));
+        }
+
+        /// <summary>
+        /// Test that Execute calls TranslationAdd on the logic exeuctor when a food group for the key does exist and it does not have the translation in the command.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsTranslationAddOnLogicExecutorWhenFoodGroupForKeyDoesExistAndFoodGroupForKeyDoesNotHaveTranslationInCommand()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var updatedFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(updatedFoodGroupMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var name = fixture.Create<string>();
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var translation = (ITranslation) e.Arguments.ElementAt(0);
+                    Assert.That(translation, Is.Not.Null);
+                    Assert.That(translation.Identifier, Is.Null);
+                    Assert.That(translation.Identifier.HasValue, Is.False);
+                    Assert.That(translation.TranslationInfo, Is.Not.Null);
+                    Assert.That(translation.TranslationInfo, Is.EqualTo(translationInfoMock));
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(translation.TranslationOfIdentifier, Is.EqualTo(updatedFoodGroupMock.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(translation.Value, Is.Not.Null);
+                    Assert.That(translation.Value, Is.Not.Empty);
+                    Assert.That(translation.Value, Is.EqualTo(name));
+                })
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = name,
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            logicExecutor.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Test that Execute set the value for Value on the translation when a food group for the key does exist and it have the translation in the command.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteSetsValueOnTranslationWhenFoodGroupForKeyDoesExistAndFoodGroupForKeyDoesHaveTranslationInCommand()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var updatedFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            var translationMock = updatedFoodGroupMock.Translations.First();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationMock.TranslationInfo)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(updatedFoodGroupMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationModify(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            translationMock.AssertWasCalled(m => m.Value = Arg<string>.Is.Equal(importFoodGroupFromDataProviderCommand.Name));
+        }
+
+        /// <summary>
+        /// Test that Execute calls TranslationModify on the logic exeuctor when a food group for the key does exist and it have the translation in the command.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsTranslationModifyOnLogicExecutorWhenFoodGroupForKeyDoesExistAndFoodGroupForKeyDoesHaveTranslationInCommand()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var updatedFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            var translationMock = updatedFoodGroupMock.Translations.First();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationMock.TranslationInfo)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(updatedFoodGroupMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationModify(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            logicExecutor.AssertWasCalled(m => m.TranslationModify(Arg<ITranslation>.Is.Equal(translationMock)));
+        }
+
+        /// <summary>
+        /// Test that Execute calls Map for the updated food group on the object mapper for the food waste domain when a food group for the key does exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsMapForUpdatedFoodGroupOnFoodWasteObjectMapperWhenFoodGroupForKeyDoesExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var updatedFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(updatedFoodGroupMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+
+            foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(updatedFoodGroupMock), Arg<CultureInfo>.Is.Null));
+        }
+
+        /// <summary>
+        /// Test that Execute returns the service receipt created by Map for the updated food group on the object mapper for the food waste domain when a food group for the key does exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteReturnsServiceReceiptFromMapOnFoodWasteObjectMapperWhenFoodGroupForKeyDoesExist()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var key = fixture.Create<string>();
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Equal(key)))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Update(Arg<IFoodGroup>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock(translations: new List<ITranslation>(0)))
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            foodWasteObjectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(serviceReceipt)
+                .Repeat.Any();
+
+            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+
+            var importFoodGroupFromDataProviderCommand = new ImportFoodGroupFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = key,
+                Name = fixture.Create<string>(),
+                IsActive = fixture.Create<bool>(),
+                ParentKey = null
+            };
+
+            var result = importFoodGroupFromDataProviderCommandHandler.Execute(importFoodGroupFromDataProviderCommand);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(serviceReceipt));
         }
 
         /// <summary>

@@ -156,7 +156,7 @@
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyDeleteCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyModifyCommandTests.cs" />
-    <Compile Include="Unittests\Contracts\Commands\ImportFoodGroupFromDataProviderCommandTests.cs" />
+    <Compile Include="Unittests\Contracts\Commands\FoodGroupImportFromDataProviderCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationDeleteCommandTest.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationModifyCommandTests.cs" />

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -16,7 +18,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
     /// <summary>
     /// Command handler which handles a command for importing a food group from a given data provider.
     /// </summary>
-    public class ImportFoodGroupFromDataProviderCommandHandler : FoodWasteSystemDataCommandHandlerBase, ICommandHandler<ImportFoodGroupFromDataProviderCommand, ServiceReceiptResponse>
+    public class ImportFoodGroupFromDataProviderCommandHandler : FoodWasteSystemDataCommandHandlerBase, ICommandHandler<FoodGroupImportFromDataProviderCommand, ServiceReceiptResponse>
     {
         #region Private variables
 
@@ -46,12 +48,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
 
         #endregion
 
+        #region Methods
+
         /// <summary>
         /// Executes the command which handles a command for importing a food group from a given data provider.
         /// </summary>
         /// <param name="command">Command which imports a food group from a given data provider.</param>
         /// <returns>Service receipt.</returns>
-        public virtual ServiceReceiptResponse Execute(ImportFoodGroupFromDataProviderCommand command)
+        public virtual ServiceReceiptResponse Execute(FoodGroupImportFromDataProviderCommand command)
         {
             if (command == null)
             {
@@ -77,7 +81,28 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .IsSatisfiedBy(() => string.IsNullOrWhiteSpace(parentKey) == false && CommonValidations.IsNotNull(parentFoodGroup), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, parentKey, "ParentKey")))
                 .Evaluate();
 
-            return null;
+            var foodGroup = SystemDataRepository.FoodGroupGetByForeignKey(dataProvider, command.Key);
+            if (foodGroup == null)
+            {
+                var insertedfoodGroup = SystemDataRepository.Insert<IFoodGroup>(new FoodGroup {IsActive = true, Parent = parentFoodGroup});
+
+                var foreignKey = new ForeignKey(dataProvider, insertedfoodGroup.Identifier.HasValue ? insertedfoodGroup.Identifier.Value : default(Guid), insertedfoodGroup.GetType(), command.Key);
+                foreignKey.Identifier = _logicExecutor.ForeignKeyAdd(foreignKey);
+                insertedfoodGroup.ForeignKeyAdd(foreignKey);
+
+                ImportTranslation(insertedfoodGroup, translationInfo, command.Name);
+
+                return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(insertedfoodGroup);
+            }
+
+            foodGroup.IsActive = command.IsActive;
+            foodGroup.Parent = parentFoodGroup;
+
+            var updatedFoodGroup = SystemDataRepository.Update(foodGroup);
+
+            ImportTranslation(updatedFoodGroup, translationInfo, command.Name);
+
+            return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(updatedFoodGroup);
         }
 
         /// <summary>
@@ -85,7 +110,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// </summary>
         /// <param name="command">Command which imports a food group from a given data provider.</param>
         /// <param name="exception">Exception.</param>
-        public virtual void HandleException(ImportFoodGroupFromDataProviderCommand command, Exception exception)
+        public virtual void HandleException(FoodGroupImportFromDataProviderCommand command, Exception exception)
         {
             if (command == null)
             {
@@ -101,5 +126,41 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             }
             throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, command.GetType().Name, typeof (ServiceReceiptResponse).Name, exception.Message), exception);
         }
+
+        /// <summary>
+        /// Imports a given translation for the food group.
+        /// </summary>
+        /// <param name="foodGroup">Food group for which to import the translation.</param>
+        /// <param name="translationInfo">Translation informations for the translation to import.</param>
+        /// <param name="value">The translation value for the food group.</param>
+        private void ImportTranslation(IFoodGroup foodGroup, ITranslationInfo translationInfo, string value)
+        {
+            if (foodGroup == null)
+            {
+                throw new ArgumentNullException("foodGroup");
+            }
+            if (translationInfo == null)
+            {
+                throw new ArgumentNullException("translationInfo");
+            }
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException("value");
+            }
+            var foodGroupIdentifier = foodGroup.Identifier.HasValue ? foodGroup.Identifier.Value : default(Guid);
+            var translationInfoIdentifier = translationInfo.Identifier.HasValue ? translationInfo.Identifier.Value : default(Guid);
+            var translation = foodGroup.Translations.SingleOrDefault(m => m.TranslationOfIdentifier == foodGroupIdentifier && m.TranslationInfo.Identifier == translationInfoIdentifier);
+            if (translation == null)
+            {
+                translation = new Translation(foodGroupIdentifier, translationInfo, value);
+                translation.Identifier = _logicExecutor.TranslationAdd(translation);
+                foodGroup.TranslationAdd(translation);
+                return;
+            }
+            translation.Value = value;
+            translation.Identifier = _logicExecutor.TranslationModify(translation);
+        }
+
+        #endregion
     }
 }
