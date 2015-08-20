@@ -70,7 +70,7 @@
     <Compile Include="ForeignKeyAddCommandHandler.cs" />
     <Compile Include="ForeignKeyDeleteCommandHandler.cs" />
     <Compile Include="ForeignKeyModifyCommandHandler.cs" />
-    <Compile Include="ImportFoodGroupFromDataProviderCommandHandler.cs" />
+    <Compile Include="FoodGroupImportFromDataProviderCommandHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TranslationAddCommandHandler.cs" />
     <Compile Include="TranslationDeleteCommandHandler.cs" />

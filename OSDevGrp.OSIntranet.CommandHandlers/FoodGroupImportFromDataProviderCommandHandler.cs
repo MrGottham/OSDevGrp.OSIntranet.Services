@@ -18,7 +18,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
     /// <summary>
     /// Command handler which handles a command for importing a food group from a given data provider.
     /// </summary>
-    public class ImportFoodGroupFromDataProviderCommandHandler : FoodWasteSystemDataCommandHandlerBase, ICommandHandler<FoodGroupImportFromDataProviderCommand, ServiceReceiptResponse>
+    public class FoodGroupImportFromDataProviderCommandHandler : FoodWasteSystemDataCommandHandlerBase, ICommandHandler<FoodGroupImportFromDataProviderCommand, ServiceReceiptResponse>
     {
         #region Private variables
 
@@ -36,7 +36,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="specification">Implementation of a specification which encapsulates validation rules.</param>
         /// <param name="commonValidations">Implementation of the common validations.</param>
         /// <param name="logicExecutor">Implementation of the logic executor which can execute basic logic.</param>
-        public ImportFoodGroupFromDataProviderCommandHandler(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, ILogicExecutor logicExecutor)
+        public FoodGroupImportFromDataProviderCommandHandler(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, ILogicExecutor logicExecutor)
             : base(systemDataRepository, foodWasteObjectMapper, specification, commonValidations)
         {
             if (logicExecutor == null)

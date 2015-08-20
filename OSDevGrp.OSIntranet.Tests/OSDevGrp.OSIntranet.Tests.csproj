@@ -147,7 +147,7 @@
     <Compile Include="Unittests\CommandHandlers\ForeignKeyAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyModifyCommandHandlerTests.cs" />
-    <Compile Include="Unittests\CommandHandlers\ImportFoodGroupFromDataProviderCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\FoodGroupImportFromDataProviderCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationModifyCommandHandlerTests.cs" />

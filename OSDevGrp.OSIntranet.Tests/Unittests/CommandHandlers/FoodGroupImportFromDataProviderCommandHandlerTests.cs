@@ -25,13 +25,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
     /// Tests the command handler which handles a command for importing a food group from a given data provider.
     /// </summary>
     [TestFixture]
-    public class ImportFoodGroupFromDataProviderCommandHandlerTests
+    public class FoodGroupImportFromDataProviderCommandHandlerTests
     {
         /// <summary>
         /// Tests that the constructor initialize a command handler which handles a command for importing a food group from a given data provider.
         /// </summary>
         [Test]
-        public void TestThatConstructorInitializeImportFoodGroupFromDataProviderCommandHandler()
+        public void TestThatConstructorInitializeFoodGroupImportFromDataProviderCommandHandler()
         {
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
@@ -39,8 +39,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() =>  new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -74,10 +74,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => importFoodGroupFromDataProviderCommandHandler.Execute(null));
+            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupImportFromDataProviderCommandHandler.Execute(null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -127,8 +127,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -140,7 +140,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             systemDataRepositoryMock.AssertWasCalled(m => m.Get<IDataProvider>(Arg<Guid>.Is.Equal(foodGroupImportFromDataProviderCommand.DataProviderIdentifier)));
         }
@@ -187,8 +187,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -200,7 +200,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             systemDataRepositoryMock.AssertWasCalled(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Equal(foodGroupImportFromDataProviderCommand.TranslationInfoIdentifier)));
         }
@@ -250,8 +250,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -263,7 +263,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = noValue
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             systemDataRepositoryMock.AssertWasNotCalled(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Equal(dataProviderMock), Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.ParentKey)));
         }
@@ -315,8 +315,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -328,7 +328,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = parentKey
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             systemDataRepositoryMock.AssertWasCalled(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Equal(dataProviderMock), Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.ParentKey)));
         }
@@ -381,8 +381,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -394,7 +394,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             commonValidationsMock.AssertWasCalled(m => m.IsNotNull(Arg<IDataProvider>.Is.Equal(dataProviderMock)));
         }
@@ -447,8 +447,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -460,7 +460,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             commonValidationsMock.AssertWasCalled(m => m.IsNotNull(Arg<ITranslation>.Is.Equal(translationInfoMock)));
         }
@@ -512,8 +512,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -525,7 +525,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             commonValidationsMock.AssertWasCalled(m => m.HasValue(Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.Key)));
         }
@@ -577,8 +577,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -590,7 +590,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             commonValidationsMock.AssertWasCalled(m => m.ContainsIllegalChar(Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.Key)));
         }
@@ -642,8 +642,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -655,7 +655,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             commonValidationsMock.AssertWasCalled(m => m.HasValue(Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.Name)));
         }
@@ -707,8 +707,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -720,7 +720,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             commonValidationsMock.AssertWasCalled(m => m.ContainsIllegalChar(Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.Name)));
         }
@@ -777,8 +777,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -790,7 +790,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = parentKey
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             commonValidationsMock.AssertWasCalled(m => m.IsNotNull(Arg<IFoodGroup>.Is.Equal(parentFoodGroup)));
         }
@@ -837,8 +837,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -850,7 +850,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(7));
         }
@@ -897,8 +897,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -910,7 +910,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             specificationMock.AssertWasCalled(m => m.Evaluate());
         }
@@ -958,8 +958,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -971,7 +971,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             systemDataRepositoryMock.AssertWasCalled(m => m.FoodGroupGetByForeignKey(Arg<IDataProvider>.Is.Equal(dataProviderMock), Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.Key)));
         }
@@ -1043,8 +1043,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1056,7 +1056,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = hasParent ? parentKey : null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             systemDataRepositoryMock.AssertWasCalled(m => m.Insert(Arg<IFoodGroup>.Is.NotNull));
         }
@@ -1123,8 +1123,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1136,7 +1136,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             logicExecutor.AssertWasCalled(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull));
         }
@@ -1201,8 +1201,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1214,7 +1214,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             logicExecutor.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
         }
@@ -1262,8 +1262,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1275,7 +1275,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(insertedFoodGroupMock), Arg<CultureInfo>.Is.Null));
         }
@@ -1323,8 +1323,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1336,7 +1336,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            var result = importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            var result = foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(serviceReceipt));
         }
@@ -1381,8 +1381,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1394,7 +1394,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             foodGroupMock.AssertWasCalled(m => m.IsActive = Arg<bool>.Is.Equal(foodGroupImportFromDataProviderCommand.IsActive));
         }
@@ -1446,8 +1446,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1459,7 +1459,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = hasParent ? parentKey : null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             foodGroupMock.AssertWasCalled(m => m.Parent = Arg<IFoodGroup>.Is.Equal(hasParent ? parentFoodGroupMock : null));
         }
@@ -1504,8 +1504,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1517,7 +1517,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             systemDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<IFoodGroup>.Is.Equal(foodGroupMock)));
         }
@@ -1579,8 +1579,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1592,7 +1592,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             logicExecutor.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
         }
@@ -1638,8 +1638,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1651,7 +1651,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             translationMock.AssertWasCalled(m => m.Value = Arg<string>.Is.Equal(foodGroupImportFromDataProviderCommand.Name));
         }
@@ -1697,8 +1697,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1710,7 +1710,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             logicExecutor.AssertWasCalled(m => m.TranslationModify(Arg<ITranslation>.Is.Equal(translationMock)));
         }
@@ -1755,8 +1755,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1768,7 +1768,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
 
             foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(updatedFoodGroupMock), Arg<CultureInfo>.Is.Null));
         }
@@ -1813,8 +1813,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var foodGroupImportFromDataProviderCommand = new FoodGroupImportFromDataProviderCommand
             {
@@ -1826,7 +1826,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 ParentKey = null
             };
 
-            var result = importFoodGroupFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
+            var result = foodGroupImportFromDataProviderCommandHandler.Execute(foodGroupImportFromDataProviderCommand);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(serviceReceipt));
         }
@@ -1844,10 +1844,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => importFoodGroupFromDataProviderCommandHandler.HandleException(null, fixture.Create<Exception>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupImportFromDataProviderCommandHandler.HandleException(null, fixture.Create<Exception>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -1868,10 +1868,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => importFoodGroupFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), null));
+            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -1892,12 +1892,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<IntranetRepositoryException>();
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => importFoodGroupFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception, Is.EqualTo(incomingException));
         }
@@ -1915,12 +1915,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<IntranetBusinessException>();
 
-            var exception = Assert.Throws<IntranetBusinessException>(() => importFoodGroupFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetBusinessException>(() => foodGroupImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception, Is.EqualTo(incomingException));
         }
@@ -1938,12 +1938,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<IntranetSystemException>();
 
-            var exception = Assert.Throws<IntranetSystemException>(() => importFoodGroupFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetSystemException>(() => foodGroupImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception, Is.EqualTo(incomingException));
         }
@@ -1961,12 +1961,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var importFoodGroupFromDataProviderCommandHandler = new ImportFoodGroupFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(importFoodGroupFromDataProviderCommandHandler, Is.Not.Null);
+            var foodGroupImportFromDataProviderCommandHandler = new FoodGroupImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodGroupImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var incomingException = fixture.Create<Exception>();
 
-            var exception = Assert.Throws<IntranetSystemException>(() => importFoodGroupFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
+            var exception = Assert.Throws<IntranetSystemException>(() => foodGroupImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodGroupImportFromDataProviderCommand>(), incomingException));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
