@@ -32,6 +32,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 Assert.That(dataProvider, Is.Not.Null);
             }
 
+            /// <summary>
+            /// Mapper relationer.
+            /// </summary>
+            /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
+            public void MapRelations(IDataProviderBase dataProvider)
+            {
+                Assert.That(dataProvider, Is.Not.Null);
+            }
+
             #endregion
         }
 

@@ -252,6 +252,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             _dataProvider = dataProvider;
         }
 
+        /// <summary>
+        /// Maps relations.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        public virtual void MapRelations(IDataProviderBase dataProvider)
+        {
+        }
+
         #endregion
     }
 }

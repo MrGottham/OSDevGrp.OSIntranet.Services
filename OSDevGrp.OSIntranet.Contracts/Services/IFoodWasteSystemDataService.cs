@@ -15,6 +15,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteSystemDataService : IIntranetService
     {
         /// <summary>
+        /// Imports a food group from a given data provider.
+        /// </summary>
+        /// <param name="command">Command for importing a food group from a given data provider.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse FoodGroupImportFromDataProvider(FoodGroupImportFromDataProviderCommand command);
+
+        /// <summary>
         /// Adds a dataproviders foreign key to a given domain object in the food waste domain.
         /// </summary>
         /// <param name="command">Command for adding a dataproviders foreign key to a given domain object in the food waste domain.</param>

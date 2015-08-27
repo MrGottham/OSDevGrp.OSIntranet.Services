@@ -187,6 +187,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             _dataProvider = dataProvider;
         }
 
+        /// <summary>
+        /// Mapper relationer til en kalenderaftale.
+        /// </summary>
+        /// <param name="dataProviderBase">Dataprovider.</param>
+        public virtual void MapRelations(IDataProviderBase dataProviderBase)
+        {
+        }
+
         #endregion
 
         #region ILazyLoadable Members

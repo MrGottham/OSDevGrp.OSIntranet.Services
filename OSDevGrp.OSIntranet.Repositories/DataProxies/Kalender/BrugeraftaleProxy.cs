@@ -107,7 +107,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
 
         #endregion
 
-
         #region IMySqlDataProxy<IBrugeraftale> Members
 
         /// <summary>
@@ -142,7 +141,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         public virtual string GetSqlCommandForInsert()
         {
             return string.Format("INSERT INTO Calmerge (SystemNo,CalId,UserId,Properties) VALUES({0},{1},{2},{3})", System.Nummer, Aftale.Id, Bruger.Id, Properties);
-
         }
 
         /// <summary>
@@ -197,6 +195,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             DataIsLoaded = true;
 
             _dataProvider = dataProvider;
+        }
+
+        /// <summary>
+        /// Mapning af relationer til en brugers kalenderaftale.
+        /// </summary>
+        /// <param name="dataProvider">Dataprovider.</param>
+        public virtual void MapRelations(IDataProviderBase dataProvider)
+        {
         }
 
         #endregion

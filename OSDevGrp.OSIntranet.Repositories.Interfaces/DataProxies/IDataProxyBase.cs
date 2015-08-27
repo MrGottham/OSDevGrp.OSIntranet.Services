@@ -13,5 +13,11 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies
         /// <param name="dataReader">Data reader for data provideren.</param>
         /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
         void MapData(object dataReader, IDataProviderBase dataProvider);
+
+        /// <summary>
+        /// Mapper ata proxyens relationer.
+        /// </summary>
+        /// <param name="dataProvider">Data provider, hvorfra data kan mappes.</param>
+        void MapRelations(IDataProviderBase dataProvider);
     }
 }

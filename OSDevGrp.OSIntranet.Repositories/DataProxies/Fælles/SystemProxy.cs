@@ -133,6 +133,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
             DataIsLoaded = true;
         }
 
+        /// <summary>
+        /// Mappper relationer til et system under OSWEBDB.
+        /// </summary>
+        /// <param name="dataProvider">Dataprovider.</param>
+        public virtual void MapRelations(IDataProviderBase dataProvider)
+        {
+        }
+
         #endregion
 
         #region ILazyLoadable Members

@@ -32,6 +32,22 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tests that FoodGroupImportFromDataProvider imports food groups from the data provider.
+        /// </summary>
+        [Test]
+        public void TestThatFoodGroupImportFromDataProviderImportsFoodGroups()
+        {
+            foreach (var command in TestHelpers.FoodGroupImportFromDataProviderCommands)
+            {
+                var result = _foodWasteSystemDataService.FoodGroupImportFromDataProvider(command);
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Identifier, Is.Not.EqualTo(default(Guid)));
+                Assert.That(result.Identifier, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(result.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+            }
+        }
+
+        /// <summary>
         /// Tests that DataProviderGetAll gets all the data providers.
         /// </summary>
         [Test]

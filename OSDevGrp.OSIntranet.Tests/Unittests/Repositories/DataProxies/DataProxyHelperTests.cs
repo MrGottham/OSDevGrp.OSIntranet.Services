@@ -61,8 +61,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             /// Mapper data fra data reader til data proxy.
             /// </summary>
             /// <param name="dataReader">Data reader.</param>
-            /// <param name="dataProvider">Data proxy.</param>
+            /// <param name="dataProvider">Data provider.</param>
             public void MapData(object dataReader, IDataProviderBase dataProvider)
+            {
+            }
+
+            /// <summary>
+            /// Mapper relationer til en data proxy.
+            /// </summary>
+            /// <param name="dataProvider">Data provider.</param>
+            public void MapRelations(IDataProviderBase dataProvider)
             {
             }
 

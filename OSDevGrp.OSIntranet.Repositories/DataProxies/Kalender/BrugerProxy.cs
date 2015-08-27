@@ -140,7 +140,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         #region IDataProxyBase Members
 
         /// <summary>
-        /// Mapper data for en bruer.
+        /// Mapper data for en bruger.
         /// </summary>
         /// <param name="dataReader">Datareader.</param>
         /// <param name="dataProvider">Dataprovider.</param>
@@ -170,6 +170,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             DataIsLoaded = true;
 
             _dataProvider = dataProvider;
+        }
+
+        /// <summary>
+        /// Mapper relationer til en bruger.
+        /// </summary>
+        /// <param name="dataProvider">Dataprovider.</param>
+        public virtual void MapRelations(IDataProviderBase dataProvider)
+        {
         }
 
         #endregion

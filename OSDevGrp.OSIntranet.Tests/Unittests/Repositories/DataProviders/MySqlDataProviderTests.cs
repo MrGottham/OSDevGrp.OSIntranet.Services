@@ -62,6 +62,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 Title = mySqlReader.GetString("Title");
             }
 
+            /// <summary>
+            /// Mapper releationer.
+            /// </summary>
+            /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
+            public void MapRelations(IDataProviderBase dataProvider)
+            {
+            }
+
             #endregion
 
             #region IMySqlDataProxy<MyDataProxy> Members

@@ -78,7 +78,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.Key) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Key")))
                 .IsSatisfiedBy(() => CommonValidations.HasValue(command.Name), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")))
                 .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.Name) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Name")))
-                .IsSatisfiedBy(() => string.IsNullOrWhiteSpace(parentKey) == false && CommonValidations.IsNotNull(parentFoodGroup), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, parentKey, "ParentKey")))
+                .IsSatisfiedBy(() => string.IsNullOrWhiteSpace(parentKey) || (string.IsNullOrWhiteSpace(parentKey) == false && CommonValidations.IsNotNull(parentFoodGroup)), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, parentKey, "ParentKey")))
                 .Evaluate();
 
             var foodGroup = SystemDataRepository.FoodGroupGetByForeignKey(dataProvider, command.Key);

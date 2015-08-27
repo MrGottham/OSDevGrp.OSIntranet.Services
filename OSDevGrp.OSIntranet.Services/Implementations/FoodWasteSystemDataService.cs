@@ -63,6 +63,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Imports a food group from a given data provider.
+        /// </summary>
+        /// <param name="command">Command for importing a food group from a given data provider.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse FoodGroupImportFromDataProvider(FoodGroupImportFromDataProviderCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<FoodGroupImportFromDataProviderCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Adds a dataproviders foreign key to a given domain object in the food waste domain.
         /// </summary>
         /// <param name="command">Command for adding a dataproviders foreign key to a given domain object in the food waste domain.</param>

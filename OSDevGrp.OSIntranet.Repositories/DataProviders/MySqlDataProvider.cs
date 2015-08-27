@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
+using System.Transactions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
@@ -16,12 +18,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
     {
         #region Private variables
 
-        private readonly ConnectionStringSettings _connectionStringSettings;
         private readonly MySqlConnection _mySqlConnection;
+        private readonly bool _clonedWithinTransaction;
 
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         /// <summary>
         /// Danner en data provider, som benytter MySql.
@@ -33,8 +35,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 throw new ArgumentNullException("connectionStringSettings");
             }
-            _connectionStringSettings = connectionStringSettings;
-            _mySqlConnection = new MySqlConnection(_connectionStringSettings.ConnectionString);
+            _mySqlConnection = new MySqlConnection(connectionStringSettings.ConnectionString);
+            _clonedWithinTransaction = false;
+        }
+
+        /// <summary>
+        /// Danner en data provider, som benytter MySql.
+        /// </summary>
+        /// <param name="mySqlConnection">Eksisterende MySql connection.</param>
+        /// <param name="clonedWithinTransaction">True, ved en igangværende transaktion ellers false.</param>
+        private MySqlDataProvider(MySqlConnection mySqlConnection, bool clonedWithinTransaction)
+        {
+            if (mySqlConnection == null)
+            {
+                throw new ArgumentNullException("mySqlConnection");
+            }
+            _mySqlConnection = mySqlConnection;
+            _clonedWithinTransaction = clonedWithinTransaction;
         }
 
         #endregion
@@ -46,6 +63,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// </summary>
         public override void Dispose()
         {
+            if (_clonedWithinTransaction)
+            {
+                return;
+            }
             _mySqlConnection.Dispose();
         }
 
@@ -55,7 +76,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <returns>Ny instans af data provideren til MSql.</returns>
         public override object Clone()
         {
-            return new MySqlDataProvider(_connectionStringSettings);
+            return Transaction.Current == null ? new MySqlDataProvider((MySqlConnection) _mySqlConnection.Clone(), false) : new MySqlDataProvider(_mySqlConnection, true);
         }
 
         /// <summary>
@@ -70,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 throw new ArgumentNullException("query");
             }
-            _mySqlConnection.Open();
+            Open();
             try
             {
                 var collection = new List<TDataProxy>();
@@ -92,7 +113,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             }
             finally
             {
-                _mySqlConnection.Close();
+                Close();
             }
         }
 
@@ -108,7 +129,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 throw new ArgumentNullException("queryForDataProxy");
             }
-            _mySqlConnection.Open();
+            Open();
             try
             {
                 var sqlQuery = ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).GetSqlQueryForId(queryForDataProxy);
@@ -120,10 +141,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                         if (!reader.HasRows)
                         {
                             reader.Close();
-                            throw new IntranetRepositoryException(
-                                Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
-                                                             queryForDataProxy.GetType().Name,
-                                                             ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).UniqueId));
+                            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, queryForDataProxy.GetType().Name, ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).UniqueId));
                         }
                         var dataProxy = new TDataProxy();
                         if (reader.Read())
@@ -137,7 +155,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             }
             finally
             {
-                _mySqlConnection.Close();
+                Close();
             }
         }
 
@@ -153,7 +171,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 throw new ArgumentNullException("dataProxy");
             }
-            _mySqlConnection.Open();
+            Open();
             try
             {
                 var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForInsert();
@@ -166,7 +184,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             }
             finally
             {
-                _mySqlConnection.Close();
+                Close();
             }
         }
 
@@ -182,7 +200,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 throw new ArgumentNullException("dataProxy");
             }
-            _mySqlConnection.Open();
+            Open();
             try
             {
                 var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForUpdate();
@@ -195,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             }
             finally
             {
-                _mySqlConnection.Close();
+                Close();
             }
         }
 
@@ -210,7 +228,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 throw new ArgumentNullException("dataProxy");
             }
-            _mySqlConnection.Open();
+            Open();
             try
             {
                 var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForDelete();
@@ -222,8 +240,32 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             }
             finally
             {
-                _mySqlConnection.Close();
+                Close();
             }
+        }
+
+        /// <summary>
+        /// Opens the MySQL connection when it's not cloned within a transaction scope.
+        /// </summary>
+        private void Open()
+        {
+            if (_clonedWithinTransaction && _mySqlConnection.State == ConnectionState.Open)
+            {
+                return;
+            }
+            _mySqlConnection.Open();
+        }
+
+        /// <summary>
+        /// Closed the MySQL connection when it's not cloned within a transaction scope.
+        /// </summary>
+        private void Close()
+        {
+            if (_clonedWithinTransaction)
+            {
+                return;
+            }
+            _mySqlConnection.Close();
         }
 
         #endregion
