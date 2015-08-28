@@ -29,6 +29,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// </summary>
         private class MyDataProxy : IMySqlDataProxy<MyDataProxy>
         {
+            #region Properties
+
             /// <summary>
             /// Systemnummer.
             /// </summary>
@@ -47,6 +49,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 private set;
             }
 
+            /// <summary>
+            /// Angivelse af, at MapData er blevet kaldt.
+            /// </summary>
+            public bool MapDataIsCalled
+            {
+                get; 
+                private set;
+            }
+
+            /// <summary>
+            /// Angivelse af, at MapRelations er blevet kaldt.
+            /// </summary>
+            public bool MapRelationsIsCalled
+            {
+                get; 
+                private set;
+            }
+
+            #endregion
+
             #region IDataProxyBase Members
 
             /// <summary>
@@ -60,6 +82,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
                 SystemNo = mySqlReader.GetInt32("SystemNo");
                 Title = mySqlReader.GetString("Title");
+
+                MapDataIsCalled = true;
             }
 
             /// <summary>
@@ -68,6 +92,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
             public void MapRelations(IDataProviderBase dataProvider)
             {
+                Assert.That(dataProvider, Is.Not.Null);
+
+                MapRelationsIsCalled = true;
             }
 
             #endregion
@@ -197,7 +224,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
                 var result = mySqlDataProvider.GetCollection<MyDataProxy>("SELECT SystemNo,Title FROM Systems ORDER BY SystemNo");
                 Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.GreaterThan(0));
+
+                var proxyCollection = result.ToList();
+                Assert.That(proxyCollection, Is.Not.Null);
+                Assert.That(proxyCollection.Count, Is.GreaterThan(0));
+
+                proxyCollection.ForEach(proxy =>
+                {
+                    Assert.That(proxy.MapDataIsCalled, Is.True);
+                    Assert.That(proxy.MapRelationsIsCalled, Is.True);
+                });
             }
         }
 
@@ -249,6 +285,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 Assert.That(result.SystemNo, Is.EqualTo(1));
                 Assert.That(result.Title, Is.Not.Null);
                 Assert.That(result.Title.Length, Is.GreaterThan(0));
+
+                Assert.That(result.MapDataIsCalled, Is.True);
+                Assert.That(result.MapRelationsIsCalled, Is.True);
             }
         }
 

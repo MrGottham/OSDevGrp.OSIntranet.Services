@@ -270,10 +270,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData maps data into the proxy.
+        /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataMapsDataIntoProxy()
+        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
         {
             var fixture = new Fixture();
 
@@ -353,6 +353,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.ForeignKeys, Is.Empty);
 
             foodGroupProxy.MapData(dataReader, dataProviderBaseMock);
+            foodGroupProxy.MapRelations(dataProviderBaseMock);
             Assert.That(foodGroupProxy, Is.Not.Null);
             Assert.That(foodGroupProxy.Identifier, Is.Not.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.True);
@@ -390,6 +391,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", dataReader.GetString("FoodGroupIdentifier")))));
             dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("FoodGroupIdentifier")))));
             dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", dataReader.GetString("FoodGroupIdentifier"))));
+        }
+
+        /// <summary>
+        /// Tests that MapRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+
+            var foodGroupProxy = new FoodGroupProxy();
+            Assert.That(foodGroupProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupProxy.MapRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
         }
     }
 }

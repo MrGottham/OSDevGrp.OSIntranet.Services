@@ -250,10 +250,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData maps data into the proxy.
+        /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataMapsDataIntoProxy()
+        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
         {
             var fixture = new Fixture();
             fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
@@ -274,6 +274,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationInfoProxy.CultureInfo, Is.Null);
 
             translationInfoProxy.MapData(dataReader, fixture.Create<IDataProviderBase>());
+            translationInfoProxy.MapRelations(fixture.Create<IDataProviderBase>());
             Assert.That(translationInfoProxy.Identifier, Is.Not.Null);
             Assert.That(translationInfoProxy.Identifier.HasValue, Is.True);
             // ReSharper disable PossibleInvalidOperationException
@@ -286,6 +287,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Null);
             Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Empty);
             Assert.That(translationInfoProxy.CultureInfo.Name, Is.EqualTo(dataReader.GetString("CultureName")));
+        }
+
+        /// <summary>
+        /// Tests that MapRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+
+            var translationInfoProxy = new TranslationInfoProxy();
+            Assert.That(translationInfoProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => translationInfoProxy.MapRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
         }
     }
 }

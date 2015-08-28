@@ -263,10 +263,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData maps data into the proxy.
+        /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataMapsDataIntoProxy()
+        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
         {
             var fixture = new Fixture();
 
@@ -315,6 +315,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foreignKeyProxy.ForeignKeyValue, Is.Null);
 
             foreignKeyProxy.MapData(dataReader, dataProviderBaseMock);
+            foreignKeyProxy.MapRelations(dataProviderBaseMock);
             Assert.That(foreignKeyProxy, Is.Not.Null);
             Assert.That(foreignKeyProxy.Identifier, Is.Not.Null);
             Assert.That(foreignKeyProxy.Identifier.HasValue, Is.True);
@@ -337,5 +338,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
             dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<DataProviderProxy>.Is.NotNull));
         }
+
+        /// <summary>
+        /// Tests that MapRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+
+            var foreignKeyProxy = new ForeignKeyProxy();
+            Assert.That(foreignKeyProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyProxy.MapRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
     }
 }

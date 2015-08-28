@@ -109,6 +109,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                         reader.Close();
                     }
                 }
+                collection.ForEach(proxy => proxy.MapRelations(this));
                 return collection;
             }
             finally
@@ -135,6 +136,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 var sqlQuery = ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).GetSqlQueryForId(queryForDataProxy);
                 using (var command = _mySqlConnection.CreateCommand())
                 {
+                    var dataHasBeenReaded = false;
+                    var dataProxy = new TDataProxy();
+                    // Execute the command and read the data.
                     command.CommandText = sqlQuery;
                     using (var reader = command.ExecuteReader())
                     {
@@ -143,14 +147,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                             reader.Close();
                             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, queryForDataProxy.GetType().Name, ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).UniqueId));
                         }
-                        var dataProxy = new TDataProxy();
                         if (reader.Read())
                         {
                             dataProxy.MapData(reader, this);
+                            dataHasBeenReaded = true;
                         }
                         reader.Close();
-                        return dataProxy;
                     }
+                    // When data has been readed then map the relations.
+                    if (dataHasBeenReaded)
+                    {
+                        dataProxy.MapRelations(this);
+                    }
+                    return dataProxy;
                 }
             }
             finally
