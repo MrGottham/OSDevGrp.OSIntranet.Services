@@ -14,7 +14,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         /// Tests that the query for getting a collection of data providers can be initialized.
         /// </summary>
         [Test]
-        public void TestThatTranslationInfoCollectionGetQueryCanBeInitialized()
+        public void TestThatDataProviderCollectionGetQueryCanBeInitialized()
         {
             var fixture = new Fixture();
             var dataProviderCollectionGetQuery = fixture.Create<DataProviderCollectionGetQuery>();
@@ -25,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         /// Tests that the query for getting a collection of data providers can be serialized.
         /// </summary>
         [Test]
-        public void TestThatTranslationInfoCollectionGetQueryCanBeSerialized()
+        public void TestThatDataProviderCollectionGetQueryCanBeSerialized()
         {
             var fixture = new Fixture();
             var dataProviderCollectionGetQuery = fixture.Create<DataProviderCollectionGetQuery>();

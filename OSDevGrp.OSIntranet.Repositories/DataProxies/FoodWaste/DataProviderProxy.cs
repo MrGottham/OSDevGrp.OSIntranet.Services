@@ -128,13 +128,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             Identifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
             Name = mySqlDataReader.GetString("Name");
             DataSourceStatementIdentifier = new Guid(mySqlDataReader.GetString("DataSourceStatementIdentifier"));
-
-            //var translationCollection = new List<ITranslation>();
-            //using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
-            //{
-            //    translationCollection.AddRange(subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(DataSourceStatementIdentifier)));
-            //}
-            //Translations = translationCollection;
         }
 
         /// <summary>
@@ -143,6 +136,17 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase dataProvider)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var translationCollection = new List<ITranslation>();
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                translationCollection.AddRange(subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(DataSourceStatementIdentifier)));
+            }
+            Translations = translationCollection;
         }
 
         #endregion

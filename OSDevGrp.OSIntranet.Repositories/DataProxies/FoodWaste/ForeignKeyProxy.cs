@@ -51,6 +51,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the identifier for the data provider.
+        /// </summary>
+        private Guid DataProviderIdentifier { get; set; }
+
+        #endregion
+
         #region IMySqlDataProxy<IForeignKey>
 
         /// <summary>
@@ -164,15 +173,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             ForeignKeyForTypes = foreignKeyForTypes;
 
-            var dataProviderIdentifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
-            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
-            {
-                var dataProviderProxy = new DataProviderProxy
-                {
-                    Identifier = dataProviderIdentifier
-                };
-                DataProvider = subDataProvider.Get(dataProviderProxy);
-            }
+            DataProviderIdentifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
         }
 
         /// <summary>
@@ -181,6 +182,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase dataProvider)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                var dataProviderProxy = new DataProviderProxy
+                {
+                    Identifier = DataProviderIdentifier
+                };
+                DataProvider = subDataProvider.Get(dataProviderProxy);
+            }
         }
 
         #endregion

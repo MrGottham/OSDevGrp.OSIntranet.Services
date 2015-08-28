@@ -43,6 +43,30 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that FoodGroupImportFromDataProvider imports food groups from the data provider.
+        /// </summary>
+        [Test]
+        public void TestThatFoodGroupImportFromDataProviderImportsFoodGroups()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                foreach (var command in TestHelpers.FoodGroupImportFromDataProviderCommands)
+                {
+                    var result = client.FoodGroupImportFromDataProvider(command);
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result.Identifier, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(result.Identifier, Is.Not.EqualTo(Guid.Empty));
+                    Assert.That(result.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that DataProviderGetAll gets all the data providers.
         /// </summary>
         [Test]

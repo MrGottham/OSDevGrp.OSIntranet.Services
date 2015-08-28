@@ -262,6 +262,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 return;
             }
+            if (_mySqlConnection.State == ConnectionState.Open)
+            {
+                return;
+            }
             _mySqlConnection.Open();
         }
 
