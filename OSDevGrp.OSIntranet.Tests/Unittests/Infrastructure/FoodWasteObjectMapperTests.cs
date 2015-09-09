@@ -13,6 +13,7 @@ using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
+using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
@@ -130,6 +131,98 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map calls Translate on the data provider for each foreign key when source is a domain object with foreign keys and the translation culture is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapCallsTranslateOnDataProviderForEachForeignKeyWhenSourceHasForeignKeysAndTranslationCultureIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProvider>(e => e.FromFactory(() =>
+            {
+                var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
+                dataProviderMock.Stub(m => m.Translation)
+                    .Return(null)
+                    .Repeat.Any();
+                return dataProviderMock;
+            }));
+            fixture.Customize<IForeignKey>(e => e.FromFactory(() =>
+            {
+                var foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
+                foreignKeyMock.Stub(m => m.DataProvider)
+                    .Return(fixture.Create<IDataProvider>())
+                    .Repeat.Any();
+                return foreignKeyMock;
+            }));
+
+            var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            foodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            foodGroupMock.Stub(m => m.ForeignKeys)
+                .Return(fixture.CreateMany<IForeignKey>(7).ToList())
+                .Repeat.Any();
+
+            var dataProviderMockCollection = foodGroupMock.ForeignKeys.Where(m => m.DataProvider != null).Select(m => m.DataProvider).ToList();
+            Assert.That(dataProviderMockCollection, Is.Not.Null);
+            Assert.That(dataProviderMockCollection, Is.Not.Empty);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            foodWasteObjectMapper.Map<IFoodGroup, object>(foodGroupMock);
+
+            dataProviderMockCollection.ForEach(dataProviderMock => dataProviderMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(Thread.CurrentThread.CurrentUICulture))));
+        }
+
+        /// <summary>
+        /// Tests that Map calls Translate on the data provider for each foreign key when source is a domain object with foreign keys and the translation culture is null.
+        /// </summary>
+        [Test]
+        [TestCase("da-DK")]
+        [TestCase("en-US")]
+        public void TestThatMapCallsTranslateOnDataProviderForEachForeignKeyWhenSourceHasForeignKeysAndTranslationCultureIsNotNull(string cultureName)
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProvider>(e => e.FromFactory(() =>
+            {
+                var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
+                dataProviderMock.Stub(m => m.Translation)
+                    .Return(null)
+                    .Repeat.Any();
+                return dataProviderMock;
+            }));
+            fixture.Customize<IForeignKey>(e => e.FromFactory(() =>
+            {
+                var foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
+                foreignKeyMock.Stub(m => m.DataProvider)
+                    .Return(fixture.Create<IDataProvider>())
+                    .Repeat.Any();
+                return foreignKeyMock;
+            }));
+
+            var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            foodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            foodGroupMock.Stub(m => m.ForeignKeys)
+                .Return(fixture.CreateMany<IForeignKey>(7).ToList())
+                .Repeat.Any();
+
+            var dataProviderMockCollection = foodGroupMock.ForeignKeys.Where(m => m.DataProvider != null).Select(m => m.DataProvider).ToList();
+            Assert.That(dataProviderMockCollection, Is.Not.Null);
+            Assert.That(dataProviderMockCollection, Is.Not.Empty);
+
+            var translationCulture = new CultureInfo(cultureName);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            foodWasteObjectMapper.Map<IFoodGroup, object>(foodGroupMock, translationCulture);
+
+            dataProviderMockCollection.ForEach(dataProviderMock => dataProviderMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture))));
+        }
+
+        /// <summary>
         /// Tests that Map calls Translate on each translatable domain object in source if source is a collection of translatable domain objects and the translation culture is null.
         /// </summary>
         [Test]
@@ -162,6 +255,97 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             foodWasteObjectMapper.Map<List<IFoodGroup>, IEnumerable<object>>(translatableMockCollection, translationCulture);
 
             translatableMockCollection.ForEach(m => m.AssertWasCalled(n => n.Translate(Arg<CultureInfo>.Is.Equal(translationCulture))));
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodGroup to FoodGroupIdentificationView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupToFoodGroupIdentificationView()
+        {
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupIdentificationView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupIdentificationView>(foodGroupMock);
+            Assert.That(foodGroupIdentificationView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodGroupIdentificationView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodGroupIdentificationView.Name, Is.Not.Null);
+            Assert.That(foodGroupIdentificationView.Name, Is.Not.Empty);
+            Assert.That(foodGroupIdentificationView.Name, Is.EqualTo(foodGroupMock.Translation.Value));
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodGroup to FoodGroupSystemView when parent is not null.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupSystemViewWhenParentIsNotNull()
+        {
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupSystemView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupSystemView>(foodGroupMock);
+            Assert.That(foodGroupSystemView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodGroupSystemView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodGroupSystemView.Name, Is.Not.Null);
+            Assert.That(foodGroupSystemView.Name, Is.Not.Empty);
+            Assert.That(foodGroupSystemView.Name, Is.EqualTo(foodGroupMock.Translation.Value));
+            Assert.That(foodGroupSystemView.IsActive, Is.EqualTo(foodGroupMock.IsActive));
+            Assert.That(foodGroupSystemView.Parent, Is.Not.Null);
+            Assert.That(foodGroupSystemView.Parent, Is.TypeOf<FoodGroupIdentificationView>());
+            Assert.That(foodGroupSystemView.Translations, Is.Not.Null);
+            Assert.That(foodGroupSystemView.Translations, Is.Not.Empty);
+            Assert.That(foodGroupSystemView.Translations, Is.TypeOf<List<TranslationSystemView>>());
+            Assert.That(foodGroupSystemView.Translations.Count(), Is.EqualTo(foodGroupMock.Translations.Count()));
+            Assert.That(foodGroupSystemView.ForeignKeys, Is.Not.Null);
+            Assert.That(foodGroupSystemView.ForeignKeys, Is.Not.Empty);
+            Assert.That(foodGroupSystemView.ForeignKeys, Is.TypeOf<List<ForeignKeySystemView>>());
+            Assert.That(foodGroupSystemView.ForeignKeys.Count(), Is.EqualTo(foodGroupMock.ForeignKeys.Count()));
+            Assert.That(foodGroupSystemView.Children, Is.Not.Null);
+            Assert.That(foodGroupSystemView.Children, Is.Empty);
+            Assert.That(foodGroupSystemView.Children, Is.TypeOf<List<FoodGroupSystemView>>());
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodGroup to FoodGroupSystemView when parent is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupSystemViewWhenParentIsNull()
+        {
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupSystemView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupSystemView>(foodGroupMock);
+            Assert.That(foodGroupSystemView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodGroupSystemView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodGroupSystemView.Name, Is.Not.Null);
+            Assert.That(foodGroupSystemView.Name, Is.Not.Empty);
+            Assert.That(foodGroupSystemView.Name, Is.EqualTo(foodGroupMock.Translation.Value));
+            Assert.That(foodGroupSystemView.IsActive, Is.EqualTo(foodGroupMock.IsActive));
+            Assert.That(foodGroupSystemView.Parent, Is.Null);
+            Assert.That(foodGroupSystemView.Translations, Is.Not.Null);
+            Assert.That(foodGroupSystemView.Translations, Is.Not.Empty);
+            Assert.That(foodGroupSystemView.Translations, Is.TypeOf<List<TranslationSystemView>>());
+            Assert.That(foodGroupSystemView.Translations.Count(), Is.EqualTo(foodGroupMock.Translations.Count()));
+            Assert.That(foodGroupSystemView.ForeignKeys, Is.Not.Null);
+            Assert.That(foodGroupSystemView.ForeignKeys, Is.Not.Empty);
+            Assert.That(foodGroupSystemView.ForeignKeys, Is.TypeOf<List<ForeignKeySystemView>>());
+            Assert.That(foodGroupSystemView.ForeignKeys.Count(), Is.EqualTo(foodGroupMock.ForeignKeys.Count()));
+            Assert.That(foodGroupSystemView.Children, Is.Not.Null);
+            Assert.That(foodGroupSystemView.Children, Is.Not.Empty);
+            Assert.That(foodGroupSystemView.Children, Is.TypeOf<List<FoodGroupSystemView>>());
+            Assert.That(foodGroupSystemView.Children.Count(), Is.EqualTo(foodGroupMock.Children.Count()));
         }
 
         /// <summary>
@@ -208,6 +392,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                 Assert.That(foreignKey, Is.Not.Null);
                 Assert.That(foreignKey, Is.TypeOf<ForeignKeyProxy>());
             }
+        }
+
+        /// <summary>
+        /// Tests that Map maps ForeignKey to ForeignKeyView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsForeignKeyToForeignKeyView()
+        {
+            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof(IFoodGroup));
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foreignKeyView = foodWasteObjectMapper.Map<IForeignKey, ForeignKeyView>(foreignKeyMock);
+            Assert.That(foreignKeyView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foreignKeyView.ForeignKeyIdentifier, Is.EqualTo(foreignKeyMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foreignKeyView.DataProvider, Is.Not.Null);
+            Assert.That(foreignKeyView.DataProvider, Is.TypeOf<DataProviderView>());
+            Assert.That(foreignKeyView.ForeignKeyForIdentifier, Is.EqualTo(foreignKeyMock.ForeignKeyForIdentifier));
+            Assert.That(foreignKeyView.ForeignKey, Is.Not.Null);
+            Assert.That(foreignKeyView.ForeignKey, Is.Not.Empty);
+            Assert.That(foreignKeyView.ForeignKey, Is.EqualTo(foreignKeyMock.ForeignKeyValue));
+        }
+
+        /// <summary>
+        /// Tests that Map maps ForeignKey to ForeignKeySystemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsForeignKeyToForeignKeySystemView()
+        {
+            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof (IFoodGroup));
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foreignKeySystemView = foodWasteObjectMapper.Map<IForeignKey, ForeignKeySystemView>(foreignKeyMock);
+            Assert.That(foreignKeySystemView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foreignKeySystemView.ForeignKeyIdentifier, Is.EqualTo(foreignKeyMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foreignKeySystemView.DataProvider, Is.Not.Null);
+            Assert.That(foreignKeySystemView.DataProvider, Is.TypeOf<DataProviderSystemView>());
+            Assert.That(foreignKeySystemView.ForeignKeyForIdentifier, Is.EqualTo(foreignKeyMock.ForeignKeyForIdentifier));
+            Assert.That(foreignKeySystemView.ForeignKey, Is.Not.Null);
+            Assert.That(foreignKeySystemView.ForeignKey, Is.Not.Empty);
+            Assert.That(foreignKeySystemView.ForeignKey, Is.EqualTo(foreignKeyMock.ForeignKeyValue));
         }
 
         /// <summary>

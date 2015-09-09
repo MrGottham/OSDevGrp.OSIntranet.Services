@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using AutoMapper;
 using OSDevGrp.OSIntranet.Contracts.Responses;
@@ -26,6 +27,19 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
+            Mapper.CreateMap<IFoodGroup, FoodGroupIdentificationView>()
+                .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
+
+            Mapper.CreateMap<IFoodGroup, FoodGroupSystemView>()
+                .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent == null ? null : Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.Parent)))
+                .ForMember(m => m.Translations, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.Translations)))
+                .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IForeignKey>, IEnumerable<ForeignKeySystemView>>(s.ForeignKeys)))
+                .ForMember(m => m.Children, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupSystemView>>(s.Children)));
+
             Mapper.CreateMap<IFoodGroup, IFoodGroupProxy>()
                 .ConvertUsing(m =>
                 {
@@ -77,6 +91,18 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     return foodGroupProxy;
                 });
 
+            Mapper.CreateMap<IForeignKey, ForeignKeyView>()
+                .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)))
+                .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
+                .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
+
+            Mapper.CreateMap<IForeignKey, ForeignKeySystemView>()
+                .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderSystemView>(s.DataProvider)))
+                .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
+                .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
+                
             Mapper.CreateMap<IForeignKey, IForeignKeyProxy>()
                 .ConvertUsing(m =>
                 {
@@ -190,6 +216,14 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             if (translatable != null)
             {
                 translatable.Translate(translationCulture ?? Thread.CurrentThread.CurrentUICulture);
+            }
+            var foreignKeyable = source as IForeignKeyable;
+            if (foreignKeyable != null)
+            {
+                foreach (var foreignKey in foreignKeyable.ForeignKeys.Where(m => m.DataProvider != null && m.DataProvider.Translation == null))
+                {
+                    foreignKey.DataProvider.Translate(translationCulture ?? Thread.CurrentThread.CurrentUICulture);
+                }
             }
             var translatableCollection = source as IEnumerable<ITranslatable>;
             if (translatableCollection != null)

@@ -11,5 +11,10 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// Gets the data provider who has provided the food groups.
         /// </summary>
         IDataProvider DataProvider { get; }
+
+        /// <summary>
+        /// Removes inactive food groups from the collection.
+        /// </summary>
+        void RemoveInactiveFoodGroups();
     }
 }

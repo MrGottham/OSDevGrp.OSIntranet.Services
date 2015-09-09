@@ -126,6 +126,11 @@
     <Compile Include="Views\DebitorListeView.cs" />
     <Compile Include="Views\DebitorView.cs" />
     <Compile Include="Views\FirmaView.cs" />
+    <Compile Include="Views\FoodGroupIdentificationView.cs" />
+    <Compile Include="Views\FoodGroupSystemView.cs" />
+    <Compile Include="Views\FoodGroupView.cs" />
+    <Compile Include="Views\ForeignKeySystemView.cs" />
+    <Compile Include="Views\ForeignKeyView.cs" />
     <Compile Include="Views\KalenderbrugerAftaleView.cs" />
     <Compile Include="Views\KalenderbrugerView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />

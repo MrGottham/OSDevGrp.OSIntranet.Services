@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
@@ -60,7 +63,26 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         /// <returns>Tree of food groups.</returns>
         public virtual TFoodGroupTreeView Query(FoodGroupTreeGetQuery query)
         {
-            throw new NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+
+            var translationInfo = _systemDataRepository.Get<ITranslationInfo>(query.TranslationInfoIdentifier);
+            var dataProvider = _systemDataRepository.DataProviderForFoodGroupsGet();
+            var foodGroups = _systemDataRepository.FoodGroupGetAllOnRoot()
+                .Where(foodGroup => foodGroup.ForeignKeys != null && foodGroup.ForeignKeys.Any(foreignKey => foreignKey.DataProvider.Identifier == dataProvider.Identifier))
+                .ToList();
+
+            dataProvider.Translate(translationInfo.CultureInfo);
+
+            var foodGroupCollection = new FoodGroupCollection(foodGroups, dataProvider);
+            if (OnlyActive)
+            {
+                foodGroupCollection.RemoveInactiveFoodGroups();
+            }
+
+            return _foodWasteObjectMapper.Map<IFoodGroupCollection, TFoodGroupTreeView>(foodGroupCollection, translationInfo.CultureInfo);
         }
 
         #endregion

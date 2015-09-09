@@ -7,7 +7,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
     /// <summary>
     /// View for a data provider.
     /// </summary>
-    [DataContract(Name = "DataProvider", Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [DataContract(Name = "DataProviderView", Namespace = SoapNamespaces.FoodWasteNamespace)]
     public class DataProviderView : IView
     {
         /// <summary>

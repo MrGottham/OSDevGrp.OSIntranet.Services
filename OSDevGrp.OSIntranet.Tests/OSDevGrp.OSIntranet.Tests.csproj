@@ -215,6 +215,10 @@
     <Compile Include="Unittests\Contracts\Views\DebitorlisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\DebitorViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FirmaViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodGroupIdentificationViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodGroupSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\ForeignKeySystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\ForeignKeyViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerAftaleViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />

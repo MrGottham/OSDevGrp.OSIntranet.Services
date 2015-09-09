@@ -46,6 +46,18 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             get { return _dataProvider; }
         }
 
+        /// <summary>
+        /// Removes inactive food groups from the collection.
+        /// </summary>
+        public virtual void RemoveInactiveFoodGroups()
+        {
+            Items.Where(foodGroup => foodGroup.IsActive == false).ToList().ForEach(foodGroup => Remove(foodGroup));
+            foreach (var foodGroup in Items)
+            {
+                foodGroup.RemoveInactiveChildren();
+            }
+        }
+
         #endregion
     }
 }

@@ -17,9 +17,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a food group.
         /// </summary>
         /// <param name="parentMock">Mockup for the parent food group.</param>
+        /// <param name="isActive">Indicates whether the food group should be active or inactive.</param>
         /// <param name="translations">Collection for translation mockups for the food group.</param>
+        /// <param name="dataProvider">Data provider who owns one of the foreign keys.</param>
         /// <returns>Mockup for a food group.</returns>
-        public static IFoodGroup BuildFoodGroupMock(IFoodGroup parentMock = null, IEnumerable<ITranslation> translations = null)
+        public static IFoodGroup BuildFoodGroupMock(IFoodGroup parentMock = null, bool isActive = true, IDataProvider dataProvider = null, IEnumerable<ITranslation> translations = null)
         {
             var identifier = Guid.NewGuid();
             var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
@@ -30,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(parentMock)
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.IsActive)
-                .Return(true)
+                .Return(isActive)
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.Children)
                 .Return(parentMock != null ? new List<IFoodGroup>(0) : BuildFoodGroupMockCollection(foodGroupMock))
@@ -42,7 +44,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(translations ?? BuildTranslationMockCollection(identifier))
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.ForeignKeys)
-                .Return(BuildForeignKeyMockCollection(identifier, typeof (IFoodGroup)))
+                .Return(BuildForeignKeyMockCollection(identifier, typeof (IFoodGroup), dataProvider))
                 .Repeat.Any();
             return foodGroupMock;
         }
@@ -69,12 +71,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// </summary>
         /// <param name="foreignKeyForIdentifier">Identifier for the domain object which has the foreign keys.</param>
         /// <param name="foreignKeyForType">Type on which has the foreign keys.</param>
+        /// <param name="dataProvider">Data provider who owns one of the foreign keys.</param>
         /// <returns>Collection of mockups for a foreign key to a domain object in the food waste domain.</returns>
-        public static IEnumerable<IForeignKey> BuildForeignKeyMockCollection(Guid foreignKeyForIdentifier, Type foreignKeyForType)
+        public static IEnumerable<IForeignKey> BuildForeignKeyMockCollection(Guid foreignKeyForIdentifier, Type foreignKeyForType, IDataProvider dataProvider = null)
         {
             return new List<IForeignKey>
             {
-                BuildForeignKeyMock(foreignKeyForIdentifier, foreignKeyForType),
+                BuildForeignKeyMock(foreignKeyForIdentifier, foreignKeyForType, dataProvider),
                 BuildForeignKeyMock(foreignKeyForIdentifier, foreignKeyForType),
                 BuildForeignKeyMock(foreignKeyForIdentifier, foreignKeyForType)
             };
@@ -85,8 +88,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// </summary>
         /// <param name="foreignKeyForIdentifier">Identifier for the domain object which has the foreign key.</param>
         /// <param name="foreignKeyForType">Type on which has the foreign key.</param>
+        /// <param name="dataProvider">Data provider who owns the foreign key.</param>
         /// <returns>Mockup for a foreign key to a to a domain object in the food waste domain.</returns>
-        public static IForeignKey BuildForeignKeyMock(Guid foreignKeyForIdentifier, Type foreignKeyForType)
+        public static IForeignKey BuildForeignKeyMock(Guid foreignKeyForIdentifier, Type foreignKeyForType, IDataProvider dataProvider = null)
         {
             if (foreignKeyForType == null)
             {
@@ -98,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
             foreignKeyMock.Stub(m => m.DataProvider)
-                .Return(BuildDataProviderMock())
+                .Return(dataProvider ?? BuildDataProviderMock())
                 .Repeat.Any();
             foreignKeyMock.Stub(m => m.ForeignKeyForIdentifier)
                 .Return(foreignKeyForIdentifier)

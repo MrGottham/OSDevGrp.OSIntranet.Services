@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -16,6 +17,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         private IFoodGroup _parent;
         private IList<IFoodGroup> _children = new List<IFoodGroup>(0); 
         private IList<IForeignKey> _foreignKeys = new List<IForeignKey>(0);
+        private bool _isTranslating;
 
         #endregion
 
@@ -26,6 +28,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public FoodGroup()
         {
+            _isTranslating = false;
         }
 
         /// <summary>
@@ -39,11 +42,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 throw new ArgumentNullException("children");
             }
             _children = children.ToList();
+            _isTranslating = false;
         }
 
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Indicates whether the food group is active.
+        /// </summary>
+        public virtual bool IsActive { get; set; }
 
         /// <summary>
         /// Food group which has this food group as a child.
@@ -81,11 +90,6 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 _parent = value;
             }
         }
-
-        /// <summary>
-        /// Indicates whether the food group is active.
-        /// </summary>
-        public virtual bool IsActive { get; set; }
 
         /// <summary>
         /// Foods groups which has this food group as a parent. 
@@ -140,6 +144,49 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 throw new ArgumentNullException("foreignKey");
             }
             _foreignKeys.Add(foreignKey);
+        }
+
+        /// <summary>
+        /// Remove inactive food groups which has this food groups as parent.
+        /// </summary>
+        public virtual void RemoveInactiveChildren()
+        {
+            _children = Children.Where(m => m.IsActive).ToList();
+            foreach (var child in _children)
+            {
+                child.RemoveInactiveChildren();
+            }
+        }
+
+        /// <summary>
+        /// Finish up the translation for the food group.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        protected override void OnTranslation(CultureInfo translationCulture)
+        {
+            if (_isTranslating)
+            {
+                return;
+            }
+            
+            base.OnTranslation(translationCulture);
+            
+            _isTranslating = true;
+            try
+            {
+                if (Parent != null && Parent.Translation == null)
+                {
+                    Parent.Translate(translationCulture);
+                }
+                foreach (var childFoodGroup in Children.Where(m => m.Translation == null))
+                {
+                    childFoodGroup.Translate(translationCulture);
+                }
+            }
+            finally
+            {
+                _isTranslating = false;
+            }
         }
 
         #endregion

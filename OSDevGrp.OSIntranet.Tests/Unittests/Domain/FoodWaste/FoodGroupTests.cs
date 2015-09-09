@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
@@ -12,6 +16,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
     [TestFixture]
     public class FoodGroupTests
     {
+        /// <summary>
+        /// Private class for testing the food group domain object.
+        /// </summary>
+        private class MyFoodGroup : FoodGroup
+        {
+            #region Properties
+
+            /// <summary>
+            /// Foods groups which has this food group as a parent. 
+            /// </summary>
+            public new IEnumerable<IFoodGroup> Children
+            {
+                get { return base.Children; }
+                set { base.Children = value; }
+            }
+
+            #endregion
+        }
         /// <summary>
         /// Tests that the constructor initialize a food group.
         /// </summary>
@@ -155,7 +177,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(foodGroupLevel3.Parent, Is.Not.Null);
             Assert.That(foodGroupLevel3.Parent, Is.EqualTo(foodGroupLevel2));
 
-
             var exception = Assert.Throws<ArgumentException>(() => foodGroupLevel1.Parent = foodGroupLevel3);
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
@@ -201,6 +222,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             foodGroup.IsActive = false;
             Assert.That(foodGroup.IsActive, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that the setter to Children throws an ArgumentNullException when the new value is null.
+        /// </summary>
+        [Test]
+        public void TestThatChildrenSetterThrowsArgumentNullExceptionWhenValueIsNull()
+        {
+            var foodGroup = new MyFoodGroup();
+            Assert.That(foodGroup, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodGroup.Children = null);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -285,6 +323,386 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("foreignKey"));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that RemoveInactiveChildren removes inactive children.
+        /// </summary>
+        [Test]
+        public void TestThatRemoveInactiveChildrenRemovesInactiveChildren()
+        {
+            var activeFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup1.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var activeFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup2.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var activeFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup3.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var inactiveFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup1.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+            var inactiveFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup2.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+            var inactiveFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup3.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+
+            var foodGroup = new MyFoodGroup
+            {
+                Children = new List<IFoodGroup>
+                {
+                    activeFoodGroup1,
+                    inactiveFoodGroup1,
+                    activeFoodGroup2,
+                    inactiveFoodGroup2,
+                    activeFoodGroup3,
+                    inactiveFoodGroup3
+                }
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Empty);
+            Assert.That(foodGroup.Children.Count(), Is.EqualTo(6));
+
+            foodGroup.RemoveInactiveChildren();
+            Assert.That(foodGroup.Children, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Empty);
+            Assert.That(foodGroup.Children.Count(), Is.EqualTo(3));
+            Assert.That(foodGroup.Children.Contains(activeFoodGroup1), Is.True);
+            Assert.That(foodGroup.Children.Contains(activeFoodGroup2), Is.True);
+            Assert.That(foodGroup.Children.Contains(activeFoodGroup2), Is.True);
+        }
+
+        /// <summary>
+        /// Tests that RemoveInactiveChildren calls RemoveInactiveChildren on active children.
+        /// </summary>
+        [Test]
+        public void TestThatRemoveInactiveChildrenCallsRemoveInactiveChildrenOnActiveChildrens()
+        {
+            var activeFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup1.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var activeFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup2.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var activeFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup3.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var inactiveFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup1.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+            var inactiveFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup2.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+            var inactiveFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup3.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+
+            var foodGroup = new MyFoodGroup
+            {
+                Children = new List<IFoodGroup>
+                {
+                    activeFoodGroup1,
+                    inactiveFoodGroup1,
+                    activeFoodGroup2,
+                    inactiveFoodGroup2,
+                    activeFoodGroup3,
+                    inactiveFoodGroup3
+                }
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Empty);
+
+            foodGroup.RemoveInactiveChildren();
+
+            activeFoodGroup1.AssertWasCalled(m => m.RemoveInactiveChildren());
+            activeFoodGroup2.AssertWasCalled(m => m.RemoveInactiveChildren());
+            activeFoodGroup3.AssertWasCalled(m => m.RemoveInactiveChildren());
+        }
+
+        /// <summary>
+        /// Tests that RemoveInactiveChildren does not call RemoveInactiveChildren on inactive children.
+        /// </summary>
+        [Test]
+        public void TestThatRemoveInactiveChildrenDoesNotCallRemoveInactiveChildrenOnInactiveChildrens()
+        {
+            var activeFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup1.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var activeFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup2.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var activeFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            activeFoodGroup3.Stub(m => m.IsActive)
+                .Return(true)
+                .Repeat.Any();
+            var inactiveFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup1.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+            var inactiveFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup2.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+            var inactiveFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            inactiveFoodGroup3.Stub(m => m.IsActive)
+                .Return(false)
+                .Repeat.Any();
+
+            var foodGroup = new MyFoodGroup
+            {
+                Children = new List<IFoodGroup>
+                {
+                    activeFoodGroup1,
+                    inactiveFoodGroup1,
+                    activeFoodGroup2,
+                    inactiveFoodGroup2,
+                    activeFoodGroup3,
+                    inactiveFoodGroup3
+                }
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Empty);
+
+            foodGroup.RemoveInactiveChildren();
+
+            inactiveFoodGroup1.AssertWasNotCalled(m => m.RemoveInactiveChildren());
+            inactiveFoodGroup2.AssertWasNotCalled(m => m.RemoveInactiveChildren());
+            inactiveFoodGroup3.AssertWasNotCalled(m => m.RemoveInactiveChildren());
+        }
+
+        /// <summary>
+        /// Test that Translate calls Translate on the parent food group when the parent food group is not null and has not been translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateCallsTranslateOnParentWhenParentIsNotNullAndHasNotBeenTranslated()
+        {
+            var cultureInfo = CultureInfo.CurrentUICulture;
+
+            var parentFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            parentFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            parentFoodGroupMock.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            
+            var foodGroup = new FoodGroup
+            {
+                Parent = parentFoodGroupMock
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.Parent, Is.Not.Null);
+            Assert.That(foodGroup.Parent, Is.EqualTo(parentFoodGroupMock));
+            Assert.That(foodGroup.Parent.Translation, Is.Null);
+
+            foodGroup.Translate(cultureInfo);
+
+            parentFoodGroupMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(cultureInfo)));
+        }
+
+        /// <summary>
+        /// Test that Translate does not call Translate on the parent food group when the parent food group is not null and has been translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateDoesNotCallTranslateOnParentWhenParentIsNotNullAndHasBeenTranslated()
+        {
+            var cultureInfo = CultureInfo.CurrentUICulture;
+
+            var parentFoodGroupIdentifier = Guid.NewGuid();
+            var parentFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            parentFoodGroupMock.Stub(m => m.Identifier)
+                .Return(parentFoodGroupIdentifier)
+                .Repeat.Any();
+            parentFoodGroupMock.Stub(m => m.Translation)
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(parentFoodGroupIdentifier))
+                .Repeat.Any();
+
+            var foodGroup = new FoodGroup
+            {
+                Parent = parentFoodGroupMock
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.Parent, Is.Not.Null);
+            Assert.That(foodGroup.Parent, Is.EqualTo(parentFoodGroupMock));
+            Assert.That(foodGroup.Parent.Translation, Is.Not.Null);
+
+            foodGroup.Translate(cultureInfo);
+
+            parentFoodGroupMock.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Test that Translate calls Translate on each children which has not been translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateCallsTranslateOnEndChildrenWhichHasNotBeenTranslated()
+        {
+            var cultureInfo = CultureInfo.CurrentUICulture;
+
+            var untranslatedFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            untranslatedFoodGroup1.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            untranslatedFoodGroup1.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            var untranslatedFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            untranslatedFoodGroup2.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            untranslatedFoodGroup2.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            var untranslatedFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            untranslatedFoodGroup3.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            untranslatedFoodGroup3.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            var translatedFoodGroup1Identifier = Guid.NewGuid();
+            var translatedFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            translatedFoodGroup1.Stub(m => m.Identifier)
+                .Return(translatedFoodGroup1Identifier)
+                .Repeat.Any();
+            translatedFoodGroup1.Stub(m => m.Translation)
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(translatedFoodGroup1Identifier))
+                .Repeat.Any();
+            var translatedFoodGroup2Identifier = Guid.NewGuid();
+            var translatedFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            translatedFoodGroup2.Stub(m => m.Identifier)
+                .Return(translatedFoodGroup2Identifier)
+                .Repeat.Any();
+            translatedFoodGroup2.Stub(m => m.Translation)
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(translatedFoodGroup2Identifier))
+                .Repeat.Any();
+            var translatedFoodGroup3Identifier = Guid.NewGuid();
+            var translatedFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            translatedFoodGroup3.Stub(m => m.Identifier)
+                .Return(translatedFoodGroup3Identifier)
+                .Repeat.Any();
+            translatedFoodGroup3.Stub(m => m.Translation)
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(translatedFoodGroup3Identifier))
+                .Repeat.Any();
+
+            var foodGroup = new MyFoodGroup
+            {
+                Children = new List<IFoodGroup>
+                {
+                    untranslatedFoodGroup1,
+                    translatedFoodGroup1,
+                    untranslatedFoodGroup2,
+                    translatedFoodGroup2,
+                    untranslatedFoodGroup3,
+                    translatedFoodGroup3
+                }
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Empty);
+            
+            foodGroup.Translate(cultureInfo);
+
+            untranslatedFoodGroup1.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(cultureInfo)));
+            untranslatedFoodGroup2.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(cultureInfo)));
+            untranslatedFoodGroup3.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(cultureInfo)));
+        }
+
+        /// <summary>
+        /// Test that Translate does not call Translate on each children which has been translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateDoesNotCallTranslateOnEndChildrenWhichHasBeenTranslated()
+        {
+            var cultureInfo = CultureInfo.CurrentUICulture;
+
+            var untranslatedFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            untranslatedFoodGroup1.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            untranslatedFoodGroup1.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            var untranslatedFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            untranslatedFoodGroup2.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            untranslatedFoodGroup2.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            var untranslatedFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            untranslatedFoodGroup3.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            untranslatedFoodGroup3.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            var translatedFoodGroup1Identifier = Guid.NewGuid();
+            var translatedFoodGroup1 = MockRepository.GenerateMock<IFoodGroup>();
+            translatedFoodGroup1.Stub(m => m.Identifier)
+                .Return(translatedFoodGroup1Identifier)
+                .Repeat.Any();
+            translatedFoodGroup1.Stub(m => m.Translation)
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(translatedFoodGroup1Identifier))
+                .Repeat.Any();
+            var translatedFoodGroup2Identifier = Guid.NewGuid();
+            var translatedFoodGroup2 = MockRepository.GenerateMock<IFoodGroup>();
+            translatedFoodGroup2.Stub(m => m.Identifier)
+                .Return(translatedFoodGroup2Identifier)
+                .Repeat.Any();
+            translatedFoodGroup2.Stub(m => m.Translation)
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(translatedFoodGroup2Identifier))
+                .Repeat.Any();
+            var translatedFoodGroup3Identifier = Guid.NewGuid();
+            var translatedFoodGroup3 = MockRepository.GenerateMock<IFoodGroup>();
+            translatedFoodGroup3.Stub(m => m.Identifier)
+                .Return(translatedFoodGroup3Identifier)
+                .Repeat.Any();
+            translatedFoodGroup3.Stub(m => m.Translation)
+                .Return(DomainObjectMockBuilder.BuildTranslationMock(translatedFoodGroup3Identifier))
+                .Repeat.Any();
+
+            var foodGroup = new MyFoodGroup
+            {
+                Children = new List<IFoodGroup>
+                {
+                    untranslatedFoodGroup1,
+                    translatedFoodGroup1,
+                    untranslatedFoodGroup2,
+                    translatedFoodGroup2,
+                    untranslatedFoodGroup3,
+                    translatedFoodGroup3
+                }
+            };
+            Assert.That(foodGroup, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Null);
+            Assert.That(foodGroup.Children, Is.Not.Empty);
+
+            foodGroup.Translate(cultureInfo);
+
+            translatedFoodGroup1.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything));
+            translatedFoodGroup2.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything));
+            translatedFoodGroup3.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything));
         }
     }
 }
