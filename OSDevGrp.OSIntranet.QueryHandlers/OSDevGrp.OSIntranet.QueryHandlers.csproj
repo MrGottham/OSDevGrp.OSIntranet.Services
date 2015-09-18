@@ -75,6 +75,8 @@
     <Compile Include="Core\FællesElementQueryHandlerBase.cs" />
     <Compile Include="FirmaGetQueryHandler.cs" />
     <Compile Include="FirmalisteGetQueryHandler.cs" />
+    <Compile Include="FoodGroupTreeGetQueryHandler.cs" />
+    <Compile Include="FoodGroupTreeGetQueryHandlerForSystemView.cs" />
     <Compile Include="KalenderbrugerAftaleGetQueryHandler.cs" />
     <Compile Include="KalenderbrugerAftalerGetQueryHandler.cs" />
     <Compile Include="KalenderbrugereGetQueryHandler.cs" />

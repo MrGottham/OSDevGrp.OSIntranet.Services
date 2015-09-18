@@ -63,6 +63,17 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Gets the tree of food groups.
+        /// </summary>
+        /// <param name="query">Query for getting the tree of food groups.</param>
+        /// <returns>Tree of food groups.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual FoodGroupTreeSystemView FoodGroupTreeGet(FoodGroupTreeGetQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Imports a food group from a given data provider.
         /// </summary>
         /// <param name="command">Command for importing a food group from a given data provider.</param>

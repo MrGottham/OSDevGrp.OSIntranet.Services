@@ -27,9 +27,24 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
+            Mapper.CreateMap<IFoodGroupCollection, FoodGroupTreeView>()
+                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupView>>(s)))
+                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
+
+            Mapper.CreateMap<IFoodGroupCollection, FoodGroupTreeSystemView>()
+                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupSystemView>>(s)))
+                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
+
             Mapper.CreateMap<IFoodGroup, FoodGroupIdentificationView>()
                 .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                 .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
+
+            Mapper.CreateMap<IFoodGroup, FoodGroupView>()
+                .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent == null ? null : Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.Parent)))
+                .ForMember(m => m.Children, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupView>>(s.Children)));
 
             Mapper.CreateMap<IFoodGroup, FoodGroupSystemView>()
                 .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))

@@ -6,6 +6,7 @@ using System.Threading;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -258,6 +259,48 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps FoodGroupCollection to FoodGroupTreeView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupCollectionToFoodGroupTreeView()
+        {
+            var foodGroupMockCollection = new FoodGroupCollection(new List<IFoodGroup> {DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock()}, DomainObjectMockBuilder.BuildDataProviderMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupTreeView = foodWasteObjectMapper.Map<IFoodGroupCollection, FoodGroupTreeView>(foodGroupMockCollection);
+            Assert.That(foodGroupTreeView, Is.Not.Null);
+            Assert.That(foodGroupTreeView.FoodGroups, Is.Not.Null);
+            Assert.That(foodGroupTreeView.FoodGroups, Is.Not.Empty);
+            Assert.That(foodGroupTreeView.FoodGroups, Is.TypeOf<List<FoodGroupView>>());
+            Assert.That(foodGroupTreeView.FoodGroups.Count(), Is.EqualTo(foodGroupMockCollection.Count));
+            Assert.That(foodGroupTreeView.DataProvider, Is.Not.Null);
+            Assert.That(foodGroupTreeView.DataProvider, Is.TypeOf<DataProviderView>());
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodGroupCollection to FoodGroupTreeSystemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupCollectionToFoodGroupTreeSystemView()
+        {
+            var foodGroupMockCollection = new FoodGroupCollection(new List<IFoodGroup> {DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock()}, DomainObjectMockBuilder.BuildDataProviderMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupTreeSystemView = foodWasteObjectMapper.Map<IFoodGroupCollection, FoodGroupTreeSystemView>(foodGroupMockCollection);
+            Assert.That(foodGroupTreeSystemView, Is.Not.Null);
+            Assert.That(foodGroupTreeSystemView.FoodGroups, Is.Not.Null);
+            Assert.That(foodGroupTreeSystemView.FoodGroups, Is.Not.Empty);
+            Assert.That(foodGroupTreeSystemView.FoodGroups, Is.TypeOf<List<FoodGroupSystemView>>());
+            Assert.That(foodGroupTreeSystemView.FoodGroups.Count(), Is.EqualTo(foodGroupMockCollection.Count));
+            Assert.That(foodGroupTreeSystemView.DataProvider, Is.Not.Null);
+            Assert.That(foodGroupTreeSystemView.DataProvider, Is.TypeOf<DataProviderView>());
+        }
+
+        /// <summary>
         /// Tests that Map maps FoodGroup to FoodGroupIdentificationView.
         /// </summary>
         [Test]
@@ -279,10 +322,64 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps FoodGroup to FoodGroupView when parent is not null.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupToFoodGroupViewWhenParentIsNotNull()
+        {
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupView>(foodGroupMock);
+            Assert.That(foodGroupView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodGroupView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodGroupView.Name, Is.Not.Null);
+            Assert.That(foodGroupView.Name, Is.Not.Empty);
+            Assert.That(foodGroupView.Name, Is.EqualTo(foodGroupMock.Translation.Value));
+            Assert.That(foodGroupView.IsActive, Is.EqualTo(foodGroupMock.IsActive));
+            Assert.That(foodGroupView.Parent, Is.Not.Null);
+            Assert.That(foodGroupView.Parent, Is.TypeOf<FoodGroupIdentificationView>());
+            Assert.That(foodGroupView.Children, Is.Not.Null);
+            Assert.That(foodGroupView.Children, Is.Empty);
+            Assert.That(foodGroupView.Children, Is.TypeOf<List<FoodGroupView>>());
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodGroup to FoodGroupView when parent is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodGroupToFoodGroupViewWhenParentIsNull()
+        {
+            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodGroupView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupView>(foodGroupMock);
+            Assert.That(foodGroupView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodGroupView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodGroupView.Name, Is.Not.Null);
+            Assert.That(foodGroupView.Name, Is.Not.Empty);
+            Assert.That(foodGroupView.Name, Is.EqualTo(foodGroupMock.Translation.Value));
+            Assert.That(foodGroupView.IsActive, Is.EqualTo(foodGroupMock.IsActive));
+            Assert.That(foodGroupView.Parent, Is.Null);
+            Assert.That(foodGroupView.Children, Is.Not.Null);
+            Assert.That(foodGroupView.Children, Is.Not.Empty);
+            Assert.That(foodGroupView.Children, Is.TypeOf<List<FoodGroupView>>());
+            Assert.That(foodGroupView.Children.Count(), Is.EqualTo(foodGroupMock.Children.Count()));
+        }
+
+        /// <summary>
         /// Tests that Map maps FoodGroup to FoodGroupSystemView when parent is not null.
         /// </summary>
         [Test]
-        public void TestThatMapMapsFoodGroupSystemViewWhenParentIsNotNull()
+        public void TestThatMapMapsFoodGroupToFoodGroupSystemViewWhenParentIsNotNull()
         {
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
 
@@ -317,7 +414,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map maps FoodGroup to FoodGroupSystemView when parent is null.
         /// </summary>
         [Test]
-        public void TestThatMapMapsFoodGroupSystemViewWhenParentIsNull()
+        public void TestThatMapMapsFoodGroupToFoodGroupSystemViewWhenParentIsNull()
         {
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
 

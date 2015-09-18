@@ -217,6 +217,9 @@
     <Compile Include="Unittests\Contracts\Views\FirmaViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FoodGroupIdentificationViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FoodGroupSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodGroupTreeSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodGroupTreeViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodGroupViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\ForeignKeySystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\ForeignKeyViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerAftaleViewTests.cs" />
@@ -293,6 +296,8 @@
     <Compile Include="Unittests\QueryHandlers\Core\FællesElementQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FirmaGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FirmalisteGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerForSystemViewTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftaleGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftalerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugereGetQueryHandlerTests.cs" />

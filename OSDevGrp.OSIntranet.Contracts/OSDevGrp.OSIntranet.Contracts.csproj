@@ -128,6 +128,8 @@
     <Compile Include="Views\FirmaView.cs" />
     <Compile Include="Views\FoodGroupIdentificationView.cs" />
     <Compile Include="Views\FoodGroupSystemView.cs" />
+    <Compile Include="Views\FoodGroupTreeSystemView.cs" />
+    <Compile Include="Views\FoodGroupTreeView.cs" />
     <Compile Include="Views\FoodGroupView.cs" />
     <Compile Include="Views\ForeignKeySystemView.cs" />
     <Compile Include="Views\ForeignKeyView.cs" />
