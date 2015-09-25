@@ -68,6 +68,7 @@
     <Compile Include="FoodWaste\DomainObjectBase.cs" />
     <Compile Include="FoodWaste\FoodGroup.cs" />
     <Compile Include="FoodWaste\FoodGroupCollection.cs" />
+    <Compile Include="FoodWaste\FoodItem.cs" />
     <Compile Include="FoodWaste\ForeignKey.cs" />
     <Compile Include="FoodWaste\IdentifiableBase.cs" />
     <Compile Include="FoodWaste\TranslatableBase.cs" />
