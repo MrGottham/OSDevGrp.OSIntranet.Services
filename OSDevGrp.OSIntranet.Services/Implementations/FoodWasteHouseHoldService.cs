@@ -62,6 +62,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Gets the tree of food groups.
+        /// </summary>
+        /// <param name="query">Query for getting the tree of food groups.</param>
+        /// <returns>Tree of food groups.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual FoodGroupTreeView FoodGroupTreeGet(FoodGroupTreeGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<FoodGroupTreeGetQuery, FoodGroupTreeView>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseHoldServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>

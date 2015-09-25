@@ -13,6 +13,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteHouseHoldService : IIntranetService
     {
         /// <summary>
+        /// Gets the tree of food groups.
+        /// </summary>
+        /// <param name="query">Query for getting the tree of food groups.</param>
+        /// <returns>Tree of food groups.</returns>
+        [OperationContract]
+        [FaultContract(typeof(FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        FoodGroupTreeView FoodGroupTreeGet(FoodGroupTreeGetQuery query);
+
+        /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>
