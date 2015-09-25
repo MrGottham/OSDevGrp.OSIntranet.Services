@@ -21,6 +21,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
     /// </summary>
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, Namespace = SoapNamespaces.FoodWasteNamespace)]
     [RequiredClaimType(FoodWasteClaimTypes.SystemManagement)]
+    [RequiredClaimType(FoodWasteClaimTypes.ValidatedUser)]
     public class FoodWasteSystemDataService : IFoodWasteSystemDataService
     {
         #region Private variables
@@ -70,7 +71,18 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual FoodGroupTreeSystemView FoodGroupTreeGet(FoodGroupTreeGetQuery query)
         {
-            throw new NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<FoodGroupTreeGetQuery, FoodGroupTreeSystemView>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
         }
 
         /// <summary>

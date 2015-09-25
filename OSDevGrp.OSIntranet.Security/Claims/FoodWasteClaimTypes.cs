@@ -6,6 +6,7 @@
     public static class FoodWasteClaimTypes
     {
         public const string SystemManagement = "http://osdevgrp.local/foodwaste/security/systemmanagement";
+        public const string HouseHoldManagement = "http://osdevgrp.local/foodwaste/security/householdmanagement";
         public const string ValidatedUser = "http://osdevgrp.local/foodwaste/security/user";
     }
 }

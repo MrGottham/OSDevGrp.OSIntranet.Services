@@ -30,6 +30,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
         /// Private class for a secured service used for testing purpose.
         /// </summary>
         [RequiredClaimType(FoodWasteClaimTypes.SystemManagement)]
+        [RequiredClaimType(FoodWasteClaimTypes.HouseHoldManagement)]
         [RequiredClaimType(FoodWasteClaimTypes.ValidatedUser)]
         private class MySecuredService
         {
@@ -189,6 +190,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
             claimSetStub.Stub(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.SystemManagement), Arg<string>.Is.Anything))
                 .Return(new List<Claim> {new Claim(FoodWasteClaimTypes.SystemManagement, fixture.Create<object>(), Rights.PossessProperty)})
                 .Repeat.Any();
+            claimSetStub.Stub(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.HouseHoldManagement), Arg<string>.Is.Anything))
+                .Return(new List<Claim> {new Claim(FoodWasteClaimTypes.HouseHoldManagement, fixture.Create<object>(), Rights.PossessProperty)})
+                .Repeat.Any();
             claimSetStub.Stub(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.ValidatedUser), Arg<string>.Is.Anything))
                 .Return(new List<Claim> {new Claim(FoodWasteClaimTypes.ValidatedUser, fixture.Create<object>(), Rights.PossessProperty)})
                 .Repeat.Any();
@@ -199,6 +203,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
             authorizationHandler.Authorize(new List<ClaimSet> {claimSetStub}, typeof (MySecuredService));
 
             claimSetStub.AssertWasCalled(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.SystemManagement), Arg<string>.Is.Equal(Rights.PossessProperty)));
+            claimSetStub.AssertWasCalled(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.HouseHoldManagement), Arg<string>.Is.Equal(Rights.PossessProperty)));
             claimSetStub.AssertWasCalled(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.ValidatedUser), Arg<string>.Is.Equal(Rights.PossessProperty)));
         }
 
@@ -211,6 +216,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core
             var fixture = new Fixture();
             var claimSetStub = MockRepository.GenerateStub<ClaimSet>();
             claimSetStub.Stub(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.SystemManagement), Arg<string>.Is.Anything))
+                .Return(new List<Claim>(0))
+                .Repeat.Any();
+            claimSetStub.Stub(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.HouseHoldManagement), Arg<string>.Is.Anything))
                 .Return(new List<Claim>(0))
                 .Repeat.Any();
             claimSetStub.Stub(m => m.FindClaims(Arg<string>.Is.Equal(FoodWasteClaimTypes.ValidatedUser), Arg<string>.Is.Anything))

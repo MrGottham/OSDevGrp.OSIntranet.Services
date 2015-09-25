@@ -32,6 +32,30 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tests that FoodGroupTreeGet gets the tree of food groups.
+        /// </summary>
+        [Test]
+        public void TestThatFoodGroupTreeGetGetsFoodGroupTree()
+        {
+            var translationInfoCollection = _foodWasteSystemDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
+
+            foreach (var translationInfo in translationInfoCollection)
+            {
+                var query = new FoodGroupTreeGetQuery
+                {
+                    TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                };
+                var foodGroupTree = _foodWasteSystemDataService.FoodGroupTreeGet(query);
+                Assert.That(foodGroupTree, Is.Not.Null);
+                Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
+                Assert.That(foodGroupTree.FoodGroups.Count(), Is.GreaterThanOrEqualTo(0));
+                Assert.That(foodGroupTree.DataProvider, Is.Not.Null);
+            }
+        }
+
+        /// <summary>
         /// Tests that FoodGroupImportFromDataProvider imports food groups from the data provider.
         /// </summary>
         [Test]

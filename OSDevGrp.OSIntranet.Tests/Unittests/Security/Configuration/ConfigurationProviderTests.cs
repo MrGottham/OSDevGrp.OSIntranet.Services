@@ -35,7 +35,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Configuration
             Assert.That(configurationProvider.TrustedRelyingPartyCollection.Count, Is.EqualTo(2));
             Assert.That(configurationProvider.ClaimCollection, Is.Not.Null);
             Assert.That(configurationProvider.ClaimCollection, Is.Not.Empty);
-            Assert.That(configurationProvider.ClaimCollection.Count, Is.EqualTo(2));
+            Assert.That(configurationProvider.ClaimCollection.Count, Is.EqualTo(3));
         }
     }
 }

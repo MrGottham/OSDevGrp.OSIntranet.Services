@@ -21,6 +21,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Claims
         }
 
         /// <summary>
+        /// Tests that HouseHoldManagement returns the claim type for house hold management.
+        /// </summary>
+        [Test]
+        public void TestThatHouseHoldManagementReturnClaimType()
+        {
+            Assert.That(FoodWasteClaimTypes.HouseHoldManagement, Is.Not.Null);
+            Assert.That(FoodWasteClaimTypes.HouseHoldManagement, Is.Not.Empty);
+            Assert.That(FoodWasteClaimTypes.HouseHoldManagement, Is.EqualTo("http://osdevgrp.local/foodwaste/security/householdmanagement"));
+        }
+
+        /// <summary>
         /// Tests that ValidatedUser returns the claim type for validated user.
         /// </summary>
         [Test]

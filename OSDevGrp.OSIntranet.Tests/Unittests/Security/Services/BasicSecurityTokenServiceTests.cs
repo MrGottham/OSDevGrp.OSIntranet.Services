@@ -323,10 +323,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         /// Tests that Issue appends claims to the calling claims principal.
         /// </summary>
         [Test]
-        [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 2)]
-        [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 1)]
-        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 2)]
-        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 1)]
+        [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 3)]
+        [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 2)]
+        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 3)]
+        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 2)]
         public void TestThatIssueAppendsClaimsToCallingClaimsPrincipal(string trustedUri, string identityCertificate, string mailAddress, int expectedAppendedClaims)
         {
             var fixture = new Fixture();

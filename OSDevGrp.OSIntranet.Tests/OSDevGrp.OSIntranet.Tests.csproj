@@ -356,6 +356,7 @@
     <Compile Include="Unittests\Services\CommonServiceTests.cs" />
     <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />
     <Compile Include="Unittests\Services\FoodWasteSystemDataServiceTests.cs" />
+    <Compile Include="Unittests\Services\FoodWasteHouseHoldServiceTests.cs" />
     <Compile Include="Unittests\Services\IntranetServiceBaseTests.cs" />
     <Compile Include="Unittests\Services\KalenderServiceTests.cs" />
   </ItemGroup>
