@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts;
 using OSDevGrp.OSIntranet.Contracts.Faults;
+using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Security.Attributes;
 using OSDevGrp.OSIntranet.Security.Claims;
@@ -57,10 +61,26 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
 
         #region Methods
 
+        /// <summary>
+        /// Gets all the translation informations which can be used for translations.
+        /// </summary>
+        /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>
+        /// <returns>Collection of all the translation informations which can be used for translations.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
-        public virtual void Test()
+        public virtual IEnumerable<TranslationInfoSystemView> TranslationInfoGetAll(TranslationInfoCollectionGetQuery query)
         {
-            throw new NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseHoldServiceName, MethodBase.GetCurrentMethod());
+            }
         }
 
         #endregion

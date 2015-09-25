@@ -42,8 +42,8 @@
         public const string FoodWasteSystemDataServiceName = "SystemDataService";
 
         /// <summary>
-        /// Name for the service which can access and modify data in a house hold.
+        /// Name for the service which can access and modify data on a house hold in the food waste domain.
         /// </summary>
-        public const string HouseHoldServiceName = "HouseHoldService";
+        public const string FoodWasteHouseHoldServiceName = "HouseHoldService";
     }
 }

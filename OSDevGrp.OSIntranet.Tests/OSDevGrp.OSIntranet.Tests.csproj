@@ -127,11 +127,13 @@
     <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteHouseHoldServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\Implementations\FoodWasteHouseHoldServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\TestHelpers.cs" />
