@@ -138,3 +138,44 @@ END $$
 DELIMITER ;
 CALL GrantRightsForFoodGroups(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForFoodGroups;
+
+CREATE TABLE IF NOT EXISTS FoodItems (
+	FoodItemIdentifier VARCHAR(40) NOT NULL,
+	IsActive BIT NOT NULL,
+	PRIMARY KEY (FoodItemIdentifier)
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForFoodItems;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForFoodItems(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.FoodItems TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForFoodItems(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForFoodItems;
+
+CREATE TABLE IF NOT EXISTS FoodItemGroups (
+	FoodItemGroupIdentifier VARCHAR(40) NOT NULL,
+	FoodItemIdentifier VARCHAR(40) NOT NULL,
+	FoodGroupIdentifier VARCHAR(40) NOT NULL,
+	IsPrimary BIT NOT NULL,
+	PRIMARY KEY (FoodItemGroupIdentifier),
+	UNIQUE INDEX IX_FoodItemGroups_FoodItemIdentifier_FoodGroupIdentifier (FoodItemIdentifier,FoodGroupIdentifier),
+	FOREIGN KEY FK_FoodItemGroups_FoodItemIdentifier (FoodItemIdentifier) REFERENCES FoodItems (FoodItemIdentifier) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY FK_FoodItemGroups_FoodGroupIdentifier (FoodGroupIdentifier) REFERENCES FoodGroups (FoodGroupIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForFoodItemGroups;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForFoodItemGroups(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.FoodItemGroups TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForFoodItemGroups(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForFoodItemGroups;

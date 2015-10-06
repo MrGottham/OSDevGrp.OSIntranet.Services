@@ -14,12 +14,70 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
     public static class DomainObjectMockBuilder
     {
         /// <summary>
+        /// Build a mockup for a food item.
+        /// </summary>
+        /// <param name="isActive">Indicates whether the food item should be active or inactive.</param>
+        /// <param name="dataProvider">Data provider who owns one of the foreign keys.</param>
+        /// <param name="translations">Collection of translation mockups for the food item.</param>
+        /// <returns>Mockup for a food item.</returns>
+        public static IFoodItem BuildFoodItemMock(bool isActive = true, IDataProvider dataProvider = null, IEnumerable<ITranslation> translations = null)
+        {
+            var identifier = Guid.NewGuid();
+            var primaryFoodGroupMock = BuildFoodGroupMock();
+            var foodGroupMockCollection = new List<IFoodGroup>
+            {
+                primaryFoodGroupMock,
+                BuildFoodGroupMock(),
+                BuildFoodGroupMock()
+            };
+            var foodItemMock = MockRepository.GenerateMock<IFoodItem>();
+            foodItemMock.Stub(m => m.Identifier)
+                .Return(identifier)
+                .Repeat.Any();
+            foodItemMock.Stub(m => m.PrimaryFoodGroup)
+                .Return(primaryFoodGroupMock)
+                .Repeat.Any();
+            foodItemMock.Stub(m => m.IsActive)
+                .Return(isActive)
+                .Repeat.Any();
+            foodItemMock.Stub(m => m.FoodGroups)
+                .Return(foodGroupMockCollection)
+                .Repeat.Any();
+            foodItemMock.Stub(m => m.Translation)
+                .Return(BuildTranslationMock(identifier))
+                .Repeat.Any();
+            foodItemMock.Stub(m => m.Translations)
+                .Return(translations ?? BuildTranslationMockCollection(identifier))
+                .Repeat.Any();
+            foodItemMock.Stub(m => m.ForeignKeys)
+                .Return(BuildForeignKeyMockCollection(identifier, typeof (IFoodItem), dataProvider))
+                .Repeat.Any();
+            return foodItemMock;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some food items.
+        /// </summary>
+        /// <returns>Collection of mockups for some food items.</returns>
+        public static IEnumerable<IFoodItem> BuildFoodItemMockCollection()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var result = new List<IFoodItem>(random.Next(15, 50));
+            while (result.Count < result.Capacity)
+            {
+                result.Add(BuildFoodItemMock());
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Build a mockup for a food group.
         /// </summary>
         /// <param name="parentMock">Mockup for the parent food group.</param>
         /// <param name="isActive">Indicates whether the food group should be active or inactive.</param>
-        /// <param name="translations">Collection for translation mockups for the food group.</param>
         /// <param name="dataProvider">Data provider who owns one of the foreign keys.</param>
+        /// <param name="translations">Collection for translation mockups for the food group.</param>
         /// <returns>Mockup for a food group.</returns>
         public static IFoodGroup BuildFoodGroupMock(IFoodGroup parentMock = null, bool isActive = true, IDataProvider dataProvider = null, IEnumerable<ITranslation> translations = null)
         {

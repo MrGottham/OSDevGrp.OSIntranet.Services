@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 
@@ -60,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 {
                     throw new ArgumentNullException("value");
                 }
-                var existingFoodGroup = _foodGroups.SingleOrDefault(foodGroup => foodGroup.Identifier == value.Identifier);
+                var existingFoodGroup = FoodGroups.SingleOrDefault(foodGroup => foodGroup.Identifier == value.Identifier);
                 if (existingFoodGroup != null)
                 {
                     _primaryFoodGroup = existingFoodGroup;
@@ -91,7 +92,19 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 {
                     throw new ArgumentNullException("value");
                 }
-                throw new NotImplementedException();
+                _foodGroups = value.ToList();
+                if (PrimaryFoodGroup == null)
+                {
+                    PrimaryFoodGroup = _foodGroups.FirstOrDefault();
+                    return;
+                }
+                var primaryFoodGroup = _foodGroups.SingleOrDefault(foodGroup => foodGroup.Identifier == PrimaryFoodGroup.Identifier);
+                if (primaryFoodGroup == null)
+                {
+                    _foodGroups.Add(PrimaryFoodGroup);
+                    return;
+                }
+                PrimaryFoodGroup = primaryFoodGroup;
             }
         }
 
@@ -100,8 +113,18 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual IEnumerable<IForeignKey> ForeignKeys
         {
-            get { return _foreignKeys; }
-            protected set { throw new NotImplementedException(); }
+            get
+            {
+                return _foreignKeys;
+            }
+            protected set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _foreignKeys = value.ToList();
+            }
         }
 
         #endregion
@@ -114,7 +137,11 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="foodGroup">Food group which this food item should belong to.</param>
         public virtual void FoodGroupAdd(IFoodGroup foodGroup)
         {
-            throw new NotImplementedException();
+            if (foodGroup == null)
+            {
+                throw new ArgumentNullException("foodGroup");
+            }
+            _foodGroups.Add(foodGroup);
         }
 
         /// <summary>
@@ -123,7 +150,23 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="foreignKey">Foreign key which should be added to the food item.</param>
         public virtual void ForeignKeyAdd(IForeignKey foreignKey)
         {
-            throw new NotImplementedException();
+            if (foreignKey == null)
+            {
+                throw new ArgumentNullException("foreignKey");
+            }
+            _foreignKeys.Add(foreignKey);
+        }
+
+        /// <summary>
+        /// Finish up the translation for the food item.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        protected override void OnTranslation(CultureInfo translationCulture)
+        {
+            foreach (var foodGroup in FoodGroups)
+            {
+                foodGroup.Translate(translationCulture);
+            }
         }
 
         #endregion
