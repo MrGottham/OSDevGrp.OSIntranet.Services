@@ -141,6 +141,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         {
         }
 
+        /// <summary>
+        /// Gemmer relationer til et system under OSWEBDB.
+        /// </summary>
+        /// <param name="dataProvider">Dataprovider.</param>
+        /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
+        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        {
+        }
+
+        /// <summary>
+        /// Sletter relationer til et system under OSWEBDB.
+        /// </summary>
+        /// <param name="dataProvider">Dataprovider.</param>
+        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        {
+        }
+
         #endregion
 
         #region ILazyLoadable Members

@@ -197,6 +197,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
+        /// <summary>
+        /// Save relations.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="isInserting">Indication of whether we are inserting or updating</param>
+        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        {
+        }
+
+        /// <summary>
+        /// Delete relations.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        {
+        }
+
         #endregion
     }
 }

@@ -67,6 +67,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 private set;
             }
 
+            /// <summary>
+            /// Angivelse af, at SaveRelations er blevet kaldt.
+            /// </summary>
+            public bool SaveRelationsIsCalled
+            {
+                get; 
+                private set; 
+            }
+
+            /// <summary>
+            /// Angivelse af den værdi for indsættelse eller opdatering, som SaveRelations er blevet kaldt med.
+            /// </summary>
+            public bool IsInserting
+            {
+                get; 
+                private set;
+            }
+
+            /// <summary>
+            /// Angivelse af, at DeleteRelations er blevet kaldt.
+            /// </summary>
+            public bool DeleteRelationsIsCalled
+            {
+                get; 
+                private set; 
+            }
+
             #endregion
 
             #region IDataProxyBase Members
@@ -95,6 +122,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 Assert.That(dataProvider, Is.Not.Null);
 
                 MapRelationsIsCalled = true;
+            }
+
+            /// <summary>
+            /// Gemmer relationer.
+            /// </summary>
+            /// <param name="dataProvider">Dataprovider.</param>
+            /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
+            public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+            {
+                Assert.That(dataProvider, Is.Not.Null);
+
+                SaveRelationsIsCalled = true;
+                IsInserting = isInserting;
+            }
+
+            /// <summary>
+            /// Sletter relationer.
+            /// </summary>
+            /// <param name="dataProvider">Dataprovider.</param>
+            public virtual void DeleteRelations(IDataProviderBase dataProvider)
+            {
+                Assert.That(dataProvider, Is.Not.Null);
+
+                DeleteRelationsIsCalled = true;
             }
 
             #endregion
@@ -336,9 +387,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
                 var mySqlDataProxy = fixture.Create<MyDataProxy>();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
+                Assert.That(mySqlDataProxy.SaveRelationsIsCalled, Is.False);
 
                 var result = mySqlDataProvider.Add(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
+                Assert.That(result.SaveRelationsIsCalled, Is.True);
+                Assert.That(result.IsInserting, Is.True);
 
                 mySqlDataProvider.Delete(result);
             }
@@ -396,12 +450,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
                 var mySqlDataProxy = fixture.Create<MyDataProxy>();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
+                Assert.That(mySqlDataProxy.SaveRelationsIsCalled, Is.False);
 
                 var result = mySqlDataProvider.Add(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
+                Assert.That(result.SaveRelationsIsCalled, Is.True);
+                Assert.That(result.IsInserting, Is.True);
 
                 result = mySqlDataProvider.Save(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
+                Assert.That(result.SaveRelationsIsCalled, Is.True);
+                Assert.That(result.IsInserting, Is.False);
 
                 mySqlDataProvider.Delete(result);
             }
@@ -435,11 +494,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
                 var mySqlDataProxy = fixture.Create<MyDataProxy>();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
+                Assert.That(mySqlDataProxy.DeleteRelationsIsCalled, Is.False);
 
                 var result = mySqlDataProvider.Add(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
+                Assert.That(result.DeleteRelationsIsCalled, Is.False);
 
                 mySqlDataProvider.Delete(result);
+
+                Assert.That(result.DeleteRelationsIsCalled, Is.True);
             }
         }
 

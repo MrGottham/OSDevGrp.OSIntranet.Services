@@ -74,6 +74,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             {
             }
 
+            /// <summary>
+            /// Gemmer relationer til en data proxy.
+            /// </summary>
+            /// <param name="dataProvider">Dataprovider.</param>
+            /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
+            public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+            {
+            }
+
+            /// <summary>
+            /// Sletter relationer til en data proxy.
+            /// </summary>
+            /// <param name="dataProvider">Dataprovider.</param>
+            public virtual void DeleteRelations(IDataProviderBase dataProvider)
+            {
+            }
+
             #endregion
         }
 

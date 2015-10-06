@@ -189,6 +189,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
                 }
+                dataProxy.SaveRelations(this, true);
                 return dataProxy;
             }
             finally
@@ -218,6 +219,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
                 }
+                dataProxy.SaveRelations(this, false);
                 return dataProxy;
             }
             finally
@@ -246,6 +248,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
                 }
+                dataProxy.DeleteRelations(this);
             }
             finally
             {

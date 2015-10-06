@@ -180,6 +180,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         {
         }
 
+        /// <summary>
+        /// Gemmer relationer til en bruger.
+        /// </summary>
+        /// <param name="dataProvider">Dataprovider.</param>
+        /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
+        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        {
+        }
+
+        /// <summary>
+        /// Sletter relationer til en bruger.
+        /// </summary>
+        /// <param name="dataProvider">Dataprovider.</param>
+        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        {
+        }
+
         #endregion
 
         #region ILazyLoadable Members

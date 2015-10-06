@@ -41,6 +41,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 Assert.That(dataProvider, Is.Not.Null);
             }
 
+            /// <summary>
+            /// Gemmer relationer.
+            /// </summary>
+            /// <param name="dataProvider">Dataprovider.</param>
+            /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
+            public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+            {
+                Assert.That(dataProvider, Is.Not.Null);
+            }
+
+            /// <summary>
+            /// Sletter relationer.
+            /// </summary>
+            /// <param name="dataProvider">Dataprovider.</param>
+            public virtual void DeleteRelations(IDataProviderBase dataProvider)
+            {
+                Assert.That(dataProvider, Is.Not.Null);
+            }
+
             #endregion
         }
 

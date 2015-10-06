@@ -15,9 +15,22 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies
         void MapData(object dataReader, IDataProviderBase dataProvider);
 
         /// <summary>
-        /// Mapper ata proxyens relationer.
+        /// Mapper data proxyens relationer.
         /// </summary>
         /// <param name="dataProvider">Data provider, hvorfra data kan mappes.</param>
         void MapRelations(IDataProviderBase dataProvider);
+
+        /// <summary>
+        /// Gemmer data proxyens relationer.
+        /// </summary>
+        /// <param name="dataProvider">Data provider, hvorfra data kan gemmes.</param>
+        /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
+        void SaveRelations(IDataProviderBase dataProvider, bool isInserting);
+
+        /// <summary>
+        /// Sletter data aproxyens relationer.
+        /// </summary>
+        /// <param name="dataProvider">Data provider, hvorfra data kan slettes.</param>
+        void DeleteRelations(IDataProviderBase dataProvider);
     }
 }
