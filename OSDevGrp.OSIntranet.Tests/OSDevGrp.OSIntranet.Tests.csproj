@@ -324,6 +324,7 @@
     <Compile Include="Unittests\Repositories\DataProxies\DataProxyHelperTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\DataProviderProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\FoodGroupProxyTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\FoodItemGroupProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\ForeignKeyProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\TranslationInfoProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\TranslationProxyTests.cs" />
