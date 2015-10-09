@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -154,6 +156,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
         }
 
         /// <summary>
@@ -162,6 +172,52 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+        }
+
+        /// <summary>
+        /// Gets the translations for a given translatable domain object in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="translationOfIdentifier">Identifier for the given domain object on which to get the translations.</param>
+        /// <returns>Translations for a given translatable domain object in the food waste domain.</returns>
+        internal static IEnumerable<TranslationProxy> GetDomainObjectTranslations(IDataProviderBase dataProvider, Guid translationOfIdentifier)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                return subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(translationOfIdentifier));
+            }
+        }
+
+        /// <summary>
+        /// Deletes translations for a given translatable domain object in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="translationOfIdentifier">Identifier for the given domain object on which to delete the translations.</param>
+        internal static void DeleteDomainObjectTranslations(IDataProviderBase dataProvider, Guid translationOfIdentifier)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            foreach (var translationProxy in GetDomainObjectTranslations(dataProvider, translationOfIdentifier))
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(translationProxy);
+                }
+            }
         }
 
         #endregion

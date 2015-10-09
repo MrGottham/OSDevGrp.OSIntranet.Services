@@ -4,7 +4,6 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -141,12 +140,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new ArgumentNullException("dataProvider");
             }
 
-            var translationCollection = new List<ITranslation>();
-            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
-            {
-                translationCollection.AddRange(subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(DataSourceStatementIdentifier)));
-            }
-            Translations = translationCollection;
+            Translations = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(dataProvider, DataSourceStatementIdentifier));
         }
 
         /// <summary>
@@ -156,6 +150,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -164,6 +159,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
+            throw new NotSupportedException();
         }
 
         #endregion

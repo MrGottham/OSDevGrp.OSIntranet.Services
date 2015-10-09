@@ -347,5 +347,91 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
             Assert.That(exception.InnerException, Is.Null);
         }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+
+            var translationProxy = new TranslationProxy();
+            Assert.That(translationProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => translationProxy.SaveRelations(null, fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for the translation is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var translationProxy = new TranslationProxy
+            {
+                Identifier = null
+            };
+            Assert.That(translationProxy, Is.Not.Null);
+            Assert.That(translationProxy.Identifier, Is.Null);
+            Assert.That(translationProxy.Identifier.HasValue, Is.False);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => translationProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translationProxy.Identifier, "Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var translationProxy = new TranslationProxy();
+            Assert.That(translationProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => translationProxy.DeleteRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an IntranetRepositoryException when the identifier for the translation is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var translationProxy = new TranslationProxy
+            {
+                Identifier = null
+            };
+            Assert.That(translationProxy, Is.Not.Null);
+            Assert.That(translationProxy.Identifier, Is.Null);
+            Assert.That(translationProxy.Identifier.HasValue, Is.False);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => translationProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translationProxy.Identifier, "Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
     }
 }

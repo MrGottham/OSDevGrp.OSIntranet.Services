@@ -349,5 +349,69 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
             Assert.That(exception.InnerException, Is.Null);
         }
+        
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+
+            var dataProviderProxy = new DataProviderProxy();
+            Assert.That(dataProviderProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.SaveRelations(null, fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is not null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+
+            var dataProviderProxy = new DataProviderProxy();
+            Assert.That(dataProviderProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an NotSupportedException when the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
+        {
+            var dataProviderProxy = new DataProviderProxy();
+            Assert.That(dataProviderProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.DeleteRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is not null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+
+            var dataProviderProxy = new DataProviderProxy();
+            Assert.That(dataProviderProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
     }
 }

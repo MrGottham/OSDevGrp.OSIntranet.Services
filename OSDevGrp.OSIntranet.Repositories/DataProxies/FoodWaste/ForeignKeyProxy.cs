@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -101,7 +102,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this foreign key.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            return string.Format("INSERT INTO ForeignKeys (ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue) VALUES('{0}','{1}','{2}','{3}','{4}')", UniqueId, DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : Guid.Empty.ToString("D").ToUpper(), ForeignKeyForIdentifier, string.Join(";", ForeignKeyForTypes.Select(m => m.Name)), ForeignKeyValue);
+            var emptyGuid = Guid.Empty;
+            return string.Format("INSERT INTO ForeignKeys (ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue) VALUES('{0}','{1}','{2}','{3}','{4}')", UniqueId, DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : emptyGuid.ToString("D").ToUpper(), ForeignKeyForIdentifier, string.Join(";", ForeignKeyForTypes.Select(m => m.Name)), ForeignKeyValue);
         }
 
         /// <summary>
@@ -110,7 +112,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this foreign key.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            return string.Format("UPDATE ForeignKeys SET DataProviderIdentifier='{1}',ForeignKeyForIdentifier='{2}',ForeignKeyForTypes='{3}',ForeignKeyValue='{4}' WHERE ForeignKeyIdentifier='{0}'", UniqueId, DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : Guid.Empty.ToString("D").ToUpper(), ForeignKeyForIdentifier, string.Join(";", ForeignKeyForTypes.Select(m => m.Name)), ForeignKeyValue);
+            var emptyGuid = Guid.Empty;
+            return string.Format("UPDATE ForeignKeys SET DataProviderIdentifier='{1}',ForeignKeyForIdentifier='{2}',ForeignKeyForTypes='{3}',ForeignKeyValue='{4}' WHERE ForeignKeyIdentifier='{0}'", UniqueId, DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : emptyGuid.ToString("D").ToUpper(), ForeignKeyForIdentifier, string.Join(";", ForeignKeyForTypes.Select(m => m.Name)), ForeignKeyValue);
         }
 
         /// <summary>
@@ -158,8 +161,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 // ReSharper disable EmptyGeneralCatchClause
                 try
                 {
+                    var typeName = foreignKeyForTypeName;
                     var assembly = typeof (IDomainObject).Assembly;
-                    var type = assembly.GetTypes().SingleOrDefault(m => string.Compare(m.Name, foreignKeyForTypeName, StringComparison.Ordinal) == 0);
+                    var type = assembly.GetTypes().SingleOrDefault(m => string.Compare(m.Name, typeName, StringComparison.Ordinal) == 0);
                     if (type != null)
                     {
                         foreignKeyForTypes.Add(type);
@@ -204,6 +208,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
         }
 
         /// <summary>
@@ -212,6 +224,52 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+        }
+
+        /// <summary>
+        /// Gets foreign keys for a domain object in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="foreignKeyForIdentifier">Identifier for the given domain object on which to get the foreign keys.</param>
+        /// <returns>Foreign keys for a domain object in the food waste domain.</returns>
+        internal static IEnumerable<ForeignKeyProxy> GetDomainObjectForeignKeys(IDataProviderBase dataProvider, Guid foreignKeyForIdentifier)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                return subDataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(foreignKeyForIdentifier));
+            }
+        }
+
+        /// <summary>
+        /// Deletes foreign keys for a domain object in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="foreignKeyForIdentifier">Identifier for the given domain object on which to get the foreign keys.</param>
+        internal static void DeleteDomainObjectForeignKeys(IDataProviderBase dataProvider, Guid foreignKeyForIdentifier)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            foreach (var foreignKeyProxy in GetDomainObjectForeignKeys(dataProvider, foreignKeyForIdentifier))
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(foreignKeyProxy);
+                }
+            }
         }
 
         #endregion

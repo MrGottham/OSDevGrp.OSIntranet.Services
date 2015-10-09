@@ -152,11 +152,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 Identifier = Guid.NewGuid()
             };
 
+            var guidEmpty = Guid.Empty;
             var sqlCommand = foreignKeyProxy.GetSqlCommandForInsert();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO ForeignKeys (ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue) VALUES('{0}','{1}','{2}','{3}','{4}')", foreignKeyProxy.UniqueId, foreignKeyProxy.DataProvider.Identifier.HasValue ? foreignKeyProxy.DataProvider.Identifier.Value.ToString("D").ToUpper() : Guid.Empty.ToString("D").ToUpper(), foreignKeyProxy.ForeignKeyForIdentifier, string.Join(";", foreignKeyProxy.ForeignKeyForTypes.Select(m => m.Name)), foreignKeyProxy.ForeignKeyValue)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO ForeignKeys (ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue) VALUES('{0}','{1}','{2}','{3}','{4}')", foreignKeyProxy.UniqueId, foreignKeyProxy.DataProvider.Identifier.HasValue ? foreignKeyProxy.DataProvider.Identifier.Value.ToString("D").ToUpper() : guidEmpty.ToString("D").ToUpper(), foreignKeyProxy.ForeignKeyForIdentifier, string.Join(";", foreignKeyProxy.ForeignKeyForTypes.Select(m => m.Name)), foreignKeyProxy.ForeignKeyValue)));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -173,11 +174,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 Identifier = Guid.NewGuid()
             };
 
+            var guidEmpty = Guid.Empty;
             var sqlCommand = foreignKeyProxy.GetSqlCommandForUpdate();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE ForeignKeys SET DataProviderIdentifier='{1}',ForeignKeyForIdentifier='{2}',ForeignKeyForTypes='{3}',ForeignKeyValue='{4}' WHERE ForeignKeyIdentifier='{0}'", foreignKeyProxy.UniqueId, foreignKeyProxy.DataProvider.Identifier.HasValue ? foreignKeyProxy.DataProvider.Identifier.Value.ToString("D").ToUpper() : Guid.Empty.ToString("D").ToUpper(), foreignKeyProxy.ForeignKeyForIdentifier, string.Join(";", foreignKeyProxy.ForeignKeyForTypes.Select(m => m.Name)), foreignKeyProxy.ForeignKeyValue)));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE ForeignKeys SET DataProviderIdentifier='{1}',ForeignKeyForIdentifier='{2}',ForeignKeyForTypes='{3}',ForeignKeyValue='{4}' WHERE ForeignKeyIdentifier='{0}'", foreignKeyProxy.UniqueId, foreignKeyProxy.DataProvider.Identifier.HasValue ? foreignKeyProxy.DataProvider.Identifier.Value.ToString("D").ToUpper() : guidEmpty.ToString("D").ToUpper(), foreignKeyProxy.ForeignKeyForIdentifier, string.Join(";", foreignKeyProxy.ForeignKeyForTypes.Select(m => m.Name)), foreignKeyProxy.ForeignKeyValue)));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -359,5 +361,90 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(exception.InnerException, Is.Null);
         }
 
+        /// <summary>
+        /// Tests that SaveRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+
+            var foreignKeyProxy = new ForeignKeyProxy();
+            Assert.That(foreignKeyProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyProxy.SaveRelations(null, fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for the foreign key is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var foreignKeyProxy = new ForeignKeyProxy
+            {
+                Identifier = null
+            };
+            Assert.That(foreignKeyProxy, Is.Not.Null);
+            Assert.That(foreignKeyProxy.Identifier, Is.Null);
+            Assert.That(foreignKeyProxy.Identifier.HasValue, Is.False);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foreignKeyProxy.Identifier, "Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var foreignKeyProxy = new ForeignKeyProxy();
+            Assert.That(foreignKeyProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyProxy.DeleteRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an IntranetRepositoryException when the identifier for the foreign key is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var foreignKeyProxy = new ForeignKeyProxy
+            {
+                Identifier = null
+            };
+            Assert.That(foreignKeyProxy, Is.Not.Null);
+            Assert.That(foreignKeyProxy.Identifier, Is.Null);
+            Assert.That(foreignKeyProxy.Identifier.HasValue, Is.False);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foreignKeyProxy.Identifier, "Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
     }
 }

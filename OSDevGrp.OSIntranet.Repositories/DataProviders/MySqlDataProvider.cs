@@ -242,13 +242,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             Open();
             try
             {
-                var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForDelete();
+                dataProxy.DeleteRelations(this);
+                var sqlCommand = ((IMySqlDataProxy<TDataProxy>)dataProxy).GetSqlCommandForDelete();
                 using (var command = _mySqlConnection.CreateCommand())
                 {
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
                 }
-                dataProxy.DeleteRelations(this);
             }
             finally
             {

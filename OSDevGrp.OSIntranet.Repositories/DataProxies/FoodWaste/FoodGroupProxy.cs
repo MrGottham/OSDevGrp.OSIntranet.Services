@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -80,7 +80,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Foods groups which has this food group as a parent. 
+        /// Foods groups which has this food group as a parent.
         /// </summary>
         public override IEnumerable<IFoodGroup> Children
         {
@@ -90,11 +90,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.Children;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
-                {
-                    base.Children = subDataProvider.GetCollection<FoodGroupProxy>(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", UniqueId));
-                    _childrenIsLoaded = true;
-                }
+                base.Children = new List<IFoodGroup>(GetFoodGroupChildren(_dataProvider, Guid.Parse(UniqueId)));
+                _childrenIsLoaded = true;
                 return base.Children;
             }
         }
@@ -110,11 +107,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.Translations;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
-                {
-                    base.Translations = subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(new Guid(UniqueId)));
-                    _translationsIsLoaded = true;
-                }
+                base.Translations = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(_dataProvider, Guid.Parse(UniqueId)));
+                _translationsIsLoaded = true;
                 return base.Translations;
             }
         }
@@ -130,11 +124,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.ForeignKeys;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
-                {
-                    base.ForeignKeys = subDataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(new Guid(UniqueId)));
-                    _foreignKeysIsLoaded = true;
-                }
+                base.ForeignKeys = new List<IForeignKey>(ForeignKeyProxy.GetDomainObjectForeignKeys(_dataProvider, Guid.Parse(UniqueId)));
+                _foreignKeysIsLoaded = true;
                 return base.ForeignKeys;
             }
         }
@@ -249,7 +240,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 _parentIdentifier = string.IsNullOrWhiteSpace(mySqlDataReader.GetString(parentIdentifierOrdinal)) ? (Guid?) null : new Guid(mySqlDataReader.GetString(parentIdentifierOrdinal));
             }
 
-            _dataProvider = dataProvider;
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -271,6 +265,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -279,6 +286,49 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
+
+            var children = GetFoodGroupChildren(dataProvider, Identifier.Value).ToArray();
+            foreach (var child in children)
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(child);
+                }
+            }
+            
+            TranslationProxy.DeleteDomainObjectTranslations(dataProvider, Identifier.Value);
+            ForeignKeyProxy.DeleteDomainObjectForeignKeys(dataProvider, Identifier.Value);
+        }
+
+        /// <summary>
+        /// Gets foods groups which has this a given food group as a parent.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="foodGroupIdentifier">Identifier for the food group which is the parent.</param>
+        /// <returns>Foods groups which has this a given food group as a parent.</returns>
+        private static IEnumerable<FoodGroupProxy> GetFoodGroupChildren(IDataProviderBase dataProvider, Guid foodGroupIdentifier)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                return subDataProvider.GetCollection<FoodGroupProxy>(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", foodGroupIdentifier.ToString("D").ToUpper()));
+            }
         }
 
         #endregion
