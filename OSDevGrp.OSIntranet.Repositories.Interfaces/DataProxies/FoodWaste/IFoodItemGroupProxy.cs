@@ -9,28 +9,28 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
     public interface IFoodItemGroupProxy : IIdentifiable, IMySqlDataProxy<IFoodItemGroupProxy>
     {
         /// <summary>
-        /// Gets or sets the identifier for the food item.
-        /// </summary>
-        Guid FoodItemIdentifier { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier for the food group.
-        /// </summary>
-        Guid FoodGroupIdentifier { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether this will be the primary food group for the food item.
-        /// </summary>
-        bool IsPrimary { get; set; }
-
-        /// <summary>
         /// Gets the food item.
         /// </summary>
         IFoodItem FoodItem { get; }
 
         /// <summary>
+        /// Gets or sets the identifier for the food item.
+        /// </summary>
+        Guid? FoodItemIdentifier { get; set; }
+
+        /// <summary>
         /// Gets the food group.
         /// </summary>
         IFoodGroup FoodGroup { get; }
+
+        /// <summary>
+        /// Gets or sets the identifier for the food group.
+        /// </summary>
+        Guid? FoodGroupIdentifier { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this will be the primary food group for the food item.
+        /// </summary>
+        bool IsPrimary { get; set; }
     }
 }
