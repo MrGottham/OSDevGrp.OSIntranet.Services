@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -367,10 +368,40 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(bool isPrimary)
         {
             var fixture = new Fixture();
+            var foodItemProxy = fixture.Create<FoodItemProxy>();
+            var foodGroupProxy = fixture.Build<FoodGroupProxy>()
+                .With(m => m.Parent, null)
+                .Create();
 
             var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.Get(Arg<FoodItemProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var proxy = (FoodItemProxy) e.Arguments.ElementAt(0);
+                    Assert.That(proxy, Is.Not.Null);
+                    Assert.That(proxy.Identifier, Is.Not.Null);
+                    Assert.That(proxy.Identifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(proxy.Identifier.Value, Is.EqualTo(new Guid("AD62F870-5DFF-4E96-ACE5-D73C06905585")));
+                    // ReSharper restore PossibleInvalidOperationException
+                })
+                .Return(foodItemProxy)
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.Get(Arg<FoodGroupProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var proxy = (FoodGroupProxy) e.Arguments.ElementAt(0);
+                    Assert.That(proxy, Is.Not.Null);
+                    Assert.That(proxy.Identifier, Is.Not.Null);
+                    Assert.That(proxy.Identifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(proxy.Identifier.Value, Is.EqualTo(new Guid("32F94B7E-3D9F-43AE-A1B6-97405CB2B3A1")));
+                    // ReSharper restore PossibleInvalidOperationException
+                })
+                .Return(foodGroupProxy)
                 .Repeat.Any();
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
@@ -400,37 +431,45 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodItemGroupProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("FoodItemGroupIdentifier")));
             // ReSharper restore PossibleInvalidOperationException
-            //Assert.That(foodGroupProxy.Parent, Is.Not.Null);
-            //Assert.That(foodGroupProxy.Parent, Is.EqualTo(parentFoodGroupProxy));
-            //Assert.That(foodGroupProxy.IsActive, Is.True);
-            //Assert.That(foodGroupProxy.Children, Is.Not.Null);
-            //Assert.That(foodGroupProxy.Children, Is.Not.Empty);
-            //Assert.That(foodGroupProxy.Children.Count(), Is.EqualTo(childrenFoodGroupProxyCollection.Count));
-            //foreach (var childFoodGroupProxy in childrenFoodGroupProxyCollection)
-            //{
-            //    Assert.That(foodGroupProxy.Children.Contains(childFoodGroupProxy), Is.True);
-            //}
-            //Assert.That(foodGroupProxy.Translation, Is.Null);
-            //Assert.That(foodGroupProxy.Translations, Is.Not.Null);
-            //Assert.That(foodGroupProxy.Translations, Is.Not.Empty);
-            //Assert.That(foodGroupProxy.Translations.Count(), Is.EqualTo(translationProxyCollection.Count));
-            //foreach (var translationProxy in translationProxyCollection)
-            //{
-            //    Assert.That(foodGroupProxy.Translations.Contains(translationProxy), Is.True);
-            //}
-            //Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Null);
-            //Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Empty);
-            //Assert.That(foodGroupProxy.ForeignKeys.Count(), Is.EqualTo(foreignKeyProxyCollection.Count));
-            //foreach (var foreignKeyProxy in foreignKeyProxyCollection)
-            //{
-            //    Assert.That(foodGroupProxy.ForeignKeys.Contains(foreignKeyProxy), Is.True);
-            //}
+            Assert.That(foodItemGroupProxy.FoodItem, Is.Not.Null);
+            Assert.That(foodItemGroupProxy.FoodItem, Is.TypeOf<FoodItemProxy>());
+            Assert.That(foodItemGroupProxy.FoodItemIdentifier, Is.Not.Null);
+            Assert.That(foodItemGroupProxy.FoodItemIdentifier.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodItemGroupProxy.FoodItemIdentifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("FoodItemIdentifier")));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodItemGroupProxy.FoodGroup, Is.Not.Null);
+            Assert.That(foodItemGroupProxy.FoodGroup, Is.TypeOf<FoodGroupProxy>());
+            Assert.That(foodItemGroupProxy.FoodGroupIdentifier, Is.Not.Null);
+            Assert.That(foodItemGroupProxy.FoodGroupIdentifier.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodItemGroupProxy.FoodGroupIdentifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("FoodGroupIdentifier")));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodItemGroupProxy.IsPrimary, Is.EqualTo(isPrimary));
 
-            //dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(4));
-            //dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<FoodGroupProxy>.Is.NotNull));
-            //dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", dataReader.GetString("FoodGroupIdentifier")))));
-            //dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("FoodGroupIdentifier")))));
-            //dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", dataReader.GetString("FoodGroupIdentifier"))));
+            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
+            dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<FoodItemProxy>.Is.NotNull));
+            dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<FoodGroupProxy>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tests that MapRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+
+            var foodItemGroupProxy = new FoodItemGroupProxy();
+            Assert.That(foodItemGroupProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodItemGroupProxy.MapRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
         }
     }
 }

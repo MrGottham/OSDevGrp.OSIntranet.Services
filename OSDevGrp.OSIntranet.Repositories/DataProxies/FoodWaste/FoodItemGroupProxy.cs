@@ -37,10 +37,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return null;
                 }
-
-                _foodItem.ToString();
-
-                throw new NotImplementedException();
+                if (_foodItem != null)
+                {
+                    return _foodItem;
+                }
+                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                {
+                    var foodItemProxy = new FoodItemProxy
+                    {
+                        Identifier = _foodItemIdentifier.Value
+                    };
+                    _foodItem = subDataProvider.Get(foodItemProxy);
+                }
+                return _foodItem;
             }
         }
 
@@ -75,10 +84,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return null;
                 }
-
-                _foodGroup.ToString();
-                
-                throw new NotImplementedException();
+                if (_foodGroup != null)
+                {
+                    return _foodGroup;
+                }
+                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                {
+                    var foodGroupProxy = new FoodGroupProxy
+                    {
+                        Identifier = _foodGroupIdentifier.Value
+                    };
+                    _foodGroup = subDataProvider.Get(foodGroupProxy);
+                }
+                return _foodGroup;
             }
         }
 
@@ -113,7 +131,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy<IForeignKey>
+        #region IMySqlDataProxy<IFoodItemGroupProxy>
 
         /// <summary>
         /// Gets the unique identification for the relation between a food item and a food group.
@@ -221,6 +239,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
             }
 
+            Identifier = new Guid(mySqlDataReader.GetString("FoodItemGroupIdentifier"));
+            FoodItemIdentifier = new Guid(mySqlDataReader.GetString("FoodItemIdentifier"));
+            FoodGroupIdentifier = new Guid(mySqlDataReader.GetString("FoodGroupIdentifier"));
+            IsPrimary = Convert.ToBoolean(mySqlDataReader.GetInt32("IsPrimary"));
+
             if (_dataProvider == null)
             {
                 _dataProvider = dataProvider;
@@ -233,7 +256,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
         }
 
         /// <summary>
