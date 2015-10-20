@@ -19,7 +19,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class FoodItemGroupProxyTests
     {
-
         /// <summary>
         /// Tests that the constructor initialize a data proxy to a given relation between a food item and a food group.
         /// </summary>
@@ -38,6 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodItemGroupProxy.FoodGroupIdentifier.HasValue, Is.False);
             Assert.That(foodItemGroupProxy.IsPrimary, Is.False);
         }
+
         /// <summary>
         /// Tests that getter for UniqueId throws an IntranetRepositoryException when the relation between a food item and a food group has no identifier.
         /// </summary>
@@ -469,6 +469,92 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+
+            var foodItemGroupProxy = new FoodItemGroupProxy();
+            Assert.That(foodItemGroupProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodItemGroupProxy.SaveRelations(null, fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for the relation between a food item and a food group is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var foodItemGroupProxy = new FoodItemGroupProxy
+            {
+                Identifier = null
+            };
+            Assert.That(foodItemGroupProxy, Is.Not.Null);
+            Assert.That(foodItemGroupProxy.Identifier, Is.Null);
+            Assert.That(foodItemGroupProxy.Identifier.HasValue, Is.False);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodItemGroupProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodItemGroupProxy.Identifier, "Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            var foodItemGroupProxy = new FoodItemGroupProxy();
+            Assert.That(foodItemGroupProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodItemGroupProxy.DeleteRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an IntranetRepositoryException when the identifier for the translation is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var foodItemGroupProxy = new FoodItemGroupProxy
+            {
+                Identifier = null
+            };
+            Assert.That(foodItemGroupProxy, Is.Not.Null);
+            Assert.That(foodItemGroupProxy.Identifier, Is.Null);
+            Assert.That(foodItemGroupProxy.Identifier.HasValue, Is.False);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodItemGroupProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodItemGroupProxy.Identifier, "Identifier")));
             Assert.That(exception.InnerException, Is.Null);
         }
     }

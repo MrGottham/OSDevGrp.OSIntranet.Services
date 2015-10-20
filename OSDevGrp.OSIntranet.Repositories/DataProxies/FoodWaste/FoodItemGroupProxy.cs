@@ -269,7 +269,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -278,7 +290,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         #endregion
