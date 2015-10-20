@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -16,10 +18,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     {
         #region Private variables
 
-        private bool _foodGroupsIsLoaded = false;
-        private bool _translationsIsLoaded = false;
-        private bool _foreignKeysIsLoaded = false;
-        private IDataProviderBase _dataProvider = null;
+        private bool _foodGroupsIsLoaded;
+        private bool _foodGroupsIsLoading;
+        private bool _translationsIsLoaded;
+        private bool _foreignKeysIsLoaded;
+        private IDataProviderBase _dataProvider;
 
         #endregion
 
@@ -52,11 +55,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             get
             {
-                if (base.PrimaryFoodGroup != null || _dataProvider == null)
+                if (base.PrimaryFoodGroup != null)
                 {
                     return base.PrimaryFoodGroup;
                 }
-                throw new NotImplementedException();
+                
+                // Force the lazy load of food groups which should initialize the primary food group.
+                FoodGroups.ToArray();
+                
+                return base.PrimaryFoodGroup;
             }
         }
 
@@ -67,11 +74,33 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             get
             {
-                if (_foodGroupsIsLoaded || _dataProvider == null)
+                if (_foodGroupsIsLoaded || _foodGroupsIsLoading || _dataProvider == null)
                 {
                     return base.FoodGroups;
                 }
-                throw new NotImplementedException();
+                _foodGroupsIsLoading = true;
+                try
+                {
+                    // Find all relations between this food item and it's food group.
+                    var foodItemGroups = FoodItemGroupProxy.GetFoodItemGroups(_dataProvider, Guid.Parse(UniqueId)).ToArray();
+                    var primaryFoodItemGroup = foodItemGroups.SingleOrDefault(foodItemGroup => foodItemGroup.IsPrimary);
+
+                    // Initialize the collection of food groups on this food item.
+                    base.FoodGroups = foodItemGroups.Select(foodItemGroup => foodItemGroup.FoodGroup).ToList();
+                    _foodGroupsIsLoaded = true;
+
+                    // Initialize the primary food group for this food item.
+                    if (primaryFoodItemGroup != null)
+                    {
+                        base.PrimaryFoodGroup = primaryFoodItemGroup.FoodGroup;
+                    }
+
+                    return base.FoodGroups;
+                }
+                finally
+                {
+                    _foodGroupsIsLoading = false;
+                }
             }
         }
 
@@ -86,7 +115,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.Translations;
                 }
-                throw new NotImplementedException();
+                base.Translations = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(_dataProvider, Guid.Parse(UniqueId)));
+                _translationsIsLoaded = true;
+                return base.Translations;
             }
         }
 
@@ -101,7 +132,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.ForeignKeys;
                 }
-                throw new NotImplementedException();
+                base.ForeignKeys = new List<IForeignKey>(ForeignKeyProxy.GetDomainObjectForeignKeys(_dataProvider, Guid.Parse(UniqueId)));
+                _foreignKeysIsLoaded = true;
+                return base.ForeignKeys;
             }
         }
 
@@ -148,7 +181,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this food item</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new NotImplementedException();
+            return string.Format("INSERT INTO FoodItems (FoodItemIdentifier,IsActive) VALUES('{0}',{1})", UniqueId, Convert.ToInt32(IsActive));
         }
 
         /// <summary>
@@ -157,7 +190,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this food item.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new NotImplementedException();
+            return string.Format("UPDATE FoodItems SET IsActive={1} WHERE FoodItemIdentifier='{0}'", UniqueId, Convert.ToInt32(IsActive));
         }
 
         /// <summary>
@@ -166,7 +199,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to delete this food item.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new NotImplementedException();
+            return string.Format("DELETE FROM FoodItems WHERE FoodItemIdentifier='{0}'", UniqueId);
         }
 
         #endregion
@@ -180,7 +213,28 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException("dataReader");
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
+            }
+
+            Identifier = new Guid(mySqlDataReader.GetString("FoodItemIdentifier"));
+            IsActive = Convert.ToBoolean(mySqlDataReader.GetInt32("IsActive"));
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -189,7 +243,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
         }
 
         /// <summary>

@@ -368,8 +368,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(bool isPrimary)
         {
             var fixture = new Fixture();
-            var foodItemProxy = fixture.Create<FoodItemProxy>();
+            var foodItemProxy = fixture.Build<FoodItemProxy>()
+                .With(m => m.Identifier, new Guid("AD62F870-5DFF-4E96-ACE5-D73C06905585"))
+                .Create();
             var foodGroupProxy = fixture.Build<FoodGroupProxy>()
+                .With(m => m.Identifier, new Guid("32F94B7E-3D9F-43AE-A1B6-97405CB2B3A1"))
                 .With(m => m.Parent, null)
                 .Create();
 
