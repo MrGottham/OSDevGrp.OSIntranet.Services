@@ -82,7 +82,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 try
                 {
                     // Find all relations between this food item and it's food group.
-                    var foodItemGroups = FoodItemGroupProxy.GetFoodItemGroups(_dataProvider, Guid.Parse(UniqueId)).ToArray();
+                    var foodItemGroups = FoodItemGroupProxy.GetFoodItemGroups(_dataProvider, this).ToArray();
                     var primaryFoodItemGroup = foodItemGroups.SingleOrDefault(foodItemGroup => foodItemGroup.IsPrimary);
 
                     // Initialize the collection of food groups on this food item.
@@ -256,7 +256,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -265,7 +277,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         #endregion

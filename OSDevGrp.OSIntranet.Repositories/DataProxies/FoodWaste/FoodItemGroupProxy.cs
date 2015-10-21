@@ -342,17 +342,91 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Gets relations between a given food item and it's food groups in the food waste domain.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        /// <param name="foodItemIdentifier">Identifier of the food item for which to get the relations between the food item and it's food groups.</param>
+        /// <param name="foodItemProxy">Data proxy for the food item on which to get the relations between the food item and it's food groups.</param>
         /// <returns>Relations between a given food item and it's food groups in the food waste domain.</returns>
-        internal static IEnumerable<FoodItemGroupProxy> GetFoodItemGroups(IDataProviderBase dataProvider, Guid foodItemIdentifier)
+        internal static IEnumerable<FoodItemGroupProxy> GetFoodItemGroups(IDataProviderBase dataProvider, IFoodItemProxy foodItemProxy)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProvider");
             }
+            if (foodItemProxy == null)
+            {
+                throw new ArgumentNullException("foodItemProxy");
+            }
             using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<FoodItemGroupProxy>(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary WHERE FoodItemIdentifier='{0}'", foodItemIdentifier.ToString("D").ToUpper()));
+                return subDataProvider.GetCollection<FoodItemGroupProxy>(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary WHERE FoodItemIdentifier='{0}'", foodItemProxy.UniqueId));
+            }
+        }
+
+        /// <summary>
+        /// Gets relations between a given food group and it's food items in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="foodGroupProxy">Data proxy for the food group on which to get the relations between the food group and it's food items.</param>
+        /// <returns>Relations between a given food group and it's food items in the food waste domain.</returns>
+        internal static IEnumerable<FoodItemGroupProxy> GetFoodItemGroups(IDataProviderBase dataProvider, IFoodGroupProxy foodGroupProxy)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (foodGroupProxy == null)
+            {
+                throw new ArgumentNullException("foodGroupProxy");
+            }
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                return subDataProvider.GetCollection<FoodItemGroupProxy>(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.UniqueId));
+            }
+        }
+
+        /// <summary>
+        /// Deletes relations between a given food item and it's food groups in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="foodItemProxy">Data proxy for the food item on which to delete the relations between the food item and it's food groups.</param>
+        internal static void DeleteFoodItemGroups(IDataProviderBase dataProvider, IFoodItemProxy foodItemProxy)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (foodItemProxy == null)
+            {
+                throw new ArgumentNullException("foodItemProxy");
+            }
+            foreach (var foodItemGroupProxy in GetFoodItemGroups(dataProvider, foodItemProxy))
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(foodItemGroupProxy);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes relations between a given food group and it's food items in the food waste domain.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="foodGroupProxy">Data proxy for the food group on which to delete the relations between the food group and it's food items.</param>
+        internal static void DeleteFoodItemGroups(IDataProviderBase dataProvider, IFoodGroupProxy foodGroupProxy)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (foodGroupProxy == null)
+            {
+                throw new ArgumentNullException("foodGroupProxy");
+            }
+            foreach (var foodItemGroupProxy in GetFoodItemGroups(dataProvider, foodGroupProxy))
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(foodItemGroupProxy);
+                }
             }
         }
 

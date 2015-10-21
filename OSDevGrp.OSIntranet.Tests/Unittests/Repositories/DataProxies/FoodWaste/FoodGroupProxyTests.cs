@@ -503,7 +503,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that DeleteRelations calls Clone on the data provider tree times.
         /// </summary>
         [Test]
-        public void TestThatDeleteRelationsCallsCloneOnDataProvider3Times()
+        public void TestThatDeleteRelationsCallsCloneOnDataProvider4Times()
         {
             var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
             dataProviderMock.Stub(m => m.Clone())
@@ -511,6 +511,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
                 .Return(new List<TranslationProxy>())
@@ -529,7 +532,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             foodGroupProxy.DeleteRelations(dataProviderMock);
 
-            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(3));
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(4));
         }
 
         /// <summary>
@@ -544,6 +547,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
                 .Return(new List<TranslationProxy>())
@@ -594,6 +600,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
                 .Return(childrenFoodGroupProxyCollection)
                 .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
@@ -623,6 +632,91 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that DeleteRelations calls GetCollection on the data provider to get the releations between the food group and it's food items.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetFoodItemGroups()
+        {
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+
+            var foodGroupProxy = new FoodGroupProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodGroupProxy, Is.Not.Null);
+            Assert.That(foodGroupProxy.Identifier, Is.Not.Null);
+            Assert.That(foodGroupProxy.Identifier.HasValue, Is.True);
+
+            foodGroupProxy.DeleteRelations(dataProviderMock);
+
+            // ReSharper disable PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsActive FROM FoodItemGroups WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
+            // ReSharper restore PossibleInvalidOperationException
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls Delete on the data provider for each relation between the food group and it's food items.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsDeleteOnDataProviderForEachFoodItemGroups()
+        {
+            var fixture = new Fixture();
+
+            var foodItemGroupProxyCollection = fixture.CreateMany<FoodItemGroupProxy>(7).ToList();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(foodItemGroupProxyCollection)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Delete(Arg<FoodItemGroupProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var foodItemGroupProxy = (FoodItemGroupProxy) e.Arguments.ElementAt(0);
+                    Assert.That(foodItemGroupProxy, Is.Not.Null);
+                    Assert.That(foodItemGroupProxyCollection.Contains(foodItemGroupProxy), Is.True);
+                })
+                .Repeat.Any();
+
+            var foodGroupProxy = new FoodGroupProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodGroupProxy, Is.Not.Null);
+            Assert.That(foodGroupProxy.Identifier, Is.Not.Null);
+            Assert.That(foodGroupProxy.Identifier.HasValue, Is.True);
+
+            foodGroupProxy.DeleteRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.Delete(Arg<FoodItemGroupProxy>.Is.NotNull), opt => opt.Repeat.Times(foodItemGroupProxyCollection.Count));
+        }
+
+        /// <summary>
         /// Tests that DeleteRelations calls GetCollection on the data provider to get the translation for the data proxy food group.
         /// </summary>
         [Test]
@@ -634,6 +728,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
                 .Return(new List<TranslationProxy>())
@@ -672,6 +769,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
                 .Return(translationProxyCollection)
@@ -714,6 +814,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
@@ -751,6 +854,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
                 .Return(new List<TranslationProxy>())
