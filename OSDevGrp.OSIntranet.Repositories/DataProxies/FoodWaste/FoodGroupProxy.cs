@@ -42,6 +42,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public FoodGroupProxy(IEnumerable<IFoodGroup> children) 
             : base(children)
         {
+            _childrenIsLoaded = true;
         }
 
         #endregion
@@ -309,6 +310,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 }
             }
             
+            FoodItemGroupProxy.DeleteFoodItemGroups(dataProvider, this);
             TranslationProxy.DeleteDomainObjectTranslations(dataProvider, Identifier.Value);
             ForeignKeyProxy.DeleteDomainObjectForeignKeys(dataProvider, Identifier.Value);
         }

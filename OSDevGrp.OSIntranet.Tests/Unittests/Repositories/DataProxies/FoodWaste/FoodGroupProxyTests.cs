@@ -500,7 +500,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that DeleteRelations calls Clone on the data provider tree times.
+        /// Tests that DeleteRelations calls Clone on the data provider four times.
         /// </summary>
         [Test]
         public void TestThatDeleteRelationsCallsCloneOnDataProvider4Times()
@@ -665,7 +665,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             foodGroupProxy.DeleteRelations(dataProviderMock);
 
             // ReSharper disable PossibleInvalidOperationException
-            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsActive FROM FoodItemGroups WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
             // ReSharper restore PossibleInvalidOperationException
         }
 

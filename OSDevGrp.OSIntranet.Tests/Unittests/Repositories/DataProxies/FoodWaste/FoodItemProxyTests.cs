@@ -372,7 +372,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             }
 
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(3));
-            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary WHERE FoodItemIdentifier='{0}'", dataReader.GetString("FoodItemIdentifier")))));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodItemIdentifier='{0}'", dataReader.GetString("FoodItemIdentifier")))));
             dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("FoodItemIdentifier")))));
             dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", dataReader.GetString("FoodItemIdentifier"))));
         }
@@ -442,6 +442,166 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for the primary food group is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNullOnPrimaryFoodGroup()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var primaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            primaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(null)
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy(primaryFoodGroupMock)
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodItemProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, primaryFoodGroupMock.Identifier, "PrimaryFoodGroup.Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for a secondary food group is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNullOnSecondaryFoodGroup()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+
+            var primaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            primaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var secondaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            secondaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(null)
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy(primaryFoodGroupMock)
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            foodItemProxy.FoodGroupAdd(secondaryFoodGroupMock);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Null);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItemProxy.FoodGroups.Contains(secondaryFoodGroupMock), Is.True);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodItemProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, secondaryFoodGroupMock.Identifier, "FoodGroups[].Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations inserts the missing relations between a food item and it's food groups.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsInsertsMissingFoodItemGroups()
+        {
+            var fixture = new Fixture();
+            var foodItemIdentifier = Guid.NewGuid();
+
+            var primaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            primaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var secondaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            secondaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var dataProviderMock = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>(0))
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Add(Arg<FoodItemGroupProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var foodItemGroupProxy = (FoodItemGroupProxy) e.Arguments.ElementAt(0);
+                    Assert.That(foodItemGroupProxy, Is.Not.Null);
+                    Assert.That(foodItemGroupProxy.Identifier, Is.Not.Null);
+                    Assert.That(foodItemGroupProxy.Identifier.HasValue, Is.True);
+                    Assert.That(foodItemGroupProxy.FoodItemIdentifier, Is.Not.Null);
+                    Assert.That(foodItemGroupProxy.FoodItemIdentifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(foodItemGroupProxy.FoodItemIdentifier.Value, Is.EqualTo(foodItemIdentifier));
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(foodItemGroupProxy.FoodGroupIdentifier, Is.Not.Null);
+                    Assert.That(foodItemGroupProxy.FoodGroupIdentifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    if (foodItemGroupProxy.FoodGroupIdentifier.Value == primaryFoodGroupMock.Identifier.Value)
+                    // ReSharper restore PossibleInvalidOperationException
+                    {
+                        Assert.That(foodItemGroupProxy.IsPrimary, Is.True);
+                        e.ReturnValue = foodItemGroupProxy;
+                        return;
+                    }
+                    // ReSharper disable PossibleInvalidOperationException
+                    if (foodItemGroupProxy.FoodGroupIdentifier.Value == secondaryFoodGroupMock.Identifier.Value)
+                    // ReSharper restore PossibleInvalidOperationException
+                    {
+                        Assert.That(foodItemGroupProxy.IsPrimary, Is.False);
+                        e.ReturnValue = foodItemGroupProxy;
+                        return;
+                    }
+                    Assert.Fail(string.Format("The FoodGroupIdentifier '{0}' is unknown.", foodItemGroupProxy.FoodGroupIdentifier.Value));
+                })
+                .Return(null)
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy(primaryFoodGroupMock)
+            {
+                Identifier = foodItemIdentifier
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            foodItemProxy.FoodGroupAdd(secondaryFoodGroupMock);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Null);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItemProxy.FoodGroups.Contains(secondaryFoodGroupMock), Is.True);
+
+            foodItemProxy.SaveRelations(dataProviderMock, fixture.Create<bool>());
+
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(3));
+            // ReSharper disable PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodItemIdentifier='{0}'", foodItemProxy.Identifier.Value.ToString("D").ToUpper()))));
+            // ReSharper restore PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.Add(Arg<FoodItemGroupProxy>.Is.NotNull), opt => opt.Repeat.Times(2));
+        }
+
+
+        /// <summary>
         /// Tests that DeleteRelations throws an ArgumentNullException if the data provider is null.
         /// </summary>
         [Test]
@@ -481,6 +641,276 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(exception.Message, Is.Not.Empty);
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodItemProxy.Identifier, "Identifier")));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls Clone on the data provider tree times.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsCloneOnDataProvider3Times()
+        {
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+
+            foodItemProxy.DeleteRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(3));
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls GetCollection on the data provider to get the releations between the food item and it's food groups.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetFoodItemGroups()
+        {
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+
+            foodItemProxy.DeleteRelations(dataProviderMock);
+
+            // ReSharper disable PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodItemIdentifier='{0}'", foodItemProxy.Identifier.Value.ToString("D").ToUpper()))));
+            // ReSharper restore PossibleInvalidOperationException
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls Delete on the data provider for each relation between the food item and it's food groups.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsDeleteOnDataProviderForEachFoodItemGroups()
+        {
+            var fixture = new Fixture();
+
+            var foodItemGroupProxyCollection = fixture.CreateMany<FoodItemGroupProxy>(7).ToList();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(foodItemGroupProxyCollection)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Delete(Arg<FoodItemGroupProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var foodItemGroupProxy = (FoodItemGroupProxy) e.Arguments.ElementAt(0);
+                    Assert.That(foodItemGroupProxy, Is.Not.Null);
+                    Assert.That(foodItemGroupProxyCollection.Contains(foodItemGroupProxy), Is.True);
+                })
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+
+            foodItemProxy.DeleteRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.Delete(Arg<FoodItemGroupProxy>.Is.NotNull), opt => opt.Repeat.Times(foodItemGroupProxyCollection.Count));
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls GetCollection on the data provider to get the translation for the data proxy food item.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetTranslations()
+        {
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+
+            foodItemProxy.DeleteRelations(dataProviderMock);
+
+            // ReSharper disable PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", foodItemProxy.Identifier.Value.ToString("D").ToUpper()))));
+            // ReSharper restore PossibleInvalidOperationException
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls Delete on the data provider for each translation for the data proxy food item.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsDeleteOnDataProviderForEachTranslations()
+        {
+            var fixture = new Fixture();
+
+            var translationProxyCollection = fixture.CreateMany<TranslationProxy>(7).ToList();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(translationProxyCollection)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Delete(Arg<TranslationProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var translationProxy = (TranslationProxy) e.Arguments.ElementAt(0);
+                    Assert.That(translationProxy, Is.Not.Null);
+                    Assert.That(translationProxyCollection.Contains(translationProxy), Is.True);
+                })
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+
+            foodItemProxy.DeleteRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.Delete(Arg<TranslationProxy>.Is.NotNull), opt => opt.Repeat.Times(translationProxyCollection.Count));
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls GetCollection on the data provider to get the foreign keys for the data proxy food item.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetForeignKeys()
+        {
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(new List<ForeignKeyProxy>())
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+
+            foodItemProxy.DeleteRelations(dataProviderMock);
+
+            // ReSharper disable PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", foodItemProxy.Identifier.Value.ToString("D").ToUpper())));
+            // ReSharper restore PossibleInvalidOperationException
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls Delete on the data provider for each translation for the data proxy food item.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsDeleteOnDataProviderForEachForeignKey()
+        {
+            var fixture = new Fixture();
+
+            var foreignKeyProxyCollection = fixture.CreateMany<ForeignKeyProxy>(7).ToList();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(new List<FoodItemGroupProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(new List<TranslationProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                .Return(foreignKeyProxyCollection)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Delete(Arg<ForeignKeyProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var foreignKeyProxy = (ForeignKeyProxy) e.Arguments.ElementAt(0);
+                    Assert.That(foreignKeyProxy, Is.Not.Null);
+                    Assert.That(foreignKeyProxyCollection.Contains(foreignKeyProxy), Is.True);
+                })
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+
+            foodItemProxy.DeleteRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.Delete(Arg<ForeignKeyProxy>.Is.NotNull), opt => opt.Repeat.Times(foreignKeyProxyCollection.Count));
         }
     }
 }

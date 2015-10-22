@@ -42,6 +42,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public FoodItemProxy(IFoodGroup primaryFoodGroup) 
             : base(primaryFoodGroup)
         {
+            _foodGroupsIsLoaded = true;
         }
 
         #endregion
@@ -269,6 +270,34 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 _dataProvider = dataProvider;
             }
+
+            if (PrimaryFoodGroup != null && PrimaryFoodGroup.Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, PrimaryFoodGroup.Identifier, "PrimaryFoodGroup.Identifier"));
+            }
+            if (FoodGroups != null && FoodGroups.Any(foodGroup => foodGroup.Identifier.HasValue == false))
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, FoodGroups.First(foodGroup => foodGroup.Identifier.HasValue == false).Identifier, "FoodGroups[].Identifier"));
+            }
+
+            var foodItemGroups = FoodItemGroupProxy.GetFoodItemGroups(dataProvider, this).ToList();
+            if (PrimaryFoodGroup != null && PrimaryFoodGroup.Identifier.HasValue && foodItemGroups.SingleOrDefault(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value == PrimaryFoodGroup.Identifier.Value) == null)
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    var foodItemGroupProxy = new FoodItemGroupProxy
+                    {
+                        Identifier = Guid.NewGuid(),
+                        FoodItemIdentifier = Identifier.Value,
+                        FoodGroupIdentifier = PrimaryFoodGroup.Identifier.Value,
+                        IsPrimary = true
+                    };
+                    foodItemGroups.Add(subDataProvider.Add(foodItemGroupProxy));
+                }
+            }
+
+//            var missingFoodItemGroup = foodItemGroups.Single()
+
         }
 
         /// <summary>
@@ -290,6 +319,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 _dataProvider = dataProvider;
             }
+
+            FoodItemGroupProxy.DeleteFoodItemGroups(dataProvider, this);
+            TranslationProxy.DeleteDomainObjectTranslations(dataProvider, Identifier.Value);
+            ForeignKeyProxy.DeleteDomainObjectForeignKeys(dataProvider, Identifier.Value);
         }
 
         #endregion
