@@ -275,7 +275,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, PrimaryFoodGroup.Identifier, "PrimaryFoodGroup.Identifier"));
             }
-            if (FoodGroups != null && FoodGroups.Any(foodGroup => foodGroup.Identifier.HasValue == false))
+            if (FoodGroups.Any(foodGroup => foodGroup.Identifier.HasValue == false))
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, FoodGroups.First(foodGroup => foodGroup.Identifier.HasValue == false).Identifier, "FoodGroups[].Identifier"));
             }
@@ -295,9 +295,58 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                     foodItemGroups.Add(subDataProvider.Add(foodItemGroupProxy));
                 }
             }
+            var missingfoodItemGroup = FoodGroups.FirstOrDefault(foodGroup => foodGroup.Identifier.HasValue && foodItemGroups.Any(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value == foodGroup.Identifier.Value) == false);
+            while (missingfoodItemGroup != null)
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    var foodItemGroupProxy = new FoodItemGroupProxy
+                    {
+                        Identifier = Guid.NewGuid(),
+                        FoodItemIdentifier = Identifier.Value,
+                        FoodGroupIdentifier = missingfoodItemGroup.Identifier,
+                        IsPrimary = false
+                    };
+                    foodItemGroups.Add(subDataProvider.Add(foodItemGroupProxy));
+                }
+                missingfoodItemGroup = FoodGroups.FirstOrDefault(foodGroup => foodGroup.Identifier.HasValue && foodItemGroups.Any(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value == foodGroup.Identifier.Value) == false);
+            }
+            var noLongerExistingFoodItemGroup = foodItemGroups.FirstOrDefault(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && FoodGroups.Any(foodGroup => foodGroup.Identifier.HasValue && foodGroup.Identifier.Value == foodItemGroup.FoodGroupIdentifier.Value) == false);
+            while (noLongerExistingFoodItemGroup != null)
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(noLongerExistingFoodItemGroup);
+                    foodItemGroups.Remove(noLongerExistingFoodItemGroup);
+                }
+                noLongerExistingFoodItemGroup = foodItemGroups.FirstOrDefault(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && FoodGroups.Any(foodGroup => foodGroup.Identifier.HasValue && foodGroup.Identifier.Value == foodItemGroup.FoodGroupIdentifier.Value) == false);
+            }
 
-//            var missingFoodItemGroup = foodItemGroups.Single()
-
+            if (PrimaryFoodGroup == null || PrimaryFoodGroup.Identifier.HasValue == false)
+            {
+                return;
+            }
+            var primaryFoodItemGroup = foodItemGroups.SingleOrDefault(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value == PrimaryFoodGroup.Identifier.Value);
+            if (primaryFoodItemGroup != null && primaryFoodItemGroup.IsPrimary == false)
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    primaryFoodItemGroup.IsPrimary = true;
+                    foodItemGroups.Remove(primaryFoodItemGroup);
+                    foodItemGroups.Add(subDataProvider.Save(primaryFoodItemGroup));
+                }
+            }
+            var nonPrimaryFoodItemGroup = foodItemGroups.Where(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value != PrimaryFoodGroup.Identifier.Value).SingleOrDefault(foodItemGroup => foodItemGroup.IsPrimary);
+            while (nonPrimaryFoodItemGroup != null)
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    nonPrimaryFoodItemGroup.IsPrimary = false;
+                    foodItemGroups.Remove(nonPrimaryFoodItemGroup);
+                    foodItemGroups.Add(subDataProvider.Save(nonPrimaryFoodItemGroup));
+                }
+                nonPrimaryFoodItemGroup = foodItemGroups.Where(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value != PrimaryFoodGroup.Identifier.Value).SingleOrDefault(foodItemGroup => foodItemGroup.IsPrimary);
+            }
         }
 
         /// <summary>

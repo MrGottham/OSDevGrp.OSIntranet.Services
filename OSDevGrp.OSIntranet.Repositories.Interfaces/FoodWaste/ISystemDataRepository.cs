@@ -9,6 +9,27 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
     public interface ISystemDataRepository : IDataRepository
     {
         /// <summary>
+        /// Gets all the food items.
+        /// </summary>
+        /// <returns>All food items.</returns>
+        IEnumerable<IFoodItem> FoodItemGetAll();
+
+        /// <summary>
+        /// Gets all the food items which belongs to a given food group.
+        /// </summary>
+        /// <param name="foodGroup">Food group which the food items should belong to.</param>
+        /// <returns>All food items which belongs to the given food group.</returns>
+        IEnumerable<IFoodItem> FoodItemGetAllForFoodGroup(IFoodGroup foodGroup);
+
+        /// <summary>
+        /// Gets a food item by a given data providers foreign key.
+        /// </summary>
+        /// <param name="dataProvider">Data provider.</param>
+        /// <param name="foreignKeyValue">Foreign key value.</param>
+        /// <returns>Food item.</returns>
+        IFoodItem FoodItemGetByForeignKey(IDataProvider dataProvider, string foreignKeyValue);
+            
+        /// <summary>
         /// Gets all the food groups.
         /// </summary>
         /// <returns>All food groups.</returns>

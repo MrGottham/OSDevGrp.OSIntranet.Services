@@ -41,6 +41,47 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Gets all the food items.
+        /// </summary>
+        /// <returns>All food items.</returns>
+        public virtual IEnumerable<IFoodItem> FoodItemGetAll()
+        {
+            try
+            {
+                return DataProvider.GetCollection<FoodItemProxy>("SELECT FoodItemIdentifier,IsActive FROM FoodItems");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets all the food items which belongs to a given food group.
+        /// </summary>
+        /// <param name="foodGroup">Food group which the food items should belong to.</param>
+        /// <returns>All food items which belongs to the given food group.</returns>
+        public virtual IEnumerable<IFoodItem> FoodItemGetAllForFoodGroup(IFoodGroup foodGroup)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Gets a food item by a given data providers foreign key.
+        /// </summary>
+        /// <param name="dataProvider">Data provider.</param>
+        /// <param name="foreignKeyValue">Foreign key value.</param>
+        /// <returns>Food item.</returns>
+        public virtual IFoodItem FoodItemGetByForeignKey(IDataProvider dataProvider, string foreignKeyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Gets all the food groups.
         /// </summary>
         /// <returns>All food groups.</returns>

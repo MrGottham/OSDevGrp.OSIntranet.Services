@@ -600,6 +600,174 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataProviderMock.AssertWasCalled(m => m.Add(Arg<FoodItemGroupProxy>.Is.NotNull), opt => opt.Repeat.Times(2));
         }
 
+        /// <summary>
+        /// Tests that SaveRelations deletes the no longer existing relations between a food item and it's food groups.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsDeletesNoLongerExistingFoodItemGroups()
+        {
+            var fixture = new Fixture();
+            var foodItemIdentifier = Guid.NewGuid();
+
+            var primaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            primaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var secondaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            secondaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var noLongerExistingFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            noLongerExistingFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodItemGroupProxyCollection = new List<FoodItemGroupProxy>
+            {
+                new FoodItemGroupProxy(MockRepository.GenerateMock<IFoodItem>(), primaryFoodGroupMock)
+                {
+                    IsPrimary = true
+                },
+                new FoodItemGroupProxy(MockRepository.GenerateMock<IFoodItem>(), secondaryFoodGroupMock)
+                {
+                    IsPrimary = false
+                },
+                new FoodItemGroupProxy(MockRepository.GenerateMock<IFoodItem>(), noLongerExistingFoodGroupMock)
+                {
+                    IsPrimary = false
+                }
+            };
+
+            var dataProviderMock = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(foodItemGroupProxyCollection)
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy(primaryFoodGroupMock)
+            {
+                Identifier = foodItemIdentifier
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            foodItemProxy.FoodGroupAdd(secondaryFoodGroupMock);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Null);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItemProxy.FoodGroups.Contains(secondaryFoodGroupMock), Is.True);
+
+            foodItemProxy.SaveRelations(dataProviderMock, fixture.Create<bool>());
+
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
+            // ReSharper disable PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodItemIdentifier='{0}'", foodItemProxy.Identifier.Value.ToString("D").ToUpper()))));
+            // ReSharper restore PossibleInvalidOperationException
+            dataProviderMock.AssertWasNotCalled(m => m.Delete(Arg<FoodItemGroupProxy>.Is.Equal(foodItemGroupProxyCollection.ElementAt(0))));
+            dataProviderMock.AssertWasNotCalled(m => m.Delete(Arg<FoodItemGroupProxy>.Is.Equal(foodItemGroupProxyCollection.ElementAt(1))));
+            dataProviderMock.AssertWasCalled(m => m.Delete(Arg<FoodItemGroupProxy>.Is.Equal(foodItemGroupProxyCollection.ElementAt(2))));
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations updates IsPrimary on relations between a food item and it's food groups.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsUpdatesIsPrimaryOnFoodItemGroups()
+        {
+            var fixture = new Fixture();
+            var foodItemIdentifier = Guid.NewGuid();
+
+            var primaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            primaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var secondaryFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            secondaryFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var noLongerExistingFoodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            noLongerExistingFoodGroupMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodItemGroupProxyCollection = new List<FoodItemGroupProxy>
+            {
+                new FoodItemGroupProxy(MockRepository.GenerateMock<IFoodItem>(), primaryFoodGroupMock)
+                {
+                    IsPrimary = false
+                },
+                new FoodItemGroupProxy(MockRepository.GenerateMock<IFoodItem>(), secondaryFoodGroupMock)
+                {
+                    IsPrimary = true
+                }
+            };
+
+            var dataProviderMock = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+                .Return(foodItemGroupProxyCollection)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Save(Arg<FoodItemGroupProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var foodItemGroupProxy = (FoodItemGroupProxy) e.Arguments.ElementAt(0);
+                    Assert.That(foodItemGroupProxy, Is.Not.Null);
+                    Assert.That(foodItemGroupProxy.FoodGroupIdentifier, Is.Not.Null);
+                    Assert.That(foodItemGroupProxy.FoodGroupIdentifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    if (foodItemGroupProxy.FoodGroupIdentifier.Value == primaryFoodGroupMock.Identifier.Value)
+                    // ReSharper restore PossibleInvalidOperationException
+                    {
+                        Assert.That(foodItemGroupProxy.IsPrimary, Is.True);
+                        e.ReturnValue = foodItemGroupProxy;
+                        return;
+                    }
+                    // ReSharper disable PossibleInvalidOperationException
+                    if (foodItemGroupProxy.FoodGroupIdentifier.Value == secondaryFoodGroupMock.Identifier.Value)
+                    // ReSharper restore PossibleInvalidOperationException
+                    {
+                        Assert.That(foodItemGroupProxy.IsPrimary, Is.False);
+                        e.ReturnValue = foodItemGroupProxy;
+                        return;
+                    }
+                    Assert.Fail(string.Format("The FoodGroupIdentifier '{0}' is unknown.", foodItemGroupProxy.FoodGroupIdentifier.Value));
+                })
+                .Return(null)
+                .Repeat.Any();
+
+            var foodItemProxy = new FoodItemProxy(primaryFoodGroupMock)
+            {
+                Identifier = foodItemIdentifier
+            };
+            Assert.That(foodItemProxy, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier, Is.Not.Null);
+            Assert.That(foodItemProxy.Identifier.HasValue, Is.True);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItemProxy.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            foodItemProxy.FoodGroupAdd(secondaryFoodGroupMock);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Null);
+            Assert.That(foodItemProxy.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItemProxy.FoodGroups.Contains(secondaryFoodGroupMock), Is.True);
+
+            foodItemProxy.SaveRelations(dataProviderMock, fixture.Create<bool>());
+
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(3));
+            // ReSharper disable PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodItemIdentifier='{0}'", foodItemProxy.Identifier.Value.ToString("D").ToUpper()))));
+            // ReSharper restore PossibleInvalidOperationException
+            dataProviderMock.AssertWasCalled(m => m.Save(Arg<FoodItemGroupProxy>.Is.NotNull), opt => opt.Repeat.Times(2));
+        }
 
         /// <summary>
         /// Tests that DeleteRelations throws an ArgumentNullException if the data provider is null.

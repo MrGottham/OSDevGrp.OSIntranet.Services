@@ -25,6 +25,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// <summary>
         /// Adds a food group which this food item should belong to.
         /// </summary>
+        /// 
         /// <param name="foodGroup">Food group which this food item should belong to.</param>
         void FoodGroupAdd(IFoodGroup foodGroup);
     }
