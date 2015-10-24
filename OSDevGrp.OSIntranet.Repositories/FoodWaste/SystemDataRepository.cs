@@ -67,6 +67,14 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>All food items which belongs to the given food group.</returns>
         public virtual IEnumerable<IFoodItem> FoodItemGetAllForFoodGroup(IFoodGroup foodGroup)
         {
+            if (foodGroup == null)
+            {
+                throw new ArgumentNullException("foodGroup");
+            }
+            if (foodGroup.Identifier.HasValue == false)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroup.Identifier, "Identifier"));
+            }
             throw new NotImplementedException();
         }
 
