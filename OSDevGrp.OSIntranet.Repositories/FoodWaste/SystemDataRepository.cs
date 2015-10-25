@@ -71,11 +71,22 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 throw new ArgumentNullException("foodGroup");
             }
-            if (foodGroup.Identifier.HasValue == false)
+            try
             {
+                if (foodGroup.Identifier.HasValue)
+                {
+                    return DataProvider.GetCollection<FoodItemProxy>(string.Format("SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{0}'", foodGroup.Identifier.Value.ToString("D").ToUpper()));
+                }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroup.Identifier, "Identifier"));
             }
-            throw new NotImplementedException();
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
         }
 
         /// <summary>
