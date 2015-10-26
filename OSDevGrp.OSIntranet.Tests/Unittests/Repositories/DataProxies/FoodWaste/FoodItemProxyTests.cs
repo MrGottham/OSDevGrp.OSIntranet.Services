@@ -139,7 +139,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlQueryForId, Is.Not.Null);
             Assert.That(sqlQueryForId, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT IsActive FROM FoodItems WHERE FoodItemIdentifier='{0}'", foodItemMock.Identifier.Value.ToString("D").ToUpper())));
+            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT FoodItemIdentifier,IsActive FROM FoodItems WHERE FoodItemIdentifier='{0}'", foodItemMock.Identifier.Value.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 

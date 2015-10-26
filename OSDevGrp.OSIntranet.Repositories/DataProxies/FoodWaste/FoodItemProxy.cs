@@ -171,7 +171,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             if (foodItem.Identifier.HasValue)
             {
-                return string.Format("SELECT IsActive FROM FoodItems WHERE FoodItemIdentifier='{0}'", foodItem.Identifier.Value.ToString("D").ToUpper());
+                return string.Format("SELECT FoodItemIdentifier,IsActive FROM FoodItems WHERE FoodItemIdentifier='{0}'", foodItem.Identifier.Value.ToString("D").ToUpper());
             }
             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodItem.Identifier, "Identifier"));
         }

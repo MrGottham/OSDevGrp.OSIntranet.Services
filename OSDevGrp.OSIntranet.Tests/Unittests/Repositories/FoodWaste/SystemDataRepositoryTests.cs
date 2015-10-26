@@ -474,9 +474,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var fixture = new Fixture();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
-            var foodItemProxy = fixture.Build<FoodItemProxy>()
-                .With(m => m.PrimaryFoodGroup, MockRepository.GenerateMock<IFoodGroup>())
-                .Create();
+            var foodItemProxy = new FoodItemProxy(MockRepository.GenerateMock<IFoodGroup>());
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
                 .Return(new List<FoodItemProxy> {foodItemProxy})

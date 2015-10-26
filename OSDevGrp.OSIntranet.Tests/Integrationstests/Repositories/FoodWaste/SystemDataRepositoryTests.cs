@@ -32,6 +32,197 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that FoodItemGetByForeignKey returns the food item for the given data providers foreign key.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemGetAllForFoodGroupReturnsFoodItem()
+        {
+            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            Assert.That(dataProvider, Is.Not.Null);
+
+            var primaryFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodItem = _systemDataRepository.Insert(new FoodItem(primaryFoodGroup) {IsActive = true});
+                try
+                {
+                    // ReSharper disable PossibleInvalidOperationException
+                    var foreignKey = _systemDataRepository.Insert(new ForeignKey(dataProvider, foodItem.Identifier.Value, foodItem.GetType(), "ForeignKeyToFoodItem"));
+                    // ReSharper restore PossibleInvalidOperationException
+                    try
+                    {
+                        var result = _systemDataRepository.FoodItemGetByForeignKey(dataProvider, "ForeignKeyToFoodItem");
+                        Assert.That(result, Is.Not.Null);
+                        Assert.That(result.Identifier, Is.Not.Null);
+                        Assert.That(result.Identifier.HasValue, Is.True);
+                        // ReSharper disable PossibleInvalidOperationException
+                        Assert.That(result.Identifier.Value, Is.EqualTo(foodItem.Identifier.Value));
+                        // ReSharper restore PossibleInvalidOperationException
+                    }
+                    finally
+                    {
+                        _systemDataRepository.Delete(foreignKey);
+                    }
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodItem);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(primaryFoodGroup);
+            }
+        }
+
+        /// <summary>
+        /// Tests that FoodItemGetAllForFoodGroup gets all the food items for a given food group
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemGetAllForFoodGroupGetsAllFoodItemsForFoodGroup()
+        {
+            var primaryFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodItem = _systemDataRepository.Insert(new FoodItem(primaryFoodGroup) {IsActive = true});
+                try
+                {
+                    var result = _systemDataRepository.FoodItemGetAllForFoodGroup(primaryFoodGroup);
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result, Is.Not.Empty);
+                    Assert.That(result.Any(fi => fi.Identifier.HasValue && fi.Identifier.Equals(foodItem.Identifier)), Is.True);
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodItem);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(primaryFoodGroup);
+            }
+        }
+
+        /// <summary>
+        /// Tests that FoodItemGetAll gets all the food items.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemGetAllGetsAllFoodItems()
+        {
+            var primaryFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodItem = _systemDataRepository.Insert(new FoodItem(primaryFoodGroup) {IsActive = true});
+                try
+                {
+                    var result = _systemDataRepository.FoodItemGetAll();
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result, Is.Not.Empty);
+                    Assert.That(result.Any(fi => fi.Identifier.HasValue && fi.Identifier.Equals(foodItem.Identifier)), Is.True);
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodItem);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(primaryFoodGroup);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Get gets a given food item.
+        /// </summary>
+        [Test]
+        public void TestThatGetGetsFoodItem()
+        {
+            var primaryFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodItem = _systemDataRepository.Insert(new FoodItem(primaryFoodGroup) { IsActive = true });
+                try
+                {
+                    // ReSharper disable PossibleInvalidOperationException
+                    var result = _systemDataRepository.Get<IFoodItem>(foodItem.Identifier.Value);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result.PrimaryFoodGroup, Is.Not.Null);
+                    Assert.That(result.PrimaryFoodGroup.Identifier, Is.Not.Null);
+                    Assert.That(result.PrimaryFoodGroup.Identifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(result.PrimaryFoodGroup.Identifier.Value, Is.EqualTo(primaryFoodGroup.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(result.IsActive, Is.True);
+                    Assert.That(result.FoodGroups, Is.Not.Null);
+                    Assert.That(result.FoodGroups, Is.Not.Empty);
+                    Assert.That(result.FoodGroups.Count(), Is.EqualTo(1));
+                    Assert.That(result.FoodGroups.SingleOrDefault(fg => fg.Identifier.HasValue && fg.Identifier.Equals(primaryFoodGroup.Identifier)), Is.Not.Null);
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodItem);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(primaryFoodGroup);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Update updates a given food item.
+        /// </summary>
+        [Test]
+        public void TestThatUpdateUpdatesFoodItem()
+        {
+            var primaryFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+            try
+            {
+                var foodItem = _systemDataRepository.Insert(new FoodItem(primaryFoodGroup) {IsActive = true});
+                try
+                {
+                    var secondaryFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
+                    try
+                    {
+                        foodItem.IsActive = false;
+                        foodItem.FoodGroupAdd(secondaryFoodGroup);
+                        _systemDataRepository.Update(foodItem);
+
+                        // ReSharper disable PossibleInvalidOperationException
+                        var result = _systemDataRepository.Get<IFoodItem>(foodItem.Identifier.Value);
+                        // ReSharper restore PossibleInvalidOperationException
+                        Assert.That(result, Is.Not.Null);
+                        Assert.That(result.PrimaryFoodGroup, Is.Not.Null);
+                        Assert.That(result.PrimaryFoodGroup.Identifier, Is.Not.Null);
+                        Assert.That(result.PrimaryFoodGroup.Identifier.HasValue, Is.True);
+                        // ReSharper disable PossibleInvalidOperationException
+                        Assert.That(result.PrimaryFoodGroup.Identifier.Value, Is.EqualTo(primaryFoodGroup.Identifier.Value));
+                        // ReSharper restore PossibleInvalidOperationException
+                        Assert.That(result.IsActive, Is.False);
+                        Assert.That(result.FoodGroups, Is.Not.Null);
+                        Assert.That(result.FoodGroups, Is.Not.Empty);
+                        Assert.That(result.FoodGroups.Count(), Is.EqualTo(2));
+                        Assert.That(result.FoodGroups.SingleOrDefault(fg => fg.Identifier.HasValue && fg.Identifier.Equals(primaryFoodGroup.Identifier)), Is.Not.Null);
+                        Assert.That(result.FoodGroups.SingleOrDefault(fg => fg.Identifier.HasValue && fg.Identifier.Equals(secondaryFoodGroup.Identifier)), Is.Not.Null);
+                    }
+                    finally
+                    {
+                        _systemDataRepository.Delete(secondaryFoodGroup);
+                    }
+                }
+                finally
+                {
+                    _systemDataRepository.Delete(foodItem);
+                }
+            }
+            finally
+            {
+                _systemDataRepository.Delete(primaryFoodGroup);
+            }
+        }
+
+        /// <summary>
         /// Tests that FoodGroupGetAll gets all the food groups.
         /// </summary>
         [Test]
@@ -108,7 +299,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 {
                     var result = _systemDataRepository.FoodGroupGetByForeignKey(dataProvider, "ForeignKeyToFoodGroup");
                     Assert.That(result, Is.Not.Null);
-                    Assert.That(result.Identifier, Is.EqualTo(foodGroup.Identifier));
+                    Assert.That(result.Identifier, Is.Not.Null);
+                    Assert.That(result.Identifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(result.Identifier.Value, Is.EqualTo(foodGroup.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
                 }
                 finally
                 {
@@ -133,11 +328,27 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 var foodGroupWithParent = _systemDataRepository.Insert(new FoodGroup {Parent = foodGroupAtRoot, IsActive = true});
                 try
                 {
-                    // ReSharper disable PossibleInvalidOperationException
-                    var result = _systemDataRepository.Get<IFoodGroup>(foodGroupWithParent.Identifier.Value);
-                    // ReSharper restore PossibleInvalidOperationException
-                    Assert.That(result.Parent, Is.Not.Null);
-                    Assert.That(result.IsActive, Is.True);
+                    var childFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = foodGroupWithParent, IsActive = true});
+                    try
+                    {
+                        // ReSharper disable PossibleInvalidOperationException
+                        var result = _systemDataRepository.Get<IFoodGroup>(foodGroupWithParent.Identifier.Value);
+                        // ReSharper restore PossibleInvalidOperationException
+                        Assert.That(result.Parent, Is.Not.Null);
+                        Assert.That(result.Parent.Identifier, Is.Not.Null);
+                        Assert.That(result.Parent.Identifier.HasValue, Is.True);
+                        // ReSharper disable PossibleInvalidOperationException
+                        Assert.That(result.Parent.Identifier.Value, Is.EqualTo(foodGroupAtRoot.Identifier.Value));
+                        // ReSharper restore PossibleInvalidOperationException
+                        Assert.That(result.IsActive, Is.True);
+                        Assert.That(result.Children, Is.Not.Null);
+                        Assert.That(result.Children, Is.Not.Empty);
+                        Assert.That(result.Children.SingleOrDefault(child => child.Identifier.HasValue && child.Identifier.Equals(childFoodGroup.Identifier)), Is.Not.Null);
+                    }
+                    finally
+                    {
+                        _systemDataRepository.Delete(childFoodGroup);
+                    }
                 }
                 finally
                 {
@@ -165,7 +376,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                     foodGroupWithParent.Parent = null;
                     foodGroupWithParent.IsActive = false;
                     _systemDataRepository.Update(foodGroupWithParent);
-                    
+
                     // ReSharper disable PossibleInvalidOperationException
                     var result = _systemDataRepository.Get<IFoodGroup>(foodGroupWithParent.Identifier.Value);
                     // ReSharper restore PossibleInvalidOperationException

@@ -97,7 +97,30 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>Food item.</returns>
         public virtual IFoodItem FoodItemGetByForeignKey(IDataProvider dataProvider, string foreignKeyValue)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (string.IsNullOrEmpty(foreignKeyValue))
+            {
+                throw new ArgumentNullException("foreignKeyValue");
+            }
+            try
+            {
+                if (dataProvider.Identifier.HasValue)
+                {
+                    return DataProvider.GetCollection<FoodItemProxy>(string.Format("SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{0}' AND fk.ForeignKeyForTypes LIKE '%{1}%' AND fk.ForeignKeyValue='{2}'", dataProvider.Identifier.Value.ToString("D").ToUpper(), typeof (IFoodItem).Name, foreignKeyValue)).FirstOrDefault();
+                }
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
         }
 
         /// <summary>
