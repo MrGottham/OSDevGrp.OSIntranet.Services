@@ -8,7 +8,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Commands
     /// Tests the command for deleting a translation.
     /// </summary>
     [TestFixture]
-    public class TranslationDeleteCommandTest
+    public class TranslationDeleteCommandTests
     {
         /// <summary>
         /// Tests that the command for deleting a translation can be initialized.

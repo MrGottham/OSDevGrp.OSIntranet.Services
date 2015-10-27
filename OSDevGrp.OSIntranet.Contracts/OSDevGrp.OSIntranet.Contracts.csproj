@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\BogføringslinjeOpretCommand.cs" />
+    <Compile Include="Commands\FoodItemImportFromDataProviderCommand.cs" />
     <Compile Include="Commands\ForeignKeyAddCommand.cs" />
     <Compile Include="Commands\ForeignKeyDeleteCommand.cs" />
     <Compile Include="Commands\ForeignKeyModifyCommand.cs" />
