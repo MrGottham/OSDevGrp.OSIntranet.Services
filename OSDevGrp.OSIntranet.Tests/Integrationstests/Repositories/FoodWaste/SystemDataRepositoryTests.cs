@@ -37,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllForFoodGroupReturnsFoodItem()
         {
-            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var dataProvider = _systemDataRepository.DataProviderForFoodItemsGet();
             Assert.That(dataProvider, Is.Not.Null);
 
             var primaryFoodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
@@ -286,7 +286,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyReturnsFoodGroup()
         {
-            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var dataProvider = _systemDataRepository.DataProviderForFoodGroupsGet();
             Assert.That(dataProvider, Is.Not.Null);
 
             var foodGroup = _systemDataRepository.Insert(new FoodGroup {Parent = null, IsActive = true});
@@ -400,7 +400,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatForeignKeysForDomainObjectGetGetsForeignKeysForIdentifiableDomainObject()
         {
-            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var dataProvider = _systemDataRepository.DataProviderForFoodItemsGet();
             var foreignKeyFor = new ForeignKey(dataProvider, Guid.NewGuid(), typeof (ForeignKey), "Test")
             {
                 Identifier = Guid.NewGuid()
@@ -426,7 +426,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatGetGetsForeignKey()
         {
-            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var dataProvider = _systemDataRepository.DataProviderForFoodItemsGet();
             var foreignKey = _systemDataRepository.Insert(new ForeignKey(dataProvider, Guid.NewGuid(), typeof (ForeignKey), "Test"));
             try
             {
@@ -448,7 +448,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateUpdatesForeignKey()
         {
-            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var dataProvider = _systemDataRepository.DataProviderForFoodItemsGet();
             var foreignKey = _systemDataRepository.Insert(new ForeignKey(dataProvider, Guid.NewGuid(), typeof(ForeignKey), "Test"));
             try
             {
@@ -470,12 +470,12 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Tests that DataProviderForFoodsGet returns the default data provider for foods.
+        /// Tests that DataProviderForFoodItemsGet returns the default data provider for foods.
         /// </summary>
         [Test]
-        public void TestThatDataProviderForFoodsGetReturnsDataProvider()
+        public void TestThatDataProviderForFoodItemsGetReturnsDataProvider()
         {
-            var dataProvider = _systemDataRepository.DataProviderForFoodsGet();
+            var dataProvider = _systemDataRepository.DataProviderForFoodItemsGet();
             Assert.That(dataProvider, Is.Not.Null);
         }
 

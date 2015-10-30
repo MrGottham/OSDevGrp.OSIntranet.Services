@@ -19,7 +19,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
     {
         #region Private variables
 
-        private readonly Guid _dataProviderForFoodsIdentifier = new Guid("5A1B9283-6406-44DF-91C5-F2FB83CC9A42");
+        private readonly Guid _dataProviderForFoodItemsIdentifier = new Guid("5A1B9283-6406-44DF-91C5-F2FB83CC9A42");
         private readonly Guid _dataProviderForFoodGroupsIdentifier = new Guid("5A1B9283-6406-44DF-91C5-F2FB83CC9A42");
 
         #endregion
@@ -227,16 +227,16 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Gets the default data provider for foods.
+        /// Gets the default data provider for food items.
         /// </summary>
-        /// <returns>Default data provider for foods</returns>
-        public virtual IDataProvider DataProviderForFoodsGet()
+        /// <returns>Default data provider for food items</returns>
+        public virtual IDataProvider DataProviderForFoodItemsGet()
         {
             try
             {
                 var dataProviderProxy = new DataProviderProxy
                 {
-                    Identifier = _dataProviderForFoodsIdentifier
+                    Identifier = _dataProviderForFoodItemsIdentifier
                 };
                 return DataProvider.Get(dataProviderProxy);
             }

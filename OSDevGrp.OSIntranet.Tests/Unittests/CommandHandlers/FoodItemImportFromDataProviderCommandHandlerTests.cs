@@ -5,11 +5,13 @@ using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
+using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -77,6 +79,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("command"));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Get to get the data provider on the repository which can access system data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsGetForDataProviderIdentifierOnSystemDataRepository()
+        {
+            var fixture = new Fixture();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
+
+            var command = new FoodItemImportFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = fixture.Create<string>(),
+                Name = fixture.Create<string>(),
+                PrimaryFoodGroupIdentifier = Guid.NewGuid(),
+                IsActive = fixture.Create<bool>()
+            };
+
+            foodItemImportFromDataProviderCommandHandler.Execute(command);
+
+            systemDataRepositoryMock.AssertWasCalled(m => m.Get<IDataProvider>(Arg<Guid>.Is.Equal(command.DataProviderIdentifier)));
         }
 
         /// <summary>

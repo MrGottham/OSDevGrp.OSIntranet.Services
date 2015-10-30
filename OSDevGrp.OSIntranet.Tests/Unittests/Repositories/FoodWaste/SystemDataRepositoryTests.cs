@@ -1160,10 +1160,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Tests that DataProviderForFoodsGet calls Get on the data provider which can access data in the food waste repository.
+        /// Tests that DataProviderForFoodItemsGet calls Get on the data provider which can access data in the food waste repository.
         /// </summary>
         [Test]
-        public void TestThatDataProviderForFoodsGetCallsGetOnFoodWasteDataProvider()
+        public void TestThatDataProviderForFoodItemsGetCallsGetOnFoodWasteDataProvider()
         {
             var fixture = new Fixture();
 
@@ -1186,16 +1186,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
             Assert.That(systemDataRepository, Is.Not.Null);
 
-            systemDataRepository.DataProviderForFoodsGet();
+            systemDataRepository.DataProviderForFoodItemsGet();
 
             foodWasteDataProviderMock.AssertWasCalled(m => m.Get(Arg<DataProviderProxy>.Is.NotNull));
         }
 
         /// <summary>
-        /// Tests that DataProviderForFoodsGet returns the result from the data provider which can access data in the food waste repository.
+        /// Tests that DataProviderForFoodItemsGet returns the result from the data provider which can access data in the food waste repository.
         /// </summary>
         [Test]
-        public void TestThatDataProviderForFoodsGetReturnsResultFromFoodWasteDataProvider()
+        public void TestThatDataProviderForFoodItemsGetReturnsResultFromFoodWasteDataProvider()
         {
             var fixture = new Fixture();
 
@@ -1210,16 +1210,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
             Assert.That(systemDataRepository, Is.Not.Null);
 
-            var result = systemDataRepository.DataProviderForFoodsGet();
+            var result = systemDataRepository.DataProviderForFoodItemsGet();
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(dataProvider));
         }
 
         /// <summary>
-        /// Tests that DataProviderForFoodsGet throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
+        /// Tests that DataProviderForFoodItemsGet throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
         [Test]
-        public void TestThatDataProviderForFoodsGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
+        public void TestThatDataProviderForFoodItemsGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
             var fixture = new Fixture();
 
@@ -1234,17 +1234,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
             Assert.That(systemDataRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.DataProviderForFoodsGet());
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.DataProviderForFoodItemsGet());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception, Is.EqualTo(exceptionToThrow));
             Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
-        /// Tests that DataProviderForFoodsGet throws an IntranetRepositoryException when an Exception occurs.
+        /// Tests that DataProviderForFoodItemsGet throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
         [Test]
-        public void TestThatDataProviderForFoodsGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
+        public void TestThatDataProviderForFoodItemsGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
             var fixture = new Fixture();
 
@@ -1259,11 +1259,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
             Assert.That(systemDataRepository, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.DataProviderForFoodsGet());
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.DataProviderForFoodItemsGet());
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DataProviderForFoodsGet", exceptionToThrow.Message)));
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DataProviderForFoodItemsGet", exceptionToThrow.Message)));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
         }

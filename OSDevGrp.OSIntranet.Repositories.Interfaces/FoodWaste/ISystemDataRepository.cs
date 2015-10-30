@@ -57,10 +57,10 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
         IEnumerable<IForeignKey> ForeignKeysForDomainObjectGet(IIdentifiable identifiableDomainObject);
 
         /// <summary>
-        /// Gets the default data provider for foods.
+        /// Gets the default data provider for food items.
         /// </summary>
-        /// <returns>Default data provider for foods</returns>
-        IDataProvider DataProviderForFoodsGet();
+        /// <returns>Default data provider for food items.</returns>
+        IDataProvider DataProviderForFoodItemsGet();
 
         /// <summary>
         /// Gets the default data provider for food groups.
