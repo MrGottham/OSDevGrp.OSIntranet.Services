@@ -97,6 +97,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildDataProviderMock())
                 .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<IFoodGroup>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock())
+                .Repeat.Any();
 
             var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
@@ -114,6 +120,88 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             foodItemImportFromDataProviderCommandHandler.Execute(command);
 
             systemDataRepositoryMock.AssertWasCalled(m => m.Get<IDataProvider>(Arg<Guid>.Is.Equal(command.DataProviderIdentifier)));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Get to get the transation informations on the repository which can access system data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsGetForTranslationInfoIdentifierOnSystemDataRepository()
+        {
+            var fixture = new Fixture();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<IFoodGroup>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock())
+                .Repeat.Any();
+
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
+
+            var command = new FoodItemImportFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = fixture.Create<string>(),
+                Name = fixture.Create<string>(),
+                PrimaryFoodGroupIdentifier = Guid.NewGuid(),
+                IsActive = fixture.Create<bool>()
+            };
+
+            foodItemImportFromDataProviderCommandHandler.Execute(command);
+
+            systemDataRepositoryMock.AssertWasCalled(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Equal(command.TranslationInfoIdentifier)));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Get to get the primary food group on the repository which can access system data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsGetForPrimaryFoodGroupIdentifierOnSystemDataRepository()
+        {
+            var fixture = new Fixture();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<IFoodGroup>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock())
+                .Repeat.Any();
+
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
+
+            var command = new FoodItemImportFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = fixture.Create<string>(),
+                Name = fixture.Create<string>(),
+                PrimaryFoodGroupIdentifier = Guid.NewGuid(),
+                IsActive = fixture.Create<bool>()
+            };
+
+            foodItemImportFromDataProviderCommandHandler.Execute(command);
+
+            systemDataRepositoryMock.AssertWasCalled(m => m.Get<IFoodGroup>(Arg<Guid>.Is.Equal(command.PrimaryFoodGroupIdentifier)));
         }
 
         /// <summary>

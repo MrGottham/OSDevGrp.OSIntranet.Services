@@ -4,6 +4,7 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
@@ -59,7 +60,11 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 throw new ArgumentNullException("command");
             }
 
-            throw new NotImplementedException();
+            var dataProvider = SystemDataRepository.Get<IDataProvider>(command.DataProviderIdentifier);
+            var translationInfo = SystemDataRepository.Get<ITranslationInfo>(command.TranslationInfoIdentifier);
+            var primaryFoodGroup = SystemDataRepository.Get<IFoodGroup>(command.PrimaryFoodGroupIdentifier);
+
+            return null;
         }
 
         /// <summary>
