@@ -4,6 +4,7 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -63,6 +64,23 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             var dataProvider = SystemDataRepository.Get<IDataProvider>(command.DataProviderIdentifier);
             var translationInfo = SystemDataRepository.Get<ITranslationInfo>(command.TranslationInfoIdentifier);
             var primaryFoodGroup = SystemDataRepository.Get<IFoodGroup>(command.PrimaryFoodGroupIdentifier);
+
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(dataProvider), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.DataProviderIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.IsNotNull(translationInfo), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.TranslationInfoIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.IsNotNull(primaryFoodGroup), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.PrimaryFoodGroupIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.HasValue(command.Key), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Key")))
+                .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.Key), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Key")))
+                .IsSatisfiedBy(() => CommonValidations.HasValue(command.Name), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")))
+                .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.Name), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Name")))
+                .Evaluate();
+
+            var foodItem = SystemDataRepository.FoodItemGetByForeignKey(dataProvider, command.Key);
+            if (foodItem == null)
+            {
+                var insertedFoodItem = SystemDataRepository.Insert<IFoodItem>(new FoodItem(primaryFoodGroup) {IsActive = command.IsActive});
+                
+                return null;
+            }
 
             return null;
         }
