@@ -85,7 +85,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
 
                 ImportTranslation(insertedFoodItem, translationInfo, command.Name, _logicExecutor);
                 
-                return null;
+                return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(insertedFoodItem);
             }
 
             return null;
