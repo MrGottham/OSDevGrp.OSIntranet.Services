@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
@@ -90,7 +89,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 foreignKey.Identifier = _logicExecutor.ForeignKeyAdd(foreignKey);
                 insertedfoodGroup.ForeignKeyAdd(foreignKey);
 
-                ImportTranslation(insertedfoodGroup, translationInfo, command.Name);
+                ImportTranslation(insertedfoodGroup, translationInfo, command.Name, _logicExecutor);
 
                 return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(insertedfoodGroup);
             }
@@ -100,7 +99,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
 
             var updatedFoodGroup = SystemDataRepository.Update(foodGroup);
 
-            ImportTranslation(updatedFoodGroup, translationInfo, command.Name);
+            ImportTranslation(updatedFoodGroup, translationInfo, command.Name, _logicExecutor);
 
             return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(updatedFoodGroup);
         }
@@ -125,40 +124,6 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 throw exception;
             }
             throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, command.GetType().Name, typeof (ServiceReceiptResponse).Name, exception.Message), exception);
-        }
-
-        /// <summary>
-        /// Imports a given translation for the food group.
-        /// </summary>
-        /// <param name="foodGroup">Food group for which to import the translation.</param>
-        /// <param name="translationInfo">Translation informations for the translation to import.</param>
-        /// <param name="value">The translation value for the food group.</param>
-        private void ImportTranslation(IFoodGroup foodGroup, ITranslationInfo translationInfo, string value)
-        {
-            if (foodGroup == null)
-            {
-                throw new ArgumentNullException("foodGroup");
-            }
-            if (translationInfo == null)
-            {
-                throw new ArgumentNullException("translationInfo");
-            }
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new ArgumentNullException("value");
-            }
-            var foodGroupIdentifier = foodGroup.Identifier.HasValue ? foodGroup.Identifier.Value : default(Guid);
-            var translationInfoIdentifier = translationInfo.Identifier.HasValue ? translationInfo.Identifier.Value : default(Guid);
-            var translation = foodGroup.Translations.SingleOrDefault(m => m.TranslationOfIdentifier == foodGroupIdentifier && m.TranslationInfo.Identifier == translationInfoIdentifier);
-            if (translation == null)
-            {
-                translation = new Translation(foodGroupIdentifier, translationInfo, value);
-                translation.Identifier = _logicExecutor.TranslationAdd(translation);
-                foodGroup.TranslationAdd(translation);
-                return;
-            }
-            translation.Value = value;
-            translation.Identifier = _logicExecutor.TranslationModify(translation);
         }
 
         #endregion

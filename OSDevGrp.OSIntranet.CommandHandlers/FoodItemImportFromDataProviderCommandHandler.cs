@@ -78,6 +78,12 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             if (foodItem == null)
             {
                 var insertedFoodItem = SystemDataRepository.Insert<IFoodItem>(new FoodItem(primaryFoodGroup) {IsActive = command.IsActive});
+
+                var foreignKey = new ForeignKey(dataProvider, insertedFoodItem.Identifier.HasValue ? insertedFoodItem.Identifier.Value : default(Guid), insertedFoodItem.GetType(), command.Key);
+                foreignKey.Identifier = _logicExecutor.ForeignKeyAdd(foreignKey);
+                insertedFoodItem.ForeignKeyAdd(foreignKey);
+
+                ImportTranslation(insertedFoodItem, translationInfo, command.Name, _logicExecutor);
                 
                 return null;
             }

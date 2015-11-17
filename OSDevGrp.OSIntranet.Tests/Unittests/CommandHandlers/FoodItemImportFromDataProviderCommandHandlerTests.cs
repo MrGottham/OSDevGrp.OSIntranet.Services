@@ -1001,7 +1001,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     Assert.That(foreignKey.DataProvider, Is.Not.Null);
                     Assert.That(foreignKey.DataProvider, Is.EqualTo(dataProviderMock));
                     // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(foreignKey.ForeignKeyForIdentifier, Is.EqualTo(DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0)).Identifier.Value));
+                    Assert.That(foreignKey.ForeignKeyForIdentifier, Is.EqualTo(insertedFoodItemMock.Identifier.Value));
                     // ReSharper restore PossibleInvalidOperationException
                     Assert.That(foreignKey.ForeignKeyForTypes, Is.Not.Null);
                     Assert.That(foreignKey.ForeignKeyForTypes, Is.Not.Empty);
@@ -1032,6 +1032,82 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             foodItemImportFromDataProviderCommandHandler.Execute(command);
 
             logicExecutor.AssertWasCalled(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls TranslationAdd on the logic executor when a food item for the key does not exist.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsTranslationAddOnLogicExecutorWhenFoodItemForKeyDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var insertedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Get<IFoodGroup>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildFoodGroupMock())
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.FoodItemGetByForeignKey(Arg<IDataProvider>.Is.Anything, Arg<string>.Is.Anything))
+                .Return(null)
+                .Repeat.Any();
+            systemDataRepositoryMock.Stub(m => m.Insert(Arg<IFoodItem>.Is.Anything))
+                .Return(insertedFoodItemMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var name = fixture.Create<string>();
+            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+                .WhenCalled(e =>
+                {
+                    var translation = (ITranslation) e.Arguments.ElementAt(0);
+                    Assert.That(translation, Is.Not.Null);
+                    Assert.That(translation.Identifier, Is.Null);
+                    Assert.That(translation.Identifier.HasValue, Is.False);
+                    Assert.That(translation.TranslationInfo, Is.Not.Null);
+                    Assert.That(translation.TranslationInfo, Is.EqualTo(translationInfoMock));
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(translation.TranslationOfIdentifier, Is.EqualTo(insertedFoodItemMock.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(translation.Value, Is.Not.Null);
+                    Assert.That(translation.Value, Is.Not.Empty);
+                    Assert.That(translation.Value, Is.EqualTo(name));
+                })
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
+
+            var command = new FoodItemImportFromDataProviderCommand
+            {
+                DataProviderIdentifier = Guid.NewGuid(),
+                TranslationInfoIdentifier = Guid.NewGuid(),
+                Key = fixture.Create<string>(),
+                Name = name,
+                PrimaryFoodGroupIdentifier = Guid.NewGuid(),
+                IsActive = fixture.Create<bool>()
+            };
+
+            foodItemImportFromDataProviderCommandHandler.Execute(command);
+
+            logicExecutor.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
         }
 
         /// <summary>

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.Core;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -88,6 +91,51 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         protected virtual ICommonValidations CommonValidations
         {
             get { return _commonValidations; }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Imports a given translation on a given translatable domain object.
+        /// </summary>
+        /// <param name="domainObject">Translatable domain object on which to import the translation.</param>
+        /// <param name="translationInfo">Translation informations for the translation to import.</param>
+        /// <param name="translationValue">The translation value for the translatable domain object.</param>
+        /// <param name="logicExecutor">Implementation of the logic executor which can execute basic logic.</param>
+        /// <returns>The imported translation.</returns>
+        protected virtual ITranslation ImportTranslation(ITranslatable domainObject, ITranslationInfo translationInfo, string translationValue, ILogicExecutor logicExecutor)
+        {
+            if (domainObject == null)
+            {
+                throw new ArgumentNullException("domainObject");
+            }
+            if (translationInfo == null)
+            {
+                throw new ArgumentNullException("translationInfo");
+            }
+            if (string.IsNullOrEmpty(translationValue))
+            {
+                throw new ArgumentNullException("translationValue");
+            }
+            if (logicExecutor == null)
+            {
+                throw new ArgumentNullException("logicExecutor");
+            }
+            var domainObjectIdentifier = domainObject.Identifier.HasValue ? domainObject.Identifier.Value : default(Guid);
+            var translationInfoIdentifier = translationInfo.Identifier.HasValue ? translationInfo.Identifier.Value : default(Guid);
+            var translation = domainObject.Translations.SingleOrDefault(m => m.TranslationOfIdentifier == domainObjectIdentifier && m.TranslationInfo.Identifier.HasValue && m.TranslationInfo.Identifier.Value == translationInfoIdentifier);
+            if (translation == null)
+            {
+                var insertedTranslation = new Translation(domainObjectIdentifier, translationInfo, translationValue);
+                insertedTranslation.Identifier = logicExecutor.TranslationAdd(insertedTranslation);
+                domainObject.TranslationAdd(insertedTranslation);
+                return insertedTranslation;
+            }
+            translation.Value = translationValue;
+            translation.Identifier = logicExecutor.TranslationModify(translation);
+            return translation;
         }
 
         #endregion
