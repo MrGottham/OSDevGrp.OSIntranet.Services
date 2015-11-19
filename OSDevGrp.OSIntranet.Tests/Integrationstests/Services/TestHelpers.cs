@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Contracts.Views;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
 {
@@ -295,6 +299,102 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
                     }
                 };
             }
+        }
+
+        /// <summary>
+        /// Gets the food items to import.
+        /// </summary>
+        /// <param name="foodGroupTree">Tree for the food groups.</param>
+        /// <param name="translationInfoCollection">Collection of translation informations.</param>
+        /// <returns>Commands for food items to import.</returns>
+        public static IEnumerable<FoodItemImportFromDataProviderCommand> GetFoodItemImportFromDataProviderCommands(FoodGroupTreeSystemView foodGroupTree, ICollection<TranslationInfoSystemView> translationInfoCollection)
+        {
+            if (foodGroupTree == null)
+            {
+                throw new ArgumentNullException("foodGroupTree");
+            }
+            if (translationInfoCollection == null)
+            {
+                throw new ArgumentNullException("translationInfoCollection");
+            }
+
+            var dataProviderIdentifier = foodGroupTree.DataProvider.DataProviderIdentifier;
+
+            var foodGroupDataProviderKeys = foodGroupTree.FoodGroups
+                .SelectMany(foodGroup => foodGroup.ForeignKeys)
+                .Where(foreignKey => foreignKey.DataProvider != null && foreignKey.DataProvider.DataProviderIdentifier == dataProviderIdentifier)
+                .ToDictionary(foreignKey => foreignKey.ForeignKey, foreignKey => foreignKey.ForeignKeyForIdentifier);
+
+            var daDkIdentifier = translationInfoCollection.Single(m => m.CultureName == "da-DK").TranslationInfoIdentifier;
+            var enUsIdentifier = translationInfoCollection.Single(m => m.CultureName == "en-US").TranslationInfoIdentifier;
+
+            var foodItems = new Dictionary<string, IDictionary<string, string>>(0);
+            using (var resourceStream = GetEmbeddedResourceStream("Integrationstests.Testdata.DKFoodComp701_2009-11-16.txt"))
+            {
+                using (var streamReader = new StreamReader(resourceStream, Encoding.Default))
+                {
+                    while (streamReader.EndOfStream == false)
+                    {
+                        var buffer = streamReader.ReadLine();
+                        if (buffer.Length < 2 + 4 + 3)
+                        {
+                            continue;
+                        }
+
+                        var foodItemKey = buffer.Substring(2, 4);
+                        if (string.IsNullOrEmpty(foodItemKey))
+                        {
+                            continue;
+                        }
+
+                        IDictionary<string, string> foodItemValues;
+                        if (foodItems.TryGetValue(foodItemKey, out foodItemValues) == false)
+                        {
+                            foodItemValues = new Dictionary<string, string>();
+                            foodItems.Add(foodItemKey, foodItemValues);
+                        }
+
+                        switch (buffer.Substring(6, 3))
+                        {
+                            case "DAN":
+                                foodItemValues.Add("DAN", buffer.Substring(10).Trim());
+                                break;
+
+                            case "ENG":
+                                foodItemValues.Add("ENG", buffer.Substring(10).Trim());
+                                break;
+
+                            case "MGR":
+                                foodItemValues.Add("MGR", buffer.Substring(10).Trim());
+                                break;
+                        }
+                    }
+                    streamReader.Close();
+                }
+                resourceStream.Close();
+            }
+
+            return new List<FoodItemImportFromDataProviderCommand>();
+        }
+
+        /// <summary>
+        /// Loads the specified manifest resource stream from this assembly.
+        /// </summary>
+        /// <param name="name">The case-sensitive name of the manifest resource being requested.</param>
+        /// <returns>The manifest resource.</returns>
+        private static Stream GetEmbeddedResourceStream(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException("name");
+            }
+            var assembly = typeof (TestHelpers).Assembly;
+            var stream = assembly.GetManifestResourceStream(string.Format("{0}.{1}", assembly.GetName().Name, name));
+            if (stream == null)
+            {
+                throw new FileNotFoundException(string.Format("The embedded manifest resource named '{0}.{1}' could not be found.", assembly.GetName().Name, name));
+            }
+            return stream;
         }
     }
 }

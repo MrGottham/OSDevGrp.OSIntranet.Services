@@ -88,7 +88,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(insertedFoodItem);
             }
 
-            return null;
+            foodItem.IsActive = command.IsActive;
+
+            var updatedFoodItem = SystemDataRepository.Update(foodItem);
+
+            ImportTranslation(updatedFoodItem, translationInfo, command.Name, _logicExecutor);
+
+            return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(updatedFoodItem);
         }
 
         /// <summary>

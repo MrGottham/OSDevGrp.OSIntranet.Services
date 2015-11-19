@@ -64,6 +64,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Imports a food item from a given data provider.
+        /// </summary>
+        /// <param name="command">Command for importing a food item from a given data provider.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public ServiceReceiptResponse FoodItemImportFromDataProvider(FoodItemImportFromDataProviderCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<FoodItemImportFromDataProviderCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets the tree of food groups.
         /// </summary>
         /// <param name="query">Query for getting the tree of food groups.</param>

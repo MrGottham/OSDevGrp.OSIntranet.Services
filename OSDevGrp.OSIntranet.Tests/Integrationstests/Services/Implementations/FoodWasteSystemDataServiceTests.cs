@@ -4,6 +4,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Services;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
@@ -29,6 +30,29 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             var container = ContainerFactory.Create();
             _foodWasteSystemDataService = container.Resolve<IFoodWasteSystemDataService>();
+        }
+
+        /// <summary>
+        /// Tests that FoodItemImportFromDataProvider imports food items from the data provider.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemImportFromDataProviderImportsFoodItems()
+        {
+            var translationInfoCollection = _foodWasteSystemDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery()).ToArray();
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
+
+            var foodGroupTree = _foodWasteSystemDataService.FoodGroupTreeGet(new FoodGroupTreeGetQuery {TranslationInfoIdentifier = translationInfoCollection.First().TranslationInfoIdentifier});
+            Assert.That(foodGroupTree, Is.Not.Null);
+
+            foreach (var command in TestHelpers.GetFoodItemImportFromDataProviderCommands(foodGroupTree, translationInfoCollection))
+            {
+                ServiceReceiptResponse result = null; //_foodWasteSystemDataService.FoodGroupImportFromDataProvider(command);
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Identifier, Is.Not.EqualTo(default(Guid)));
+                Assert.That(result.Identifier, Is.Not.EqualTo(Guid.Empty));
+                Assert.That(result.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+            }
         }
 
         /// <summary>
