@@ -39,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             /// </summary>
             /// <param name="systemDataRepository">Implementation for a repository which can access system data in the food waste domain.</param>
             /// <param name="foodWasteObjectMapper">Implementation for a object mapper which can map domain object in the food waste domain.</param>
-            /// <param name="onlyActive">Indication of whether only active food groups should be includes.</param>
+            /// <param name="onlyActive">Indication of whether only active food groups should be included.</param>
             public MyFoodGroupTreeGetQueryHandler(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, bool onlyActive) 
                 : base(systemDataRepository, foodWasteObjectMapper)
             {
@@ -65,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             /// <summary>
             /// Returns whether only active food groups should be included.
             /// </summary>
-            /// <returns>Indication of whether only active food groups should be included</returns>
+            /// <returns>Indication of whether only active food groups should be included.</returns>
             public bool GetOnlyActive()
             {
                 return OnlyActive;

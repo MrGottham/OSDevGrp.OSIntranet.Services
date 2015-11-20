@@ -66,6 +66,7 @@
     <Compile Include="BudgetkontoplanGetQueryHandler.cs" />
     <Compile Include="BudgetkontoGetQueryHandler.cs" />
     <Compile Include="Core\FoodGroupTreeGetQueryHandlerBase.cs" />
+    <Compile Include="Core\FoodItemCollectionGetQueryHandlerBase.cs" />
     <Compile Include="Core\KalenderQueryHandlerBase.cs" />
     <Compile Include="Core\RegnskabQueryHandlerBase.cs" />
     <Compile Include="DataProviderCollectionGetQueryHandler.cs" />
