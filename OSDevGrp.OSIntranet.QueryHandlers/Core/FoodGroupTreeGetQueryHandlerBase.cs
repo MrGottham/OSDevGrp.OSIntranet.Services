@@ -71,7 +71,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             var translationInfo = _systemDataRepository.Get<ITranslationInfo>(query.TranslationInfoIdentifier);
             var dataProvider = _systemDataRepository.DataProviderForFoodGroupsGet();
             var foodGroups = _systemDataRepository.FoodGroupGetAllOnRoot()
-                .Where(foodGroup => foodGroup.ForeignKeys != null && foodGroup.ForeignKeys.Any(foreignKey => foreignKey.DataProvider.Identifier == dataProvider.Identifier))
+                .Where(foodGroup => foodGroup.ForeignKeys != null && foodGroup.ForeignKeys.Any(foreignKey => foreignKey.DataProvider != null && foreignKey.DataProvider.Identifier == dataProvider.Identifier))
                 .ToList();
 
             dataProvider.Translate(translationInfo.CultureInfo);
