@@ -65,6 +65,7 @@
     <Compile Include="FoodWaste\IFoodGroup.cs" />
     <Compile Include="FoodWaste\IFoodGroupCollection.cs" />
     <Compile Include="FoodWaste\IFoodItem.cs" />
+    <Compile Include="FoodWaste\IFoodItemCollection.cs" />
     <Compile Include="FoodWaste\IForeignKey.cs" />
     <Compile Include="FoodWaste\IForeignKeyable.cs" />
     <Compile Include="FoodWaste\IIdentifiable.cs" />

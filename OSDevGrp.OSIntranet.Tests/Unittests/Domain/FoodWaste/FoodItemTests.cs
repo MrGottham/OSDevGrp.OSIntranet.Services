@@ -94,7 +94,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of PrimaryFoodGroup throws an ArgumentNullException when the value is null.
+        /// Tests that the setter of PrimaryFoodGroup throws an ArgumentNullException when the value is null.
         /// </summary>
         [Test]
         public void TestThatPrimaryFoodGroupSetterThrowsArgumentNullExceptionWhenValueIsNull()
@@ -111,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of PrimaryFoodGroup sets the primary food group.
+        /// Tests that the setter of PrimaryFoodGroup sets the primary food group.
         /// </summary>
         [Test]
         public void TestThatPrimaryFoodGroupSetterSetsPrimaryFoodGroup()
@@ -133,7 +133,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of IsActive sets whether the food item is active.
+        /// Tests that the setter of IsActive sets whether the food item is active.
         /// </summary>
         [Test]
         [TestCase(true)]
@@ -152,7 +152,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of FoodGroups throws an ArgumentNullException when the value is null.
+        /// Tests that the setter of FoodGroups throws an ArgumentNullException when the value is null.
         /// </summary>
         [Test]
         public void TestThatFoodGroupsSetterThrowsArgumentNullExceptionWhenValueIsNull()
@@ -169,7 +169,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of FoodGroups sets the food groups which this food item belong to when the primary food group is null.
+        /// Tests that the setter of FoodGroups sets the food groups which this food item belong to when the primary food group is null.
         /// </summary>
         [Test]
         public void TestThatFoodGroupsSetterSetsFoodGroupsWhenPrimaryFoodGroupIsNull()
@@ -190,7 +190,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of FoodGroups sets the food groups which this food item belong to when the primary food group is not null and the food group collection does not contain the primary food group.
+        /// Tests that the setter of FoodGroups sets the food groups which this food item belong to when the primary food group is not null and the food group collection does not contain the primary food group.
         /// </summary>
         [Test]
         public void TestThatFoodGroupsSetterSetsFoodGroupsWhenPrimaryFoodGroupIsNotNullAndValueDoesNotContainPrimaryFoodGroup()
@@ -225,7 +225,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of FoodGroups sets the food groups which this food item belong to when the primary food group is not null and the food group collection does contain the primary food group.
+        /// Tests that the setter of FoodGroups sets the food groups which this food item belong to when the primary food group is not null and the food group collection does contain the primary food group.
         /// </summary>
         [Test]
         public void TestThatFoodGroupsSetterSetsFoodGroupsWhenPrimaryFoodGroupIsNotNullAndValueDoesContainPrimaryFoodGroup()
@@ -264,7 +264,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of ForeignKeys throws an ArgumentNullException when the value is null.
+        /// Tests that the setter of ForeignKeys throws an ArgumentNullException when the value is null.
         /// </summary>
         [Test]
         public void TestThatForeignKeysSetterThrowsArgumentNullExceptionWhenValueIsNull()
@@ -281,7 +281,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the setter of ForeignKeys sets the foreign keys for the food item.
+        /// Tests that the setter of ForeignKeys sets the foreign keys for the food item.
         /// </summary>
         [Test]
         public void TestThatForeignKeysSetterSetForeignKeys()
@@ -309,7 +309,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that FoodGroupAdd throws an ArgumentNullException when the food group is null.
+        /// Tests that FoodGroupAdd throws an ArgumentNullException when the food group is null.
         /// </summary>
         [Test]
         public void TestThatFoodGroupAddThrowsArgumentNullExceptionWhenFoodGroupIsNull()
@@ -326,7 +326,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that FoodGroupAdd adds a food group to the food item.
+        /// Tests that FoodGroupAdd adds a food group to the food item.
         /// </summary>
         [Test]
         public void TestThatFoodGroupAddAddsFoodGroup()
@@ -360,7 +360,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that TranslationAdd throws an ArgumentNullException when the translation is null.
+        /// Tests that TranslationAdd throws an ArgumentNullException when the translation is null.
         /// </summary>
         [Test]
         public void TestThatTranslationAddThrowsArgumentNullExceptionWhenTranslationIsNull()
@@ -377,7 +377,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that TranslationAdd adds a translation to the food item.
+        /// Tests that TranslationAdd adds a translation to the food item.
         /// </summary>
         [Test]
         public void TestThatTranslationAddAddsTranslation()
@@ -405,7 +405,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that ForeignKeyAdd throws an ArgumentNullException when the foreign key is null.
+        /// Tests that ForeignKeyAdd throws an ArgumentNullException when the foreign key is null.
         /// </summary>
         [Test]
         public void TestThatForeignKeyAddThrowsArgumentNullExceptionWhenForeignKeyIsNull()
@@ -422,7 +422,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that ForeignKeyAdd adds a foreign key to the food item.
+        /// Tests that ForeignKeyAdd adds a foreign key to the food item.
         /// </summary>
         [Test]
         public void TestThatForeignKeyAddAddsForeignKey()
@@ -447,6 +447,159 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(foodItem.ForeignKeys, Is.Not.Empty);
             Assert.That(foodItem.ForeignKeys.Count(), Is.EqualTo(1));
             Assert.That(foodItem.ForeignKeys.Contains(foreignKeyMock), Is.True);
+        }
+
+        /// <summary>
+        /// Tests that RemoveInactiveFoodGroups removes all the inactive food groups.
+        /// </summary>
+        [Test]
+        public void TestThatRemoveInactiveFoodGroupsRemovesInactiveFoodGroups()
+        {
+            var primaryFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(primaryFoodGroupMock, Is.Not.Null);
+            Assert.That(primaryFoodGroupMock.Identifier, Is.Not.Null);
+            Assert.That(primaryFoodGroupMock.Identifier.HasValue, Is.True);
+            Assert.That(primaryFoodGroupMock.IsActive, Is.False);
+
+            var activeFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            Assert.That(activeFoodGroupMock, Is.Not.Null);
+            Assert.That(activeFoodGroupMock.Identifier, Is.Not.Null);
+            Assert.That(activeFoodGroupMock.Identifier.HasValue, Is.True);
+            Assert.That(activeFoodGroupMock.IsActive, Is.True);
+
+            var inactiveFoodGroup1Mock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(inactiveFoodGroup1Mock, Is.Not.Null);
+            Assert.That(inactiveFoodGroup1Mock.Identifier, Is.Not.Null);
+            Assert.That(inactiveFoodGroup1Mock.Identifier.HasValue, Is.True);
+            Assert.That(inactiveFoodGroup1Mock.IsActive, Is.False);
+
+            var inactiveFoodGroup2Mock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(inactiveFoodGroup2Mock, Is.Not.Null);
+            Assert.That(inactiveFoodGroup2Mock.Identifier, Is.Not.Null);
+            Assert.That(inactiveFoodGroup2Mock.Identifier.HasValue, Is.True);
+            Assert.That(inactiveFoodGroup2Mock.IsActive, Is.False);
+
+            var foodItem = new FoodItem(primaryFoodGroupMock);
+            Assert.That(foodItem, Is.Not.Null);
+            Assert.That(foodItem.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItem.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            foodItem.FoodGroupAdd(activeFoodGroupMock);
+            foodItem.FoodGroupAdd(inactiveFoodGroup1Mock);
+            foodItem.FoodGroupAdd(inactiveFoodGroup2Mock);
+            Assert.That(foodItem.FoodGroups, Is.Not.Null);
+            Assert.That(foodItem.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItem.FoodGroups.Count(), Is.EqualTo(4));
+            Assert.That(foodItem.FoodGroups.Contains(primaryFoodGroupMock), Is.True);
+            Assert.That(foodItem.FoodGroups.Contains(activeFoodGroupMock), Is.True);
+            Assert.That(foodItem.FoodGroups.Contains(inactiveFoodGroup1Mock), Is.True);
+            Assert.That(foodItem.FoodGroups.Contains(inactiveFoodGroup2Mock), Is.True);
+
+            foodItem.RemoveInactiveFoodGroups();
+
+            Assert.That(foodItem.FoodGroups, Is.Not.Null);
+            Assert.That(foodItem.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItem.FoodGroups.Count(), Is.EqualTo(2));
+            Assert.That(foodItem.FoodGroups.Contains(primaryFoodGroupMock), Is.True);
+            Assert.That(foodItem.FoodGroups.Contains(activeFoodGroupMock), Is.True);
+            Assert.That(foodItem.FoodGroups.Contains(inactiveFoodGroup1Mock), Is.False);
+            Assert.That(foodItem.FoodGroups.Contains(inactiveFoodGroup2Mock), Is.False);
+        }
+
+        /// <summary>
+        /// Tests that RemoveInactiveFoodGroups calls RemoveInactiveChildren on each active food group.
+        /// </summary>
+        [Test]
+        public void TestThatRemoveInactiveFoodGroupsCallsRemoveInactiveChildrenOnEachActiveFoodGroup()
+        {
+            var primaryFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(primaryFoodGroupMock, Is.Not.Null);
+            Assert.That(primaryFoodGroupMock.Identifier, Is.Not.Null);
+            Assert.That(primaryFoodGroupMock.Identifier.HasValue, Is.True);
+            Assert.That(primaryFoodGroupMock.IsActive, Is.False);
+
+            var activeFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            Assert.That(activeFoodGroupMock, Is.Not.Null);
+            Assert.That(activeFoodGroupMock.Identifier, Is.Not.Null);
+            Assert.That(activeFoodGroupMock.Identifier.HasValue, Is.True);
+            Assert.That(activeFoodGroupMock.IsActive, Is.True);
+
+            var inactiveFoodGroup1Mock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(inactiveFoodGroup1Mock, Is.Not.Null);
+            Assert.That(inactiveFoodGroup1Mock.Identifier, Is.Not.Null);
+            Assert.That(inactiveFoodGroup1Mock.Identifier.HasValue, Is.True);
+            Assert.That(inactiveFoodGroup1Mock.IsActive, Is.False);
+
+            var inactiveFoodGroup2Mock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(inactiveFoodGroup2Mock, Is.Not.Null);
+            Assert.That(inactiveFoodGroup2Mock.Identifier, Is.Not.Null);
+            Assert.That(inactiveFoodGroup2Mock.Identifier.HasValue, Is.True);
+            Assert.That(inactiveFoodGroup2Mock.IsActive, Is.False);
+
+            var foodItem = new FoodItem(primaryFoodGroupMock);
+            Assert.That(foodItem, Is.Not.Null);
+            Assert.That(foodItem.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItem.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            foodItem.FoodGroupAdd(activeFoodGroupMock);
+            foodItem.FoodGroupAdd(inactiveFoodGroup1Mock);
+            foodItem.FoodGroupAdd(inactiveFoodGroup2Mock);
+            Assert.That(foodItem.FoodGroups, Is.Not.Null);
+            Assert.That(foodItem.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItem.FoodGroups.Count(), Is.EqualTo(4));
+
+            foodItem.RemoveInactiveFoodGroups();
+
+            primaryFoodGroupMock.AssertWasCalled(m => m.RemoveInactiveChildren());
+            activeFoodGroupMock.AssertWasCalled(m => m.RemoveInactiveChildren());
+        }
+
+        /// <summary>
+        /// Tests that RemoveInactiveFoodGroups does not call RemoveInactiveChildren on each inactive food group.
+        /// </summary>
+        [Test]
+        public void TestThatRemoveInactiveFoodGroupsDoesNotCallRemoveInactiveChildrenOnEachInactiveFoodGroup()
+        {
+            var primaryFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(primaryFoodGroupMock, Is.Not.Null);
+            Assert.That(primaryFoodGroupMock.Identifier, Is.Not.Null);
+            Assert.That(primaryFoodGroupMock.Identifier.HasValue, Is.True);
+            Assert.That(primaryFoodGroupMock.IsActive, Is.False);
+
+            var activeFoodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            Assert.That(activeFoodGroupMock, Is.Not.Null);
+            Assert.That(activeFoodGroupMock.Identifier, Is.Not.Null);
+            Assert.That(activeFoodGroupMock.Identifier.HasValue, Is.True);
+            Assert.That(activeFoodGroupMock.IsActive, Is.True);
+
+            var inactiveFoodGroup1Mock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(inactiveFoodGroup1Mock, Is.Not.Null);
+            Assert.That(inactiveFoodGroup1Mock.Identifier, Is.Not.Null);
+            Assert.That(inactiveFoodGroup1Mock.Identifier.HasValue, Is.True);
+            Assert.That(inactiveFoodGroup1Mock.IsActive, Is.False);
+
+            var inactiveFoodGroup2Mock = DomainObjectMockBuilder.BuildFoodGroupMock(isActive: false);
+            Assert.That(inactiveFoodGroup2Mock, Is.Not.Null);
+            Assert.That(inactiveFoodGroup2Mock.Identifier, Is.Not.Null);
+            Assert.That(inactiveFoodGroup2Mock.Identifier.HasValue, Is.True);
+            Assert.That(inactiveFoodGroup2Mock.IsActive, Is.False);
+
+            var foodItem = new FoodItem(primaryFoodGroupMock);
+            Assert.That(foodItem, Is.Not.Null);
+            Assert.That(foodItem.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItem.PrimaryFoodGroup, Is.EqualTo(primaryFoodGroupMock));
+
+            foodItem.FoodGroupAdd(activeFoodGroupMock);
+            foodItem.FoodGroupAdd(inactiveFoodGroup1Mock);
+            foodItem.FoodGroupAdd(inactiveFoodGroup2Mock);
+            Assert.That(foodItem.FoodGroups, Is.Not.Null);
+            Assert.That(foodItem.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItem.FoodGroups.Count(), Is.EqualTo(4));
+
+            foodItem.RemoveInactiveFoodGroups();
+
+            inactiveFoodGroup1Mock.AssertWasNotCalled(m => m.RemoveInactiveChildren());
+            inactiveFoodGroup2Mock.AssertWasNotCalled(m => m.RemoveInactiveChildren());
         }
 
         /// <summary>

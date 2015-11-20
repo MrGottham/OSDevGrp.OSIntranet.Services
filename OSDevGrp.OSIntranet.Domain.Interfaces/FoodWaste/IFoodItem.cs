@@ -28,5 +28,10 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// 
         /// <param name="foodGroup">Food group which this food item should belong to.</param>
         void FoodGroupAdd(IFoodGroup foodGroup);
+
+        /// <summary>
+        /// Removes all inactive food groups.
+        /// </summary>
+        void RemoveInactiveFoodGroups();
     }
 }

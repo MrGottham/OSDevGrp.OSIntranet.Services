@@ -258,6 +258,7 @@
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectMockBuilder.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\FoodGroupCollectionTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\FoodGroupTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\FoodItemCollectionTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\FoodItemTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\ForeignKeyTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />

@@ -158,6 +158,18 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Removes all inactive food groups.
+        /// </summary>
+        public virtual void RemoveInactiveFoodGroups()
+        {
+            _foodGroups = FoodGroups.Where(foodGroup => foodGroup == PrimaryFoodGroup || foodGroup.IsActive).ToList();
+            foreach (var foodGroup in _foodGroups)
+            {
+                foodGroup.RemoveInactiveChildren();
+            }
+        }
+        
+        /// <summary>
         /// Finish up the translation for the food item.
         /// </summary>
         /// <param name="translationCulture">Culture information which are used for translation.</param>
