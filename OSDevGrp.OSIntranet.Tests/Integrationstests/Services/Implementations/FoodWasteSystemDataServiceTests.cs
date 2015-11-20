@@ -4,7 +4,6 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
-using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Services;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
@@ -47,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
 
             foreach (var command in TestHelpers.GetFoodItemImportFromDataProviderCommands(foodGroupTree, translationInfoCollection))
             {
-                ServiceReceiptResponse result = null; //_foodWasteSystemDataService.FoodGroupImportFromDataProvider(command);
+                var result = _foodWasteSystemDataService.FoodItemImportFromDataProvider(command);
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Identifier, Is.Not.EqualTo(default(Guid)));
                 Assert.That(result.Identifier, Is.Not.EqualTo(Guid.Empty));

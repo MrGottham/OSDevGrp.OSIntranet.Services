@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Views;
 
@@ -325,8 +326,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
                 .Where(foreignKey => foreignKey.DataProvider != null && foreignKey.DataProvider.DataProviderIdentifier == dataProviderIdentifier)
                 .ToDictionary(foreignKey => foreignKey.ForeignKey, foreignKey => foreignKey.ForeignKeyForIdentifier);
 
-            var daDkIdentifier = translationInfoCollection.Single(m => m.CultureName == "da-DK").TranslationInfoIdentifier;
-            var enUsIdentifier = translationInfoCollection.Single(m => m.CultureName == "en-US").TranslationInfoIdentifier;
+            var daDkTranslationInfoIdentifier = translationInfoCollection.Single(m => m.CultureName == "da-DK").TranslationInfoIdentifier;
+            var enUsTranslationInfoIdentifier = translationInfoCollection.Single(m => m.CultureName == "en-US").TranslationInfoIdentifier;
 
             var foodItems = new Dictionary<string, IDictionary<string, string>>(0);
             using (var resourceStream = GetEmbeddedResourceStream("Integrationstests.Testdata.DKFoodComp701_2009-11-16.txt"))
@@ -357,11 +358,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
                         switch (buffer.Substring(6, 3))
                         {
                             case "DAN":
-                                foodItemValues.Add("DAN", buffer.Substring(10).Trim());
+                                foodItemValues.Add("DAN", CommonValidations.IllegalChars.Aggregate(buffer.Substring(10).Trim(), (current, illegalChar) => current.Replace(Convert.ToString(illegalChar), string.Empty)));
                                 break;
 
                             case "ENG":
-                                foodItemValues.Add("ENG", buffer.Substring(10).Trim());
+                                foodItemValues.Add("ENG", CommonValidations.IllegalChars.Aggregate(buffer.Substring(10).Trim(), (current, illegalChar) => current.Replace(Convert.ToString(illegalChar), string.Empty)));
                                 break;
 
                             case "MGR":
@@ -374,7 +375,49 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
                 resourceStream.Close();
             }
 
-            return new List<FoodItemImportFromDataProviderCommand>();
+            var commands = new List<FoodItemImportFromDataProviderCommand>();
+            foreach (var foodItem in foodItems)
+            {
+                var foodItemValues = foodItem.Value;
+                if (foodItemValues.ContainsKey("MGR") == false || string.IsNullOrEmpty(foodItemValues["MGR"]))
+                {
+                    continue;
+                }
+                if (foodGroupDataProviderKeys.ContainsKey(foodItemValues["MGR"]) == false)
+                {
+                    continue;
+                }
+                var primaryGroupIdentifier = foodGroupDataProviderKeys[foodItemValues["MGR"]];
+
+                if (foodItemValues.ContainsKey("DAN") && string.IsNullOrEmpty(foodItemValues["DAN"]) == false)
+                {
+                    var command = new FoodItemImportFromDataProviderCommand
+                    {
+                        DataProviderIdentifier = dataProviderIdentifier,
+                        TranslationInfoIdentifier = daDkTranslationInfoIdentifier,
+                        Key = foodItem.Key,
+                        Name = foodItemValues["DAN"].Trim(),
+                        PrimaryFoodGroupIdentifier = primaryGroupIdentifier,
+                        IsActive = true
+                    };
+                    commands.Add(command);
+                }
+
+                if (foodItemValues.ContainsKey("ENG") && string.IsNullOrEmpty(foodItemValues["ENG"]) == false)
+                {
+                    var command = new FoodItemImportFromDataProviderCommand
+                    {
+                        DataProviderIdentifier = dataProviderIdentifier,
+                        TranslationInfoIdentifier = enUsTranslationInfoIdentifier,
+                        Key = foodItem.Key,
+                        Name = foodItemValues["ENG"].Trim(),
+                        PrimaryFoodGroupIdentifier = primaryGroupIdentifier,
+                        IsActive = true
+                    };
+                    commands.Add(command);
+                }
+            }
+            return commands;
         }
 
         /// <summary>

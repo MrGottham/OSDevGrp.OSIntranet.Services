@@ -43,6 +43,37 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that FoodItemImportFromDataProvider imports food items from the data provider.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemImportFromDataProviderImportsFoodItems()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery()).ToArray();
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                var foodGroupTree = client.FoodGroupTreeGet(new FoodGroupTreeGetQuery { TranslationInfoIdentifier = translationInfoCollection.First().TranslationInfoIdentifier });
+                Assert.That(foodGroupTree, Is.Not.Null);
+
+                foreach (var command in TestHelpers.GetFoodItemImportFromDataProviderCommands(foodGroupTree, translationInfoCollection))
+                {
+                    var result = client.FoodItemImportFromDataProvider(command);
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result.Identifier, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(result.Identifier, Is.Not.EqualTo(Guid.Empty));
+                    Assert.That(result.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that FoodGroupTreeGet gets the tree of food groups.
         /// </summary>
         [Test]
