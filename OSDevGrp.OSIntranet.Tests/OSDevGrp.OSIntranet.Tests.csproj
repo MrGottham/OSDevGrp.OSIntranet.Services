@@ -225,6 +225,11 @@
     <Compile Include="Unittests\Contracts\Views\FoodGroupTreeSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FoodGroupTreeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FoodGroupViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodItemCollectionSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodItemCollectionViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodItemIdentificationViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodItemSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\FoodItemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\ForeignKeySystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\ForeignKeyViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerAftaleViewTests.cs" />

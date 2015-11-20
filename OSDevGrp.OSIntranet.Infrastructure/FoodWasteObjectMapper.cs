@@ -27,6 +27,30 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
+            Mapper.CreateMap<IFoodItemCollection, FoodItemCollectionSystemView>()
+                .ForMember(m => m.FoodItems, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodItem>, IEnumerable<FoodItemSystemView>>(s)))
+                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
+
+            Mapper.CreateMap<IFoodItem, FoodItemIdentificationView>()
+                .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
+
+            Mapper.CreateMap<IFoodItem, FoodItemView>()
+                .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.PrimaryFoodGroup)))
+                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupIdentificationView>>(s.FoodGroups)));
+
+            Mapper.CreateMap<IFoodItem, FoodItemSystemView>()
+                .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.PrimaryFoodGroup)))
+                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupSystemView>>(s.FoodGroups)))
+                .ForMember(m => m.Translations, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.Translations)))
+                .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IForeignKey>, IEnumerable<ForeignKeySystemView>>(s.ForeignKeys)));
+
             Mapper.CreateMap<IFoodItem, IFoodItemProxy>()
                 .ConvertUsing(m =>
                 {

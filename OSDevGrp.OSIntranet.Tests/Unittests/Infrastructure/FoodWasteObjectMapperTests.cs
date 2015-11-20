@@ -259,6 +259,133 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps FoodItemCollection to FoodItemCollectionView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodItemCollectionToFoodItemCollectionView()
+        {
+            var foodItemCollection = new FoodItemCollection(DomainObjectMockBuilder.BuildFoodItemMockCollection(), DomainObjectMockBuilder.BuildDataProviderMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodItemCollectionView = foodWasteObjectMapper.Map<IFoodItemCollection, FoodItemCollectionView>(foodItemCollection);
+            Assert.That(foodItemCollectionView, Is.Not.Null);
+            Assert.That(foodItemCollectionView.FoodItems, Is.Not.Null);
+            Assert.That(foodItemCollectionView.FoodItems, Is.Not.Empty);
+            Assert.That(foodItemCollectionView.FoodItems, Is.TypeOf<List<FoodItemView>>());
+            Assert.That(foodItemCollectionView.FoodItems.Count(), Is.EqualTo(foodItemCollection.Count));
+            Assert.That(foodItemCollectionView.DataProvider, Is.Not.Null);
+            Assert.That(foodItemCollectionView.DataProvider, Is.TypeOf<DataProviderView>());
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodItemCollection to FoodItemCollectionSystemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodItemCollectionToFoodItemCollectionSystemView()
+        {
+            var foodItemCollection = new FoodItemCollection(DomainObjectMockBuilder.BuildFoodItemMockCollection(), DomainObjectMockBuilder.BuildDataProviderMock());
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodItemCollectionSystemView = foodWasteObjectMapper.Map<IFoodItemCollection, FoodItemCollectionSystemView>(foodItemCollection);
+            Assert.That(foodItemCollectionSystemView, Is.Not.Null);
+            Assert.That(foodItemCollectionSystemView.FoodItems, Is.Not.Null);
+            Assert.That(foodItemCollectionSystemView.FoodItems, Is.Not.Empty);
+            Assert.That(foodItemCollectionSystemView.FoodItems, Is.TypeOf<List<FoodItemSystemView>>());
+            Assert.That(foodItemCollectionSystemView.FoodItems.Count(), Is.EqualTo(foodItemCollection.Count));
+            Assert.That(foodItemCollectionSystemView.DataProvider, Is.Not.Null);
+            Assert.That(foodItemCollectionSystemView.DataProvider, Is.TypeOf<DataProviderView>());
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodItem to FoodItemIdentificationView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodItemToFoodItemIdentificationView()
+        {
+            var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodItemIdentificationView = foodWasteObjectMapper.Map<IFoodItem, FoodItemIdentificationView>(foodItemMock);
+            Assert.That(foodItemIdentificationView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodItemIdentificationView.FoodItemIdentifier, Is.EqualTo(foodItemMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodItemIdentificationView.Name, Is.Not.Null);
+            Assert.That(foodItemIdentificationView.Name, Is.Not.Empty);
+            Assert.That(foodItemIdentificationView.Name, Is.EqualTo(foodItemMock.Translation.Value));
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodItem to FoodItemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodItemToFoodItemView()
+        {
+            var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodItemView = foodWasteObjectMapper.Map<IFoodItem, FoodItemView>(foodItemMock);
+            Assert.That(foodItemView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodItemView.FoodItemIdentifier, Is.EqualTo(foodItemMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodItemView.Name, Is.Not.Null);
+            Assert.That(foodItemView.Name, Is.Not.Empty);
+            Assert.That(foodItemView.Name, Is.EqualTo(foodItemMock.Translation.Value));
+            Assert.That(foodItemView.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItemView.PrimaryFoodGroup, Is.TypeOf<FoodGroupIdentificationView>());
+            Assert.That(foodItemView.IsActive, Is.EqualTo(foodItemMock.IsActive));
+            Assert.That(foodItemView.FoodGroups, Is.Not.Null);
+            Assert.That(foodItemView.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItemView.FoodGroups, Is.TypeOf<List<FoodGroupIdentificationView>>());
+            Assert.That(foodItemView.FoodGroups.Count(), Is.EqualTo(foodItemMock.FoodGroups.Count()));
+        }
+
+        /// <summary>
+        /// Tests that Map maps FoodItem to FoodItemSystemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsFoodItemToFoodItemSystemView()
+        {
+            var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var foodItemSystemView = foodWasteObjectMapper.Map<IFoodItem, FoodItemSystemView>(foodItemMock);
+            Assert.That(foodItemSystemView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(foodItemSystemView.FoodItemIdentifier, Is.EqualTo(foodItemMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(foodItemSystemView.Name, Is.Not.Null);
+            Assert.That(foodItemSystemView.Name, Is.Not.Empty);
+            Assert.That(foodItemSystemView.Name, Is.EqualTo(foodItemMock.Translation.Value));
+            Assert.That(foodItemSystemView.PrimaryFoodGroup, Is.Not.Null);
+            Assert.That(foodItemSystemView.PrimaryFoodGroup, Is.TypeOf<FoodGroupIdentificationView>());
+            Assert.That(foodItemSystemView.IsActive, Is.EqualTo(foodItemMock.IsActive));
+            Assert.That(foodItemSystemView.FoodGroups, Is.Not.Null);
+            Assert.That(foodItemSystemView.FoodGroups, Is.Not.Empty);
+            Assert.That(foodItemSystemView.FoodGroups, Is.TypeOf<List<FoodGroupSystemView>>());
+            Assert.That(foodItemSystemView.FoodGroups.Count(), Is.EqualTo(foodItemMock.FoodGroups.Count()));
+            Assert.That(foodItemSystemView.Translations, Is.Not.Null);
+            Assert.That(foodItemSystemView.Translations, Is.Not.Empty);
+            Assert.That(foodItemSystemView.Translations, Is.TypeOf<List<TranslationSystemView>>());
+            Assert.That(foodItemSystemView.Translations.Count(), Is.EqualTo(foodItemMock.Translations.Count()));
+            Assert.That(foodItemSystemView.ForeignKeys, Is.Not.Null);
+            Assert.That(foodItemSystemView.ForeignKeys, Is.Not.Empty);
+            Assert.That(foodItemSystemView.ForeignKeys, Is.TypeOf<List<ForeignKeySystemView>>());
+            Assert.That(foodItemSystemView.ForeignKeys.Count(), Is.EqualTo(foodItemMock.ForeignKeys.Count()));
+        }
+
+        /// <summary>
         /// Tests that Map maps FoodItem to FoodItemProxy.
         /// </summary>
         [Test]

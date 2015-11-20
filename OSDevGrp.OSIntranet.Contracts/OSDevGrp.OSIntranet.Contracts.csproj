@@ -134,6 +134,11 @@
     <Compile Include="Views\FoodGroupTreeSystemView.cs" />
     <Compile Include="Views\FoodGroupTreeView.cs" />
     <Compile Include="Views\FoodGroupView.cs" />
+    <Compile Include="Views\FoodItemCollectionSystemView.cs" />
+    <Compile Include="Views\FoodItemCollectionView.cs" />
+    <Compile Include="Views\FoodItemIdentificationView.cs" />
+    <Compile Include="Views\FoodItemSystemView.cs" />
+    <Compile Include="Views\FoodItemView.cs" />
     <Compile Include="Views\ForeignKeySystemView.cs" />
     <Compile Include="Views\ForeignKeyView.cs" />
     <Compile Include="Views\KalenderbrugerAftaleView.cs" />
