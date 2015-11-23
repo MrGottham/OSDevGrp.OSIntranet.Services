@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         #region Properties
 
         /// <summary>
-        /// Gets whether only active food groups should be included.
+        /// Gets whether only active food items should be included.
         /// </summary>
         protected abstract bool OnlyActive { get; }
 

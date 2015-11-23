@@ -27,6 +27,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
+            Mapper.CreateMap<IFoodItemCollection, FoodItemCollectionView>()
+                .ForMember(m => m.FoodItems, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodItem>, IEnumerable<FoodItemView>>(s)))
+                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
+
             Mapper.CreateMap<IFoodItemCollection, FoodItemCollectionSystemView>()
                 .ForMember(m => m.FoodItems, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodItem>, IEnumerable<FoodItemSystemView>>(s)))
                 .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
