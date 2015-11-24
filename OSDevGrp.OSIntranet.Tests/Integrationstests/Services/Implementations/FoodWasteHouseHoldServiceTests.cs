@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Contracts.Queries;
@@ -27,6 +29,47 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             var container = ContainerFactory.Create();
             _foodWasteHouseHoldService = container.Resolve<IFoodWasteHouseHoldService>();
+        }
+
+        /// <summary>
+        /// Tests that FoodItemCollectionGet gets the collection of food items.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemCollectionGetGetsFoodItemCollection()
+        {
+            var translationInfoCollection = _foodWasteHouseHoldService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
+
+            foreach (var translationInfo in translationInfoCollection)
+            {
+                var foodGroupTreeGetQuery = new FoodGroupTreeGetQuery
+                {
+                    TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                };
+                var foodGroupTree = _foodWasteHouseHoldService.FoodGroupTreeGet(foodGroupTreeGetQuery);
+                Assert.That(foodGroupTree, Is.Not.Null);
+                Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
+
+                var foodGroupIdentifiers = new List<Guid?> {null};
+                if (foodGroupTree.FoodGroups.Any())
+                {
+                    foodGroupIdentifiers.Add(foodGroupTree.FoodGroups.Take(1).ElementAt(0).FoodGroupIdentifier);
+                }
+                foreach (var foodGroupIdentifier in foodGroupIdentifiers)
+                {
+                    var foodItemCollectionGetQuery = new FoodItemCollectionGetQuery
+                    {
+                        TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier,
+                        FoodGroupIdentifier = foodGroupIdentifier
+                    };
+                    var foodItemCollection = _foodWasteHouseHoldService.FoodItemCollectionGet(foodItemCollectionGetQuery);
+                    Assert.That(foodItemCollection, Is.Not.Null);
+                    Assert.That(foodItemCollection.FoodItems, Is.Not.Null);
+                    Assert.That(foodItemCollection.FoodItems.Count(), Is.GreaterThanOrEqualTo(0));
+                    Assert.That(foodItemCollection.DataProvider, Is.Not.Null);
+                }
+            }
         }
 
         /// <summary>

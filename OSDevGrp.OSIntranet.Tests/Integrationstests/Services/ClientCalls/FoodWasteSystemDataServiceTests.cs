@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
@@ -40,6 +41,55 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 return;
             }
             _channelFactory.Credentials.UserName.UserName = "mrgottham@gmail.com";
+        }
+
+        /// <summary>
+        /// Tests that FoodItemCollectionGet gets the collection of food items.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemCollectionGetGetsFoodItemCollection()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                foreach (var translationInfo in translationInfoCollection)
+                {
+                    var foodGroupTreeGetQuery = new FoodGroupTreeGetQuery
+                    {
+                        TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                    };
+                    var foodGroupTree = client.FoodGroupTreeGet(foodGroupTreeGetQuery);
+                    Assert.That(foodGroupTree, Is.Not.Null);
+                    Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
+
+                    var foodGroupIdentifiers = new List<Guid?> {null};
+                    if (foodGroupTree.FoodGroups.Any())
+                    {
+                        foodGroupIdentifiers.Add(foodGroupTree.FoodGroups.Take(1).ElementAt(0).FoodGroupIdentifier);
+                    }
+                    foreach (var foodGroupIdentifier in foodGroupIdentifiers)
+                    {
+                        var foodItemCollectionGetQuery = new FoodItemCollectionGetQuery
+                        {
+                            TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier,
+                            FoodGroupIdentifier = foodGroupIdentifier
+                        };
+                        var foodItemCollection = client.FoodItemCollectionGet(foodItemCollectionGetQuery);
+                        Assert.That(foodItemCollection, Is.Not.Null);
+                        Assert.That(foodItemCollection.FoodItems, Is.Not.Null);
+                        Assert.That(foodItemCollection.FoodItems.Count(), Is.GreaterThanOrEqualTo(0));
+                        Assert.That(foodItemCollection.DataProvider, Is.Not.Null);
+                    }
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
         }
 
         /// <summary>
