@@ -15,6 +15,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteSystemDataService : IIntranetService
     {
         /// <summary>
+        /// Gets the collection of food items.
+        /// </summary>
+        /// <param name="query">Query for getting the collection of food items.</param>
+        /// <returns>Collection of food items.</returns>
+        [OperationContract]
+        [FaultContract(typeof(FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        FoodItemCollectionSystemView FoodItemCollectionGet(FoodItemCollectionGetQuery query);
+
+        /// <summary>
         /// Imports a food item from a given data provider.
         /// </summary>
         /// <param name="command">Command for importing a food item from a given data provider.</param>

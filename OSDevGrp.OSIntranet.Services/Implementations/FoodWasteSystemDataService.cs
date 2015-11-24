@@ -64,12 +64,34 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Gets the collection of food items.
+        /// </summary>
+        /// <param name="query">Query for getting the collection of food items.</param>
+        /// <returns>Collection of food items.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual FoodItemCollectionSystemView FoodItemCollectionGet(FoodItemCollectionGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<FoodItemCollectionGetQuery, FoodItemCollectionSystemView>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Imports a food item from a given data provider.
         /// </summary>
         /// <param name="command">Command for importing a food item from a given data provider.</param>
         /// <returns>Service receipt.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
-        public ServiceReceiptResponse FoodItemImportFromDataProvider(FoodItemImportFromDataProviderCommand command)
+        public virtual ServiceReceiptResponse FoodItemImportFromDataProvider(FoodItemImportFromDataProviderCommand command)
         {
             if (command == null)
             {

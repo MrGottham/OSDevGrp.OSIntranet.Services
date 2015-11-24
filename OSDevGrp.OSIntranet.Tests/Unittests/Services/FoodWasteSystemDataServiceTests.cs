@@ -99,6 +99,108 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
+        /// Tests that FoodItemCollectionGet throws an ArgumentNullException when the query for getting the collection of food items is null.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemCollectionGetThrowsArgumentNullExceptionIfFoodItemCollectionGetQueryIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.FoodItemCollectionGet(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("query"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that FoodItemCollectionGet calls Query on the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemCollectionGetCallsQueryOnQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            fixture.Inject(fixture.Build<FoodItemSystemView>().With(m => m.FoodGroups, new List<FoodGroupSystemView>(0)).Create());
+
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<FoodItemCollectionGetQuery, FoodItemCollectionSystemView>(Arg<FoodItemCollectionGetQuery>.Is.NotNull))
+                .Return(fixture.Create<FoodItemCollectionSystemView>())
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var query = fixture.Create<FoodItemCollectionGetQuery>();
+            foodWasteSystemDataService.FoodItemCollectionGet(query);
+
+            queryBusMock.AssertWasCalled(m => m.Query<FoodItemCollectionGetQuery, FoodItemCollectionSystemView>(Arg<FoodItemCollectionGetQuery>.Is.Equal(query)));
+        }
+
+        /// <summary>
+        /// Tests that FoodItemCollectionGet returns the result from the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemCollectionGetReturnsResultFromQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            fixture.Inject(fixture.Build<FoodItemSystemView>().With(m => m.FoodGroups, new List<FoodGroupSystemView>(0)).Create());
+
+            var foodItemCollectionSystemView = fixture.Create<FoodItemCollectionSystemView>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<FoodItemCollectionGetQuery, FoodItemCollectionSystemView>(Arg<FoodItemCollectionGetQuery>.Is.NotNull))
+                .Return(foodItemCollectionSystemView)
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var result = foodWasteSystemDataService.FoodItemCollectionGet(fixture.Create<FoodItemCollectionGetQuery>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(foodItemCollectionSystemView));
+        }
+
+        /// <summary>
+        /// Tests that FoodItemCollectionGet throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatFoodItemCollectionGetThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<FoodItemCollectionGetQuery, FoodItemCollectionSystemView>(Arg<FoodItemCollectionGetQuery>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.FoodItemCollectionGet(fixture.Create<FoodItemCollectionGetQuery>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+        }
+
+        /// <summary>
         /// Tests that FoodItemImportFromDataProvider throws an ArgumentNullException when the command for importing a food item from a given data provider is null.
         /// </summary>
         [Test]
@@ -204,7 +306,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
-        /// Tests that FoodGroupTreeGet throws an ArgumentNullException when the query for getting all the data providers is null.
+        /// Tests that FoodGroupTreeGet throws an ArgumentNullException when the query for getting all the tree of food groups is null.
         /// </summary>
         [Test]
         public void TestThatFoodGroupTreeGetThrowsArgumentNullExceptionIfFoodGroupTreeGetQueryIsNull()
@@ -213,7 +315,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
             fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
             fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
-            fixture.Inject(fixture.Build<FoodGroupSystemView>().With(m => m.Parent, fixture.Create<FoodGroupIdentificationView>()).With(m => m.Children, new List<FoodGroupSystemView>(0)).Create());
 
             var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
             Assert.That(foodWasteSystemDataService, Is.Not.Null);
@@ -284,7 +385,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         {
             var fixture = new Fixture();
             fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Inject(fixture.Build<FoodGroupSystemView>().With(m => m.Parent, fixture.Create<FoodGroupIdentificationView>()).With(m => m.Children, new List<FoodGroupSystemView>(0)).Create());
 
             var exception = fixture.Create<Exception>();
             var queryBusMock = MockRepository.GenerateMock<IQueryBus>();

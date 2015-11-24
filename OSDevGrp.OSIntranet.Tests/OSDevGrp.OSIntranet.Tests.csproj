@@ -312,6 +312,7 @@
     <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerForSystemViewTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerForSystemViewTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerTest.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftaleGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftalerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugereGetQueryHandlerTests.cs" />
