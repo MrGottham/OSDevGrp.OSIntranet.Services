@@ -58,6 +58,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.MailAddress, Is.EqualTo(mailAddress));
             Assert.That(householdMember.ActivationCode, Is.Not.Null);
             Assert.That(householdMember.ActivationCode, Is.Not.Empty);
+            Assert.That(householdMember.ActivationTime, Is.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
+            Assert.That(householdMember.IsActivated, Is.False);
         }
 
         /// <summary>

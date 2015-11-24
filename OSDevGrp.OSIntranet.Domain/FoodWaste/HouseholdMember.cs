@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
@@ -32,7 +31,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             {
                 throw new ArgumentNullException("mailAddress");
             }
-            if (IsMailAddress(mailAddress) == false)
+            if (CommonValidations.IsMailAddress(mailAddress) == false)
             {
                 throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, mailAddress, "mailAddress"));
             }
@@ -66,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 {
                     throw new ArgumentNullException("value");
                 }
-                if (IsMailAddress(value) == false)
+                if (CommonValidations.IsMailAddress(value) == false)
                 {
                     throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
                 }
@@ -128,22 +127,6 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             {
                 throw new NotImplementedException();
             }
-        }
-
-
-        /// <summary>
-        /// Validates whether a value is a mail address.
-        /// </summary>
-        /// <param name="value">Value to validate.</param>
-        /// <returns>True if the value is a mail address otherwise false.</returns>
-        private static bool IsMailAddress(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new ArgumentNullException("value");
-            }
-            var regularExpression = new Regex(@"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$", RegexOptions.Compiled);
-            return regularExpression.IsMatch(value);
         }
 
         /// <summary>
