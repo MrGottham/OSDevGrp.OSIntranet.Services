@@ -64,7 +64,7 @@
     <Compile Include="Finansstyring\BudgetkontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\KontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\RegnskabslisteHelper.cs" />
-    <Compile Include="FoodWaste\CommonValidations.cs" />
+    <Compile Include="FoodWaste\DomainObjectValidations.cs" />
     <Compile Include="FoodWaste\DataProvider.cs" />
     <Compile Include="FoodWaste\DomainObjectBase.cs" />
     <Compile Include="FoodWaste\FoodGroup.cs" />

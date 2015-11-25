@@ -16,6 +16,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 
         private string _mailAddress;
         private string _activationCode;
+        private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
 
@@ -25,17 +26,21 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// Creates a household member.
         /// </summary>
         /// <param name="mailAddress">Mail address for the household member.</param>
-        public HouseholdMember(string mailAddress)
+        /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain</param>
+        public HouseholdMember(string mailAddress, IDomainObjectValidations domainObjectValidations = null)
         {
             if (string.IsNullOrEmpty(mailAddress))
             {
                 throw new ArgumentNullException("mailAddress");
             }
-            //if (CommonValidations.IsMailAddress(mailAddress) == false)
-            //{
-            //    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, mailAddress, "mailAddress"));
-            //}
+
+            _domainObjectValidations = domainObjectValidations ?? DomainObjectValidations.Create();
+            if (_domainObjectValidations.IsMailAddress(mailAddress) == false)
+            {
+                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, mailAddress, "mailAddress"));
+            }
             _mailAddress = mailAddress;
+
             _activationCode = GenerateActivationCode();
         }
 
@@ -44,6 +49,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         protected HouseholdMember()
         {
+            _domainObjectValidations = DomainObjectValidations.Create();
         }
 
         #endregion

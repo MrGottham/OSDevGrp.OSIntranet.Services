@@ -1,15 +1,14 @@
 ﻿using System;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
-    #region Private constants
-    #endregion
-
     /// <summary>
     /// Tests the household member.
     /// </summary>
@@ -48,33 +47,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Tests that the constructor initialize a household member.
         /// </summary>
         [Test]
-        public void TestThatConstructorInitializeHouseholdMember()
+        [TestCase("mrgottham@gmail.com")]
+        [TestCase("test@osdevgrp.dk")]
+        [TestCase("ole.sorensen@gmail.com")]
+        public void TestThatConstructorInitializeHouseholdMember(string validMailAddress)
         {
-            var fixture = new Fixture();
-            var mailAddress = string.Format("test.{0}@osdevgrp.dk", fixture.Create<string>());
-            var householdMember = new HouseholdMember(mailAddress);
+            var householdMember = new HouseholdMember(validMailAddress);
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.Identifier, Is.Null);
             Assert.That(householdMember.Identifier.HasValue, Is.False);
             Assert.That(householdMember.MailAddress, Is.Not.Null);
             Assert.That(householdMember.MailAddress, Is.Not.Empty);
-            Assert.That(householdMember.MailAddress, Is.EqualTo(mailAddress));
+            Assert.That(householdMember.MailAddress, Is.EqualTo(validMailAddress));
             Assert.That(householdMember.ActivationCode, Is.Not.Null);
             Assert.That(householdMember.ActivationCode, Is.Not.Empty);
-            Assert.That(householdMember.ActivationTime, Is.Null);
-            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
-            Assert.That(householdMember.IsActivated, Is.False);
+//            Assert.That(householdMember.ActivationTime, Is.Null);
+//            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
+//            Assert.That(householdMember.IsActivated, Is.False);
         }
 
         /// <summary>
-        /// Tests that the constructor throws an ArgumentNullException when the mail address is invalid.
+        /// Tests that the constructor throws an ArgumentNullException when the mail address is null or empty.
         /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestThatConstructorThrowsArgumentNullExceptionWhenMailAddressIsInValid(string invalidMailAddress)
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenMailAddressIsNullOrEmpty(string invalidMailAddress)
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdMember(invalidMailAddress));
+            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdMember(invalidMailAddress, MockRepository.GenerateMock<IDomainObjectValidations>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -83,22 +83,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that the constructor calls IsMailAddress on common validations used by domain objects in the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorCallsIsMailAddressOnDomainObjectValidations()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var mailAddress = fixture.Create<string>();
+            var householdMember = new HouseholdMember(mailAddress, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.IsMailAddress(Arg<string>.Is.Equal(mailAddress)));
+        }
+
+        /// <summary>
         /// Tests that the constructor throws an IntranetSystemException when the mail address is not a valid mail address.
         /// </summary>
         [Test]
-        [TestCase("123")]
-        [TestCase("XYZ")]
-        [TestCase("XXX.YYY")]
-        [TestCase("XXX.YYY.COM")]
-        public void TestThatConstructorThrowsIntranetSystemExceptionWhenMailAddressIsNotValidMailAddress(string invalidMailAddress)
+        public void TestThatConstructorThrowsIntranetSystemExceptionWhenMailAddressIsNotValidMailAddress()
         {
-            var exception = Assert.Throws<IntranetSystemException>(() => new HouseholdMember(invalidMailAddress));
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var invalidMailAddress = fixture.Create<string>();
+            var exception = Assert.Throws<IntranetSystemException>(() => new HouseholdMember(invalidMailAddress, domainObjectValidationsMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, invalidMailAddress, "mailAddress")));
             Assert.That(exception.InnerException, Is.Null);
         }
+
+
+
+
+
 
         /// <summary>
         /// Tests that the setter for MailAddress throws an ArgumentNullException when the mail address is invalid.

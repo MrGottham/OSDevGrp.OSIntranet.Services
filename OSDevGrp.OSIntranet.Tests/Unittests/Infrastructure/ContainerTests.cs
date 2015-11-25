@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
@@ -43,7 +44,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at container konfiguraiton kan indlæses og typer kan resolves.
         /// </summary>
         [Test]
-        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof (IContainer), typeof (IDomainObjectBuilder), typeof (IObjectMapper), typeof (IFoodWasteObjectMapper), typeof (IFaultExceptionBuilder<FoodWasteFault>), typeof (ISpecification), typeof (ICommandBus), typeof (IQueryBus), typeof (ILogicExecutor), typeof (ICommonValidations), typeof (IMySqlDataProvider), typeof (IFoodWasteDataProvider), typeof (IAdresseRepository), typeof (IFinansstyringRepository), typeof (IKalenderRepository), typeof (IFællesRepository), typeof (ISystemDataRepository), typeof (IKonfigurationRepository), typeof (IAdressekartotekService), typeof (IFinansstyringService), typeof (IKalenderService), typeof (ICommonService), typeof (IFoodWasteSystemDataService), typeof (IFoodWasteHouseHoldService))] Type type)
+        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof (IContainer), typeof (IDomainObjectBuilder), typeof (IObjectMapper), typeof (IFoodWasteObjectMapper), typeof (IFaultExceptionBuilder<FoodWasteFault>), typeof (IDomainObjectValidations), typeof (ISpecification), typeof (ICommandBus), typeof (IQueryBus), typeof (ILogicExecutor), typeof (ICommonValidations), typeof (IMySqlDataProvider), typeof (IFoodWasteDataProvider), typeof (IAdresseRepository), typeof (IFinansstyringRepository), typeof (IKalenderRepository), typeof (IFællesRepository), typeof (ISystemDataRepository), typeof (IKonfigurationRepository), typeof (IAdressekartotekService), typeof (IFinansstyringService), typeof (IKalenderService), typeof (ICommonService), typeof (IFoodWasteSystemDataService), typeof (IFoodWasteHouseHoldService))] Type type)
         {
             var resolvedType = _container.Resolve(type);
             Assert.That(resolvedType, Is.Not.Null);

@@ -3,7 +3,7 @@
     /// <summary>
     /// Interface for common validations used by domain objects in the food waste domain.
     /// </summary>
-    public interface ICommonValidations
+    public interface IDomainObjectValidations
     {
         /// <summary>
         /// Validates whether a value is a mail address.

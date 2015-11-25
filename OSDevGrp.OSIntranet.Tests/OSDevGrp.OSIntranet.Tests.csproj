@@ -262,6 +262,7 @@
     <Compile Include="Unittests\Domain\FoodWaste\DataProviderTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectMockBuilder.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\DomainObjectValidationsTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\FoodGroupCollectionTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\FoodGroupTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\FoodItemCollectionTests.cs" />
