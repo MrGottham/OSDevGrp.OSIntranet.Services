@@ -20,6 +20,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// </summary>
         private class MyHouseholdMember : HouseholdMember
         {
+            #region Constructors
+
+            /// <summary>
+            /// Creates a private class for testing the household member.
+            /// </summary>
+            /// <param name="mailAddress">Mail address for the household member.</param>
+            /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
+            public MyHouseholdMember(string mailAddress, IDomainObjectValidations domainObjectValidations = null)
+                : base(mailAddress, domainObjectValidations)
+            {
+            }
+
+            /// <summary>
+            /// Creates a private class for testing the household member.
+            /// </summary>
+            public MyHouseholdMember()
+            {
+            }
+
+            #endregion
+
             #region Properties
 
             /// <summary>
@@ -61,9 +82,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.MailAddress, Is.EqualTo(validMailAddress));
             Assert.That(householdMember.ActivationCode, Is.Not.Null);
             Assert.That(householdMember.ActivationCode, Is.Not.Empty);
-//            Assert.That(householdMember.ActivationTime, Is.Null);
-//            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
-//            Assert.That(householdMember.IsActivated, Is.False);
+            Assert.That(householdMember.ActivationTime, Is.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
+            Assert.That(householdMember.IsActivated, Is.False);
         }
 
         /// <summary>
@@ -122,20 +143,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(exception.InnerException, Is.Null);
         }
 
-
-
-
-
-
         /// <summary>
-        /// Tests that the setter for MailAddress throws an ArgumentNullException when the mail address is invalid.
+        /// Tests that the setter for MailAddress throws an ArgumentNullException when the mail address is null or empty.
         /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestThatMailAddressSetterThrowsArgumentNullExceptionWhenMailAddressIsInValid(string invalidMailAddress)
+        public void TestThatMailAddressSetterThrowsArgumentNullExceptionWhenMailAddressIsNullOrEmpty(string invalidMailAddress)
         {
-            var householdMember = new MyHouseholdMember();
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdMember.MailAddress = invalidMailAddress);
@@ -147,16 +169,45 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that the setter for MailAddress calls IsMailAddress on common validations used by domain objects in the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatMailAddressSetterCallsIsMailAddressOnDomainObjectValidations()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var newMailAddress = fixture.Create<string>();
+            householdMember.MailAddress = newMailAddress;
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.IsMailAddress(Arg<string>.Is.Equal(newMailAddress)));
+        }
+
+        /// <summary>
         /// Tests that the setter for MailAddress throws an IntranetSystemException when the mail address is not a valid mail address.
         /// </summary>
         [Test]
-        [TestCase("123")]
-        [TestCase("XYZ")]
-        [TestCase("XXX.YYY")]
-        [TestCase("XXX.YYY.COM")]
-        public void TestThatMailAddressSetterThrowsIntranetSystemExceptionWhenMailAddressIsNotValidMailAddress(string invalidMailAddress)
+        public void TestThatMailAddressSetterThrowsIntranetSystemExceptionWhenMailAddressIsNotValidMailAddress()
         {
-            var householdMember = new MyHouseholdMember();
+            var fixture = new Fixture();
+            
+            var validMailAddress = fixture.Create<string>();
+            var invalidMailAddress = fixture.Create<string>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Equal(validMailAddress)))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Equal(invalidMailAddress)))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(validMailAddress, domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
 
             var exception = Assert.Throws<IntranetSystemException>(() => householdMember.MailAddress = invalidMailAddress);
@@ -174,12 +225,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         public void TestThatMailAddressSetterSetsMailAddress()
         {
             var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
 
-            var householdMember = new MyHouseholdMember();
+            var newMailAddress = fixture.Create<string>();
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
-            Assert.That(householdMember.MailAddress, Is.Null);
+            Assert.That(householdMember.MailAddress, Is.Not.Null);
+            Assert.That(householdMember.MailAddress, Is.Not.Empty);
+            Assert.That(householdMember.MailAddress, Is.Not.EqualTo(newMailAddress));
 
-            var newMailAddress = string.Format("test.{0}@osdevgrp.dk", fixture.Create<string>());
             householdMember.MailAddress = newMailAddress;
             Assert.That(householdMember.MailAddress, Is.Not.Null);
             Assert.That(householdMember.MailAddress, Is.Not.Empty);
@@ -222,6 +279,57 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.ActivationCode, Is.Not.Null);
             Assert.That(householdMember.ActivationCode, Is.Not.Empty);
             Assert.That(householdMember.ActivationCode, Is.EqualTo(newActivationCode));
+        }
+
+        /// <summary>
+        /// Tests that the setter for ActivationTime sets the activation time not equal to null.
+        /// </summary>
+        [Test]
+        public void TestThatActivationTimeSetterSetsActivationTimeNotEqualToNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime, Is.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
+
+            var newActivationTime = DateTime.Now;
+            householdMember.ActivationTime = newActivationTime;
+            Assert.That(householdMember.ActivationTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.ActivationTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.ActivationTime.Value, Is.EqualTo(newActivationTime));
+        }
+
+        /// <summary>
+        /// Tests that the setter for ActivationTime sets the activation time equal to null.
+        /// </summary>
+        [Test]
+        public void TestThatActivationTimeSetterSetsActivationTimeEqualToNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                ActivationTime = DateTime.Now
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.True);
+
+            householdMember.ActivationTime = null;
+            Assert.That(householdMember.ActivationTime, Is.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// Creates a household member.
         /// </summary>
         /// <param name="mailAddress">Mail address for the household member.</param>
-        /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain</param>
+        /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
         public HouseholdMember(string mailAddress, IDomainObjectValidations domainObjectValidations = null)
         {
             if (string.IsNullOrEmpty(mailAddress))
@@ -71,10 +71,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 {
                     throw new ArgumentNullException("value");
                 }
-                //if (CommonValidations.IsMailAddress(value) == false)
-                //{
-                //    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
-                //}
+                if (_domainObjectValidations.IsMailAddress(value) == false)
+                {
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
+                }
                 _mailAddress = value;
             }
         }
@@ -103,14 +103,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual DateTime? ActivationTime
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -120,7 +114,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             get
             {
-                throw new NotImplementedException();
+                return false;
             }
         }
 
