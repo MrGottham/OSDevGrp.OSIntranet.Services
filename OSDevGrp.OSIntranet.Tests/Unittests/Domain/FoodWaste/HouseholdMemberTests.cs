@@ -7,6 +7,9 @@ using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
+    #region Private constants
+    #endregion
+
     /// <summary>
     /// Tests the household member.
     /// </summary>

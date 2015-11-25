@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 {
     /// <summary>
-    /// Common validation functionality used by the domain objects in the food waste domain.
+    /// Common validations used by domain objects in the food waste domain.
     /// </summary>
-    public static class CommonValidations
+    public class CommonValidations : ICommonValidations
     {
         /// <summary>
         /// Validates whether a value is a mail address.
         /// </summary>
         /// <param name="value">Value to validate.</param>
         /// <returns>True if the value is a mail address otherwise false.</returns>
-        public static bool IsMailAddress(string value)
+        public virtual bool IsMailAddress(string value)
         {
             if (string.IsNullOrEmpty(value))
             {

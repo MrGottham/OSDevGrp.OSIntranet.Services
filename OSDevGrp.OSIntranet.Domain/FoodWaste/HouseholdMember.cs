@@ -31,10 +31,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             {
                 throw new ArgumentNullException("mailAddress");
             }
-            if (CommonValidations.IsMailAddress(mailAddress) == false)
-            {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, mailAddress, "mailAddress"));
-            }
+            //if (CommonValidations.IsMailAddress(mailAddress) == false)
+            //{
+            //    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, mailAddress, "mailAddress"));
+            //}
             _mailAddress = mailAddress;
             _activationCode = GenerateActivationCode();
         }
@@ -65,10 +65,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 {
                     throw new ArgumentNullException("value");
                 }
-                if (CommonValidations.IsMailAddress(value) == false)
-                {
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
-                }
+                //if (CommonValidations.IsMailAddress(value) == false)
+                //{
+                //    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
+                //}
                 _mailAddress = value;
             }
         }
