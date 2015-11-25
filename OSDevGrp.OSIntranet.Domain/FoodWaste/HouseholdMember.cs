@@ -16,6 +16,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 
         private string _mailAddress;
         private string _activationCode;
+        private DateTime _creationTime;
         private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
@@ -42,6 +43,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             _mailAddress = mailAddress;
 
             _activationCode = GenerateActivationCode();
+            _creationTime = DateTime.Now;
         }
 
         /// <summary>
@@ -114,7 +116,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             get
             {
-                return false;
+                return ActivationTime.HasValue && ActivationTime.Value <= DateTime.Now;
             }
         }
 
@@ -123,10 +125,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual DateTime CreationTime
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return _creationTime; }
+            protected set { _creationTime = value; }
         }
 
         /// <summary>

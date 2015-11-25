@@ -42,7 +42,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             #endregion
 
             #region Properties
-
+            
             /// <summary>
             /// Mail address for the household member.
             /// </summary>
@@ -59,6 +59,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             {
                 get { return base.ActivationCode; }
                 set { base.ActivationCode = value; }
+            }
+
+            /// <summary>
+            /// Date and time for when the household member was created.
+            /// </summary>
+            public new DateTime CreationTime
+            {
+                get { return base.CreationTime; }
+                set { base.CreationTime = value; }
             }
 
             #endregion
@@ -85,6 +94,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.ActivationTime, Is.Null);
             Assert.That(householdMember.ActivationTime.HasValue, Is.False);
             Assert.That(householdMember.IsActivated, Is.False);
+            Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
         }
 
         /// <summary>
@@ -330,6 +340,102 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMember.ActivationTime = null;
             Assert.That(householdMember.ActivationTime, Is.Null);
             Assert.That(householdMember.ActivationTime.HasValue, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsActivated returns false when the activation time is null.
+        /// </summary>
+        [Test]
+        public void TestThatIsActivatedGetterReturnsFalseWhenActivationTimeIsNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new HouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                ActivationTime = null
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime, Is.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.False);
+            Assert.That(householdMember.IsActivated, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsActivated returns false when the activation time is in the future.
+        /// </summary>
+        [Test]
+        public void TestThatIsActivatedGetterReturnsFalseWhenActivationTimeIsInFuture()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new HouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                ActivationTime = DateTime.Now.AddMinutes(random.Next(1, 60))
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.ActivationTime.Value, Is.GreaterThan(DateTime.Now));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.IsActivated, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsActivated returns true when the activation time is in the past.
+        /// </summary>
+        [Test]
+        public void TestThatIsActivatedGetterReturnsTrueWhenActivationTimeIsInPast()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new HouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                ActivationTime = DateTime.Now.AddMinutes(random.Next(1, 60)*-1)
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime, Is.Not.Null);
+            Assert.That(householdMember.ActivationTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.ActivationTime.Value, Is.LessThan(DateTime.Now));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.IsActivated, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that the setter for CreationTime sets the creation time.
+        /// </summary>
+        [Test]
+        public void TestThatCreationTimeSetterSetsCreationTime()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+
+            var newCreationTime = DateTime.Today.AddDays(random.Next(1, 365)*-1);
+            householdMember.CreationTime = newCreationTime;
+            Assert.That(householdMember.CreationTime, Is.EqualTo(newCreationTime));
         }
     }
 }
