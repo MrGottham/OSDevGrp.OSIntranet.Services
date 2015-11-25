@@ -179,3 +179,25 @@ END $$
 DELIMITER ;
 CALL GrantRightsForFoodItemGroups(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForFoodItemGroups;
+
+CREATE TABLE IF NOT EXISTS HouseholdMembers (
+	HouseholdMemberIdentifier VARCHAR(40) NOT NULL,
+	MailAddress VARCHAR(256) NOT NULL,
+	ActivationCode VARCHAR(64) NOT NULL,
+	ActivationTime DATETIME NULL,
+	CreationTime DATETIME NOT NULL,
+	PRIMARY KEY (HouseholdMemberIdentifier),
+	UNIQUE INDEX IX_HouseholdMembers_MailAddress (MailAddress)
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForHouseholdMembers;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForHouseholdMembers(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.HouseholdMembers TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForHouseholdMembers(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForHouseholdMembers;
