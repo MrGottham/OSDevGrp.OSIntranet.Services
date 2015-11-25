@@ -417,7 +417,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for the relation between a food item and a food group is null.
+        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for the food item is null.
         /// </summary>
         [Test]
         public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
@@ -787,7 +787,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that DeleteRelations throws an IntranetRepositoryException when the identifier for the translation is null.
+        /// Tests that DeleteRelations throws an IntranetRepositoryException when the identifier for the food item is null.
         /// </summary>
         [Test]
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()

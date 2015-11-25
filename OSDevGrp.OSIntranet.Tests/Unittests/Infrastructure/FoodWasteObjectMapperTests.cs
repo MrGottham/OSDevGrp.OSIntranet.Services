@@ -259,6 +259,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps HouseholdMember to HouseholdMemberProxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsHouseholdMemberToHouseholdMemberProxy()
+        {
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var householdMemberProxy = foodWasteObjectMapper.Map<IHouseholdMember, IHouseholdMemberProxy>(householdMemberMock);
+            Assert.That(householdMemberProxy, Is.Not.Null);
+            Assert.That(householdMemberProxy.Identifier, Is.Not.Null);
+            Assert.That(householdMemberProxy.Identifier, Is.EqualTo(householdMemberMock.Identifier));
+            Assert.That(householdMemberProxy.MailAddress, Is.Not.Null);
+            Assert.That(householdMemberProxy.MailAddress, Is.Not.Empty);
+            Assert.That(householdMemberProxy.MailAddress, Is.EqualTo(householdMemberMock.MailAddress));
+            Assert.That(householdMemberProxy.ActivationCode, Is.Not.Null);
+            Assert.That(householdMemberProxy.ActivationCode, Is.Not.Empty);
+            Assert.That(householdMemberProxy.ActivationCode, Is.EqualTo(householdMemberMock.ActivationCode));
+            Assert.That(householdMemberProxy.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));
+            Assert.That(householdMemberProxy.IsActivated, Is.EqualTo(householdMemberMock.IsActivated));
+            Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
+        }
+
+        /// <summary>
         /// Tests that Map maps FoodItemCollection to FoodItemCollectionView.
         /// </summary>
         [Test]

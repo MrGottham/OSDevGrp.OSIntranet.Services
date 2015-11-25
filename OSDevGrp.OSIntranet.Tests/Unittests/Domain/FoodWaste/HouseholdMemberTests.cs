@@ -25,6 +25,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// <summary>
             /// Creates a private class for testing the household member.
             /// </summary>
+            public MyHouseholdMember()
+            {
+            }
+
+            /// <summary>
+            /// Creates a private class for testing the household member.
+            /// </summary>
             /// <param name="mailAddress">Mail address for the household member.</param>
             /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
             public MyHouseholdMember(string mailAddress, IDomainObjectValidations domainObjectValidations = null)
@@ -35,7 +42,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// <summary>
             /// Creates a private class for testing the household member.
             /// </summary>
-            public MyHouseholdMember()
+            /// <param name="mailAddress">Mail address for the household member.</param>
+            /// <param name="activationCode">Activation code for the household member.</param>
+            /// <param name="creationTime">Date and time for when the household member was created.</param>
+            /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
+            public MyHouseholdMember(string mailAddress, string activationCode, DateTime creationTime, IDomainObjectValidations domainObjectValidations = null)
+                : base(mailAddress, activationCode, creationTime, domainObjectValidations)
             {
             }
 
@@ -110,6 +122,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("mailAddress"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the activation code is null or empty.
+        /// </summary>
+        [Test]
+        [TestCase(null)]
+        [TestCase("")]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenActivationCodeIsNullOrEmpty(string invalidActivationCode)
+        {
+            var fixture = new Fixture();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyHouseholdMember(fixture.Create<string>(), invalidActivationCode, DateTime.Now, MockRepository.GenerateMock<IDomainObjectValidations>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("activationCode"));
             Assert.That(exception.InnerException, Is.Null);
         }
 

@@ -8,6 +8,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
     public static class DataRepositoryHelper
     {
         /// <summary>
+        /// MySQL DateTime format.
+        /// </summary>
+        public const string MySqlDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+        /// <summary>
         /// Gets the SQL statement for selecting the translations to a given domain object in the food waste domain.
         /// </summary>
         /// <param name="translationOfIdentifier">Identifier for the given domain object on which to get the translations.</param>
@@ -25,6 +30,26 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         public static string GetSqlStatementForSelectingForeignKeys(Guid foreignKeyForIdentifier)
         {
             return string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", foreignKeyForIdentifier.ToString("D").ToUpper());
+        }
+
+        /// <summary>
+        /// Gets the SQL value for a given DateTime value.
+        /// </summary>
+        /// <param name="dateTime">DateTime value for which to get the SQL value.</param>
+        /// <returns>SQL value for the given DateTime value.</returns>
+        public static string GetSqlValueForDateTime(DateTime dateTime)
+        {
+            return string.Format("'{0}'", dateTime.ToString(MySqlDateTimeFormat));
+        }
+
+        /// <summary>
+        /// Gets the SQL value for a given nullable DateTime value.
+        /// </summary>
+        /// <param name="dateTime">Nullable DateTime value for which to get the SQL value.</param>
+        /// <returns>SQL value for the given nullable DateTime value.</returns>
+        public static string GetSqlValueForDateTime(DateTime? dateTime)
+        {
+            return dateTime.HasValue ? GetSqlValueForDateTime(dateTime.Value) : "NULL";
         }
     }
 }

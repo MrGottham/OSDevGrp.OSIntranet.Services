@@ -14,6 +14,53 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
     public static class DomainObjectMockBuilder
     {
         /// <summary>
+        /// Build a mockup for a household member.
+        /// </summary>
+        /// <returns>Mockup for a household member.</returns>
+        public static IHouseholdMember BuildHouseholdMemberMock()
+        {
+            var fixture = new Fixture();
+            var identfier = Guid.NewGuid();
+            var mailAddress = string.Format("test.{0}@osdevgrp.dk", identfier.ToString("D").ToLower());
+            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMemberMock.Stub(m => m.Identifier)
+                .Return(identfier)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.MailAddress)
+                .Return(mailAddress)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.ActivationCode)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.ActivationTime)
+                .Return(DateTime.Today)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.IsActivated)
+                .Return(true)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.CreationTime)
+                .Return(DateTime.Today)
+                .Repeat.Any();
+            return householdMemberMock;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some household members.
+        /// </summary>
+        /// <returns>Collection of mockups for some household members.</returns>
+        public static IEnumerable<IHouseholdMember> BuildHouseholdMemberMockCollection()
+        {
+            return new List<IHouseholdMember>
+            {
+                BuildHouseholdMemberMock(),
+                BuildHouseholdMemberMock(),
+                BuildHouseholdMemberMock(),
+                BuildHouseholdMemberMock(),
+                BuildHouseholdMemberMock()
+            };
+        }
+
+        /// <summary>
         /// Build a mockup for a food item.
         /// </summary>
         /// <param name="isActive">Indicates whether the food item should be active or inactive.</param>

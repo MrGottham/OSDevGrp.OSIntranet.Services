@@ -28,11 +28,35 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         /// <param name="mailAddress">Mail address for the household member.</param>
         /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
-        public HouseholdMember(string mailAddress, IDomainObjectValidations domainObjectValidations = null)
+        public HouseholdMember(string mailAddress, IDomainObjectValidations domainObjectValidations = null) 
+            : this(mailAddress, GenerateActivationCode(), DateTime.Now, domainObjectValidations)
+        {
+        }
+
+        /// <summary>
+        /// Creates a household member.
+        /// </summary>
+        protected HouseholdMember()
+        {
+            _domainObjectValidations = DomainObjectValidations.Create();
+        }
+
+        /// <summary>
+        /// Creates a household member.
+        /// </summary>
+        /// <param name="mailAddress">Mail address for the household member.</param>
+        /// <param name="activationCode">Activation code for the household member.</param>
+        /// <param name="creationTime">Date and time for when the household member was created.</param>
+        /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
+        protected HouseholdMember(string mailAddress, string activationCode, DateTime creationTime, IDomainObjectValidations domainObjectValidations = null)
         {
             if (string.IsNullOrEmpty(mailAddress))
             {
                 throw new ArgumentNullException("mailAddress");
+            }
+            if (string.IsNullOrEmpty(activationCode))
+            {
+                throw new ArgumentNullException("activationCode");
             }
 
             _domainObjectValidations = domainObjectValidations ?? DomainObjectValidations.Create();
@@ -42,16 +66,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             }
             _mailAddress = mailAddress;
 
-            _activationCode = GenerateActivationCode();
-            _creationTime = DateTime.Now;
-        }
-
-        /// <summary>
-        /// Creates a household member.
-        /// </summary>
-        protected HouseholdMember()
-        {
-            _domainObjectValidations = DomainObjectValidations.Create();
+            _activationCode = activationCode;
+            _creationTime = creationTime;
         }
 
         #endregion
