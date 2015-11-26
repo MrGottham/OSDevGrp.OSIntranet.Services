@@ -76,6 +76,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>The identifiable domain object.</returns>
         public virtual TIdentifiable Get<TIdentifiable>(Guid identifier) where TIdentifiable : IIdentifiable
         {
+            if (typeof (TIdentifiable) == typeof (IHouseholdMember))
+            {
+                return (TIdentifiable) Get<IHouseholdMember, HouseholdMemberProxy>(identifier);
+            }
             if (typeof (TIdentifiable) == typeof (IFoodItem))
             {
                 return (TIdentifiable) Get<IFoodItem, FoodItemProxy>(identifier);
@@ -114,6 +118,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IHouseholdMember)
+            {
+                return (TIdentifiable) Insert<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
             }
             if (identifiable is IFoodItem)
             {
@@ -154,6 +162,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 throw new ArgumentNullException("identifiable");
             }
+            if (identifiable is IHouseholdMember)
+            {
+                return (TIdentifiable) Update<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
+            }
             if (identifiable is IFoodItem)
             {
                 return (TIdentifiable) Update<IFoodItem, IFoodItemProxy>(identifiable as IFoodItem);
@@ -191,6 +203,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IHouseholdMember)
+            {
+                Delete<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
+                return;
             }
             if (identifiable is IFoodItem)
             {

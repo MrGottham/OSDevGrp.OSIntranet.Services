@@ -27,6 +27,21 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
+            Mapper.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
+                .ConstructUsing(m =>
+                {
+                    if (m as IHouseholdMemberProxy != null)
+                    {
+                        return (IHouseholdMemberProxy) m;
+                    }
+                    var householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.ActivationCode, m.CreationTime)
+                    {
+                        Identifier = m.Identifier,
+                        ActivationTime = m.ActivationTime,
+                    };
+                    return householdMemberProxy;
+                });
+
             Mapper.CreateMap<IFoodItemCollection, FoodItemCollectionView>()
                 .ForMember(m => m.FoodItems, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodItem>, IEnumerable<FoodItemView>>(s)))
                 .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));

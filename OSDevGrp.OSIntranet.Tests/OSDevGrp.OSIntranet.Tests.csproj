@@ -121,6 +121,7 @@
   <ItemGroup>
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
+    <Compile Include="Integrationstests\Repositories\FoodWaste\HouseholdDataRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\SystemDataRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\KalenderRepositoryTests.cs" />
@@ -351,6 +352,7 @@
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\DataRepositoryBaseTests.cs" />
+    <Compile Include="Unittests\Repositories\FoodWaste\HouseholdDataRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\SystemDataRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\KalenderRepositoryTests.cs" />

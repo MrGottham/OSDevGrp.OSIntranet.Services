@@ -118,6 +118,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetCallsGetOnFoodWasteDataProvider()
         {
+            TestThatGetCallsGetOnFoodWasteDataProvider<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
             TestThatGetCallsGetOnFoodWasteDataProvider<IFoodItem, FoodItemProxy>(Guid.NewGuid());
             TestThatGetCallsGetOnFoodWasteDataProvider<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
             TestThatGetCallsGetOnFoodWasteDataProvider<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
@@ -132,6 +133,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetReturnsReceivedDataProxy()
         {
+            TestThatGetReturnsReceivedDataProxy<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
             TestThatGetReturnsReceivedDataProxy<IFoodItem, FoodItemProxy>(Guid.NewGuid());
             TestThatGetReturnsReceivedDataProxy<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
             TestThatGetReturnsReceivedDataProxy<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
@@ -146,6 +148,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
+            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
             TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IFoodItem, FoodItemProxy>(Guid.NewGuid());
             TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
             TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
@@ -160,6 +163,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
+            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
             TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IFoodItem, FoodItemProxy>(Guid.NewGuid());
             TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
             TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
@@ -194,6 +198,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertCallsMapOnFoodWasteObjectMapper()
         {
+            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -208,6 +213,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertCallsAddOnFoodWasteDataProvider()
         {
+            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -222,6 +228,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertReturnsInsertedDataProxy()
         {
+            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -236,6 +243,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
+            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -250,6 +258,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
+            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -284,6 +293,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateCallsMapOnFoodWasteObjectMapper()
         {
+            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -298,6 +308,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateCallsSaveOnFoodWasteDataProvider()
         {
+            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -312,6 +323,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateReturnsUpdatedDataProxy()
         {
+            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -326,6 +338,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
+            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -340,6 +353,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
+            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -374,6 +388,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteCallsMapOnFoodWasteObjectMapper()
         {
+            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -388,6 +403,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteCallsDeleteOnFoodWasteDataProvider()
         {
+            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -402,6 +418,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
+            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
@@ -416,6 +433,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
+            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
             TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
             TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
             TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
