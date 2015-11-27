@@ -15,8 +15,10 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Infrastructure.Validation;
 using OSDevGrp.OSIntranet.Repositories;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Infrastructure.IoC
 {
@@ -41,6 +43,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
         public void AddConfiguration(IWindsorContainer container)
         {
             var konfigurationRepository = new KonfigurationRepository(ConfigurationManager.AppSettings);
+            var foodWasteConfigurationRepository = new ConfigurationRepository(ConfigurationManager.AppSettings);
 
             container.Register(Component.For<IDomainObjectBuilder>().ImplementedBy<DomainObjectBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
@@ -53,6 +56,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<ICommonValidations>().ImplementedBy<CommonValidations>().LifeStyle.Singleton);
             container.Register(Component.For<ILogicExecutor>().ImplementedBy<LogicExecutor>().LifeStyle.Transient);
             container.Register(Component.For<IKonfigurationRepository>().Instance(konfigurationRepository).LifeStyle.Transient);
+            container.Register(Component.For<IConfigurationRepository>().Instance(foodWasteConfigurationRepository).LifeStyle.Transient);
 
             container.Register(Component.For<IMySqlDataProvider>().Instance(new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName])).LifeStyle.Transient);
             container.Register(Component.For<IFoodWasteDataProvider>().Instance(new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteProviderConnectionStringSettingsName])).LifeStyle.Transient);

@@ -110,6 +110,7 @@
     <Compile Include="DataProxies\Kalender\BrugerProxy.cs" />
     <Compile Include="DomainObjectBuilder.cs" />
     <Compile Include="FinansstyringRepository.cs" />
+    <Compile Include="FoodWaste\ConfigurationRepository.cs" />
     <Compile Include="FoodWaste\DataRepositoryBase.cs" />
     <Compile Include="FoodWaste\DataRepositoryHelper.cs" />
     <Compile Include="DataProxies\FoodWaste\FoodGroupProxy.cs" />
