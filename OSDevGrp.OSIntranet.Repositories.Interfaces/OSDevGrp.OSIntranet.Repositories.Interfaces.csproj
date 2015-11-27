@@ -69,6 +69,7 @@
     <Compile Include="DataProxies\Kalender\IAftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\IBrugeraftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\IBrugerProxy.cs" />
+    <Compile Include="FoodWaste\ICommunicationRepository.cs" />
     <Compile Include="FoodWaste\IConfigurationRepository.cs" />
     <Compile Include="FoodWaste\IDataRepository.cs" />
     <Compile Include="FoodWaste\IHouseholdDataRepository.cs" />
