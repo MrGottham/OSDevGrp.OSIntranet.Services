@@ -39,6 +39,26 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that SmtpPort has a value.
+        /// </summary>
+        [Test]
+        public void TestThatSmtpPortHasValue()
+        {
+            var result = _configurationRepository.SmtpPort;
+            Assert.That(result, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tests that UseSmtpAuthentication has a value.
+        /// </summary>
+        [Test]
+        public void TestThatUseSmtpAuthenticationHasValue()
+        {
+            var result = _configurationRepository.UseSmtpAuthentication;
+            Assert.That(result, Is.TypeOf<bool>());
+        }
+
+        /// <summary>
         /// Tests that SmtpUserName has a value.
         /// </summary>
         [Test]
@@ -58,6 +78,16 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
             var result = _configurationRepository.SmtpPassword;
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
+        }
+
+        /// <summary>
+        /// Tests that UseSmtpSecureConnection has a value.
+        /// </summary>
+        [Test]
+        public void TestThatUseSmtpSecureConnectionHasValue()
+        {
+            var result = _configurationRepository.UseSmtpSecureConnection;
+            Assert.That(result, Is.TypeOf<bool>());
         }
 
         /// <summary>

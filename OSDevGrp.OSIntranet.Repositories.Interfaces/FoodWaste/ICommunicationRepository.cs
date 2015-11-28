@@ -5,5 +5,12 @@
     /// </summary>
     public interface ICommunicationRepository : IRepository
     {
+        /// <summary>
+        /// Send a mail.
+        /// </summary>
+        /// <param name="toMailAddress">Mail address for the receiver.</param>
+        /// <param name="subject">Subject for the mail.</param>
+        /// <param name="body">Body for the mail.</param>
+        void SendMail(string toMailAddress, string subject, string body);
     }
 }

@@ -24,9 +24,13 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #region Private variables
 
         private readonly string _smtpServer;
+        private readonly int _smtpPort;
+        private readonly bool _useSmtpAuthentication;
         private readonly string _smtpUserName;
         private readonly string _smtpPassword;
+        private readonly bool _useSmtpSecureConnection;
         private readonly string _fromMailAddress;
+        
 
         #endregion
 
@@ -45,8 +49,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             try
             {
                 _smtpServer = base.GetStringFromApplicationSettings(nameValueCollection, "SmtpServer");
+                _smtpPort = base.GetIntFromApplicationSettings(nameValueCollection, "SmtpPort");
+                _useSmtpAuthentication = base.GetBoolFromApplicationSettings(nameValueCollection, "UseSmtpAuthentication");
                 _smtpUserName = base.GetStringFromApplicationSettings(nameValueCollection, "SmtpUserName");
                 _smtpPassword = base.GetStringFromApplicationSettings(nameValueCollection, "SmtpPassword");
+                _useSmtpSecureConnection = base.GetBoolFromApplicationSettings(nameValueCollection, "UseSmtpSecureConnection");
                 _fromMailAddress = base.GetStringFromApplicationSettings(nameValueCollection, "FromMailAddress");
             }
             catch (CommonRepositoryException ex)
@@ -68,6 +75,22 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Gets the port on which to communicate with the SMTP server. 
+        /// </summary>
+        public virtual int SmtpPort
+        {
+            get { return _smtpPort; }
+        }
+
+        /// <summary>
+        /// Gets whether to use authentication against the SMTP server.
+        /// </summary>
+        public virtual bool UseSmtpAuthentication
+        {
+            get { return _useSmtpAuthentication; }
+        }
+
+        /// <summary>
         /// Gets the user name for the SMTP server.
         /// </summary>
         public virtual string SmtpUserName
@@ -81,6 +104,14 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         public virtual string SmtpPassword
         {
             get { return DecryptValue(_smtpPassword); }
+        }
+
+        /// <summary>
+        /// Gets whether to use a secure connection to the SMTP server.
+        /// </summary>
+        public virtual bool UseSmtpSecureConnection
+        {
+            get { return _useSmtpSecureConnection; }
         }
 
         /// <summary>

@@ -23,14 +23,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var fixture = new Fixture();
             
             var smtpServer = fixture.Create<string>();
+            var smtpPort = fixture.Create<int>();
+            var useSmtpAuthentication = fixture.Create<bool>();
+            var useSmtpSecureConnection = fixture.Create<bool>();
             var smtpUserName = fixture.Create<string>();
             var smtpPassword = fixture.Create<string>();
             var fromMailAddress = fixture.Create<string>();
             var nameValueCollection = new NameValueCollection
             {
                 {"SmtpServer", smtpServer},
+                {"SmtpPort", Convert.ToString(smtpPort)},
+                {"UseSmtpAuthentication", Convert.ToString(useSmtpAuthentication)},
                 {"SmtpUserName", smtpUserName},
                 {"SmtpPassword", ConfigurationRepository.EncryptValue(smtpPassword)},
+                {"UseSmtpSecureConnection", Convert.ToString(useSmtpSecureConnection)},
                 {"FromMailAddress", fromMailAddress}
             };
 
@@ -39,12 +45,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             Assert.That(configurationRepository.SmtpServer, Is.Not.Null);
             Assert.That(configurationRepository.SmtpServer, Is.Not.Empty);
             Assert.That(configurationRepository.SmtpServer, Is.EqualTo(smtpServer));
+            Assert.That(configurationRepository.SmtpPort, Is.EqualTo(smtpPort));
+            Assert.That(configurationRepository.SmtpPort, Is.EqualTo(smtpPort));
+            Assert.That(configurationRepository.UseSmtpAuthentication, Is.EqualTo(useSmtpAuthentication));
             Assert.That(configurationRepository.SmtpUserName, Is.Not.Null);
             Assert.That(configurationRepository.SmtpUserName, Is.Not.Empty);
             Assert.That(configurationRepository.SmtpUserName, Is.EqualTo(smtpUserName));
             Assert.That(configurationRepository.SmtpPassword, Is.Not.Null);
             Assert.That(configurationRepository.SmtpPassword, Is.Not.Empty);
             Assert.That(configurationRepository.SmtpPassword, Is.EqualTo(smtpPassword));
+            Assert.That(configurationRepository.UseSmtpSecureConnection, Is.EqualTo(useSmtpSecureConnection));
             Assert.That(configurationRepository.FromMailAddress, Is.Not.Null);
             Assert.That(configurationRepository.FromMailAddress, Is.Not.Empty);
             Assert.That(configurationRepository.FromMailAddress, Is.EqualTo(fromMailAddress));
