@@ -3,7 +3,7 @@
     /// <summary>
     /// Types for static text.
     /// </summary>
-    public enum StaticTextTypes
+    public enum StaticTextType
     {
         WelcomeLetter = 1
     }

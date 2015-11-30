@@ -201,3 +201,14 @@ END $$
 DELIMITER ;
 CALL GrantRightsForHouseholdMembers(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForHouseholdMembers;
+
+CREATE TABLE IF NOT EXISTS StaticTexts (
+	StaticTextIdentifier VARCHAR(40) NOT NULL,
+
+	
+	Name VARCHAR(256) NOT NULL,
+	DataSourceStatementIdentifier VARCHAR(40) NOT NULL,
+	PRIMARY KEY (StaticTextIdentifier),
+
+	UNIQUE INDEX IX_DataProviders_DataSourceStatementIdentifier (DataSourceStatementIdentifier)
+);

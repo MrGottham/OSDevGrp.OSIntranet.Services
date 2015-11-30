@@ -60,7 +60,7 @@
     <Compile Include="Finansstyring\IBudgetkontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IKontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />
-    <Compile Include="FoodWaste\Enums\StaticTextTypes.cs" />
+    <Compile Include="FoodWaste\Enums\StaticTextType.cs" />
     <Compile Include="FoodWaste\IDomainObjectValidations.cs" />
     <Compile Include="FoodWaste\IDataProvider.cs" />
     <Compile Include="FoodWaste\IDomainObject.cs" />

@@ -60,6 +60,7 @@
     <Compile Include="DataProxies\FoodWaste\IFoodItemProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\IForeignKeyProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\IHouseholdMemberProxy.cs" />
+    <Compile Include="DataProxies\FoodWaste\IStaticTextProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationInfoProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationProxy.cs" />
     <Compile Include="DataProxies\Fælles\ISystemProxy.cs" />

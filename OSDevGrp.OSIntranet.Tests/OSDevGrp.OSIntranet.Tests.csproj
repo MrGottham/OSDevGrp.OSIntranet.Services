@@ -273,6 +273,7 @@
     <Compile Include="Unittests\Domain\FoodWaste\ForeignKeyTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\HouseholdMemberTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\StaticTextTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationTests.cs" />
@@ -345,6 +346,7 @@
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\FoodItemProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\ForeignKeyProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\HouseholdMemberProxyTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\StaticTextProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\TranslationInfoProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\TranslationProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Fælles\SystemProxyTests.cs" />

@@ -12,7 +12,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// <summary>
         /// Gets the type of the static text.
         /// </summary>
-        StaticTextTypes Type { get; }
+        StaticTextType Type { get; }
 
         /// <summary>
         /// Gets the translation identifier for the subject to the static text.
