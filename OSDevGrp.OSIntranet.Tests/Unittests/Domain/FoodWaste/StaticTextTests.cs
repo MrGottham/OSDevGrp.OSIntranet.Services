@@ -71,6 +71,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that the Translate sets the translation for the static text to null.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateSetsTranslationToNull()
+        {
+            var fixture = new Fixture();
+            var subjectTranslationIdentifier = Guid.NewGuid();
+
+            var staticText = new StaticText(fixture.Create<StaticTextType>(), subjectTranslationIdentifier);
+            Assert.That(staticText, Is.Not.Null);
+            Assert.That(staticText.Translation, Is.Null);
+            Assert.That(staticText.Translations, Is.Not.Null);
+            Assert.That(staticText.Translations, Is.Empty);
+
+            var translationMock = DomainObjectMockBuilder.BuildTranslationMock(subjectTranslationIdentifier);
+            staticText.TranslationAdd(translationMock);
+            Assert.That(staticText.Translation, Is.Null);
+            Assert.That(staticText.Translations, Is.Not.Null);
+            Assert.That(staticText.Translations, Is.Not.Empty);
+
+            staticText.Translate(translationMock.TranslationInfo.CultureInfo);
+            Assert.That(staticText.Translation, Is.Null);
+        }
+
+        /// <summary>
         /// Tests that the Translate sets the translation for the subject when translation was found.
         /// </summary>
         [Test]

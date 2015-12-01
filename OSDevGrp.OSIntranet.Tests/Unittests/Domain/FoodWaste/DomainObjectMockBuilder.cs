@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -222,6 +224,63 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Build a collection of mockups for all the static text used by the food waste domain.
+        /// </summary>
+        /// <returns>Collection of mockups for all the static text used by the food waste domain.</returns>
+        public static IEnumerable<IStaticText> BuildStaticTextMockCollection()
+        {
+            return Enum.GetValues(typeof (StaticTextType))
+                .Cast<StaticTextType>()
+                .Select(BuildStaticTextMock)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Build a mockup for a static text used by the food waste domain.
+        /// </summary>
+        /// <param name="staticTextType">Type of the static text.</param>
+        /// <returns>Mockup for a static text used by the food waste domain.</returns>
+        public static IStaticText BuildStaticTextMock(StaticTextType staticTextType = StaticTextType.WelcomeLetter)
+        {
+            var subjectTranslationIdentifier = Guid.NewGuid();
+            var subjectTranslation = BuildTranslationMock(subjectTranslationIdentifier);
+            var bodyTranslationIdentifer = Guid.NewGuid();
+            var bodyTranslation = BuildTranslationMock(bodyTranslationIdentifer);
+            var staticTextMock = MockRepository.GenerateMock<IStaticText>();
+            staticTextMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.Type)
+                .Return(staticTextType)
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.Translation)
+                .Return(null)
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.Translations)
+                .Return(new List<ITranslation> {subjectTranslation, bodyTranslation})
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.SubjectTranslationIdentifier)
+                .Return(subjectTranslationIdentifier)
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.SubjectTranslation)
+                .Return(subjectTranslation)
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.SubjectTranslations)
+                .Return(new List<ITranslation> {subjectTranslation})
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.BodyTranslationIdentifier)
+                .Return(bodyTranslationIdentifer)
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.BodyTranslation)
+                .Return(bodyTranslation)
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.SubjectTranslations)
+                .Return(new List<ITranslation> {bodyTranslation})
+                .Repeat.Any();
+            return staticTextMock;
+        }
+
+        /// <summary>
         /// Build a mockup for a data provider.
         /// </summary>
         /// <returns>Mockup for a data provider.</returns>
@@ -257,7 +316,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <summary>
         /// Build a collection of mockups for some data providers.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Collection of mockups for some data providers.</returns>
         public static IEnumerable<IDataProvider> BuildDataProviderMockCollection()
         {
             return new List<IDataProvider>
