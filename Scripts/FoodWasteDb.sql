@@ -14,8 +14,8 @@ CALL GrantRightsForFoodWasteDb(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForFoodWasteDb;
 
 CREATE TABLE IF NOT EXISTS TranslationInfos (
-	TranslationInfoIdentifier VARCHAR(40) NOT NULL,
-	CultureName VARCHAR(5) NOT NULL,
+	TranslationInfoIdentifier CHAR(36) NOT NULL,
+	CultureName CHAR(5) NOT NULL,
 	PRIMARY KEY (TranslationInfoIdentifier)
 );
 
@@ -30,6 +30,21 @@ END $$
 DELIMITER ;
 CALL CreateIX_TranslationInfos_CultureName();
 DROP PROCEDURE CreateIX_TranslationInfos_CultureName;
+
+DROP PROCEDURE IF EXISTS AlterTranslationInfos;
+DELIMITER $$
+CREATE PROCEDURE AlterTranslationInfos()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='TranslationInfos' AND Column_Name='TranslationInfoIdentifier') = 'varchar') THEN
+		ALTER TABLE TranslationInfos MODIFY TranslationInfoIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='TranslationInfos' AND Column_Name='CultureName') = 'varchar') THEN
+		ALTER TABLE TranslationInfos MODIFY CultureName CHAR(5) NOT NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterTranslationInfos();
+DROP PROCEDURE AlterTranslationInfos;
 
 DROP PROCEDURE IF EXISTS InsertDataIntoTranslationInfos;
 DELIMITER $$
@@ -47,14 +62,35 @@ CALL InsertDataIntoTranslationInfos();
 DROP PROCEDURE InsertDataIntoTranslationInfos;
 
 CREATE TABLE IF NOT EXISTS Translations (
-	TranslationIdentifier VARCHAR(40) NOT NULL,
-	OfIdentifier VARCHAR(40) NOT NULL,
-	InfoIdentifier VARCHAR(40) NOT NULL,
-	Value VARCHAR(4096) NOT NULL,
+	TranslationIdentifier CHAR(36) NOT NULL,
+	OfIdentifier CHAR(36) NOT NULL,
+	InfoIdentifier CHAR(36) NOT NULL,
+	Value NVARCHAR(4096) NOT NULL,
 	PRIMARY KEY (TranslationIdentifier),
 	UNIQUE INDEX IX_Translations_OfIdentifier_InfoIdentifier (OfIdentifier,InfoIdentifier),
 	FOREIGN KEY FK_Translations_InfoIdentifier (InfoIdentifier) REFERENCES TranslationInfos (TranslationInfoIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP PROCEDURE IF EXISTS AlterTranslations;
+DELIMITER $$
+CREATE PROCEDURE AlterTranslations()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='Translations' AND Column_Name='TranslationIdentifier') = 'varchar') THEN
+		ALTER TABLE Translations MODIFY TranslationIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='Translations' AND Column_Name='OfIdentifier') = 'varchar') THEN
+		ALTER TABLE Translations MODIFY OfIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='Translations' AND Column_Name='InfoIdentifier') = 'varchar') THEN
+		ALTER TABLE Translations MODIFY InfoIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='Translations' AND Column_Name='Value') = 'varchar') THEN
+		ALTER TABLE Translations MODIFY Value NVARCHAR(4096) NOT NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterTranslations();
+DROP PROCEDURE AlterTranslations;
 
 DROP PROCEDURE IF EXISTS GrantRightsForTranslations;
 DELIMITER $$
@@ -69,12 +105,30 @@ CALL GrantRightsForTranslations(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForTranslations;
 
 CREATE TABLE IF NOT EXISTS DataProviders (
-	DataProviderIdentifier VARCHAR(40) NOT NULL,
-	Name VARCHAR(256) NOT NULL,
-	DataSourceStatementIdentifier VARCHAR(40) NOT NULL,
+	DataProviderIdentifier CHAR(36) NOT NULL,
+	Name NVARCHAR(256) NOT NULL,
+	DataSourceStatementIdentifier CHAR(36) NOT NULL,
 	PRIMARY KEY (DataProviderIdentifier),
 	UNIQUE INDEX IX_DataProviders_DataSourceStatementIdentifier (DataSourceStatementIdentifier)
 );
+
+DROP PROCEDURE IF EXISTS AlterDataProviders;
+DELIMITER $$
+CREATE PROCEDURE AlterDataProviders()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='DataProviders' AND Column_Name='DataProviderIdentifier') = 'varchar') THEN
+		ALTER TABLE DataProviders MODIFY DataProviderIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='DataProviders' AND Column_Name='Name') = 'varchar') THEN
+		ALTER TABLE DataProviders MODIFY Name NVARCHAR(256) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='DataProviders' AND Column_Name='DataSourceStatementIdentifier') = 'varchar') THEN
+		ALTER TABLE DataProviders MODIFY DataSourceStatementIdentifier CHAR(36) NOT NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterDataProviders();
+DROP PROCEDURE AlterDataProviders;
 
 DROP PROCEDURE IF EXISTS InsertDataIntoDataProviders;
 DELIMITER $$
@@ -94,17 +148,50 @@ DELIMITER ;
 CALL InsertDataIntoDataProviders();
 DROP PROCEDURE InsertDataIntoDataProviders;
 
+CREATE TABLE IF NOT EXISTS StaticTexts (
+	StaticTextIdentifier CHAR(36) NOT NULL,
+	StaticTextType TINYINT NOT NULL,
+	SubjectTranslationIdentifier CHAR(36) NOT NULL,
+	BodyTranslationIdentifier CHAR(36) NULL,
+	PRIMARY KEY (StaticTextIdentifier),
+	UNIQUE INDEX IX_StaticTexts_StaticTextType (StaticTextType)
+);
+
 CREATE TABLE IF NOT EXISTS ForeignKeys (
-	ForeignKeyIdentifier VARCHAR(40) NOT NULL,
-	DataProviderIdentifier VARCHAR(40) NOT NULL,
-	ForeignKeyForIdentifier VARCHAR(40) NOT NULL,
-	ForeignKeyForTypes VARCHAR(512) NOT NULL,
-	ForeignKeyValue VARCHAR(512) NOT NULL,
+	ForeignKeyIdentifier CHAR(36) NOT NULL,
+	DataProviderIdentifier CHAR(36) NOT NULL,
+	ForeignKeyForIdentifier CHAR(36) NOT NULL,
+	ForeignKeyForTypes NVARCHAR(128) NOT NULL,
+	ForeignKeyValue NVARCHAR(128) NOT NULL,
 	PRIMARY KEY (ForeignKeyIdentifier),
 	UNIQUE INDEX IX_ForeignKeys_ForeignKeyForTypes (DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes),
 	UNIQUE INDEX IX_ForeignKeys_ForeignKeyValue (DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyValue),
 	FOREIGN KEY FK_ForeignKeys_DataProviderIdentifier (DataProviderIdentifier) REFERENCES DataProviders (DataProviderIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP PROCEDURE IF EXISTS AlterForeignKeys;
+DELIMITER $$
+CREATE PROCEDURE AlterForeignKeys()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='ForeignKeys' AND Column_Name='ForeignKeyIdentifier') = 'varchar') THEN
+		ALTER TABLE ForeignKeys MODIFY ForeignKeyIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='ForeignKeys' AND Column_Name='DataProviderIdentifier') = 'varchar') THEN
+		ALTER TABLE ForeignKeys MODIFY DataProviderIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='ForeignKeys' AND Column_Name='ForeignKeyForIdentifier') = 'varchar') THEN
+		ALTER TABLE ForeignKeys MODIFY ForeignKeyForIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='ForeignKeys' AND Column_Name='ForeignKeyForTypes') = 'varchar') THEN
+		ALTER TABLE ForeignKeys MODIFY ForeignKeyForTypes NVARCHAR(128) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='ForeignKeys' AND Column_Name='ForeignKeyValue') = 'varchar') THEN
+		ALTER TABLE ForeignKeys MODIFY ForeignKeyValue NVARCHAR(128) NOT NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterForeignKeys();
+DROP PROCEDURE AlterForeignKeys;
 
 DROP PROCEDURE IF EXISTS GrantRightsForForeignKeys;
 DELIMITER $$
@@ -119,13 +206,28 @@ CALL GrantRightsForForeignKeys(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForForeignKeys;
 
 CREATE TABLE IF NOT EXISTS FoodGroups (
-	FoodGroupIdentifier VARCHAR(40) NOT NULL,
-	ParentIdentifier VARCHAR(40),
+	FoodGroupIdentifier CHAR(36) NOT NULL,
+	ParentIdentifier CHAR(36) NULL,
 	IsActive BIT NOT NULL,
 	PRIMARY KEY (FoodGroupIdentifier),
 	INDEX IX_FoodGroups_ParentIdentifier (ParentIdentifier),
 	FOREIGN KEY FK_FoodGroups_ParentIdentifier (ParentIdentifier) REFERENCES FoodGroups (FoodGroupIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP PROCEDURE IF EXISTS AlterFoodGroups;
+DELIMITER $$
+CREATE PROCEDURE AlterFoodGroups()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='FoodGroups' AND Column_Name='FoodGroupIdentifier') = 'varchar') THEN
+		ALTER TABLE FoodGroups MODIFY FoodGroupIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='FoodGroups' AND Column_Name='ParentIdentifier') = 'varchar') THEN
+		ALTER TABLE FoodGroups MODIFY ParentIdentifier CHAR(36) NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterFoodGroups();
+DROP PROCEDURE AlterFoodGroups;
 
 DROP PROCEDURE IF EXISTS GrantRightsForFoodGroups;
 DELIMITER $$
@@ -140,10 +242,22 @@ CALL GrantRightsForFoodGroups(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForFoodGroups;
 
 CREATE TABLE IF NOT EXISTS FoodItems (
-	FoodItemIdentifier VARCHAR(40) NOT NULL,
+	FoodItemIdentifier CHAR(36) NOT NULL,
 	IsActive BIT NOT NULL,
 	PRIMARY KEY (FoodItemIdentifier)
 );
+
+DROP PROCEDURE IF EXISTS AlterFoodItems;
+DELIMITER $$
+CREATE PROCEDURE AlterFoodItems()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='FoodItems' AND Column_Name='FoodItemIdentifier') = 'varchar') THEN
+		ALTER TABLE FoodItems MODIFY FoodItemIdentifier CHAR(36) NOT NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterFoodItems();
+DROP PROCEDURE AlterFoodItems;
 
 DROP PROCEDURE IF EXISTS GrantRightsForFoodItems;
 DELIMITER $$
@@ -158,15 +272,33 @@ CALL GrantRightsForFoodItems(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForFoodItems;
 
 CREATE TABLE IF NOT EXISTS FoodItemGroups (
-	FoodItemGroupIdentifier VARCHAR(40) NOT NULL,
-	FoodItemIdentifier VARCHAR(40) NOT NULL,
-	FoodGroupIdentifier VARCHAR(40) NOT NULL,
+	FoodItemGroupIdentifier CHAR(36) NOT NULL,
+	FoodItemIdentifier CHAR(36) NOT NULL,
+	FoodGroupIdentifier CHAR(36) NOT NULL,
 	IsPrimary BIT NOT NULL,
 	PRIMARY KEY (FoodItemGroupIdentifier),
 	UNIQUE INDEX IX_FoodItemGroups_FoodItemIdentifier_FoodGroupIdentifier (FoodItemIdentifier,FoodGroupIdentifier),
 	FOREIGN KEY FK_FoodItemGroups_FoodItemIdentifier (FoodItemIdentifier) REFERENCES FoodItems (FoodItemIdentifier) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY FK_FoodItemGroups_FoodGroupIdentifier (FoodGroupIdentifier) REFERENCES FoodGroups (FoodGroupIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP PROCEDURE IF EXISTS AlterFoodItemGroups;
+DELIMITER $$
+CREATE PROCEDURE AlterFoodItemGroups()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='FoodItemGroups' AND Column_Name='FoodItemGroupIdentifier') = 'varchar') THEN
+		ALTER TABLE FoodItemGroups MODIFY FoodItemGroupIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='FoodItemGroups' AND Column_Name='FoodItemIdentifier') = 'varchar') THEN
+		ALTER TABLE FoodItemGroups MODIFY FoodItemIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='FoodItemGroups' AND Column_Name='FoodGroupIdentifier') = 'varchar') THEN
+		ALTER TABLE FoodItemGroups MODIFY FoodGroupIdentifier CHAR(36) NOT NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterFoodItemGroups();
+DROP PROCEDURE AlterFoodItemGroups;
 
 DROP PROCEDURE IF EXISTS GrantRightsForFoodItemGroups;
 DELIMITER $$
@@ -181,14 +313,32 @@ CALL GrantRightsForFoodItemGroups(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForFoodItemGroups;
 
 CREATE TABLE IF NOT EXISTS HouseholdMembers (
-	HouseholdMemberIdentifier VARCHAR(40) NOT NULL,
-	MailAddress VARCHAR(256) NOT NULL,
-	ActivationCode VARCHAR(64) NOT NULL,
+	HouseholdMemberIdentifier CHAR(36) NOT NULL,
+	MailAddress NVARCHAR(128) NOT NULL,
+	ActivationCode NVARCHAR(64) NOT NULL,
 	ActivationTime DATETIME NULL,
 	CreationTime DATETIME NOT NULL,
 	PRIMARY KEY (HouseholdMemberIdentifier),
 	UNIQUE INDEX IX_HouseholdMembers_MailAddress (MailAddress)
 );
+
+DROP PROCEDURE IF EXISTS AlterHouseholdMembers;
+DELIMITER $$
+CREATE PROCEDURE AlterHouseholdMembers()
+BEGIN
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='HouseholdMembers' AND Column_Name='HouseholdMemberIdentifier') = 'varchar') THEN
+		ALTER TABLE HouseholdMembers MODIFY HouseholdMemberIdentifier CHAR(36) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='HouseholdMembers' AND Column_Name='MailAddress') = 'varchar') THEN
+		ALTER TABLE HouseholdMembers MODIFY MailAddress NVARCHAR(128) NOT NULL;
+	END IF;
+	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='HouseholdMembers' AND Column_Name='ActivationCode') = 'varchar') THEN
+		ALTER TABLE HouseholdMembers MODIFY ActivationCode NVARCHAR(64) NOT NULL;
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterHouseholdMembers();
+DROP PROCEDURE AlterHouseholdMembers;
 
 DROP PROCEDURE IF EXISTS GrantRightsForHouseholdMembers;
 DELIMITER $$
@@ -201,14 +351,3 @@ END $$
 DELIMITER ;
 CALL GrantRightsForHouseholdMembers(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForHouseholdMembers;
-
-CREATE TABLE IF NOT EXISTS StaticTexts (
-	StaticTextIdentifier VARCHAR(40) NOT NULL,
-
-	
-	Name VARCHAR(256) NOT NULL,
-	DataSourceStatementIdentifier VARCHAR(40) NOT NULL,
-	PRIMARY KEY (StaticTextIdentifier),
-
-	UNIQUE INDEX IX_DataProviders_DataSourceStatementIdentifier (DataSourceStatementIdentifier)
-);

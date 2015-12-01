@@ -10,6 +10,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class StaticTextProxyTests
     {
+        /*
+CREATE TABLE IF NOT EXISTS StaticTexts (
+	StaticTextIdentifier CHAR(36) NOT NULL,
+	StaticTextType TINYINT NOT NULL,
+	SubjectTranslationIdentifier CHAR(36) NOT NULL,
+	BodyTranslationIdentifier CHAR(36) NULL,
+	PRIMARY KEY (StaticTextIdentifier),
+	UNIQUE INDEX IX_StaticTexts_StaticTextType (StaticTextType)
+);
+
+         */
+
         /// <summary>
         /// Tests that the constructor initialize a data proxy to a given static text used by the food waste domain.
         /// </summary>
