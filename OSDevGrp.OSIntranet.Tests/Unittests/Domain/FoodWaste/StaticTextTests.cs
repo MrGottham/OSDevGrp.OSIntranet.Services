@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
@@ -18,25 +19,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatConstructorInitializeStaticTextWithoutBodyTranslationIdentifier()
         {
-            var fixture = new Fixture();
-            var staticTextType = fixture.Create<StaticTextType>();
-            var subjectTranslationIdentifier = Guid.NewGuid();
-            var staticText = new StaticText(staticTextType, subjectTranslationIdentifier);
-            Assert.That(staticText, Is.Not.Null);
-            Assert.That(staticText.Identifier, Is.Null);
-            Assert.That(staticText.Identifier.HasValue, Is.False);
-            Assert.That(staticText.Translation, Is.Null);
-            Assert.That(staticText.Translations, Is.Not.Null);
-            Assert.That(staticText.Translations, Is.Empty);
-            Assert.That(staticText.SubjectTranslationIdentifier, Is.EqualTo(subjectTranslationIdentifier));
-            Assert.That(staticText.SubjectTranslation, Is.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Not.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Empty);
-            Assert.That(staticText.BodyTranslationIdentifier, Is.Null);
-            Assert.That(staticText.BodyTranslationIdentifier.HasValue, Is.False);
-            Assert.That(staticText.SubjectTranslation, Is.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Not.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Empty);
+            foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
+            {
+                var subjectTranslationIdentifier = Guid.NewGuid();
+                var staticText = new StaticText(staticTextTypeToTest, subjectTranslationIdentifier);
+                Assert.That(staticText, Is.Not.Null);
+                Assert.That(staticText.Identifier, Is.Null);
+                Assert.That(staticText.Identifier.HasValue, Is.False);
+                Assert.That(staticText.Type, Is.EqualTo(staticTextTypeToTest));
+                Assert.That(staticText.Translation, Is.Null);
+                Assert.That(staticText.Translations, Is.Not.Null);
+                Assert.That(staticText.Translations, Is.Empty);
+                Assert.That(staticText.SubjectTranslationIdentifier, Is.EqualTo(subjectTranslationIdentifier));
+                Assert.That(staticText.SubjectTranslation, Is.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Not.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Empty);
+                Assert.That(staticText.BodyTranslationIdentifier, Is.Null);
+                Assert.That(staticText.BodyTranslationIdentifier.HasValue, Is.False);
+                Assert.That(staticText.SubjectTranslation, Is.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Not.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Empty);
+            }
         }
 
         /// <summary>
@@ -45,29 +48,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatConstructorInitializeStaticTextWithBodyTranslationIdentifier()
         {
-            var fixture = new Fixture();
-            var staticTextType = fixture.Create<StaticTextType>();
-            var subjectTranslationIdentifier = Guid.NewGuid();
-            var bodyTranslationIdentifier = Guid.NewGuid();
-            var staticText = new StaticText(staticTextType, subjectTranslationIdentifier, bodyTranslationIdentifier);
-            Assert.That(staticText, Is.Not.Null);
-            Assert.That(staticText.Identifier, Is.Null);
-            Assert.That(staticText.Identifier.HasValue, Is.False);
-            Assert.That(staticText.Translation, Is.Null);
-            Assert.That(staticText.Translations, Is.Not.Null);
-            Assert.That(staticText.Translations, Is.Empty);
-            Assert.That(staticText.SubjectTranslationIdentifier, Is.EqualTo(subjectTranslationIdentifier));
-            Assert.That(staticText.SubjectTranslation, Is.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Not.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Empty);
-            Assert.That(staticText.BodyTranslationIdentifier, Is.Not.Null);
-            Assert.That(staticText.BodyTranslationIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(staticText.BodyTranslationIdentifier.Value, Is.EqualTo(bodyTranslationIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(staticText.SubjectTranslation, Is.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Not.Null);
-            Assert.That(staticText.SubjectTranslations, Is.Empty);
+            foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
+            {
+                var subjectTranslationIdentifier = Guid.NewGuid();
+                var bodyTranslationIdentifier = Guid.NewGuid();
+                var staticText = new StaticText(staticTextTypeToTest, subjectTranslationIdentifier, bodyTranslationIdentifier);
+                Assert.That(staticText, Is.Not.Null);
+                Assert.That(staticText.Identifier, Is.Null);
+                Assert.That(staticText.Identifier.HasValue, Is.False);
+                Assert.That(staticText.Type, Is.EqualTo(staticTextTypeToTest));
+                Assert.That(staticText.Translation, Is.Null);
+                Assert.That(staticText.Translations, Is.Not.Null);
+                Assert.That(staticText.Translations, Is.Empty);
+                Assert.That(staticText.SubjectTranslationIdentifier, Is.EqualTo(subjectTranslationIdentifier));
+                Assert.That(staticText.SubjectTranslation, Is.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Not.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Empty);
+                Assert.That(staticText.BodyTranslationIdentifier, Is.Not.Null);
+                Assert.That(staticText.BodyTranslationIdentifier.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(staticText.BodyTranslationIdentifier.Value, Is.EqualTo(bodyTranslationIdentifier));
+                // ReSharper restore PossibleInvalidOperationException
+                Assert.That(staticText.SubjectTranslation, Is.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Not.Null);
+                Assert.That(staticText.SubjectTranslations, Is.Empty);
+            }
         }
 
         /// <summary>

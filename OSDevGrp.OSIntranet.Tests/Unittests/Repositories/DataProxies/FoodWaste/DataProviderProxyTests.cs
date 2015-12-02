@@ -142,7 +142,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert this data provider.
+        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a given data provider.
         /// </summary>
         [Test]
         public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert()
@@ -163,7 +163,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update data provider.
+        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a given data provider.
         /// </summary>
         [Test]
         public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
@@ -184,7 +184,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete data provider.
+        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete a given data provider.
         /// </summary>
         [Test]
         public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()

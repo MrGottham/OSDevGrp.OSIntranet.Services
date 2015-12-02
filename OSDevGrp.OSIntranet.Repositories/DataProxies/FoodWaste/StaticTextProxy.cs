@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
@@ -78,7 +80,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this static text.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new NotImplementedException();
+            var subjectTranslationIdentifierAsSqlValue = SubjectTranslationIdentifier.ToString("D").ToUpper();
+            var bodyTranslationIdentifierAsSqlValue = BodyTranslationIdentifier.HasValue ? string.Format("'{0}'", BodyTranslationIdentifier.Value.ToString("D").ToUpper()) : "NULL";
+            return string.Format("INSERT INTO StaticTexts (StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier) VALUES('{0}',{1},'{2}',{3})", UniqueId, (int)Type, subjectTranslationIdentifierAsSqlValue, bodyTranslationIdentifierAsSqlValue);
         }
 
         /// <summary>
@@ -87,7 +91,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this static text.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new NotImplementedException();
+            var subjectTranslationIdentifierAsSqlValue = SubjectTranslationIdentifier.ToString("D").ToUpper();
+            var bodyTranslationIdentifierAsSqlValue = BodyTranslationIdentifier.HasValue ? string.Format("'{0}'", BodyTranslationIdentifier.Value.ToString("D").ToUpper()) : "NULL";
+            return string.Format("UPDATE StaticTexts SET StaticTextType={1},SubjectTranslationIdentifier='{2}',BodyTranslationIdentifier={3} WHERE StaticTextIdentifier='{0}'", UniqueId, (int)Type, subjectTranslationIdentifierAsSqlValue, bodyTranslationIdentifierAsSqlValue);
         }
 
         /// <summary>
@@ -96,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to delete this static text.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new NotImplementedException();
+            return string.Format("DELETE FROM StaticTexts WHERE StaticTextIdentifier='{0}'", UniqueId);
         }
 
         #endregion
@@ -110,7 +116,30 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException("dataReader");
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
+            }
+
+            Identifier = new Guid(mySqlDataReader.GetString("StaticTextIdentifier"));
+            Type = (StaticTextType) mySqlDataReader.GetInt16("StaticTextType");
+            SubjectTranslationIdentifier = new Guid(mySqlDataReader.GetString("SubjectTranslationIdentifier"));
+            var bodyTranslationIdentifierColumnNo = mySqlDataReader.GetOrdinal("BodyTranslationIdentifier");
+            if (mySqlDataReader.IsDBNull(bodyTranslationIdentifierColumnNo))
+            {
+                return;
+            }
+            BodyTranslationIdentifier = new Guid(mySqlDataReader.GetString(bodyTranslationIdentifierColumnNo));
         }
 
         /// <summary>
@@ -119,7 +148,18 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+
+            var translations = new List<ITranslation>();
+            translations.AddRange(TranslationProxy.GetDomainObjectTranslations(dataProvider, SubjectTranslationIdentifier));
+            if (BodyTranslationIdentifier.HasValue)
+            {
+                translations.AddRange(TranslationProxy.GetDomainObjectTranslations(dataProvider, BodyTranslationIdentifier.Value));
+            }
+            Translations = translations;
         }
 
         /// <summary>
