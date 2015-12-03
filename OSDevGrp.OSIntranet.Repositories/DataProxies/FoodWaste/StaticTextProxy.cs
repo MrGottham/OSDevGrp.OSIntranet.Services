@@ -169,7 +169,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         #endregion

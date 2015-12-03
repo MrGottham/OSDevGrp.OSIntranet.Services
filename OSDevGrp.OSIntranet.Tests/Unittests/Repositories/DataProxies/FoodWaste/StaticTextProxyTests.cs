@@ -432,5 +432,65 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
             Assert.That(exception.InnerException, Is.Null);
         }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
+        {
+            var fixture = new Fixture();
+
+            var staticTextProxy = new StaticTextProxy();
+            Assert.That(staticTextProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(null, fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is not null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
+        {
+            var fixture = new Fixture();
+
+            var staticTextProxy = new StaticTextProxy();
+            Assert.That(staticTextProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(MockRepository.GenerateMock<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an NotSupportedException when the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
+        {
+            var staticTextProxy = new StaticTextProxy();
+            Assert.That(staticTextProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is not null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
+        {
+            var staticTextProxy = new StaticTextProxy();
+            Assert.That(staticTextProxy, Is.Not.Null);
+
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(MockRepository.GenerateMock<IDataProviderBase>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.Null);
+        }
     }
 }
