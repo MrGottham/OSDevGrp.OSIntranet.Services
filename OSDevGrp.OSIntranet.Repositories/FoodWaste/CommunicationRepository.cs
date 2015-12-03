@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Reflection;
+using System.Text;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -62,6 +64,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 var mailMessage = new MailMessage(_configurationRepository.FromMailAddress, toMailAddress, subject, body)
                 {
+                    HeadersEncoding = Encoding.UTF8,
+                    SubjectEncoding = Encoding.UTF8,
+                    BodyEncoding = Encoding.UTF8,
+                    BodyTransferEncoding = TransferEncoding.Base64,
                     IsBodyHtml = true,
                     DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure
                 };
@@ -73,6 +79,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
                         smtpClient.UseDefaultCredentials = false;
                         smtpClient.Credentials = new NetworkCredential(_configurationRepository.SmtpUserName, _configurationRepository.SmtpPassword);
                     }
+                    smtpClient.DeliveryFormat = SmtpDeliveryFormat.International;
+                    smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
                     smtpClient.EnableSsl = _configurationRepository.UseSmtpSecureConnection;
                     smtpClient.Send(mailMessage);
                 }

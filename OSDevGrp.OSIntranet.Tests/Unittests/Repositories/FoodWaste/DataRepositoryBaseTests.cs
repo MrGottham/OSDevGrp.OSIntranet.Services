@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
@@ -21,6 +24,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
     [TestFixture]
     public class DataRepositoryBaseTests
     {
+        private readonly static IList<Tuple<Type, Type, Type>> TypesToTest = new List<Tuple<Type, Type, Type>>
+        {
+            new Tuple<Type, Type, Type>(typeof (IHouseholdMember), typeof (IHouseholdMemberProxy), typeof (HouseholdMemberProxy)),
+            new Tuple<Type, Type, Type>(typeof (IFoodItem), typeof (IFoodItemProxy), typeof (FoodItemProxy)),
+            new Tuple<Type, Type, Type>(typeof (IFoodGroup), typeof (IFoodGroupProxy), typeof (FoodGroupProxy)),
+            new Tuple<Type, Type, Type>(typeof (IForeignKey), typeof (IForeignKeyProxy), typeof (ForeignKeyProxy)),
+            new Tuple<Type, Type, Type>(typeof (IStaticText), typeof (IStaticTextProxy), typeof (StaticTextProxy)),
+            new Tuple<Type, Type, Type>(typeof (IDataProvider), typeof (IDataProviderProxy), typeof (DataProviderProxy)),
+            new Tuple<Type, Type, Type>(typeof (ITranslation), typeof (ITranslationProxy), typeof (TranslationProxy)),
+            new Tuple<Type, Type, Type>(typeof (ITranslationInfo), typeof (ITranslationInfoProxy), typeof (TranslationInfoProxy))
+        };
+
         /// <summary>
         /// Private class for testing the basic functionality used by repositories in the food waste domain.
         /// </summary>
@@ -118,13 +133,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetCallsGetOnFoodWasteDataProvider()
         {
-            TestThatGetCallsGetOnFoodWasteDataProvider<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
-            TestThatGetCallsGetOnFoodWasteDataProvider<IFoodItem, FoodItemProxy>(Guid.NewGuid());
-            TestThatGetCallsGetOnFoodWasteDataProvider<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
-            TestThatGetCallsGetOnFoodWasteDataProvider<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
-            TestThatGetCallsGetOnFoodWasteDataProvider<IDataProvider, DataProviderProxy>(Guid.NewGuid());
-            TestThatGetCallsGetOnFoodWasteDataProvider<ITranslation, TranslationProxy>(Guid.NewGuid());
-            TestThatGetCallsGetOnFoodWasteDataProvider<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatGetCallsGetOnFoodWasteDataProvider");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatGetCallsGetOnFoodWasteDataProvider' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item3});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item3.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new object[] {Guid.NewGuid()});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -133,13 +162,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetReturnsReceivedDataProxy()
         {
-            TestThatGetReturnsReceivedDataProxy<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
-            TestThatGetReturnsReceivedDataProxy<IFoodItem, FoodItemProxy>(Guid.NewGuid());
-            TestThatGetReturnsReceivedDataProxy<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
-            TestThatGetReturnsReceivedDataProxy<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
-            TestThatGetReturnsReceivedDataProxy<IDataProvider, DataProviderProxy>(Guid.NewGuid());
-            TestThatGetReturnsReceivedDataProxy<ITranslation, TranslationProxy>(Guid.NewGuid());
-            TestThatGetReturnsReceivedDataProxy<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatGetReturnsReceivedDataProxy");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatGetReturnsReceivedDataProxy' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item3});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item3.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new object[] {Guid.NewGuid()});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -148,13 +191,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IFoodItem, FoodItemProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<IDataProvider, DataProviderProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<ITranslation, TranslationProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item3});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item3.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new object[] {Guid.NewGuid()});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -163,13 +220,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IHouseholdMember, HouseholdMemberProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IFoodItem, FoodItemProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IFoodGroup, FoodGroupProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IForeignKey, ForeignKeyProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<IDataProvider, DataProviderProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<ITranslation, TranslationProxy>(Guid.NewGuid());
-            TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<ITranslationInfo, TranslationInfoProxy>(Guid.NewGuid());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item3});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item3.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new object[] {Guid.NewGuid()});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -198,13 +269,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertCallsMapOnFoodWasteObjectMapper()
         {
-            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatInsertCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertCallsMapOnFoodWasteObjectMapper");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatInsertCallsMapOnFoodWasteObjectMapper' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -213,13 +298,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertCallsAddOnFoodWasteDataProvider()
         {
-            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatInsertCallsAddOnFoodWasteDataProvider(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertCallsAddOnFoodWasteDataProvider");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatInsertCallsAddOnFoodWasteDataProvider' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -228,13 +327,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertReturnsInsertedDataProxy()
         {
-            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatInsertReturnsInsertedDataProxy(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertReturnsInsertedDataProxy");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatInsertReturnsInsertedDataProxy' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -243,13 +356,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -258,13 +385,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -293,13 +434,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateCallsMapOnFoodWasteObjectMapper()
         {
-            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatUpdateCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateCallsMapOnFoodWasteObjectMapper");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatUpdateCallsMapOnFoodWasteObjectMapper' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -308,13 +463,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateCallsSaveOnFoodWasteDataProvider()
         {
-            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatUpdateCallsSaveOnFoodWasteDataProvider(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateCallsSaveOnFoodWasteDataProvider");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatUpdateCallsSaveOnFoodWasteDataProvider' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -323,13 +492,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateReturnsUpdatedDataProxy()
         {
-            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatUpdateReturnsUpdatedDataProxy(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateReturnsUpdatedDataProxy");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatUpdateReturnsUpdatedDataProxy' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -338,13 +521,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -353,13 +550,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -388,13 +599,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteCallsMapOnFoodWasteObjectMapper()
         {
-            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatDeleteCallsMapOnFoodWasteObjectMapper(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteCallsMapOnFoodWasteObjectMapper");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatDeleteCallsMapOnFoodWasteObjectMapper' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -403,13 +628,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteCallsDeleteOnFoodWasteDataProvider()
         {
-            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatDeleteCallsDeleteOnFoodWasteDataProvider(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteCallsDeleteOnFoodWasteDataProvider");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatDeleteCallsDeleteOnFoodWasteDataProvider' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -418,13 +657,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -433,13 +686,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IHouseholdMember>(), MockRepository.GenerateMock<IHouseholdMemberProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodItem>(), MockRepository.GenerateMock<IFoodItemProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IFoodGroup>(), MockRepository.GenerateMock<IFoodGroupProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IForeignKey>(), MockRepository.GenerateMock<IForeignKeyProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<IDataProvider>(), MockRepository.GenerateMock<IDataProviderProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<ITranslation>(), MockRepository.GenerateMock<ITranslationProxy>());
-            TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs(MockRepository.GenerateMock<ITranslationInfo>(), MockRepository.GenerateMock<ITranslationInfoProxy>());
+            foreach (var typeToTest in TypesToTest)
+            {
+                var method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
+                if (method == null)
+                {
+                    throw new Exception(string.Format("Can't find a method named 'TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs' on the type named '{0}'.", GetType().Name));
+                }
+                var genericMethod = method.MakeGenericMethod(new[] {typeToTest.Item1, typeToTest.Item2});
+                if (genericMethod == null)
+                {
+                    throw new Exception(string.Format("Can't make the generic method of '{0}' with the types named '{1}' and '{2}'.", method.Name, typeToTest.Item1.Name, typeToTest.Item2.Name));
+                }
+                try
+                {
+                    genericMethod.Invoke(this, new[] {GenerateMock(typeToTest.Item1), GenerateMock(typeToTest.Item2)});
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw new Exception(string.Format("{0}: {1}", typeToTest.Item1.Name, ex.InnerException.Message));
+                }
+            }
         }
 
         /// <summary>
@@ -865,6 +1132,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             Assert.That(exception.Message, Is.Not.Empty);
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Delete", exceptionToThrow.Message)));
             Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+        }
+
+        /// <summary>
+        /// Generates a mockup of a given type.
+        /// </summary>
+        /// <param name="mockType">Type on wich to generate the mockup.</param>
+        /// <returns>Mockup of the given type.</returns>
+        private static object GenerateMock(Type mockType)
+        {
+            if (mockType == null)
+            {
+                throw new ArgumentNullException("mockType");
+            }
+            return typeof (MockRepository).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Single(m => m.IsGenericMethod && m.Name == "GenerateMock" && m.GetGenericArguments().Length == 1)
+                .MakeGenericMethod(new[] {mockType})
+                .Invoke(null, new object[] {null});
         }
     }
 }

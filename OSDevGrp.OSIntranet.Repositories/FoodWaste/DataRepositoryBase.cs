@@ -92,6 +92,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 return (TIdentifiable) Get<IForeignKey, ForeignKeyProxy>(identifier);
             }
+            if (typeof (TIdentifiable) == typeof (IStaticText))
+            {
+                return (TIdentifiable) Get<IStaticText, StaticTextProxy>(identifier);
+            }
             if (typeof (TIdentifiable) == typeof (IDataProvider))
             {
                 return (TIdentifiable) Get<IDataProvider, DataProviderProxy>(identifier);
@@ -135,6 +139,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 return (TIdentifiable) Insert<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
             }
+            if (identifiable is IStaticText)
+            {
+                return (TIdentifiable) Insert<IStaticText, IStaticTextProxy>(identifiable as IStaticText);
+            }
             if (identifiable is IDataProvider)
             {
                 return (TIdentifiable) Insert<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
@@ -177,6 +185,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (identifiable is IForeignKey)
             {
                 return (TIdentifiable) Update<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+            }
+            if (identifiable is IStaticText)
+            {
+                return (TIdentifiable) Update<IStaticText, IStaticTextProxy>(identifiable as IStaticText);
             }
             if (identifiable is IDataProvider)
             {
@@ -222,6 +234,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (identifiable is IForeignKey)
             {
                 Delete<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+                return;
+            }
+            if (identifiable is IStaticText)
+            {
+                Delete<IStaticText, IStaticTextProxy>(identifiable as IStaticText);
                 return;
             }
             if (identifiable is IDataProvider)

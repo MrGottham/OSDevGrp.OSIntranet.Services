@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
@@ -215,6 +216,32 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
                     return DataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(identifiableDomainObject.Identifier.Value));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets a static text by a given static text type.
+        /// </summary>
+        /// <param name="staticTextType">Static text type for which to get the static text.</param>
+        /// <returns>Static text.</returns>
+        public virtual IStaticText StaticTextGetByStaticTextType(StaticTextType staticTextType)
+        {
+            try
+            {
+                var staticText = DataProvider.GetCollection<StaticTextProxy>(string.Format("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={0}", (int)staticTextType)).SingleOrDefault(m => m.Type == staticTextType);
+                if (staticText == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (StaticTextProxy).Name, staticTextType));
+                }
+                return staticText;
             }
             catch (IntranetRepositoryException)
             {

@@ -4,6 +4,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
@@ -466,6 +467,19 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
             finally
             {
                 _systemDataRepository.Delete(foreignKey);
+            }
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetByStaticTextType returns a given static text.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetByStaticTextTypeReturnsStaticText()
+        {
+            foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
+            {
+                var dataProvider = _systemDataRepository.StaticTextGetByStaticTextType(staticTextTypeToTest);
+                Assert.That(dataProvider, Is.Not.Null);
             }
         }
 

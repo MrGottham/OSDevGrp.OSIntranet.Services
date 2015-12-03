@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
 {
@@ -55,6 +56,13 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
         /// <param name="identifiableDomainObject">The identifiable domain object on which all the foreign keys should be returned.</param>
         /// <returns>All the foreign keys for the given domain object.</returns>
         IEnumerable<IForeignKey> ForeignKeysForDomainObjectGet(IIdentifiable identifiableDomainObject);
+
+        /// <summary>
+        /// Gets a static text by a given static text type.
+        /// </summary>
+        /// <param name="staticTextType">Static text type for which to get the static text.</param>
+        /// <returns>Static text.</returns>
+        IStaticText StaticTextGetByStaticTextType(StaticTextType staticTextType);
 
         /// <summary>
         /// Gets the default data provider for food items.

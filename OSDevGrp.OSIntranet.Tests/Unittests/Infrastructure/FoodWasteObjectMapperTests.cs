@@ -768,6 +768,52 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps StaticText to StaticTextProxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStaticTextToStaticTextProxy()
+        {
+            var staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var staticTextProxy = foodWasteObjectMapper.Map<IStaticText, IStaticTextProxy>(staticTextMock);
+            Assert.That(staticTextProxy.Identifier, Is.Not.Null);
+            Assert.That(staticTextProxy.Identifier, Is.EqualTo(staticTextMock.Identifier));
+            Assert.That(staticTextProxy.Type, Is.EqualTo(staticTextMock.Type));
+            Assert.That(staticTextProxy.Translation, Is.Null);
+            Assert.That(staticTextProxy.Translations, Is.Not.Null);
+            Assert.That(staticTextProxy.Translations, Is.Not.Empty);
+            Assert.That(staticTextProxy.Translations.Count(), Is.EqualTo(staticTextMock.Translations.Count()));
+            foreach (var translation in staticTextProxy.Translations)
+            {
+                Assert.That(translation, Is.Not.Null);
+                Assert.That(translation, Is.TypeOf<TranslationProxy>());
+            }
+            Assert.That(staticTextProxy.SubjectTranslationIdentifier, Is.EqualTo(staticTextMock.SubjectTranslationIdentifier));
+            Assert.That(staticTextProxy.SubjectTranslation, Is.Null);
+            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
+            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Empty);
+            Assert.That(staticTextProxy.SubjectTranslations.Count(), Is.EqualTo(staticTextMock.SubjectTranslations.Count()));
+            foreach (var subjectTranslation in staticTextProxy.SubjectTranslations)
+            {
+                Assert.That(subjectTranslation, Is.Not.Null);
+                Assert.That(subjectTranslation, Is.TypeOf<TranslationProxy>());
+            }
+            Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.EqualTo(staticTextMock.BodyTranslationIdentifier));
+            Assert.That(staticTextProxy.BodyTranslation, Is.Null);
+            Assert.That(staticTextProxy.BodyTranslations, Is.Not.Null);
+            Assert.That(staticTextProxy.BodyTranslations, Is.Not.Empty);
+            Assert.That(staticTextProxy.BodyTranslations.Count(), Is.EqualTo(staticTextMock.BodyTranslations.Count()));
+            foreach (var bodyTranslation in staticTextProxy.BodyTranslations)
+            {
+                Assert.That(bodyTranslation, Is.Not.Null);
+                Assert.That(bodyTranslation, Is.TypeOf<TranslationProxy>());
+            }
+        }
+
+        /// <summary>
         /// Tests that Map maps DataProvider to DataProviderView.
         /// </summary>
         [Test]

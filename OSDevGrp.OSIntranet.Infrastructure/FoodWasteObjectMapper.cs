@@ -223,6 +223,29 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     return foreignKeyProxy;
                 });
 
+            Mapper.CreateMap<IStaticText, IStaticTextProxy>()
+                .ConvertUsing(m =>
+                {
+                    if (m as IStaticTextProxy != null)
+                    {
+                        return (IStaticTextProxy) m;
+                    }
+                    var staticTextProxy = new StaticTextProxy(m.Type, m.SubjectTranslationIdentifier, m.BodyTranslationIdentifier)
+                    {
+                        Identifier = m.Identifier
+                    };
+                    foreach (var translation in m.Translations)
+                    {
+                        if (translation as ITranslationProxy != null)
+                        {
+                            staticTextProxy.TranslationAdd(translation);
+                            continue;
+                        }
+                        staticTextProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                    }
+                    return staticTextProxy;
+                });
+
             Mapper.CreateMap<IDataProvider, DataProviderView>()
                 .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                 .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
@@ -243,7 +266,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     }
                     var dataProviderProxy = new DataProviderProxy(m.Name, m.DataSourceStatementIdentifier)
                     {
-                        Identifier = m.Identifier,
+                        Identifier = m.Identifier
                     };
                     foreach (var translation in m.Translations)
                     {

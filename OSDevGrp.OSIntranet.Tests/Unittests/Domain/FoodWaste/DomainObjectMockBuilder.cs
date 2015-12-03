@@ -274,7 +274,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             staticTextMock.Stub(m => m.BodyTranslation)
                 .Return(bodyTranslation)
                 .Repeat.Any();
-            staticTextMock.Stub(m => m.SubjectTranslations)
+            staticTextMock.Stub(m => m.BodyTranslations)
                 .Return(new List<ITranslation> {bodyTranslation})
                 .Repeat.Any();
             return staticTextMock;
