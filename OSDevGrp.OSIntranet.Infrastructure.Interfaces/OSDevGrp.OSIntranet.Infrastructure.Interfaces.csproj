@@ -53,6 +53,7 @@
     <Compile Include="Exceptions\IntranetBusinessException.cs" />
     <Compile Include="Exceptions\IntranetRepositoryException.cs" />
     <Compile Include="Exceptions\IntranetSystemException.cs" />
+    <Compile Include="IExceptionBuilder.cs" />
     <Compile Include="IFaultExceptionBuilder.cs" />
     <Compile Include="IFoodWasteObjectMapper.cs" />
     <Compile Include="IObjectMapper.cs" />

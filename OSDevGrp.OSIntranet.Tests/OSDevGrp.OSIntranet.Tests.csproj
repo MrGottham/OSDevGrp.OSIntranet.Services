@@ -116,6 +116,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -287,6 +288,7 @@
     <Compile Include="Unittests\Domain\Kalender\BrugerlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\BrugerTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
+    <Compile Include="Unittests\Infrastructure\ExceptionBuilderTests.cs" />
     <Compile Include="Unittests\Infrastructure\FoodWasteFaultExceptionBuilderTests.cs" />
     <Compile Include="Unittests\Infrastructure\FoodWasteObjectMapperTests.cs" />
     <Compile Include="Unittests\Infrastructure\IntranetBusinessExceptionTests.cs" />
