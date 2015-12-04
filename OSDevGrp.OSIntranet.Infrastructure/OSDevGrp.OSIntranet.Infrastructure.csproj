@@ -89,6 +89,8 @@
     <Compile Include="FoodWasteFaultExceptionBuilder.cs" />
     <Compile Include="FoodWasteObjectMapper.cs" />
     <Compile Include="IoC\ConfigurationProvider.cs" />
+    <Compile Include="IoC\ExternalCommunicationConfigurationProvider.cs" />
+    <Compile Include="IoC\ExternalCommunicationWithoutExternalCommunicationConfigurationProvider.cs" />
     <Compile Include="ObjectMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\Specification.cs" />

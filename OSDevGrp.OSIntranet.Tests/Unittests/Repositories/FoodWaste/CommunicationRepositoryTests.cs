@@ -8,13 +8,13 @@ using Rhino.Mocks;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 {
     /// <summary>
-    /// Tests the repository used for communication with the household members in the food waste domain.
+    /// Tests the repository used for communication with internal and external stakeholders in the food waste domain.
     /// </summary>
     [TestFixture]
     public class CommunicationRepositoryTests
     {
         /// <summary>
-        /// Tests that the constructor initialize the repository used for communication with the household members in the food waste domain.
+        /// Tests that the constructor initialize the repository used for communication with internal and external stakeholders in the food waste domain.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializeCommunicationRepository()

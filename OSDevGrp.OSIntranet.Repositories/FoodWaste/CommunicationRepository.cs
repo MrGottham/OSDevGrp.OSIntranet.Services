@@ -11,7 +11,7 @@ using OSDevGrp.OSIntranet.Resources;
 namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
 {
     /// <summary>
-    /// Repository used for communication with the household members in the food waste domain.
+    /// Repository used for communication with internal and external stakeholders in the food waste domain.
     /// </summary>
     public class CommunicationRepository : ICommunicationRepository
     {
@@ -24,7 +24,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #region Constructor
 
         /// <summary>
-        /// Creates a repository used for communication with the household members in the food waste domain.
+        /// Creates a repository used for communication with internal and external stakeholders in the food waste domain.
         /// </summary>
         /// <param name="configurationRepository">Implementation of the configuration repository to the food waste domain.</param>
         public CommunicationRepository(IConfigurationRepository configurationRepository)
@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <param name="toMailAddress">Mail address for the receiver.</param>
         /// <param name="subject">Subject for the mail.</param>
         /// <param name="body">Body for the mail.</param>
-        public void SendMail(string toMailAddress, string subject, string body)
+        public virtual void SendMail(string toMailAddress, string subject, string body)
         {
             if (string.IsNullOrEmpty(toMailAddress))
             {

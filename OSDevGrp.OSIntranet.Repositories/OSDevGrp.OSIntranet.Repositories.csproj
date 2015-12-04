@@ -112,6 +112,7 @@
     <Compile Include="DomainObjectBuilder.cs" />
     <Compile Include="FinansstyringRepository.cs" />
     <Compile Include="FoodWaste\CommunicationRepository.cs" />
+    <Compile Include="FoodWaste\CommunicationRepositoryWithoutExternalCommunication.cs" />
     <Compile Include="FoodWaste\ConfigurationRepository.cs" />
     <Compile Include="FoodWaste\DataRepositoryBase.cs" />
     <Compile Include="FoodWaste\DataRepositoryHelper.cs" />

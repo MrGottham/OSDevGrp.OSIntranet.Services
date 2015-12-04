@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
+using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
@@ -24,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         public void TestSetUp()
         {
             var container = ContainerFactory.Create();
-            _communicationRepository = container.Resolve<ICommunicationRepository>();
+            _communicationRepository = new CommunicationRepository(container.Resolve<IConfigurationRepository>());
         }
 
         /// <summary>

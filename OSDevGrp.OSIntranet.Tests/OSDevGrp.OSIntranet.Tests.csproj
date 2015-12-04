@@ -356,6 +356,7 @@
     <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
     <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\CommunicationRepositoryTests.cs" />
+    <Compile Include="Unittests\Repositories\FoodWaste\CommunicationRepositoryWithoutExternalCommunicationTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\ConfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\DataRepositoryBaseTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\HouseholdDataRepositoryTests.cs" />
