@@ -478,8 +478,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         {
             foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
             {
-                var dataProvider = _systemDataRepository.StaticTextGetByStaticTextType(staticTextTypeToTest);
-                Assert.That(dataProvider, Is.Not.Null);
+                var staticText = _systemDataRepository.StaticTextGetByStaticTextType(staticTextTypeToTest);
+                Assert.That(staticText, Is.Not.Null);
             }
         }
 

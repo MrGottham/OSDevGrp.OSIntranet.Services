@@ -157,6 +157,30 @@ CREATE TABLE IF NOT EXISTS StaticTexts (
 	UNIQUE INDEX IX_StaticTexts_StaticTextType (StaticTextType)
 );
 
+DROP PROCEDURE IF EXISTS InsertDataIntoStaticTexts;
+DELIMITER $$
+CREATE PROCEDURE InsertDataIntoStaticTexts()
+BEGIN
+	IF((SELECT COUNT(*) FROM StaticTexts WHERE StaticTextType=1) = 0) THEN
+		INSERT INTO StaticTexts (StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier) VALUES('5F30DF2A-63BC-4FFA-9EF9-6B847C795A85',1,'4529AE8A-7DCA-47CE-8F07-4C4273FC0361','CBFA2654-065E-454A-BA09-8A4BA9EB3CF5');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '28CB67E3-769F-4483-ABB9-92754E10B538') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('28CB67E3-769F-4483-ABB9-92754E10B538','4529AE8A-7DCA-47CE-8F07-4C4273FC0361','807E904D-FDF9-418D-9745-B73821B8D07A','Welcome to the Minimize Food Waste Project');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '5A8D95AA-4537-40DF-94F9-2361ED6D234C') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('5A8D95AA-4537-40DF-94F9-2361ED6D234C','CBFA2654-065E-454A-BA09-8A4BA9EB3CF5','807E904D-FDF9-418D-9745-B73821B8D07A','<html><h1>Welcome to the Minimize Food Waste Project</h1><br><br>You have been created as a household member in the Minimize Food Waste Project. The next step is to activate your household member account on our website.<br><br>Your activation code is: <b>[ActivationCode]</b><br><br>Yours sincerely<br>The Minimize Food Waste Project<br><br><h2>[PrivacyPoliciesSubject]</h2><br>[PrivacyPoliciesBody]</html>');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'DE0785F1-F331-4B79-B454-019912F32E9D') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('DE0785F1-F331-4B79-B454-019912F32E9D','4529AE8A-7DCA-47CE-8F07-4C4273FC0361','978C7318-AD0A-459C-BEE0-1803A94F50D7','Velkommen til Projektet Formindsk Madspild');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '440DDE45-9D3A-4AF2-9995-7D6005D373B5') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('440DDE45-9D3A-4AF2-9995-7D6005D373B5','CBFA2654-065E-454A-BA09-8A4BA9EB3CF5','978C7318-AD0A-459C-BEE0-1803A94F50D7','<html><h1>Velkommen til Projektet Formindsk Madspild</h1><br><br>Du er blevet oprettet som husstandsmedlem i Projektet Formindsk Madspild. Dit næste skridt er at aktivere din konto på vores hjemmeside.<br><br>Din aktiveringskode er: <b>[ActivationCode]</b><br><br>Venlig hilsen<br>Projektet Formindsk Madspild<br><br><h2>[PrivacyPoliciesSubject]</h2><br>[PrivacyPoliciesBody]</html>');
+	END IF;
+END $$
+DELIMITER ;
+CALL InsertDataIntoStaticTexts();
+DROP PROCEDURE InsertDataIntoStaticTexts;
+
 CREATE TABLE IF NOT EXISTS ForeignKeys (
 	ForeignKeyIdentifier CHAR(36) NOT NULL,
 	DataProviderIdentifier CHAR(36) NOT NULL,
