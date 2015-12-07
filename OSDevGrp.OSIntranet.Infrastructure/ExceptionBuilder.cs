@@ -51,9 +51,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             {
                 return new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue, commandHandlerInterface.GetGenericArguments().ElementAt(0).Name, exception.Message), exception);
             }
+            commandHandlerInterface = methodClassType.GetInterface(typeof (ICommandHandler<,>).Name);
+            if (commandHandlerInterface != null && commandHandlerInterface.IsGenericType && commandHandlerInterface.GenericTypeArguments.Length == 2)
+            {
+                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, commandHandlerInterface.GetGenericArguments().ElementAt(0).Name, commandHandlerInterface.GetGenericArguments().ElementAt(1).Name, exception.Message), exception);
+            }
 
-
-            throw new NotImplementedException();
+            return exception;
         }
 
         #endregion

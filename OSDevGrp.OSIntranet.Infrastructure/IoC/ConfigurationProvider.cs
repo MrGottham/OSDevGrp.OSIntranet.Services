@@ -45,6 +45,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<IDomainObjectBuilder>().ImplementedBy<DomainObjectBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<IFoodWasteObjectMapper>().ImplementedBy<FoodWasteObjectMapper>().LifeStyle.Singleton);
+            container.Register(Component.For<IExceptionBuilder>().ImplementedBy<ExceptionBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IFaultExceptionBuilder<FoodWasteFault>>().ImplementedBy<FoodWasteFaultExceptionBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IDomainObjectValidations>().ImplementedBy<DomainObjectValidations>().LifeStyle.Singleton);
             container.Register(Component.For<ISpecification>().ImplementedBy<Specification>().LifeStyle.Transient);

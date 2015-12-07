@@ -188,6 +188,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Build returns the Exception when the exception is a Exception.
+        /// </summary>
+        [Test]
+        public void TestThatBuildReturnsExceptionWhenExceptionIsException()
+        {
+            var fixture = new Fixture();
+            var exception = fixture.Create<Exception>();
+
+            var exceptionBuilder = new ExceptionBuilder();
+            Assert.That(exceptionBuilder, Is.Not.Null);
+
+            var result = exceptionBuilder.Build(exception, MethodBase.GetCurrentMethod());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.TypeOf<Exception>());
+            Assert.That(result, Is.EqualTo(exception));
+        }
+
+        /// <summary>
         /// Tests that Build returns an IntranetSystemException when an exception occurs while executing a command on a command handler without a return value.
         /// </summary>
         [Test]
@@ -224,7 +242,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Message, Is.Not.Null);
             Assert.That(result.Message, Is.Not.Empty);
-            Assert.That(result.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue, typeof (ICommand).Name, typeof (Guid).Name, exception.Message)));
+            Assert.That(result.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, typeof (ICommand).Name, typeof (Guid).Name, exception.Message)));
             Assert.That(result.InnerException, Is.Not.Null);
             Assert.That(result.InnerException, Is.EqualTo(exception));
         }
