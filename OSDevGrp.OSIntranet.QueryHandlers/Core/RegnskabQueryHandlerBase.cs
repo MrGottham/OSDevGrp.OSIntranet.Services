@@ -119,12 +119,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             var konti = KontoGetAllByRegnskab(regnskabsnummer);
             try
             {
-                return konti.Single(m => m.Kontonummer.CompareTo(kontonummer) == 0);
+                return konti.Single(m => String.Compare(m.Kontonummer, kontonummer, StringComparison.Ordinal) == 0);
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto), kontonummer), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto).Name, kontonummer), ex);
             }
         }
 
@@ -155,13 +154,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             var budgetkonti = BudgetkontoGetAllByRegnskab(regnskabsnummer);
             try
             {
-                return budgetkonti.Single(m => m.Kontonummer.CompareTo(kontonummer) == 0);
+                return budgetkonti.Single(m => String.Compare(m.Kontonummer, kontonummer, StringComparison.Ordinal) == 0);
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto), kontonummer),
-                    ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto).Name, kontonummer), ex);
             }
         }
 

@@ -41,8 +41,7 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved), id), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved).Name, id), ex);
             }
         }
 

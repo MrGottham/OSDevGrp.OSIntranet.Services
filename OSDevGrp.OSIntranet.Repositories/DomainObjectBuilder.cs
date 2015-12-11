@@ -62,7 +62,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (Exception ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe), s.Adressegruppe.Nummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe).Name, s.Adressegruppe.Nummer), ex);
                                           }
                                       }
                                       var person = new Person(s.Nummer, s.Navn, adressegruppe);
@@ -91,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                               }
                                               catch (Exception ex)
                                               {
-                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse), s.Betalingsbetingelse.Nummer), ex);
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse).Name, s.Betalingsbetingelse.Nummer), ex);
                                               }
                                           }
                                           person.SætBetalingsbetingelse(betalingsbetingelse);
@@ -117,7 +117,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                               }
                                               catch (Exception ex)
                                               {
-                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma), s.Firma.Nummer), ex);
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma).Name, s.Firma.Nummer), ex);
                                               }
                                           }
                                           firma.TilføjPerson(person);
@@ -145,7 +145,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (Exception ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe), s.Adressegruppe.Nummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe).Name, s.Adressegruppe.Nummer), ex);
                                           }
                                       }
                                       var firma = new Firma(s.Nummer, s.Navn, adressegruppe);
@@ -173,7 +173,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                               }
                                               catch (Exception ex)
                                               {
-                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse), s.Betalingsbetingelse.Nummer), ex);
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse).Name, s.Betalingsbetingelse.Nummer), ex);
                                               }
                                           }
                                           firma.SætBetalingsbetingelse(betalingsbetingelse);
@@ -215,7 +215,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                               }
                                               catch (Exception ex)
                                               {
-                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved), s.Brevhoved.Nummer), ex);
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved).Name, s.Brevhoved.Nummer), ex);
                                               }
                                           }
                                           regnskab.SætBrevhoved(brevhoved);
@@ -246,7 +246,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                               }
                                               catch (Exception ex)
                                               {
-                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved), s.Brevhoved.Nummer), ex);
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved).Name, s.Brevhoved.Nummer), ex);
                                               }
                                           }
                                           regnskab.SætBrevhoved(brevhoved);
@@ -295,7 +295,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (Exception ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Regnskab.Nummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab).Name, s.Regnskab.Nummer), ex);
                                           }
                                       }
                                       Kontogruppe kontogruppe;
@@ -315,7 +315,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (Exception ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Kontogruppe), s.Kontogruppe.Nummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Kontogruppe).Name, s.Kontogruppe.Nummer), ex);
                                           }
                                       }
                                       var konto = new Konto(regnskab, s.Kontonummer, s.Kontonavn, kontogruppe);
@@ -351,7 +351,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (Exception ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Regnskab.Nummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab).Name, s.Regnskab.Nummer), ex);
                                           }
                                       }
                                       Budgetkontogruppe budgetkontogruppe;
@@ -371,7 +371,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (Exception ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkontogruppe), s.Budgetkontogruppe.Nummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkontogruppe).Name, s.Budgetkontogruppe.Nummer), ex);
                                           }
                                       }
                                       var budgetkonto = new Budgetkonto(regnskab, s.Kontonummer, s.Kontonavn, budgetkontogruppe);
@@ -407,7 +407,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (Exception ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), s.Konto.Regnskab.Nummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab).Name, s.Konto.Regnskab.Nummer), ex);
                                           }
                                       }
                                       Konto konto;
@@ -419,7 +419,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                       }
                                       catch (InvalidOperationException ex)
                                       {
-                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto), s.Konto.Kontonummer), ex);
+                                          throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto).Name, s.Konto.Kontonummer), ex);
                                       }
                                       Budgetkonto budgetkonto = null;
                                       if (s.Budgetkonto != null && string.IsNullOrEmpty(s.Budgetkonto.Kontonummer) == false)
@@ -432,7 +432,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                           }
                                           catch (InvalidOperationException ex)
                                           {
-                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto), s.Budgetkonto.Kontonummer), ex);
+                                              throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto).Name, s.Budgetkonto.Kontonummer), ex);
                                           }
                                       }
                                       AdresseBase adresse = null;
@@ -454,7 +454,7 @@ namespace OSDevGrp.OSIntranet.Repositories
                                               }
                                               catch (Exception ex)
                                               {
-                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase), s.Adresse.Nummer), ex);
+                                                  throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase).Name, s.Adresse.Nummer), ex);
                                               }
                                           }
                                       }

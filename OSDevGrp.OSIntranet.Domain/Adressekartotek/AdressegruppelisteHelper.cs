@@ -41,8 +41,7 @@ namespace OSDevGrp.OSIntranet.Domain.Adressekartotek
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe), id), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe).Name, id), ex);
             }
         }
 

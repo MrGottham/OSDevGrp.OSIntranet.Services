@@ -40,8 +40,7 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (IAftale), id), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (IAftale).Name, id), ex);
             }
         }
 

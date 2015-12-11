@@ -41,8 +41,7 @@ namespace OSDevGrp.OSIntranet.Domain.Finansstyring
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab), id), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab).Name, id), ex);
             }
         }
 

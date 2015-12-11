@@ -110,8 +110,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Person), nummer), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Person).Name, nummer), ex);
             }
         }
 
@@ -139,8 +138,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Firma), nummer), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma).Name, nummer), ex);
             }
         }
 
@@ -168,9 +166,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Postnummer),
-                                                 string.Format("{0}-{1}", landekode, postnummer)), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Postnummer).Name, string.Format("{0}-{1}", landekode, postnummer)), ex);
             }
         }
 

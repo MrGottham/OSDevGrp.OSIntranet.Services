@@ -59,7 +59,6 @@
   <ItemGroup>
     <Compile Include="BogføringslinjeOpretCommandHandler.cs" />
     <Compile Include="Core\AdressekartotekCommandHandlerBase.cs" />
-    <Compile Include="Core\CommandHandlerBaseExtensions.cs" />
     <Compile Include="Core\FinansstyringCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteSystemDataCommandHandlerBase.cs" />
     <Compile Include="Core\FællesElementCommandHandlerBase.cs" />

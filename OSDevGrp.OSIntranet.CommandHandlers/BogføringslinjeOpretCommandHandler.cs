@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
@@ -38,8 +39,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
         /// <param name="konfigurationRepository">Implementering af konfigurationsrepository.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        public BogføringslinjeOpretCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper)
-            : base(finansstyringRepository, adresseRepository, fællesRepository, objectMapper)
+        /// <param name="exceptionBuilder">Implementering af builderen, der kan bygge exceptions.</param>
+        public BogføringslinjeOpretCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IKonfigurationRepository konfigurationRepository, IObjectMapper objectMapper, IExceptionBuilder exceptionBuilder)
+            : base(finansstyringRepository, adresseRepository, fællesRepository, objectMapper, exceptionBuilder)
         {
             if (konfigurationRepository == null)
             {
@@ -69,8 +71,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             AdresseBase adressekonto;
             EvaluateCommand(command, out konto, out budgetkonto, out adressekonto);
 
-            var bogføringslinje = Repository.BogføringslinjeAdd(command.Dato, command.Bilag, konto, command.Tekst,
-                                                                budgetkonto, command.Debit, command.Kredit, adressekonto);
+            var bogføringslinje = Repository.BogføringslinjeAdd(command.Dato, command.Bilag, konto, command.Tekst, budgetkonto, command.Debit, command.Kredit, adressekonto);
 
             IBogføringsresultat bogføringsresultat = new Bogføringsresultat(bogføringslinje);
 
@@ -82,10 +83,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// </summary>
         /// <param name="command">Kommando til oprettelse af en bogføringslinje.</param>
         /// <param name="exception">Exception.</param>
-        [RethrowException(typeof(IntranetRepositoryException), typeof(IntranetBusinessException), typeof(IntranetSystemException))]
         public void HandleException(BogføringslinjeOpretCommand command, Exception exception)
         {
-            throw this.CreateIntranetSystemExceptionException<BogføringslinjeOpretCommand, BogføringslinjeOpretResponse>(command, exception);
+            throw ExceptionBuilder.Build(exception, MethodBase.GetCurrentMethod());
         }
 
         #endregion
@@ -101,70 +101,62 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         {
             var adresselisteHelper = new AdresselisteHelper(AdresseRepository.AdresseGetAll());
             var brevhovedlisteHelper = new BrevhovedlisteHelper(FællesRepository.BrevhovedGetAll());
-            var regnskab = Repository.RegnskabGet(command.Regnskabsnummer, brevhovedlisteHelper.GetById,
-                                                  adresselisteHelper.GetById);
+            var regnskab = Repository.RegnskabGet(command.Regnskabsnummer, brevhovedlisteHelper.GetById, adresselisteHelper.GetById);
+            
             var currentTime = DateTime.Now;
-            if (command.Dato.Date < currentTime.AddDays(_konfigurationRepository.DageForBogføringsperiode * -1).Date)
+            if (command.Dato.Date < currentTime.AddDays(_konfigurationRepository.DageForBogføringsperiode*-1).Date)
             {
-                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld,
-                                                                                 _konfigurationRepository.
-                                                                                     DageForBogføringsperiode));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld, _konfigurationRepository. DageForBogføringsperiode));
             }
             if (command.Dato.Date > currentTime.Date)
             {
-                throw new IntranetBusinessException(
-                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime));
             }
+            
             if (string.IsNullOrEmpty(command.Kontonummer))
             {
-                throw new IntranetBusinessException(
-                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing));
             }
             try
             {
-                konto = regnskab.Konti.OfType<Konto>().Single(m => m.Kontonummer.CompareTo(command.Kontonummer) == 0);
+                konto = regnskab.Konti.OfType<Konto>().Single(m => String.Compare(m.Kontonummer, command.Kontonummer, StringComparison.Ordinal) == 0);
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto),
-                                                 command.Kontonummer), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto).Name, command.Kontonummer), ex);
             }
+            
             if (string.IsNullOrEmpty(command.Tekst))
             {
                 throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineTextMissing));
             }
+            
             budgetkonto = null;
             if (!string.IsNullOrEmpty(command.Budgetkontonummer))
             {
                 try
                 {
-                    budgetkonto =
-                        regnskab.Konti.OfType<Budgetkonto>().Single(
-                            m => m.Kontonummer.CompareTo(command.Budgetkontonummer) == 0);
+                    budgetkonto = regnskab.Konti.OfType<Budgetkonto>().Single(m => String.Compare(m.Kontonummer, command.Budgetkontonummer, StringComparison.Ordinal) == 0);
                 }
                 catch (InvalidOperationException ex)
                 {
-                    throw new IntranetRepositoryException(
-                        Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto),
-                                                     command.Budgetkontonummer), ex);
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto).Name, command.Budgetkontonummer), ex);
                 }
             }
+
             if (command.Debit < 0M)
             {
-                throw new IntranetBusinessException(
-                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero));
             }
             if (command.Kredit < 0M)
             {
-                throw new IntranetBusinessException(
-                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero));
             }
             if (command.Debit == 0M && command.Kredit == 0M)
             {
-                throw new IntranetBusinessException(
-                    Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing));
             }
+            
             adressekonto = null;
             if (command.Adressekonto == 0)
             {

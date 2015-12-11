@@ -65,9 +65,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById,
-                                                            fixture.Create<Type>(),
-                                                            fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, fixture.Create<Type>().Name, fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -121,9 +119,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue,
-                                                            fixture.Create<string>(),
-                                                            fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue, fixture.Create<string>(), fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -140,10 +136,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue,
-                                                            fixture.Create<string>(),
-                                                            fixture.Create<string>(),
-                                                            fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }

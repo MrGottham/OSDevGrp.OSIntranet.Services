@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -24,6 +25,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         /// </summary>
         private class MyCommandHandler : RegnskabCommandHandlerBase
         {
+            #region Constructor
+
             /// <summary>
             /// Danner egen klasse til test af basisklasse for en CommandHandler til regnskaber. 
             /// </summary>
@@ -31,10 +34,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             /// <param name="adresseRepository">Implementering af repository til adresser.</param>
             /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
             /// <param name="objectMapper">Implementering af objectmapper.</param>
-            public MyCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
-                : base(finansstyringRepository, adresseRepository, fællesRepository, objectMapper)
+            /// <param name="exceptionBuilder">Implementering af builderen, der kan bygge exceptions.</param>
+            public MyCommandHandler(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper, IExceptionBuilder exceptionBuilder)
+                : base(finansstyringRepository, adresseRepository, fællesRepository, objectMapper, exceptionBuilder)
             {
             }
+
+            #endregion
         }
 
         /// <summary>
@@ -43,16 +49,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorInitiererRegnskabQueryHandlerBase()
         {
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                  objectMapper);
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
             Assert.That(commandHandler.Repository, Is.Not.Null);
+            Assert.That(commandHandler.Repository, Is.EqualTo(finansstyringRepositoryMock));
             Assert.That(commandHandler.ObjectMapper, Is.Not.Null);
+            Assert.That(commandHandler.ObjectMapper, Is.EqualTo(objectMapperMock));
+            Assert.That(commandHandler.ExceptionBuilder, Is.Not.Null);
+            Assert.That(commandHandler.ExceptionBuilder, Is.EqualTo(exceptionBuilderMock));
         }
 
         /// <summary>
@@ -61,11 +71,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFinansstyringRepositoryErNull()
         {
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            Assert.Throws<ArgumentNullException>(
-                () => new MyCommandHandler(null, adresseRepository, fællesRepository, objectMapper));
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyCommandHandler(null, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("finansstyringRepository"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -74,11 +90,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisAdresseRepositoryErNull()
         {
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            Assert.Throws<ArgumentNullException>(
-                () => new MyCommandHandler(finansstyringRepository, null, fællesRepository, objectMapper));
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyCommandHandler(finansstyringRepositoryMock, null, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("adresseRepository"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -87,11 +109,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFællesRepositoryErNull()
         {
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            Assert.Throws<ArgumentNullException>(
-                () => new MyCommandHandler(finansstyringRepository, adresseRepository, null, objectMapper));
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, null, objectMapperMock, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("fællesRepository"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -100,11 +128,36 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
         {
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            Assert.Throws<ArgumentNullException>(
-                () => new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository, null));
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, null, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("objectMapper"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis builder, der kan bygge exceptions, er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisExceptionBuilderErNull()
+        {
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("exceptionBuilder"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -114,24 +167,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtRegnskabGetByNummerHenterRegnskab()
         {
             var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(fixture.CreateMany<Person>(3));
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(fixture.CreateMany<Person>(3))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var regnskab = commandHandler.RegnskabGetByNummer(regnskaber.ElementAt(1).Nummer);
@@ -140,12 +195,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.That(regnskab.Navn, Is.Not.Null);
             Assert.That(regnskab.Navn, Is.EqualTo(regnskaber.ElementAt(1).Navn));
 
-            finansstyringRepository.AssertWasCalled(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull));
-            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
-            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull));
+            adresseRepositoryMock.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepositoryMock.AssertWasCalled(m => m.BrevhovedGetAll());
         }
 
         /// <summary>
@@ -155,30 +207,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtKontoGetAllByRegnskabHenterKontiFraRegnskab()
         {
             var fixture = new Fixture();
-            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             fixture.Inject(regnskaber.ElementAt(1));
             var konti = fixture.CreateMany<Konto>(3).ToList();
             var budgetkonti = fixture.CreateMany<Budgetkonto>(3).ToList();
             konti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
             budgetkonti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(fixture.CreateMany<Person>(3));
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(fixture.CreateMany<Person>(3))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var result = commandHandler.KontoGetAllByRegnskab(regnskaber.ElementAt(1).Nummer);
@@ -193,18 +246,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtKontoGetByRegnskabAndKontonummerKasterEnArgumentNullExceptionHvisKontonummerErNull()
         {
             var fixture = new Fixture();
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(
-                () => commandHandler.KontoGetByRegnskabAndKontonummer(fixture.Create<int>(), null));
+            var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.KontoGetByRegnskabAndKontonummer(fixture.Create<int>(), null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -214,34 +270,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtKontoGetByRegnskabAndKontonummerHenterKontoFraRegnskab()
         {
             var fixture = new Fixture();
-            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             fixture.Inject(regnskaber.ElementAt(1));
             var konti = fixture.CreateMany<Konto>(3).ToList();
             var budgetkonti = fixture.CreateMany<Budgetkonto>(3).ToList();
             konti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
             budgetkonti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(fixture.CreateMany<Person>(3));
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(fixture.CreateMany<Person>(3))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            var konto = commandHandler.KontoGetByRegnskabAndKontonummer(konti.ElementAt(1).Regnskab.Nummer,
-                                                                        konti.ElementAt(1).Kontonummer);
+            var konto = commandHandler.KontoGetByRegnskabAndKontonummer(konti.ElementAt(1).Regnskab.Nummer, konti.ElementAt(1).Kontonummer);
             Assert.That(konto, Is.Not.Null);
             Assert.That(konto.Kontonummer, Is.Not.Null);
             Assert.That(konto.Kontonummer, Is.EqualTo(konti.ElementAt(1).Kontonummer));
@@ -256,36 +312,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtKontoGetByRegnskabAndKontonummerKasterEnIntranetRepositoryExceptionHvisKontoIkkeFindes()
         {
             var fixture = new Fixture();
-            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             fixture.Inject(regnskaber.ElementAt(1));
             var konti = fixture.CreateMany<Konto>(3).ToList();
             var budgetkonti = fixture.CreateMany<Budgetkonto>(3).ToList();
             konti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
             budgetkonti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(fixture.CreateMany<Person>(3));
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(fixture.CreateMany<Person>(3))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<IntranetRepositoryException>(
-                () =>
-                commandHandler.KontoGetByRegnskabAndKontonummer(regnskaber.ElementAt(1).Nummer,
-                                                                fixture.Create<string>()));
+            var kontonummer = fixture.Create<string>();
+            var exception = Assert.Throws<IntranetRepositoryException>(() => commandHandler.KontoGetByRegnskabAndKontonummer(regnskaber.ElementAt(1).Nummer, kontonummer));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto).Name, kontonummer)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
         }
 
         /// <summary>
@@ -295,30 +356,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtBudgetkontoGetAllByRegnskabBudgetkontiFraRegnskab()
         {
             var fixture = new Fixture();
-            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             fixture.Inject(regnskaber.ElementAt(1));
             var konti = fixture.CreateMany<Konto>(3).ToList();
             var budgetkonti = fixture.CreateMany<Budgetkonto>(3).ToList();
             konti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
             budgetkonti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(fixture.CreateMany<Person>(3));
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(fixture.CreateMany<Person>(3))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var result = commandHandler.BudgetkontoGetAllByRegnskab(regnskaber.ElementAt(1).Nummer);
@@ -333,18 +395,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtBudgetkontoGetByRegnskabAndKontonummerKasterEnArgumentNullExceptionHvisKontonummerErNull()
         {
             var fixture = new Fixture();
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(
-                () => commandHandler.BudgetkontoGetByRegnskabAndKontonummer(fixture.Create<int>(), null));
+            var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.BudgetkontoGetByRegnskabAndKontonummer(fixture.Create<int>(), null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kontonummer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -354,35 +419,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtBudgetkontoGetByRegnskabAndKontonummerHenterBudgetkontoFraRegnskab()
         {
             var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
-
             fixture.Inject(regnskaber.ElementAt(1));
             var konti = fixture.CreateMany<Konto>(3).ToList();
             var budgetkonti = fixture.CreateMany<Budgetkonto>(3).ToList();
             konti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
             budgetkonti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(fixture.CreateMany<Person>(3));
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(fixture.CreateMany<Person>(3))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            var budgetkonto =
-                commandHandler.BudgetkontoGetByRegnskabAndKontonummer(budgetkonti.ElementAt(1).Regnskab.Nummer,
-                                                                      budgetkonti.ElementAt(1).Kontonummer);
+            var budgetkonto = commandHandler.BudgetkontoGetByRegnskabAndKontonummer(budgetkonti.ElementAt(1).Regnskab.Nummer, budgetkonti.ElementAt(1).Kontonummer);
             Assert.That(budgetkonto, Is.Not.Null);
             Assert.That(budgetkonto.Kontonummer, Is.Not.Null);
             Assert.That(budgetkonto.Kontonummer, Is.EqualTo(budgetkonti.ElementAt(1).Kontonummer));
@@ -397,36 +461,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtBudgetkontoGetByRegnskabAndKontonummerKasterEnIntranetRepositoryExceptionHvisBudgetkontoIkkeFindes()
         {
             var fixture = new Fixture();
-            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
+            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             fixture.Inject(regnskaber.ElementAt(1));
             var konti = fixture.CreateMany<Konto>(3).ToList();
             var budgetkonti = fixture.CreateMany<Budgetkonto>(3).ToList();
             konti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
             budgetkonti.ForEach(regnskaber.ElementAt(1).TilføjKonto);
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(fixture.CreateMany<Person>(3));
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(fixture.CreateMany<Person>(3))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<IntranetRepositoryException>(
-                () =>
-                commandHandler.BudgetkontoGetByRegnskabAndKontonummer(regnskaber.ElementAt(1).Nummer,
-                                                                      fixture.Create<string>()));
+            var budgetkontonummer = fixture.Create<string>();
+            var exception = Assert.Throws<IntranetRepositoryException>(() => commandHandler.BudgetkontoGetByRegnskabAndKontonummer(regnskaber.ElementAt(1).Nummer, budgetkontonummer));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto).Name, budgetkontonummer)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
         }
 
         /// <summary>
@@ -437,52 +506,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2010, 12, 31));
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            0M, fixture.Create<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(adresser);
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(adresser)
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var adressekonti = commandHandler.AdressekontoGetAllByRegnskab(regnskaber.ElementAt(1).Nummer);
             Assert.That(adressekonti, Is.Not.Null);
             Assert.That(adressekonti.Count(), Is.EqualTo(3));
 
-            finansstyringRepository.AssertWasCalled(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull));
-            adresseRepository.AssertWasCalled(m => m.AdresseGetAll());
-            fællesRepository.AssertWasCalled(m => m.BrevhovedGetAll());
+            finansstyringRepositoryMock.AssertWasCalled(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull));
+            adresseRepositoryMock.AssertWasCalled(m => m.AdresseGetAll());
+            fællesRepositoryMock.AssertWasCalled(m => m.BrevhovedGetAll());
         }
 
         /// <summary>
@@ -493,44 +549,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2010, 12, 31));
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            0M, fixture.Create<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(adresser);
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(adresser)
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            var adressekonto = commandHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer,
-                                                                                 adresser.ElementAt(1).Nummer);
+            var adressekonto = commandHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer, adresser.ElementAt(1).Nummer);
             Assert.That(adressekonto, Is.Not.Null);
             Assert.That(adressekonto.Nummer, Is.EqualTo(adresser.ElementAt(1).Nummer));
             Assert.That(adressekonto.Navn, Is.Not.Null);
@@ -547,46 +592,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2010, 12, 31));
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
             var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
             var adresser = fixture.CreateMany<Person>(3).ToList();
-            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<decimal>(), 0M));
-            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<decimal>(), 0M));
-            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(),
-                                                                            fixture.Create<DateTime>(),
-                                                                            fixture.Create<string>(),
-                                                                            fixture.Create<string>(),
-                                                                            0M, fixture.Create<decimal>()));
+            adresser.ElementAt(0).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(1).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
+            adresser.ElementAt(2).TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            finansstyringRepository.Expect(
-                m =>
-                m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull,
-                              Arg<Func<int, AdresseBase>>.Is.NotNull))
-                .Return(regnskaber.ElementAt(1));
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdresseGetAll())
-                .Return(adresser);
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.BrevhovedGetAll())
-                .Return(fixture.CreateMany<Brevhoved>(3));
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            var finansstyringRepositoryMock = MockRepository.GenerateMock<IFinansstyringRepository>();
+            finansstyringRepositoryMock.Expect(m => m.RegnskabGet(Arg<int>.Is.Equal(regnskaber.ElementAt(1).Nummer), Arg<Func<int, Brevhoved>>.Is.NotNull, Arg<Func<int, AdresseBase>>.Is.NotNull))
+                .Return(regnskaber.ElementAt(1))
+                .Repeat.Any();
 
-            var commandHandler = new MyCommandHandler(finansstyringRepository, adresseRepository, fællesRepository,
-                                                      objectMapper);
+            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
+            adresseRepositoryMock.Expect(m => m.AdresseGetAll())
+                .Return(adresser)
+                .Repeat.Any();
+
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.BrevhovedGetAll())
+                .Return(fixture.CreateMany<Brevhoved>(3))
+                .Repeat.Any();
+
+            var commandHandler = new MyCommandHandler(finansstyringRepositoryMock, adresseRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<IntranetRepositoryException>(
-                () =>
-                commandHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer,
-                                                                  fixture.Create<int>()));
+            var adressekonto = fixture.Create<int>();
+            var exception = Assert.Throws<IntranetRepositoryException>(() => commandHandler.AdressekontoGetByRegnskabAndNummer(regnskaber.ElementAt(1).Nummer, adressekonto));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase).Name, adressekonto)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
         }
     }
 }

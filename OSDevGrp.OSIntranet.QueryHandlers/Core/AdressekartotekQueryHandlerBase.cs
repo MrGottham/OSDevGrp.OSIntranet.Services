@@ -93,8 +93,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Person), nummer), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Person).Name, nummer), ex);
             }
         }
 
@@ -122,8 +121,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma), nummer), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma).Name, nummer), ex);
             }
         }
 
@@ -146,14 +144,11 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             var postnumre = _adresseRepository.PostnummerGetAll();
             try
             {
-                return postnumre
-                    .Single(m => m.Landekode.CompareTo(landekode) == 0 && m.Postnr.CompareTo(postnummer) == 0);
+                return postnumre.Single(m => String.Compare(m.Landekode, landekode, StringComparison.Ordinal) == 0 && String.Compare(m.Postnr, postnummer, StringComparison.Ordinal) == 0);
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Postnummer),
-                                                 string.Format("{0}-{1}", landekode, postnummer)), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Postnummer).Name, string.Format("{0}-{1}", landekode, postnummer)), ex);
             }
         }
 

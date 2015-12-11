@@ -239,7 +239,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
                 var staticText = DataProvider.GetCollection<StaticTextProxy>(string.Format("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={0}", (int)staticTextType)).SingleOrDefault(m => m.Type == staticTextType);
                 if (staticText == null)
                 {
-                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (StaticTextProxy).Name, staticTextType));
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (IStaticText).Name, staticTextType));
                 }
                 return staticText;
             }

@@ -43,7 +43,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return mapper.Map<Firma, TelefonlisteView>(s as Firma);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Person, TelefonlisteView>()
@@ -70,7 +70,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return mapper.Map<Firma, AdressekontolisteView>(s as Firma);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Person, AdressekontolisteView>()
@@ -99,7 +99,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return mapper.Map<Firma, AdressekontoView>(s as Firma);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Person, AdressekontoView>()
@@ -146,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return mapper.Map<Firma, DebitorlisteView>(s as Firma);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Person, DebitorlisteView>()
@@ -175,7 +175,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return mapper.Map<Firma, DebitorView>(s as Firma);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Person, DebitorView>()
@@ -222,7 +222,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return mapper.Map<Firma, KreditorlisteView>(s as Firma);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Person, KreditorlisteView>()
@@ -251,7 +251,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return mapper.Map<Firma, KreditorView>(s as Firma);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Person, KreditorView>()
@@ -379,7 +379,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return objectMapper.Map<Budgetkonto, BudgetkontoView>(s as Budgetkonto);
                     }
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType()));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                 });
 
             Mapper.CreateMap<Konto, KontoplanView>()

@@ -34,8 +34,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <param name="adresseRepository">Implementering af repository til adresser.</param>
         /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        protected RegnskabCommandHandlerBase(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
-            : base(finansstyringRepository, objectMapper)
+        /// <param name="exceptionBuilder">Implementering af builderen, der kan bygge exceptions.</param>
+        protected RegnskabCommandHandlerBase(IFinansstyringRepository finansstyringRepository, IAdresseRepository adresseRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper, IExceptionBuilder exceptionBuilder)
+            : base(finansstyringRepository, objectMapper, exceptionBuilder)
         {
             if (adresseRepository == null)
             {
@@ -118,12 +119,11 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             var konti = KontoGetAllByRegnskab(regnskabsnummer);
             try
             {
-                return konti.Single(m => m.Kontonummer.CompareTo(kontonummer) == 0);
+                return konti.Single(m => String.Compare(m.Kontonummer, kontonummer, StringComparison.Ordinal) == 0);
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Konto), kontonummer), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto).Name, kontonummer), ex);
             }
         }
 
@@ -154,13 +154,11 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             var budgetkonti = BudgetkontoGetAllByRegnskab(regnskabsnummer);
             try
             {
-                return budgetkonti.Single(m => m.Kontonummer.CompareTo(kontonummer) == 0);
+                return budgetkonti.Single(m => String.Compare(m.Kontonummer, kontonummer, StringComparison.Ordinal) == 0);
             }
             catch (InvalidOperationException ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Budgetkonto), kontonummer),
-                    ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto).Name, kontonummer), ex);
             }
         }
 

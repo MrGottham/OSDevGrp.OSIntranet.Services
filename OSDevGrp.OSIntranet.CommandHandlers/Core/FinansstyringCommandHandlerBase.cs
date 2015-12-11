@@ -16,6 +16,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 
         private readonly IFinansstyringRepository _finansstyringRepository;
         private readonly IObjectMapper _objectMapper;
+        private readonly IExceptionBuilder _exceptionBuilder;
 
         #endregion
 
@@ -26,7 +27,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// </summary>
         /// <param name="finansstyringRepository">Implementering af repository til finansstyring.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        protected FinansstyringCommandHandlerBase(IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper)
+        /// <param name="exceptionBuilder">Implementering af builderen, der kan bygge exceptions.</param>
+        protected FinansstyringCommandHandlerBase(IFinansstyringRepository finansstyringRepository, IObjectMapper objectMapper, IExceptionBuilder exceptionBuilder)
         {
             if (finansstyringRepository == null)
             {
@@ -36,8 +38,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             {
                 throw new ArgumentNullException("objectMapper");
             }
+            if (exceptionBuilder == null)
+            {
+                throw new ArgumentNullException("exceptionBuilder");
+            }
             _finansstyringRepository = finansstyringRepository;
             _objectMapper = objectMapper;
+            _exceptionBuilder = exceptionBuilder;
         }
 
         #endregion
@@ -63,6 +70,17 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             get
             {
                 return _objectMapper;
+            }
+        }
+
+        /// <summary>
+        /// Builder, der kan bygge exceptions.
+        /// </summary>
+        public virtual IExceptionBuilder ExceptionBuilder
+        {
+            get
+            {
+                return _exceptionBuilder;
             }
         }
 
