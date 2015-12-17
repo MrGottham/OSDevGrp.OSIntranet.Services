@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
@@ -13,7 +14,6 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
-using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -36,9 +36,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
         }
 
@@ -52,8 +53,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, null));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -71,9 +73,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => foodItemImportFromDataProviderCommandHandler.Execute(null));
@@ -92,6 +95,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -115,11 +119,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -128,7 +132,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -154,6 +158,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -177,11 +182,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -190,7 +195,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -216,6 +221,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -239,11 +245,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -252,7 +258,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -278,6 +284,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -307,11 +314,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -320,7 +327,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -346,6 +353,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -375,11 +383,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -388,7 +396,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -414,6 +422,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var primaryFoodGroup = DomainObjectMockBuilder.BuildFoodGroupMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -443,11 +452,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -456,7 +465,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -482,6 +491,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -510,11 +520,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -523,7 +533,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -549,6 +559,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -577,11 +588,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -590,7 +601,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -616,6 +627,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -644,11 +656,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -657,7 +669,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -683,6 +695,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -711,11 +724,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -724,7 +737,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -750,6 +763,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -773,11 +787,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -786,7 +800,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -812,6 +826,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -835,11 +850,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -848,7 +863,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -874,6 +889,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -898,11 +914,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -911,7 +927,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -937,6 +953,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var isActive = fixture.Create<bool>();
             var primaryFoodGroup = DomainObjectMockBuilder.BuildFoodGroupMock();
@@ -981,11 +998,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -994,7 +1011,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1020,6 +1037,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
             var insertedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
@@ -1046,8 +1064,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
 
             var key = fixture.Create<string>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull))
                 .WhenCalled(e =>
                 {
                     var foreignKey = (IForeignKey) e.Arguments.ElementAt(0);
@@ -1068,7 +1086,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 })
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1077,7 +1095,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1092,7 +1110,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             foodItemImportFromDataProviderCommandHandler.Execute(command);
 
-            logicExecutor.AssertWasCalled(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull));
+            logicExecutorMock.AssertWasCalled(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull));
         }
 
         /// <summary>
@@ -1103,6 +1121,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var insertedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
@@ -1129,11 +1148,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
 
             var name = fixture.Create<string>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
                 .WhenCalled(e =>
                 {
                     var translation = (ITranslation) e.Arguments.ElementAt(0);
@@ -1157,7 +1176,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1172,7 +1191,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             foodItemImportFromDataProviderCommandHandler.Execute(command);
 
-            logicExecutor.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
+            logicExecutorMock.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
         }
 
         /// <summary>
@@ -1183,6 +1202,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var insertedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -1207,11 +1227,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1220,7 +1240,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1246,6 +1266,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -1269,11 +1290,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.ForeignKeyAdd(Arg<IForeignKey>.Is.NotNull))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1283,7 +1304,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1311,6 +1332,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -1335,8 +1357,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1345,7 +1367,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1371,6 +1393,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -1395,8 +1418,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1405,7 +1428,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1431,6 +1454,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var updatedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
@@ -1457,8 +1481,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
 
             var name = fixture.Create<string>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
                 .WhenCalled(e =>
                 {
                     var translation = (ITranslation) e.Arguments.ElementAt(0);
@@ -1482,7 +1506,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1497,7 +1521,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             foodItemImportFromDataProviderCommandHandler.Execute(command);
 
-            logicExecutor.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
+            logicExecutorMock.AssertWasCalled(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull));
         }
 
         /// <summary>
@@ -1508,6 +1532,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var updatedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
             var translationMock = updatedFoodItemMock.Translations.First();
@@ -1533,8 +1558,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.TranslationModify(Arg<ITranslation>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.TranslationModify(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1543,7 +1568,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1569,6 +1594,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var updatedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
             var translationMock = updatedFoodItemMock.Translations.First();
@@ -1594,8 +1620,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.TranslationModify(Arg<ITranslation>.Is.Anything))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.TranslationModify(Arg<ITranslation>.Is.Anything))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1604,7 +1630,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1619,7 +1645,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             foodItemImportFromDataProviderCommandHandler.Execute(command);
 
-            logicExecutor.AssertWasCalled(m => m.TranslationModify(Arg<ITranslation>.Is.Equal(translationMock)));
+            logicExecutorMock.AssertWasCalled(m => m.TranslationModify(Arg<ITranslation>.Is.Equal(translationMock)));
         }
 
         /// <summary>
@@ -1630,6 +1656,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var updatedFoodItemMock = DomainObjectMockBuilder.BuildFoodItemMock(translations: new List<ITranslation>(0));
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -1654,8 +1681,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1664,7 +1691,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1690,6 +1717,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             systemDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
@@ -1713,8 +1741,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-            logicExecutor.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.TranslationAdd(Arg<ITranslation>.Is.NotNull))
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
@@ -1724,7 +1752,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
             var command = new FoodItemImportFromDataProviderCommand
@@ -1743,147 +1771,63 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that HandleException throws an ArgumentNullException if the command for importing a food item from a given data provider is null.
+        /// Tests that HandleException calls Build on the builder which can build exceptions.
         /// </summary>
         [Test]
-        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfFoodItemImportFromDataProviderCommandIsNull()
+        public void TestThatHandleExceptionCallsBuildOnExceptionBuilder()
         {
             var fixture = new Fixture();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            exceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.Anything, Arg<MethodBase>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var methodBase = (MethodBase) e.Arguments.ElementAt(1);
+                    Assert.That(methodBase, Is.Not.Null);
+                    Assert.That(methodBase.ReflectedType.Name, Is.EqualTo(typeof (FoodItemImportFromDataProviderCommandHandler).Name));
+                })
+                .Return(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodItemImportFromDataProviderCommandHandler.HandleException(null, fixture.Create<Exception>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("command"));
-            Assert.That(exception.InnerException, Is.Null);
+            var exception = fixture.Create<Exception>();
+            Assert.Throws<Exception>(() => foodItemImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodItemImportFromDataProviderCommand>(), exception));
+
+            exceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
-        /// Tests that HandleException throws an ArgumentNullException if the exception is null.
+        /// Tests that HandleException throws the created exception from the builder which can build exceptions.
         /// </summary>
         [Test]
-        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfExceptionIsNull()
+        public void TestThatHandleExceptionThrowsCreatedExceptionFromExceptionBuilder()
         {
             var fixture = new Fixture();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
 
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
+            var exceptionToThrow = fixture.Create<Exception>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            exceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.Anything, Arg<MethodBase>.Is.Anything))
+                .Return(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, logicExecutorMock);
             Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodItemImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodItemImportFromDataProviderCommand>(), null));
+            var exception = Assert.Throws<Exception>(() => foodItemImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodItemImportFromDataProviderCommand>(), fixture.Create<Exception>()));
             Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("exception"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that HandleException rethrows the exception when the exception if type of IntranetRepositoryException.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionRethrowsExceptionWhenExceptionIsTypeOfIntranetRepositoryException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<IntranetRepositoryException>();
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foodItemImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodItemImportFromDataProviderCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(incomingException));
-        }
-
-        /// <summary>
-        /// Tests that HandleException rethrows the exception when the exception if type of IntranetBusinessException.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionRethrowsExceptionWhenExceptionIsTypeOfIntranetBusinessException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<IntranetBusinessException>();
-
-            var exception = Assert.Throws<IntranetBusinessException>(() => foodItemImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodItemImportFromDataProviderCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(incomingException));
-        }
-
-        /// <summary>
-        /// Tests that HandleException rethrows the exception when the exception if type of IntranetSystemException.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionRethrowsExceptionWhenExceptionIsTypeOfIntranetSystemException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<IntranetSystemException>();
-
-            var exception = Assert.Throws<IntranetSystemException>(() => foodItemImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodItemImportFromDataProviderCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(incomingException));
-        }
-
-        /// <summary>
-        /// Tests that HandleException throws an IntranetSystemException when the exception if type of Exception.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionThrowsIntranetSystemExceptionWhenExceptionIsTypeOfException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-            var logicExecutor = MockRepository.GenerateMock<ILogicExecutor>();
-
-            var foodItemImportFromDataProviderCommandHandler = new FoodItemImportFromDataProviderCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, logicExecutor);
-            Assert.That(foodItemImportFromDataProviderCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<Exception>();
-
-            var exception = Assert.Throws<IntranetSystemException>(() => foodItemImportFromDataProviderCommandHandler.HandleException(fixture.Create<FoodItemImportFromDataProviderCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, typeof (FoodItemImportFromDataProviderCommand).Name, typeof (ServiceReceiptResponse).Name, incomingException.Message)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.EqualTo(incomingException));
+            Assert.That(exception, Is.EqualTo(exceptionToThrow));
         }
     }
 }

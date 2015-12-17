@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
@@ -11,7 +12,6 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
-using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -34,8 +34,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
         }
 
@@ -49,8 +50,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyDeleteCommandHandler.Execute(null));
@@ -69,6 +71,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -88,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var foreignKeyDeleteCommand = new ForeignKeyDeleteCommand
@@ -109,6 +112,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             // ReSharper disable PossibleInvalidOperationException
@@ -134,7 +138,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var foreignKeyDeleteCommand = new ForeignKeyDeleteCommand
@@ -155,6 +159,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -174,7 +179,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var foreignKeyDeleteCommand = new ForeignKeyDeleteCommand
@@ -195,6 +200,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -214,7 +220,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var foreignKeyDeleteCommand = new ForeignKeyDeleteCommand
@@ -235,6 +241,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             // ReSharper disable PossibleInvalidOperationException
@@ -255,7 +262,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var foreignKeyDeleteCommand = new ForeignKeyDeleteCommand
@@ -276,6 +283,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             // ReSharper disable PossibleInvalidOperationException
@@ -296,7 +304,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var foreignKeyDeleteCommand = new ForeignKeyDeleteCommand
@@ -317,6 +325,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -337,7 +346,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(serviceReceipt)
                 .Repeat.Any();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
             var foreignKeyDeleteCommand = new ForeignKeyDeleteCommand
@@ -351,10 +360,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that HandleException throws an ArgumentNullException if the command for deleting a foreign key is null.
+        /// Tests that HandleException calls Build on the builder which can build exceptions.
         /// </summary>
         [Test]
-        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfForeignKeyModifyCommandIsNull()
+        public void TestThatHandleExceptionCallsBuildOnExceptionBuilder()
         {
             var fixture = new Fixture();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -362,22 +371,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            exceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.Anything, Arg<MethodBase>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var methodBase = (MethodBase) e.Arguments.ElementAt(1);
+                    Assert.That(methodBase, Is.Not.Null);
+                    Assert.That(methodBase.ReflectedType.Name, Is.EqualTo(typeof (ForeignKeyDeleteCommandHandler).Name));
+                })
+                .Return(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyDeleteCommandHandler.HandleException(null, fixture.Create<Exception>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("command"));
-            Assert.That(exception.InnerException, Is.Null);
+            var exception = fixture.Create<Exception>();
+            Assert.Throws<Exception>(() => foreignKeyDeleteCommandHandler.HandleException(fixture.Create<ForeignKeyDeleteCommand>(), exception));
+
+            exceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
-        /// Tests that HandleException throws an ArgumentNullException if the exception is null.
+        /// Tests that HandleException throws the created exception from the builder which can build exceptions.
         /// </summary>
         [Test]
-        public void TestThatHandleExceptionThrowsArgumentNullExceptionIfExceptionIsNull()
+        public void TestThatHandleExceptionThrowsCreatedExceptionFromExceptionBuilder()
         {
             var fixture = new Fixture();
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
@@ -385,107 +403,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
 
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var exceptionToThrow = fixture.Create<Exception>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+            exceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.Anything, Arg<MethodBase>.Is.Anything))
+                .Return(exceptionToThrow)
+                .Repeat.Any();
+
+            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyDeleteCommandHandler.HandleException(fixture.Create<ForeignKeyDeleteCommand>(), null));
+            var exception = Assert.Throws<Exception>(() => foreignKeyDeleteCommandHandler.HandleException(fixture.Create<ForeignKeyDeleteCommand>(), fixture.Create<Exception>()));
             Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("exception"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that HandleException rethrows the exception when the exception if type of IntranetRepositoryException.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionRethrowsExceptionWhenExceptionIsTypeOfIntranetRepositoryException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<IntranetRepositoryException>();
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyDeleteCommandHandler.HandleException(fixture.Create<ForeignKeyDeleteCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(incomingException));
-        }
-
-        /// <summary>
-        /// Tests that HandleException rethrows the exception when the exception if type of IntranetBusinessException.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionRethrowsExceptionWhenExceptionIsTypeOfIntranetBusinessException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<IntranetBusinessException>();
-
-            var exception = Assert.Throws<IntranetBusinessException>(() => foreignKeyDeleteCommandHandler.HandleException(fixture.Create<ForeignKeyDeleteCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(incomingException));
-        }
-
-        /// <summary>
-        /// Tests that HandleException rethrows the exception when the exception if type of IntranetSystemException.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionRethrowsExceptionWhenExceptionIsTypeOfIntranetSystemException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<IntranetSystemException>();
-
-            var exception = Assert.Throws<IntranetSystemException>(() => foreignKeyDeleteCommandHandler.HandleException(fixture.Create<ForeignKeyDeleteCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(incomingException));
-        }
-
-        /// <summary>
-        /// Tests that HandleException throws an IntranetSystemException when the exception if type of Exception.
-        /// </summary>
-        [Test]
-        public void TestThatHandleExceptionThrowsIntranetSystemExceptionWhenExceptionIsTypeOfException()
-        {
-            var fixture = new Fixture();
-            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            var specificationMock = MockRepository.GenerateMock<ISpecification>();
-            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
-
-            var foreignKeyDeleteCommandHandler = new ForeignKeyDeleteCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
-            Assert.That(foreignKeyDeleteCommandHandler, Is.Not.Null);
-
-            var incomingException = fixture.Create<Exception>();
-
-            var exception = Assert.Throws<IntranetSystemException>(() => foreignKeyDeleteCommandHandler.HandleException(fixture.Create<ForeignKeyDeleteCommand>(), incomingException));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, typeof (ForeignKeyDeleteCommand).Name, typeof (ServiceReceiptResponse).Name, incomingException.Message)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.EqualTo(incomingException));
+            Assert.That(exception, Is.EqualTo(exceptionToThrow));
         }
     }
 }

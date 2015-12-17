@@ -33,8 +33,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             /// <param name="foodWasteObjectMapper">Implementation of an object mapper which can map objects in the food waste domain.</param>
             /// <param name="specification">Implementation of a specification which encapsulates validation rules.</param>
             /// <param name="commonValidations">Implementation of the common validations.</param>
-            public MyFoodWasteSystemDataCommandHandler(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations)
-                : base(systemDataRepository, foodWasteObjectMapper, specification, commonValidations)
+            /// <param name="exceptionBuilder">Implementation of the builder which can build exceptions.</param>
+            public MyFoodWasteSystemDataCommandHandler(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IExceptionBuilder exceptionBuilder)
+                : base(systemDataRepository, foodWasteObjectMapper, specification, commonValidations, exceptionBuilder)
             {
             }
 
@@ -75,6 +76,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             }
 
             /// <summary>
+            /// Gets the builder which can build exceptions.
+            /// </summary>
+            public IExceptionBuilder GetExceptionBuilder()
+            {
+                return ExceptionBuilder;
+            }
+
+            /// <summary>
             /// Imports a given translation on a given translatable domain object.
             /// </summary>
             /// <param name="domainObject">Translatable domain object on which to import the translation.</param>
@@ -100,8 +109,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var systemDataCommandHandlerBase = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var systemDataCommandHandlerBase = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(systemDataCommandHandlerBase, Is.Not.Null);
             Assert.That(systemDataCommandHandlerBase.GetSystemDataRepository(), Is.Not.Null);
             Assert.That(systemDataCommandHandlerBase.GetSystemDataRepository(), Is.EqualTo(systemDataRepositoryMock));
@@ -111,6 +121,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.That(systemDataCommandHandlerBase.GetSpecification(), Is.EqualTo(specificationMock));
             Assert.That(systemDataCommandHandlerBase.GetCommonValidations(), Is.Not.Null);
             Assert.That(systemDataCommandHandlerBase.GetCommonValidations(), Is.EqualTo(commonValidationsMock));
+            Assert.That(systemDataCommandHandlerBase.GetExceptionBuilder(), Is.Not.Null);
+            Assert.That(systemDataCommandHandlerBase.GetExceptionBuilder(), Is.EqualTo(exceptionBuilderMock));
         }
 
         /// <summary>
@@ -122,8 +134,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(null, foodWasteObjectMapperMock, specificationMock, commonValidationsMock));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(null, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -140,8 +153,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, null, specificationMock, commonValidationsMock));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, null, specificationMock, commonValidationsMock, exceptionBuilderMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -158,8 +172,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, null, commonValidationsMock));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, null, commonValidationsMock, exceptionBuilderMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -176,12 +191,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, null));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, null, exceptionBuilderMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("commonValidations"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the builder which can build exceptions is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenExceptionBuilderIsNull()
+        {
+            var systemDataRepositoryMock = MockRepository.GenerateMock<ISystemDataRepository>();
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("exceptionBuilder"));
             Assert.That(exception.InnerException, Is.Null);
         }
 
@@ -196,8 +231,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.ImportTranslation(null, MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>(), MockRepository.GenerateMock<ILogicExecutor>()));
@@ -219,8 +255,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.ImportTranslation(MockRepository.GenerateMock<ITranslatable>(), null, fixture.Create<string>(), MockRepository.GenerateMock<ILogicExecutor>()));
@@ -243,8 +280,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.ImportTranslation(MockRepository.GenerateMock<ITranslatable>(), MockRepository.GenerateMock<ITranslationInfo>(), invalidValue, MockRepository.GenerateMock<ILogicExecutor>()));
@@ -266,8 +304,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.ImportTranslation(MockRepository.GenerateMock<ITranslatable>(), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>(), null));
@@ -289,6 +328,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoIdentifier = Guid.NewGuid();
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
@@ -324,7 +364,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             commandHandler.ImportTranslation(domainObjectMock, translationInfoMock, translationValue, logicExecutorMock);
@@ -343,6 +383,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoIdentifier = Guid.NewGuid();
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
@@ -385,7 +426,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(translationIdentifier)
                 .Repeat.Any();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             commandHandler.ImportTranslation(domainObjectMock, translationInfoMock, translationValue, logicExecutorMock);
@@ -404,6 +445,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoIdentifier = Guid.NewGuid();
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
@@ -428,7 +470,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(translationIdentifier)
                 .Repeat.Any();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var translation = commandHandler.ImportTranslation(domainObjectMock, translationInfoMock, translationValue, logicExecutorMock);
@@ -457,6 +499,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoIdentifier = Guid.NewGuid();
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
@@ -492,7 +535,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             var translationValue = fixture.Create<string>();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             commandHandler.ImportTranslation(domainObjectMock, translationInfoMock, translationValue, logicExecutorMock);
@@ -511,6 +554,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoIdentifier = Guid.NewGuid();
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
@@ -544,7 +588,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(translationIdentifier)
                 .Repeat.Any();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             commandHandler.ImportTranslation(domainObjectMock, translationInfoMock, fixture.Create<string>(), logicExecutorMock);
@@ -563,6 +607,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoIdentifier = Guid.NewGuid();
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
@@ -596,7 +641,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(translationIdentifier)
                 .Repeat.Any();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             commandHandler.ImportTranslation(domainObjectMock, translationInfoMock, fixture.Create<string>(), logicExecutorMock);
@@ -615,6 +660,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoIdentifier = Guid.NewGuid();
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
@@ -648,7 +694,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
                 .Return(translationIdentifier)
                 .Repeat.Any();
 
-            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock);
+            var commandHandler = new MyFoodWasteSystemDataCommandHandler(systemDataRepositoryMock, foodWasteObjectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var translation = commandHandler.ImportTranslation(domainObjectMock, translationInfoMock, fixture.Create<string>(), logicExecutorMock);

@@ -23,6 +23,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         private readonly IKalenderRepository _kalenderRepository;
         private readonly IFællesRepository _fællesRepository;
         private readonly IObjectMapper _objectMapper;
+        private readonly IExceptionBuilder _exceptionBuilder;
 
         #endregion
 
@@ -34,7 +35,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <param name="kalenderRepository">Implementering af repository til kalenderdelen under OSWEBDB.</param>
         /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet, såsom systemer under OSWEBDB.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        protected KalenderCommandHandlerBase(IKalenderRepository kalenderRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
+        /// <param name="exceptionBuilder">Implementering af en builder, der kan bygge exceptions.</param>
+        protected KalenderCommandHandlerBase(IKalenderRepository kalenderRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper, IExceptionBuilder exceptionBuilder)
         {
             if (kalenderRepository == null)
             {
@@ -48,9 +50,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             {
                 throw new ArgumentNullException("objectMapper");
             }
+            if (exceptionBuilder == null)
+            {
+                throw new ArgumentNullException("exceptionBuilder");
+            }
             _kalenderRepository = kalenderRepository;
             _fællesRepository = fællesRepository;
             _objectMapper = objectMapper;
+            _exceptionBuilder = exceptionBuilder;
         }
 
         #endregion
@@ -90,6 +97,17 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             }
         }
 
+        /// <summary>
+        /// Builder, der kan bygge exceptions.
+        /// </summary>
+        public virtual IExceptionBuilder ExceptionBuilder
+        {
+            get
+            {
+                return _exceptionBuilder;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -124,13 +142,12 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 
             var comparer = new KalenderbrugerComparer();
             var brugerliste = KalenderRepository.BrugerGetAllBySystem(system.Nummer)
-                .Where(m => m.Initialer != null && m.Initialer.CompareTo(initialer) == 0)
+                .Where(m => m.Initialer != null && String.Compare(m.Initialer, initialer, StringComparison.Ordinal) == 0)
                 .OrderBy(m => m, comparer)
                 .ToList();
             if (brugerliste.Count == 0)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials, initialer));
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials, initialer));
             }
 
             return brugerliste;

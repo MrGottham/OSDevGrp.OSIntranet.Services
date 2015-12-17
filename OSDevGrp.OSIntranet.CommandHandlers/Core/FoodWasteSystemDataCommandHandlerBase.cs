@@ -21,6 +21,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         private readonly IFoodWasteObjectMapper _foodWasteObjectMapper;
         private readonly ISpecification _specification;
         private readonly ICommonValidations _commonValidations;
+        private readonly IExceptionBuilder _exceptionBuilder;
 
         #endregion
 
@@ -33,7 +34,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <param name="foodWasteObjectMapper">Implementation of an object mapper which can map objects in the food waste domain.</param>
         /// <param name="specification">Implementation of a specification which encapsulates validation rules.</param>
         /// <param name="commonValidations">Implementation of the common validations.</param>
-        protected FoodWasteSystemDataCommandHandlerBase(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations)
+        /// <param name="exceptionBuilder">Implementation of the builder which can build exceptions.</param>
+        protected FoodWasteSystemDataCommandHandlerBase(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IExceptionBuilder exceptionBuilder)
         {
             if (systemDataRepository == null)
             {
@@ -51,10 +53,15 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             {
                 throw new ArgumentNullException("commonValidations");
             }
+            if (exceptionBuilder == null)
+            {
+                throw new ArgumentNullException("exceptionBuilder");
+            }
             _systemDataRepository = systemDataRepository;
             _foodWasteObjectMapper = foodWasteObjectMapper;
             _specification = specification;
             _commonValidations = commonValidations;
+            _exceptionBuilder = exceptionBuilder;
         }
 
         #endregion
@@ -91,6 +98,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         protected virtual ICommonValidations CommonValidations
         {
             get { return _commonValidations; }
+        }
+
+        /// <summary>
+        /// Gets the builder which can build exceptions.
+        /// </summary>
+        protected virtual IExceptionBuilder ExceptionBuilder
+        {
+            get { return _exceptionBuilder; }
         }
 
         #endregion

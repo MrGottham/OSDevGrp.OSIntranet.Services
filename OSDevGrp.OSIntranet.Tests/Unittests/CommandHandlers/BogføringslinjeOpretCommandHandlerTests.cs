@@ -919,7 +919,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
             
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
-            exceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.Anything, Arg<MethodBase>.Is.Anything))
+            exceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.Anything, Arg<MethodBase>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var methodBase = (MethodBase) e.Arguments.ElementAt(1);
+                    Assert.That(methodBase, Is.Not.Null);
+                    Assert.That(methodBase.ReflectedType.Name, Is.EqualTo(typeof (BogføringslinjeOpretCommandHandler).Name));
+                })
                 .Return(fixture.Create<Exception>())
                 .Repeat.Any();
 

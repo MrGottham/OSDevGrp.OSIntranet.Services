@@ -21,6 +21,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 
         private readonly IAdresseRepository _adresseRepository;
         private readonly IObjectMapper _objectMapper;
+        private readonly IExceptionBuilder _exceptionBuilder;
 
         #endregion
 
@@ -31,7 +32,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// </summary>
         /// <param name="adresseRepository">Implementering af repository til adresser.</param>
         /// <param name="objectMapper">Implementering af objectmapper.</param>
-        protected AdressekartotekCommandHandlerBase(IAdresseRepository adresseRepository, IObjectMapper objectMapper)
+        /// <param name="exceptionBuilder">Implementering af en builder, der kan bygge exceptions.</param>
+        protected AdressekartotekCommandHandlerBase(IAdresseRepository adresseRepository, IObjectMapper objectMapper, IExceptionBuilder exceptionBuilder)
         {
             if (adresseRepository == null)
             {
@@ -41,8 +43,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             {
                 throw new ArgumentNullException("objectMapper");
             }
+            if (exceptionBuilder == null)
+            {
+                throw new ArgumentNullException("exceptionBuilder");
+            }
             _adresseRepository = adresseRepository;
             _objectMapper = objectMapper;
+            _exceptionBuilder = exceptionBuilder;
         }
 
         #endregion
@@ -68,6 +75,17 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             get
             {
                 return _objectMapper;
+            }
+        }
+
+        /// <summary>
+        /// Builder, der kan bygge exceptions.
+        /// </summary>
+        public virtual IExceptionBuilder ExceptionBuilder
+        {
+            get
+            {
+                return _exceptionBuilder;
             }
         }
 
@@ -161,8 +179,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             var postnumre = _adresseRepository.PostnummerGetAll();
             try
             {
-                return postnumre
-                    .Single(m => m.Landekode.CompareTo(landekode) == 0 && m.Postnr.CompareTo(postnummer) == 0);
+                return postnumre.Single(m => String.Compare(m.Landekode, landekode, StringComparison.Ordinal) == 0 && String.Compare(m.Postnr, postnummer, StringComparison.Ordinal) == 0);
             }
             catch (InvalidOperationException ex)
             {

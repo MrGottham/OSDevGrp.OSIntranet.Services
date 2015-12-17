@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using NUnit.Framework;
+using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
-using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
-using NUnit.Framework;
+using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -23,16 +24,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         /// </summary>
         private class MyKalenderCommandHandler : KalenderCommandHandlerBase
         {
+            #region Constructor
+
             /// <summary>
             /// Danner egen klasse til test af basisklasse for en CommandHandler til kalenderdelen under OSWEBDB.
             /// </summary>
             /// <param name="kalenderRepository">Implementering af repository til kalenderdelen under OSWEBDB.</param>
             /// <param name="fællesRepository">Implementering af repository til fælles elementer i domænet, såsom systemer under OSWEBDB.</param>
             /// <param name="objectMapper">Implementering af objectmapper.</param>
-            public MyKalenderCommandHandler(IKalenderRepository kalenderRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper)
-                : base(kalenderRepository, fællesRepository, objectMapper)
+            /// <param name="exceptionBuilder">Implementering af en builder, der kan bygge exceptions.</param>
+            public MyKalenderCommandHandler(IKalenderRepository kalenderRepository, IFællesRepository fællesRepository, IObjectMapper objectMapper, IExceptionBuilder exceptionBuilder)
+                : base(kalenderRepository, fællesRepository, objectMapper, exceptionBuilder)
             {
             }
+
+            #endregion
         }
 
         /// <summary>
@@ -41,16 +47,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorInitiererKalenderCommandHandlerBase()
         {
-            var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
             Assert.That(commandHandler.KalenderRepository, Is.Not.Null);
+            Assert.That(commandHandler.KalenderRepository, Is.EqualTo(kalenderRepositoryMock));
             Assert.That(commandHandler.FællesRepository, Is.Not.Null);
+            Assert.That(commandHandler.FællesRepository, Is.EqualTo(fællesRepositoryMock));
             Assert.That(commandHandler.ObjectMapper, Is.Not.Null);
+            Assert.That(commandHandler.ObjectMapper, Is.EqualTo(objectMapperMock));
+            Assert.That(commandHandler.ExceptionBuilder, Is.Not.Null);
+            Assert.That(commandHandler.ExceptionBuilder, Is.EqualTo(exceptionBuilderMock));
         }
 
         /// <summary>
@@ -59,16 +70,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisKalenderRepositoryErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject<IKalenderRepository>(null);
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                new MyKalenderCommandHandler(fixture.Create<IKalenderRepository>(),
-                                             fixture.Create<IFællesRepository>(),
-                                             fixture.Create<IObjectMapper>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyKalenderCommandHandler(null, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("kalenderRepository"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -77,16 +88,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFællesRepositoryErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject<IFællesRepository>(null);
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                new MyKalenderCommandHandler(fixture.Create<IKalenderRepository>(),
-                                             fixture.Create<IFællesRepository>(),
-                                             fixture.Create<IObjectMapper>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyKalenderCommandHandler(kalenderRepositoryMock, null, objectMapperMock, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("fællesRepository"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -95,16 +106,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisObjectMapperErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject<IObjectMapper>(null);
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                new MyKalenderCommandHandler(fixture.Create<IKalenderRepository>(),
-                                             fixture.Create<IFællesRepository>(),
-                                             fixture.Create<IObjectMapper>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, null, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("objectMapper"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tester, at konstruktøren kaster en ArgumentNullException, hvis builderen, der kan bygge exceptions, er null.
+        /// </summary>
+        [Test]
+        public void TestAtConstructorKasterArgumentNullExceptionHvisExceptionBuilderErNull()
+        {
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("exceptionBuilder"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -114,31 +143,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtSystemGetByNummerHenterSystem()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
-
-            fixture.Customize<ISystem>(e => e.FromFactory(() => MockRepository.GenerateMock<ISystem>()));
-            var systemer = fixture.CreateMany<ISystem>(4).ToList();
-            foreach (var system in systemer)
+            fixture.Customize<ISystem>(e => e.FromFactory(() =>
             {
-                system.Expect(m => m.Nummer)
+                var systemMock = MockRepository.GenerateMock<ISystem>();
+                systemMock.Stub(m => m.Nummer)
                     .Return(fixture.Create<int>())
                     .Repeat.Any();
-            }
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.SystemGetAll())
+                return systemMock;
+            }));
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var systemer = fixture.CreateMany<ISystem>(4).ToList();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.SystemGetAll())
                 .Return(systemer)
                 .Repeat.Any();
-            fixture.Inject(fællesRepository);
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
             var result = commandHandler.SystemGetByNummer(systemer.ElementAt(1).Nummer);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Nummer, Is.EqualTo(systemer.ElementAt(1).Nummer));
 
-            fællesRepository.AssertWasCalled(m => m.SystemGetAll());
+            fællesRepositoryMock.AssertWasCalled(m => m.SystemGetAll());
         }
 
         /// <summary>
@@ -148,30 +178,37 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtSystemGetByNummerKasterIntranetRepositoryExceptionHvisSystemIkkeFindes()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
-
-            fixture.Customize<ISystem>(e => e.FromFactory(() => MockRepository.GenerateMock<ISystem>()));
-            var systemer = fixture.CreateMany<ISystem>(4).ToList();
-            foreach (var system in systemer)
+            fixture.Customize<ISystem>(e => e.FromFactory(() =>
             {
-                system.Expect(m => m.Nummer)
+                var systemMock = MockRepository.GenerateMock<ISystem>();
+                systemMock.Stub(m => m.Nummer)
                     .Return(fixture.Create<int>())
                     .Repeat.Any();
-            }
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            fællesRepository.Expect(m => m.SystemGetAll())
+                return systemMock;
+            }));
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var systemer = fixture.CreateMany<ISystem>(4).ToList();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            fællesRepositoryMock.Expect(m => m.SystemGetAll())
                 .Return(systemer)
                 .Repeat.Any();
-            fixture.Inject(fællesRepository);
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<IntranetRepositoryException>(
-                () => commandHandler.SystemGetByNummer(fixture.Create<int>()));
+            var systemNummer = fixture.Create<int>();
+            var exception = Assert.Throws<IntranetRepositoryException>(() => commandHandler.SystemGetByNummer(systemNummer));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (ISystem).Name, systemNummer)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
 
-            fællesRepository.AssertWasCalled(m => m.SystemGetAll());
+            fællesRepositoryMock.AssertWasCalled(m => m.SystemGetAll());
         }
 
         /// <summary>
@@ -181,18 +218,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtBrugerlisteGetBySystemAndInitialerKasterArgumentNullExceptionHvisSystemErNull()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            fixture.Inject<ISystem>(null);
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
-                                                                  fixture.Create<string>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.BrugerlisteGetBySystemAndInitialer(null, fixture.Create<string>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("system"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -201,20 +240,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtBrugerlisteGetBySystemAndInitialerKasterArgumentNullExceptionHvisInitialerErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            fixture.Inject(MockRepository.GenerateMock<ISystem>());
-            fixture.Inject<string>(null);
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
-                                                                  fixture.Create<string>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.BrugerlisteGetBySystemAndInitialer(MockRepository.GenerateMock<ISystem>(), null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("initialer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -223,20 +262,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         [Test]
         public void TestAtBrugerlisteGetBySystemAndInitialerKasterArgumentNullExceptionHvisInitialerErEmpty()
         {
-            var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IKalenderRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            fixture.Inject(MockRepository.GenerateMock<ISystem>());
-            fixture.Inject(string.Empty);
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
-                                                                  fixture.Create<string>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => commandHandler.BrugerlisteGetBySystemAndInitialer(MockRepository.GenerateMock<ISystem>(), string.Empty));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("initialer"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -246,37 +285,37 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtBrugerlisteGetBySystemAndInitialerHenterBrugerlister()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
-
-            var system = MockRepository.GenerateMock<ISystem>();
-            system.Expect(m => m.Nummer)
-                .Return(fixture.Create<int>())
-                .Repeat.Any();
-            fixture.Inject(system);
-
-            fixture.Customize<IBruger>(e => e.FromFactory(() => MockRepository.GenerateMock<IBruger>()));
-            var brugere = fixture.CreateMany<IBruger>(7).ToList();
-            foreach (var bruger in brugere)
+            fixture.Customize<IBruger>(e => e.FromFactory(() =>
             {
-                bruger.Expect(m => m.Initialer)
+                var brugerMock = MockRepository.GenerateMock<IBruger>();
+                brugerMock.Stub(m => m.Initialer)
                     .Return(fixture.Create<string>())
                     .Repeat.Any();
-            }
-            var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
-            kalenderRepository.Expect(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(system.Nummer)))
-                .Return(brugere);
-            fixture.Inject(kalenderRepository);
+                return brugerMock;
+            }));
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var systemMock = MockRepository.GenerateMock<ISystem>();
+            systemMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var brugere = fixture.CreateMany<IBruger>(7).ToList();
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            kalenderRepositoryMock.Stub(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(systemMock.Nummer)))
+                .Return(brugere)
+                .Repeat.Any();
+
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            var brugerliste = commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
-                                                                                brugere.ElementAt(1).Initialer);
+            var brugerliste = commandHandler.BrugerlisteGetBySystemAndInitialer(systemMock, brugere.ElementAt(1).Initialer);
             Assert.That(brugerliste, Is.Not.Null);
             Assert.That(brugerliste.Count(), Is.EqualTo(1));
 
-            kalenderRepository.AssertWasCalled(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(system.Nummer)));
+            kalenderRepositoryMock.AssertWasCalled(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(systemMock.Nummer)));
         }
 
         /// <summary>
@@ -286,37 +325,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         public void TestAtBrugerlisteGetBySystemAndInitialerKasterIntranetRepositoryExceptionHvisInitialerIkkeFindes()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IFællesRepository>());
-            fixture.Inject(MockRepository.GenerateMock<IObjectMapper>());
-
-            var system = MockRepository.GenerateMock<ISystem>();
-            system.Expect(m => m.Nummer)
-                .Return(fixture.Create<int>())
-                .Repeat.Any();
-            fixture.Inject(system);
-
-            fixture.Customize<IBruger>(e => e.FromFactory(() => MockRepository.GenerateMock<IBruger>()));
-            var brugere = fixture.CreateMany<IBruger>(7).ToList();
-            foreach (var bruger in brugere)
+            fixture.Customize<IBruger>(e => e.FromFactory(() =>
             {
-                bruger.Expect(m => m.Initialer)
+                var brugerMock = MockRepository.GenerateMock<IBruger>();
+                brugerMock.Stub(m => m.Initialer)
                     .Return(fixture.Create<string>())
                     .Repeat.Any();
-            }
-            var kalenderRepository = MockRepository.GenerateMock<IKalenderRepository>();
-            kalenderRepository.Expect(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(system.Nummer)))
-                .Return(brugere);
-            fixture.Inject(kalenderRepository);
+                return brugerMock;
+            }));
+            var fællesRepositoryMock = MockRepository.GenerateMock<IFællesRepository>();
+            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var commandHandler = fixture.Create<MyKalenderCommandHandler>();
+            var systemMock = MockRepository.GenerateMock<ISystem>();
+            systemMock.Stub(m => m.Nummer)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            var brugere = fixture.CreateMany<IBruger>(7).ToList();
+            var kalenderRepositoryMock = MockRepository.GenerateMock<IKalenderRepository>();
+            kalenderRepositoryMock.Stub(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(systemMock.Nummer)))
+                .Return(brugere)
+                .Repeat.Any();
+
+            var commandHandler = new MyKalenderCommandHandler(kalenderRepositoryMock, fællesRepositoryMock, objectMapperMock, exceptionBuilderMock);
             Assert.That(commandHandler, Is.Not.Null);
 
-            Assert.Throws<IntranetRepositoryException>(
-                () =>
-                commandHandler.BrugerlisteGetBySystemAndInitialer(fixture.Create<ISystem>(),
-                                                                  fixture.Create<string>()));
+            var initialer = fixture.Create<string>();
+            var exception = Assert.Throws<IntranetRepositoryException>(() => commandHandler.BrugerlisteGetBySystemAndInitialer(systemMock, initialer));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials, initialer)));
+            Assert.That(exception.InnerException, Is.Null);
 
-            kalenderRepository.AssertWasCalled(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(system.Nummer)));
+            kalenderRepositoryMock.AssertWasCalled(m => m.BrugerGetAllBySystem(Arg<int>.Is.Equal(systemMock.Nummer)));
         }
     }
 }

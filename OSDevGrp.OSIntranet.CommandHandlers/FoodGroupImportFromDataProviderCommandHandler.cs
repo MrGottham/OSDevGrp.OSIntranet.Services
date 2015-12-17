@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
@@ -34,9 +35,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="foodWasteObjectMapper">Implementation of an object mapper which can map objects in the food waste domain.</param>
         /// <param name="specification">Implementation of a specification which encapsulates validation rules.</param>
         /// <param name="commonValidations">Implementation of the common validations.</param>
+        /// <param name="exceptionBuilder">Implementation of the builder which can build exceptions.</param>
         /// <param name="logicExecutor">Implementation of the logic executor which can execute basic logic.</param>
-        public FoodGroupImportFromDataProviderCommandHandler(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, ILogicExecutor logicExecutor)
-            : base(systemDataRepository, foodWasteObjectMapper, specification, commonValidations)
+        public FoodGroupImportFromDataProviderCommandHandler(ISystemDataRepository systemDataRepository, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IExceptionBuilder exceptionBuilder, ILogicExecutor logicExecutor)
+            : base(systemDataRepository, foodWasteObjectMapper, specification, commonValidations, exceptionBuilder)
         {
             if (logicExecutor == null)
             {
@@ -111,19 +113,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="exception">Exception.</param>
         public virtual void HandleException(FoodGroupImportFromDataProviderCommand command, Exception exception)
         {
-            if (command == null)
-            {
-                throw new ArgumentNullException("command");
-            }
-            if (exception == null)
-            {
-                throw new ArgumentNullException("exception");
-            }
-            if (exception.GetType() == typeof (IntranetRepositoryException) || exception.GetType() == typeof (IntranetBusinessException) || exception.GetType() == typeof (IntranetSystemException))
-            {
-                throw exception;
-            }
-            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, command.GetType().Name, typeof (ServiceReceiptResponse).Name, exception.Message), exception);
+            throw ExceptionBuilder.Build(exception, MethodBase.GetCurrentMethod());
         }
 
         #endregion
