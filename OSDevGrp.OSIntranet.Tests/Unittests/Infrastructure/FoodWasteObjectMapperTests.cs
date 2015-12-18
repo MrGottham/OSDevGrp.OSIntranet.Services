@@ -282,6 +282,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));
             Assert.That(householdMemberProxy.IsActivated, Is.EqualTo(householdMemberMock.IsActivated));
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
+            Assert.That(householdMemberProxy.Households, Is.Not.Null);
+            Assert.That(householdMemberProxy.Households, Is.Empty); // TODO: Modify this when HouseholdProxy has been implemented.
         }
 
         /// <summary>

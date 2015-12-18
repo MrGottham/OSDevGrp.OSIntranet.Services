@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -82,6 +84,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 set { base.CreationTime = value; }
             }
 
+            /// <summary>
+            /// Households on which the household member has a membership.
+            /// </summary>
+            public new IEnumerable<IHousehold> Households
+            {
+                get { return base.Households; }
+                set { base.Households = value; }
+            }
+
             #endregion
         }
 
@@ -107,6 +118,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.ActivationTime.HasValue, Is.False);
             Assert.That(householdMember.IsActivated, Is.False);
             Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
         }
 
         /// <summary>
@@ -289,7 +302,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestThatActivationCodeSetterThrowsArgumentNullExceptionWheActivationCodeIsInValid(string invalidActivationCode)
+        public void TestThatActivationCodeSetterThrowsArgumentNullExceptionWhenActivationCodeIsInValid(string invalidActivationCode)
         {
             var householdMember = new MyHouseholdMember();
             Assert.That(householdMember, Is.Not.Null);
@@ -466,6 +479,106 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var newCreationTime = DateTime.Today.AddDays(random.Next(1, 365)*-1);
             householdMember.CreationTime = newCreationTime;
             Assert.That(householdMember.CreationTime, Is.EqualTo(newCreationTime));
+        }
+
+        /// <summary>
+        /// Tests that the setter for Households throws ArgumentNullException when value is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdsSetterThrowsArgumentNullExceptionWhenValueIsNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMember.Households = null);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the setter for Households sets the households on which the household member has a membership.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdsSetterSetsHouseholds()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            var householdMockCollection = new List<IHousehold>
+            {
+                MockRepository.GenerateMock<IHousehold>(),
+                MockRepository.GenerateMock<IHousehold>(),
+                MockRepository.GenerateMock<IHousehold>()
+            };
+            householdMember.Households = householdMockCollection;
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households, Is.EqualTo(householdMockCollection));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdAdd throws ArgumentNullException when the household is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddThrowsArgumentNullExceptionWhenHouseholdIsNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMember.HouseholdAdd(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("household"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdAdd adds a household to the household member.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddAddsHousehold()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            var householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMember.HouseholdAdd(householdMock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(1));
+            Assert.That(householdMember.Households.Contains(householdMock), Is.EqualTo(true));
         }
     }
 }

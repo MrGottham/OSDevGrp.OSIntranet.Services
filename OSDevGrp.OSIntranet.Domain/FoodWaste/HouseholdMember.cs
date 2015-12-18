@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -17,6 +19,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         private string _mailAddress;
         private string _activationCode;
         private DateTime _creationTime;
+        private IList<IHousehold> _households = new List<IHousehold>(0);
         private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
@@ -143,6 +146,42 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             get { return _creationTime; }
             protected set { _creationTime = value; }
+        }
+
+        /// <summary>
+        /// Households on which the household member has a membership.
+        /// </summary>
+        public virtual IEnumerable<IHousehold> Households
+        {
+            get
+            {
+                return _households;
+            }
+            protected set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _households = value.ToList();
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Adds a household to the household member
+        /// </summary>
+        /// <param name="household">Household on which the household member has a membership.</param>
+        public virtual void HouseholdAdd(IHousehold household)
+        {
+            if (household == null)
+            {
+                throw new ArgumentNullException("household");
+            }
+            _households.Add(household);
         }
 
         /// <summary>

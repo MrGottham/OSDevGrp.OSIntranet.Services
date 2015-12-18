@@ -16,6 +16,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
     public static class DomainObjectMockBuilder
     {
         /// <summary>
+        /// Build a mockup for a household.
+        /// </summary>
+        /// <returns>Mockup for a household.</returns>
+        public static IHousehold BuildHouseholdMock()
+        {
+            var householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            return householdMock;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some households.
+        /// </summary>
+        /// <returns>Collection of mockups for some households.</returns>
+        public static IEnumerable<IHousehold> BuildHouseholdMockCollection()
+        {
+            return new List<IHousehold>
+            {
+                BuildHouseholdMock(),
+                BuildHouseholdMock(),
+                BuildHouseholdMock()
+            };
+        }
+
+        /// <summary>
         /// Build a mockup for a household member.
         /// </summary>
         /// <returns>Mockup for a household member.</returns>
@@ -42,6 +69,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.CreationTime)
                 .Return(DateTime.Today)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.Households)
+                .Return(BuildHouseholdMockCollection())
                 .Repeat.Any();
             return householdMemberMock;
         }

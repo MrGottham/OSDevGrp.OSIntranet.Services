@@ -39,6 +39,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         Identifier = m.Identifier,
                         ActivationTime = m.ActivationTime,
                     };
+                    foreach (var household in m.Households)
+                    {
+                        // TODO: Convert household to proxy and add (modify the test).
+                    }
                     return householdMemberProxy;
                 });
 

@@ -35,6 +35,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy.ActivationTime.HasValue, Is.False);
             Assert.That(householdMemberProxy.IsActivated, Is.False);
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
+            Assert.That(householdMemberProxy.Households, Is.Not.Null);
+            Assert.That(householdMemberProxy.Households, Is.Empty);
         }
 
         /// <summary>
@@ -292,6 +294,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy, Is.Not.Null);
             Assert.That(householdMemberProxy.Identifier, Is.Null);
             Assert.That(householdMemberProxy.Identifier.HasValue, Is.False);
+            Assert.That(householdMemberProxy.MailAddress, Is.Null);
+            Assert.That(householdMemberProxy.ActivationCode, Is.Null);
+            Assert.That(householdMemberProxy.ActivationTime, Is.Null);
+            Assert.That(householdMemberProxy.ActivationTime.HasValue, Is.False);
+            Assert.That(householdMemberProxy.IsActivated, Is.False);
+            Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
+            Assert.That(householdMemberProxy.Households, Is.Not.Null);
+            Assert.That(householdMemberProxy.Households, Is.Empty);
 
             householdMemberProxy.MapData(dataReader, dataProviderBaseMock);
             householdMemberProxy.MapRelations(dataProviderBaseMock);
@@ -321,6 +331,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 Assert.That(householdMemberProxy.ActivationTime.HasValue, Is.False);
             }
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(householdMemberProxy.Households, Is.Not.Null);
+            Assert.That(householdMemberProxy.Households, Is.Empty);
         }
 
         /// <summary>
