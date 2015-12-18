@@ -226,4 +226,7 @@
     <value>Værdien i egenskaben med navnet '{0}' indeholder ulovlige tegn.</value>
     <comment>{0} = Navn på egenskab.</comment>
   </data>
+  <data name="HouseholdLimitHasBeenReached" xml:space="preserve">
+    <value>Grænsen for antallet af husholdninger til husstandsmedlemmet er nået.</value>
+  </data>
 </root>

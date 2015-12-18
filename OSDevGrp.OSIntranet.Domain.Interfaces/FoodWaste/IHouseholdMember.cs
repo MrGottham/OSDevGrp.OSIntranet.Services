@@ -60,6 +60,12 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         IEnumerable<IHousehold> Households { get; }
 
         /// <summary>
+        /// Applies a new membership to the household member.
+        /// </summary>
+        /// <param name="membership">Membership which should be applied to the household member.</param>
+        void MembershipApply(Membership membership);
+
+        /// <summary>
         /// Adds a household to the household member
         /// </summary>
         /// <param name="household">Household on which the household member has a membership.</param>

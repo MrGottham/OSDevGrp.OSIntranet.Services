@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -222,6 +223,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 {
                     throw new ArgumentNullException("value");
                 }
+                if (value.Count() > _domainObjectValidations.GetHouseholdLimit(Membership))
+                {
+                    throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached));
+                }
                 _households = value.ToList();
             }
         }
@@ -229,6 +234,30 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Applies a new membership to the household member.
+        /// </summary>
+        /// <param name="membership">Membership which should be applied to the household member.</param>
+        public virtual void MembershipApply(Membership membership)
+        {
+            switch (membership)
+            {
+                case Membership.Basic:
+                    Membership = membership;
+                    MembershipExpireTime = null;
+                    break;
+
+                case Membership.Deluxe:
+                case Membership.Premium:
+                    Membership = membership;
+                    MembershipExpireTime = DateTime.Now.AddYears(1);
+                    break;
+
+                default:
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, membership, "membership", MethodBase.GetCurrentMethod().Name));
+            }
+        }
 
         /// <summary>
         /// Adds a household to the household member
@@ -239,6 +268,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             if (household == null)
             {
                 throw new ArgumentNullException("household");
+            }
+            if (_domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count()))
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached));
             }
             _households.Add(household);
         }

@@ -226,4 +226,7 @@
     <value>The value for the property named '{0}' contains illegal chars.</value>
     <comment>{0} = Name of property.</comment>
   </data>
+  <data name="HouseholdLimitHasBeenReached" xml:space="preserve">
+    <value>The household limit for the household member has been reached.</value>
+  </data>
 </root>

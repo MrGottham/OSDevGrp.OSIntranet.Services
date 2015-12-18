@@ -184,7 +184,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the constructor calls IsMailAddress on common validations used by domain objects in the food waste domain.
+        /// Tests that the constructor calls IsMailAddress on the common validations used by domain objects in the food waste domain.
         /// </summary>
         [Test]
         public void TestThatConstructorCallsIsMailAddressOnDomainObjectValidations()
@@ -249,7 +249,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the setter for MailAddress calls IsMailAddress on common validations used by domain objects in the food waste domain.
+        /// Tests that the setter for MailAddress calls IsMailAddress on the common validations used by domain objects in the food waste domain.
         /// </summary>
         [Test]
         public void TestThatMailAddressSetterCallsIsMailAddressOnDomainObjectValidations()
@@ -855,6 +855,55 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that the setter for Households calls GetHouseholdLimit on the common validations used by domain object in the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdsSetterCallsGetHouseholdLimitOnDomainObjectValidations()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.GetHouseholdLimit(Arg<Membership>.Is.Anything))
+                .Return(0)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            householdMember.Households = new List<IHousehold>(0);
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.GetHouseholdLimit(Arg<Membership>.Is.Equal(householdMember.Membership)));
+        }
+
+        /// <summary>
+        /// Tests that the setter for Households throws an IntranetBusinessException when the collection of households contains more households than the limit of households.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdsSetterThrowsIntranetBusinessExceptionWhenHouseholdCollectionContainsMoreHouseholdsThanHouseholdLimit()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.GetHouseholdLimit(Arg<Membership>.Is.Anything))
+                .Return(0)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetBusinessException>(() => householdMember.Households = new List<IHousehold> {MockRepository.GenerateMock<IHousehold>()});
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
         /// Tests that the setter for Households sets the households on which the household member has a membership.
         /// </summary>
         [Test]
@@ -864,6 +913,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
                 .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.GetHouseholdLimit(Arg<Membership>.Is.Anything))
+                .Return(3)
                 .Repeat.Any();
 
             var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
@@ -881,6 +933,90 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.Households, Is.Not.Null);
             Assert.That(householdMember.Households, Is.Not.Empty);
             Assert.That(householdMember.Households, Is.EqualTo(householdMockCollection));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdApply applies the basic membership.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdApplyAppliesBasicMembership()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Deluxe));
+            Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
+            // ReSharper restore PossibleInvalidOperationException
+
+            householdMember.MembershipApply(Membership.Basic);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+            Assert.That(householdMember.MembershipExpireTime, Is.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdApply applies the deluxe membership.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdApplyAppliesDeluxeMembership()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+            Assert.That(householdMember.MembershipExpireTime, Is.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+
+            householdMember.MembershipApply(Membership.Deluxe);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Deluxe));
+            Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
+            // ReSharper restore PossibleInvalidOperationException
+        }
+
+        /// <summary>
+        /// Tests that HouseholdApply applies the premium membership.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdApplyAppliesPremiumMembership()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+            Assert.That(householdMember.MembershipExpireTime, Is.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+
+            householdMember.MembershipApply(Membership.Premium);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Premium));
+            Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
+            // ReSharper restore PossibleInvalidOperationException
         }
 
         /// <summary>
@@ -907,6 +1043,55 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that HouseholdAdd calls HasReachedHouseholdLimit on the common validations used by domain object in the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddCallsHasReachedHouseholdLimitOnDomainObjectValidations()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            householdMember.HouseholdAdd(MockRepository.GenerateMock<IHousehold>());
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Equal(householdMember.Membership), Arg<int>.Is.Equal(householdMember.Households.Count() - 1)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdAdd  throws an IntranetBusinessException when the limit of households has been reached.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddThrowsIntranetBusinessExceptionWhenHouseholdLimitHasBeenReached()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetBusinessException>(() => householdMember.HouseholdAdd(MockRepository.GenerateMock<IHousehold>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
         /// Tests that HouseholdAdd adds a household to the household member.
         /// </summary>
         [Test]
@@ -916,6 +1101,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
                 .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
                 .Repeat.Any();
 
             var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);

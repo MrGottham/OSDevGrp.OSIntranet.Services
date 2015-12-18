@@ -35,6 +35,7 @@
         UserNameAndPasswordCouldNotBeValidated,
         IdentifierUnknownToSystem,
         ValueMustBeGivenForProperty,
-        ValueForPropertyContainsIllegalChars
+        ValueForPropertyContainsIllegalChars,
+        HouseholdLimitHasBeenReached
     }
 }
