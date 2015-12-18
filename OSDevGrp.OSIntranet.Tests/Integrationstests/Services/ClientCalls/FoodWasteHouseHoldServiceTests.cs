@@ -39,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             {
                 return;
             }
-            _channelFactory.Credentials.UserName.UserName = "ole.sorensen@osdevgrp.dk";
+            _channelFactory.Credentials.UserName.UserName = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower());
         }
 
         /// <summary>
