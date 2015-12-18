@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
 
@@ -17,6 +18,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Private variables
 
         private string _mailAddress;
+        private Membership _membership;
+        private DateTime? _membershipExpireTime;
         private string _activationCode;
         private DateTime _creationTime;
         private IList<IHousehold> _households = new List<IHousehold>(0);
@@ -32,7 +35,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="mailAddress">Mail address for the household member.</param>
         /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
         public HouseholdMember(string mailAddress, IDomainObjectValidations domainObjectValidations = null) 
-            : this(mailAddress, GenerateActivationCode(), DateTime.Now, domainObjectValidations)
+            : this(mailAddress, Membership.Basic, null, GenerateActivationCode(), DateTime.Now, domainObjectValidations)
         {
         }
 
@@ -48,10 +51,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// Creates a household member.
         /// </summary>
         /// <param name="mailAddress">Mail address for the household member.</param>
+        /// <param name="membership">Membership.</param>
+        /// <param name="membershipExpireTime">Date and time for when the membership expires.</param>
         /// <param name="activationCode">Activation code for the household member.</param>
         /// <param name="creationTime">Date and time for when the household member was created.</param>
         /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
-        protected HouseholdMember(string mailAddress, string activationCode, DateTime creationTime, IDomainObjectValidations domainObjectValidations = null)
+        protected HouseholdMember(string mailAddress, Membership membership, DateTime? membershipExpireTime, string activationCode, DateTime creationTime, IDomainObjectValidations domainObjectValidations = null)
         {
             if (string.IsNullOrEmpty(mailAddress))
             {
@@ -69,6 +74,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             }
             _mailAddress = mailAddress;
 
+            _membership = membership;
+            _membershipExpireTime = membershipExpireTime;
             _activationCode = activationCode;
             _creationTime = creationTime;
         }
@@ -98,6 +105,38 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 }
                 _mailAddress = value;
             }
+        }
+
+        /// <summary>
+        /// Membership.
+        /// </summary>
+        public virtual Membership Membership
+        {
+            get
+            {
+                if (MembershipExpireTime.HasValue == false || MembershipExpireTime.Value < DateTime.Now)
+                {
+                    return Membership.Basic;
+                }
+                return _membership;
+            }
+            protected set
+            {
+                _membership = value;
+                if (_membership == Membership.Basic)
+                {
+                    MembershipExpireTime = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Date and time for when the membership expires.
+        /// </summary>
+        public virtual DateTime? MembershipExpireTime
+        {
+            get { return _membershipExpireTime; }
+            protected set { _membershipExpireTime = value; }
         }
 
         /// <summary>
@@ -136,6 +175,26 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             get
             {
                 return ActivationTime.HasValue && ActivationTime.Value <= DateTime.Now;
+            }
+        }
+
+        /// <summary>
+        /// Date and time for when the household member has accepted our privacy policy.
+        /// </summary>
+        public virtual DateTime? PrivacyPolicyAcceptedTime
+        {
+            get; 
+            set;
+        }
+
+        /// <summary>
+        /// Indicates whether the household member has accepted our privacy policy.
+        /// </summary>
+        public virtual bool IsPrivacyPolictyAccepted
+        {
+            get
+            {
+                return PrivacyPolicyAcceptedTime.HasValue && PrivacyPolicyAcceptedTime.Value <= DateTime.Now;
             }
         }
 

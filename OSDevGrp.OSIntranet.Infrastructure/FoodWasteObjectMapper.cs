@@ -34,10 +34,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     {
                         return (IHouseholdMemberProxy) m;
                     }
-                    var householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.ActivationCode, m.CreationTime)
+                    var householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.Membership, m.MembershipExpireTime, m.ActivationCode, m.CreationTime)
                     {
                         Identifier = m.Identifier,
                         ActivationTime = m.ActivationTime,
+                        PrivacyPolicyAcceptedTime = m.PrivacyPolicyAcceptedTime
                     };
                     foreach (var household in m.Households)
                     {

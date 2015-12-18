@@ -2,7 +2,9 @@
 using System.Data;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
@@ -30,10 +32,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy.Identifier, Is.Null);
             Assert.That(householdMemberProxy.Identifier.HasValue, Is.False);
             Assert.That(householdMemberProxy.MailAddress, Is.Null);
+            Assert.That(householdMemberProxy.Membership, Is.EqualTo(Membership.Basic));
+            Assert.That(householdMemberProxy.MembershipExpireTime, Is.Null);
+            Assert.That(householdMemberProxy.MembershipExpireTime.HasValue, Is.False);
             Assert.That(householdMemberProxy.ActivationCode, Is.Null);
             Assert.That(householdMemberProxy.ActivationTime, Is.Null);
             Assert.That(householdMemberProxy.ActivationTime.HasValue, Is.False);
             Assert.That(householdMemberProxy.IsActivated, Is.False);
+            Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime, Is.Null);
+            Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime.HasValue, Is.False);
+            Assert.That(householdMemberProxy.IsPrivacyPolictyAccepted, Is.False);
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Empty);
@@ -137,7 +145,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlQueryForId, Is.Not.Null);
             Assert.That(sqlQueryForId, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,ActivationCode,ActivationTime,CreationTime FROM HouseholdMembers WHERE HouseholdMemberIdentifier='{0}'", householdMemberMock.Identifier.Value.ToString("D").ToUpper())));
+            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE HouseholdMemberIdentifier='{0}'", householdMemberMock.Identifier.Value.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -145,46 +153,82 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a household member.
         /// </summary>
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(bool hasActivationTime)
+        [TestCase(Membership.Basic, true, true, true)]
+        [TestCase(Membership.Basic, true, true, false)]
+        [TestCase(Membership.Basic, true, false, true)]
+        [TestCase(Membership.Basic, true, false, false)]
+        [TestCase(Membership.Basic, false, true, true)]
+        [TestCase(Membership.Basic, false, true, false)]
+        [TestCase(Membership.Basic, false, false, true)]
+        [TestCase(Membership.Basic, false, false, false)]
+        [TestCase(Membership.Deluxe, true, true, true)]
+        [TestCase(Membership.Deluxe, true, true, false)]
+        [TestCase(Membership.Deluxe, true, false, true)]
+        [TestCase(Membership.Deluxe, true, false, false)]
+        [TestCase(Membership.Premium, true, true, true)]
+        [TestCase(Membership.Premium, true, true, false)]
+        [TestCase(Membership.Premium, true, false, true)]
+        [TestCase(Membership.Premium, true, false, false)]
+        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(Membership membership, bool hasMembershipExpireTime, bool hasActivationTime, bool hasPrivacyPolicyAcceptedTime)
         {
             var identifier = Guid.NewGuid();
             var mailAddress = string.Format("test.{0}@osdevgrp.dk", identifier.ToString("D").ToLower());
+            var activationCode = (new HouseholdMember(mailAddress)).ActivationCode;
+            var membershipExpireTime = hasMembershipExpireTime ? DateTime.Now.AddYears(1) : (DateTime?) null;
             var activationTime = hasActivationTime ? DateTime.Now : (DateTime?) null;
-            var householdMemberProxy = new HouseholdMemberProxy(mailAddress)
+            var privacyPolicyAcceptedTime = hasPrivacyPolicyAcceptedTime ? DateTime.Now : (DateTime?) null;
+            var householdMemberProxy = new HouseholdMemberProxy(mailAddress, membership, membershipExpireTime, activationCode, DateTime.Now)
             {
                 Identifier = identifier,
                 ActivationTime = activationTime,
+                PrivacyPolicyAcceptedTime = privacyPolicyAcceptedTime,
             };
 
             var sqlCommand = householdMemberProxy.GetSqlCommandForInsert();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO HouseholdMembers (HouseholdMemberIdentifier,MailAddress,ActivationCode,ActivationTime,CreationTime) VALUES('{0}','{1}','{2}',{3},{4})", householdMemberProxy.UniqueId, mailAddress, householdMemberProxy.ActivationCode, DataRepositoryHelper.GetSqlValueForDateTime(activationTime.HasValue ? activationTime.Value.ToUniversalTime() : (DateTime?) null), DataRepositoryHelper.GetSqlValueForDateTime(householdMemberProxy.CreationTime.ToUniversalTime()))));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO HouseholdMembers (HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime) VALUES('{0}','{1}',{2},{3},'{4}',{5},{6},{7})", householdMemberProxy.UniqueId, mailAddress, (int) membership, DataRepositoryHelper.GetSqlValueForDateTime(membershipExpireTime), activationCode, DataRepositoryHelper.GetSqlValueForDateTime(activationTime), DataRepositoryHelper.GetSqlValueForDateTime(privacyPolicyAcceptedTime), DataRepositoryHelper.GetSqlValueForDateTime(householdMemberProxy.CreationTime))));
         }
 
         /// <summary>
         /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a household member.
         /// </summary>
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(bool hasActivationTime)
+        [TestCase(Membership.Basic, true, true, true)]
+        [TestCase(Membership.Basic, true, true, false)]
+        [TestCase(Membership.Basic, true, false, true)]
+        [TestCase(Membership.Basic, true, false, false)]
+        [TestCase(Membership.Basic, false, true, true)]
+        [TestCase(Membership.Basic, false, true, false)]
+        [TestCase(Membership.Basic, false, false, true)]
+        [TestCase(Membership.Basic, false, false, false)]
+        [TestCase(Membership.Deluxe, true, true, true)]
+        [TestCase(Membership.Deluxe, true, true, false)]
+        [TestCase(Membership.Deluxe, true, false, true)]
+        [TestCase(Membership.Deluxe, true, false, false)]
+        [TestCase(Membership.Premium, true, true, true)]
+        [TestCase(Membership.Premium, true, true, false)]
+        [TestCase(Membership.Premium, true, false, true)]
+        [TestCase(Membership.Premium, true, false, false)]
+        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(Membership membership, bool hasMembershipExpireTime, bool hasActivationTime, bool hasPrivacyPolicyAcceptedTime)
         {
             var identifier = Guid.NewGuid();
             var mailAddress = string.Format("test.{0}@osdevgrp.dk", identifier.ToString("D").ToLower());
+            var activationCode = (new HouseholdMember(mailAddress)).ActivationCode;
+            var membershipExpireTime = hasMembershipExpireTime ? DateTime.Now.AddYears(1) : (DateTime?) null;
             var activationTime = hasActivationTime ? DateTime.Now : (DateTime?) null;
-            var householdMemberProxy = new HouseholdMemberProxy(mailAddress)
+            var privacyPolicyAcceptedTime = hasPrivacyPolicyAcceptedTime ? DateTime.Now : (DateTime?) null;
+            var householdMemberProxy = new HouseholdMemberProxy(mailAddress, membership, membershipExpireTime, activationCode, DateTime.Now)
             {
                 Identifier = identifier,
                 ActivationTime = activationTime,
+                PrivacyPolicyAcceptedTime = privacyPolicyAcceptedTime,
             };
 
             var sqlCommand = householdMemberProxy.GetSqlCommandForUpdate();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE HouseholdMembers SET MailAddress='{1}',ActivationCode='{2}',ActivationTime={3},CreationTime={4} WHERE HouseholdMemberIdentifier='{0}'", householdMemberProxy.UniqueId, mailAddress, householdMemberProxy.ActivationCode, DataRepositoryHelper.GetSqlValueForDateTime(activationTime.HasValue ? activationTime.Value.ToUniversalTime() : (DateTime?) null), DataRepositoryHelper.GetSqlValueForDateTime(householdMemberProxy.CreationTime.ToUniversalTime()))));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE HouseholdMembers SET MailAddress='{1}',Membership={2},MembershipExpireTime={3},ActivationCode='{4}',ActivationTime={5},PrivacyPolicyAcceptedTime={6},CreationTime={7} WHERE HouseholdMemberIdentifier='{0}'", householdMemberProxy.UniqueId, mailAddress, (int) membership, DataRepositoryHelper.GetSqlValueForDateTime(membershipExpireTime), activationCode, DataRepositoryHelper.GetSqlValueForDateTime(activationTime), DataRepositoryHelper.GetSqlValueForDateTime(privacyPolicyAcceptedTime), DataRepositoryHelper.GetSqlValueForDateTime(householdMemberProxy.CreationTime))));
         }
 
         /// <summary>
@@ -261,9 +305,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(bool hasActivationTime)
+        [TestCase(Membership.Basic, true, true, true)]
+        [TestCase(Membership.Basic, true, true, false)]
+        [TestCase(Membership.Basic, true, false, true)]
+        [TestCase(Membership.Basic, true, false, false)]
+        [TestCase(Membership.Basic, false, true, true)]
+        [TestCase(Membership.Basic, false, true, false)]
+        [TestCase(Membership.Basic, false, false, true)]
+        [TestCase(Membership.Basic, false, false, false)]
+        [TestCase(Membership.Deluxe, true, true, true)]
+        [TestCase(Membership.Deluxe, true, true, false)]
+        [TestCase(Membership.Deluxe, true, false, true)]
+        [TestCase(Membership.Deluxe, true, false, false)]
+        [TestCase(Membership.Premium, true, true, true)]
+        [TestCase(Membership.Premium, true, true, false)]
+        [TestCase(Membership.Premium, true, false, true)]
+        [TestCase(Membership.Premium, true, false, false)]
+        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(Membership membership, bool hasMembershipExpireTime, bool hasActivationTime, bool hasPrivacyPolicyAcceptedTime)
         {
             var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
 
@@ -274,16 +332,37 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("MailAddress")))
                 .Return("test.f69ca810-0a8d-49d3-a50d-bce0bd38c147@osdevgrp.dk")
                 .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ActivationCode")))
-                .Return("BA9A4EE7B3E2AE9B5F4CC3E0DE0B6501")
+            dataReader.Stub(m => m.GetInt16(Arg<string>.Is.Equal("Membership")))
+                .Return((short) membership)
                 .Repeat.Any();
-            dataReader.Stub(m => m.GetOrdinal("ActivationTime"))
+            dataReader.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("MembershipExpireTime")))
                 .Return(3)
                 .Repeat.Any();
             dataReader.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(3)))
-                .Return(!hasActivationTime)
+                .Return(!hasMembershipExpireTime)
                 .Repeat.Any();
             dataReader.Stub(m => m.GetDateTime(Arg<int>.Is.Equal(3)))
+                .Return(DateTime.Now.AddYears(1).ToUniversalTime())
+                .Repeat.Any();
+            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("ActivationCode")))
+                .Return("BA9A4EE7B3E2AE9B5F4CC3E0DE0B6501")
+                .Repeat.Any();
+            dataReader.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("ActivationTime")))
+                .Return(5)
+                .Repeat.Any();
+            dataReader.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(5)))
+                .Return(!hasActivationTime)
+                .Repeat.Any();
+            dataReader.Stub(m => m.GetDateTime(Arg<int>.Is.Equal(5)))
+                .Return(DateTime.Now.ToUniversalTime())
+                .Repeat.Any();
+            dataReader.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("PrivacyPolicyAcceptedTime")))
+                .Return(6)
+                .Repeat.Any();
+            dataReader.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(6)))
+                .Return(!hasPrivacyPolicyAcceptedTime)
+                .Repeat.Any();
+            dataReader.Stub(m => m.GetDateTime(Arg<int>.Is.Equal(6)))
                 .Return(DateTime.Now.ToUniversalTime())
                 .Repeat.Any();
             dataReader.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
@@ -295,10 +374,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy.Identifier, Is.Null);
             Assert.That(householdMemberProxy.Identifier.HasValue, Is.False);
             Assert.That(householdMemberProxy.MailAddress, Is.Null);
+            Assert.That(householdMemberProxy.Membership, Is.EqualTo(Membership.Basic));
+            Assert.That(householdMemberProxy.MembershipExpireTime, Is.Null);
+            Assert.That(householdMemberProxy.MembershipExpireTime.HasValue, Is.False);
             Assert.That(householdMemberProxy.ActivationCode, Is.Null);
             Assert.That(householdMemberProxy.ActivationTime, Is.Null);
             Assert.That(householdMemberProxy.ActivationTime.HasValue, Is.False);
-            Assert.That(householdMemberProxy.IsActivated, Is.False);
+            Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime, Is.Null);
+            Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime.HasValue, Is.False);
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Empty);
@@ -314,6 +397,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy.MailAddress, Is.Not.Null);
             Assert.That(householdMemberProxy.MailAddress, Is.Not.Empty);
             Assert.That(householdMemberProxy.MailAddress, Is.EqualTo(dataReader.GetString("MailAddress")));
+            Assert.That(householdMemberProxy.Membership, Is.EqualTo(membership));
+            if (hasMembershipExpireTime)
+            {
+                Assert.That(householdMemberProxy.MembershipExpireTime, Is.Not.Null);
+                Assert.That(householdMemberProxy.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(householdMemberProxy.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
+                // ReSharper restore PossibleInvalidOperationException
+            }
+            else
+            {
+                Assert.That(householdMemberProxy.MembershipExpireTime, Is.Null);
+                Assert.That(householdMemberProxy.MembershipExpireTime.HasValue, Is.False);
+            }
             Assert.That(householdMemberProxy.ActivationCode, Is.Not.Null);
             Assert.That(householdMemberProxy.ActivationCode, Is.Not.Empty);
             Assert.That(householdMemberProxy.ActivationCode, Is.EqualTo(dataReader.GetString("ActivationCode")));
@@ -329,6 +426,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 Assert.That(householdMemberProxy.ActivationTime, Is.Null);
                 Assert.That(householdMemberProxy.ActivationTime.HasValue, Is.False);
+            }
+            if (hasPrivacyPolicyAcceptedTime)
+            {
+                Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime, Is.Not.Null);
+                Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime.Value, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+                // ReSharper restore PossibleInvalidOperationException
+            }
+            else
+            {
+                Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime, Is.Null);
+                Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime.HasValue, Is.False);
             }
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
             Assert.That(householdMemberProxy.Households, Is.Not.Null);

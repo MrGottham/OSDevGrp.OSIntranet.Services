@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
 {
@@ -12,6 +13,16 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// Mail address for the household member.
         /// </summary>
         string MailAddress { get; }
+
+        /// <summary>
+        /// Membership.
+        /// </summary>
+        Membership Membership { get; }
+
+        /// <summary>
+        /// Date and time for when the membership expires.
+        /// </summary>
+        DateTime? MembershipExpireTime { get; }
 
         /// <summary>
         /// Activation code for the household member.
@@ -27,6 +38,16 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// Indicates whether the household member is activated.
         /// </summary>
         bool IsActivated { get; }
+
+        /// <summary>
+        /// Date and time for when the household member has accepted our privacy policy.
+        /// </summary>
+        DateTime? PrivacyPolicyAcceptedTime { get; set; }
+
+        /// <summary>
+        /// Indicates whether the household member has accepted our privacy policy.
+        /// </summary>
+        bool IsPrivacyPolictyAccepted { get; }
 
         /// <summary>
         /// Date and time for when the household member was created.

@@ -339,8 +339,11 @@ DROP PROCEDURE GrantRightsForFoodItemGroups;
 CREATE TABLE IF NOT EXISTS HouseholdMembers (
 	HouseholdMemberIdentifier CHAR(36) NOT NULL,
 	MailAddress NVARCHAR(128) NOT NULL,
+	Membership TINYINT NOT NULL,
+	MembershipExpireTime DATETIME NULL,
 	ActivationCode NVARCHAR(64) NOT NULL,
 	ActivationTime DATETIME NULL,
+	PrivacyPolicyAcceptedTime DATETIME NULL,
 	CreationTime DATETIME NOT NULL,
 	PRIMARY KEY (HouseholdMemberIdentifier),
 	UNIQUE INDEX IX_HouseholdMembers_MailAddress (MailAddress)
@@ -358,6 +361,17 @@ BEGIN
 	END IF;
 	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='HouseholdMembers' AND Column_Name='ActivationCode') = 'varchar') THEN
 		ALTER TABLE HouseholdMembers MODIFY ActivationCode NVARCHAR(64) NOT NULL;
+	END IF;
+	IF((SELECT COUNT(*) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='HouseholdMembers' AND Column_Name='Membership') = 0) THEN
+		ALTER TABLE HouseholdMembers ADD Membership TINYINT NULL;
+		UPDATE HouseholdMembers SET Membership=1;
+		ALTER TABLE HouseholdMembers MODIFY Membership TINYINT NOT NULL;
+	END IF;
+	IF((SELECT COUNT(*) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='HouseholdMembers' AND Column_Name='MembershipExpireTime') = 0) THEN
+		ALTER TABLE HouseholdMembers ADD MembershipExpireTime DATETIME NULL;
+	END IF;
+	IF((SELECT COUNT(*) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='HouseholdMembers' AND Column_Name='PrivacyPolicyAcceptedTime') = 0) THEN
+		ALTER TABLE HouseholdMembers ADD PrivacyPolicyAcceptedTime DATETIME NULL;
 	END IF;
 END $$
 DELIMITER ;

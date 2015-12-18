@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
@@ -45,11 +46,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// Creates a private class for testing the household member.
             /// </summary>
             /// <param name="mailAddress">Mail address for the household member.</param>
+            /// <param name="membership">Membership.</param>
+            /// <param name="membershipExpireTime">Date and time for when the membership expires.</param>
             /// <param name="activationCode">Activation code for the household member.</param>
             /// <param name="creationTime">Date and time for when the household member was created.</param>
             /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
-            public MyHouseholdMember(string mailAddress, string activationCode, DateTime creationTime, IDomainObjectValidations domainObjectValidations = null)
-                : base(mailAddress, activationCode, creationTime, domainObjectValidations)
+            public MyHouseholdMember(string mailAddress, Membership membership, DateTime? membershipExpireTime, string activationCode, DateTime creationTime, IDomainObjectValidations domainObjectValidations = null)
+                : base(mailAddress, membership, membershipExpireTime, activationCode, creationTime, domainObjectValidations)
             {
             }
 
@@ -64,6 +67,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             {
                 get { return base.MailAddress; }
                 set { base.MailAddress = value; }
+            }
+
+            /// <summary>
+            /// Membership.
+            /// </summary>
+            public new Membership Membership
+            {
+                get { return base.Membership; }
+                set { base.Membership = value; }
+            }
+
+            /// <summary>
+            /// Date and time for when the membership expires.
+            /// </summary>
+            public new DateTime? MembershipExpireTime
+            {
+                get { return base.MembershipExpireTime; }
+                set { base.MembershipExpireTime = value; }
             }
 
             /// <summary>
@@ -112,11 +133,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.MailAddress, Is.Not.Null);
             Assert.That(householdMember.MailAddress, Is.Not.Empty);
             Assert.That(householdMember.MailAddress, Is.EqualTo(validMailAddress));
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+            Assert.That(householdMember.MembershipExpireTime, Is.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
             Assert.That(householdMember.ActivationCode, Is.Not.Null);
             Assert.That(householdMember.ActivationCode, Is.Not.Empty);
             Assert.That(householdMember.ActivationTime, Is.Null);
             Assert.That(householdMember.ActivationTime.HasValue, Is.False);
             Assert.That(householdMember.IsActivated, Is.False);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.False);
+            Assert.That(householdMember.IsPrivacyPolictyAccepted, Is.False);
             Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
             Assert.That(householdMember.Households, Is.Not.Null);
             Assert.That(householdMember.Households, Is.Empty);
@@ -148,7 +175,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             var fixture = new Fixture();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MyHouseholdMember(fixture.Create<string>(), invalidActivationCode, DateTime.Now, MockRepository.GenerateMock<IDomainObjectValidations>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MyHouseholdMember(fixture.Create<string>(), fixture.Create<Membership>(), DateTime.Today.AddYears(1), invalidActivationCode, DateTime.Now, MockRepository.GenerateMock<IDomainObjectValidations>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -294,6 +321,204 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.MailAddress, Is.Not.Null);
             Assert.That(householdMember.MailAddress, Is.Not.Empty);
             Assert.That(householdMember.MailAddress, Is.EqualTo(newMailAddress));
+        }
+
+        /// <summary>
+        /// Tests that the getter for Membership returns Basic membership when the membership expire date and time is null.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipGetterReturnsBasicWhenMembershipExpireTimeIsNull()
+        {
+            var fixture = new Fixture();
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            foreach (var membershipToTest in Enum.GetValues(typeof (Membership)).Cast<Membership>())
+            {
+                var householdMember = new MyHouseholdMember(fixture.Create<string>(), membershipToTest, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                Assert.That(householdMember, Is.Not.Null);
+                Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+                Assert.That(householdMember.MembershipExpireTime, Is.Null);
+                Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            }
+        }
+
+        /// <summary>
+        /// Tests that the getter for Membership returns Basic membership when the membership expire date and time is in the past.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipGetterReturnsBasicWhenMembershipExpireTimeIsInPast()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            foreach (var membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
+            {
+                var householdMember = new MyHouseholdMember(fixture.Create<string>(), membershipToTest, DateTime.Now.AddDays(random.Next(1, 365)*-1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                Assert.That(householdMember, Is.Not.Null);
+                Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+                Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipExpireTime.Value, Is.LessThan(DateTime.Now));
+                // ReSharper restore PossibleInvalidOperationException
+            }
+        }
+
+        /// <summary>
+        /// Tests that the getter for Membership returns membership when the membership expire date and time is in the future.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipGetterReturnsBasicWhenMembershipExpireTimeIsInFuture()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            foreach (var membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
+            {
+                var householdMember = new MyHouseholdMember(fixture.Create<string>(), membershipToTest, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                Assert.That(householdMember, Is.Not.Null);
+                Assert.That(householdMember.Membership, Is.EqualTo(membershipToTest));
+                Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipExpireTime.Value, Is.GreaterThan(DateTime.Now));
+                // ReSharper restore PossibleInvalidOperationException
+            }
+        }
+
+        /// <summary>
+        /// Tests that the setter for Membership sets the membership.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipSetterSetsMembership()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            foreach (var membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
+            {
+                var householdMember = new MyHouseholdMember(fixture.Create<string>(), Membership.Basic, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                Assert.That(householdMember, Is.Not.Null);
+                Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+                Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipExpireTime.Value, Is.GreaterThan(DateTime.Now));
+                // ReSharper restore PossibleInvalidOperationException
+
+                householdMember.Membership = membershipToTest;
+                Assert.That(householdMember.Membership, Is.EqualTo(membershipToTest));
+            }
+        }
+
+        /// <summary>
+        /// Tests that the setter for Membership sets the membership exprie date and time to null when the membership is set to basic.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipSetterSetsMembershipExpireTimeToNullWhenMembershipIsSetToBasic()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            foreach (var membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>().Where(m => m != Membership.Basic))
+            {
+                var membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365));
+                var householdMember = new MyHouseholdMember(fixture.Create<string>(), membershipToTest, membershipExpireTime, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                Assert.That(householdMember, Is.Not.Null);
+                Assert.That(householdMember.Membership, Is.EqualTo(membershipToTest));
+                Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
+                // ReSharper restore PossibleInvalidOperationException
+
+                householdMember.Membership = Membership.Basic;
+                Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+                Assert.That(householdMember.MembershipExpireTime, Is.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
+                Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            }
+        }
+
+        /// <summary>
+        /// Tests that the setter for MembershipExpireTime sets the membership expire date and time not equal to null.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeNotEqualToNull()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), fixture.Create<Membership>(), null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.MembershipExpireTime, Is.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+
+            var membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365));
+            householdMember.MembershipExpireTime = membershipExpireTime;
+            Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
+        }
+
+        /// <summary>
+        /// Tests that the setter for MembershipExpireTime sets the membership expire date and time equal to null.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeEqualToNull()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365));
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), fixture.Create<Membership>(), membershipExpireTime, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
+            // ReSharper restore PossibleInvalidOperationException
+
+            householdMember.MembershipExpireTime = null;
+            Assert.That(householdMember.MembershipExpireTime, Is.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
         }
 
         /// <summary>
@@ -457,6 +682,131 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.ActivationTime.Value, Is.LessThan(DateTime.Now));
             // ReSharper restore PossibleInvalidOperationException
             Assert.That(householdMember.IsActivated, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that the setter for PrivacyPolicyAcceptedTime sets the time for when the household member has accepted our privacy policy not equal to null.
+        /// </summary>
+        [Test]
+        public void TestThatPrivacyPolicyAcceptedTimeSetterSetsPrivacyPolicyAcceptedTimeNotEqualToNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.False);
+
+            var newPrivacyPolicyAcceptedTime = DateTime.Now;
+            householdMember.PrivacyPolicyAcceptedTime = newPrivacyPolicyAcceptedTime;
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.Value, Is.EqualTo(newPrivacyPolicyAcceptedTime));
+        }
+
+        /// <summary>
+        /// Tests that the setter for PrivacyPolicyAcceptedTime sets the time for when the household member has accepted our privacy policy equal to null.
+        /// </summary>
+        [Test]
+        public void TestThatPrivacyPolicyAcceptedTimeSetterSetsPrivacyPolicyAcceptedTimeEqualToNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                PrivacyPolicyAcceptedTime = DateTime.Now
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+
+            householdMember.PrivacyPolicyAcceptedTime = null;
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsPrivacyPolictyAccepted returns false when the time that the household member has accepted our privacy policy is null.
+        /// </summary>
+        [Test]
+        public void TestThatIsPrivacyPolictyAcceptedGetterReturnsFalseWhenPrivacyPolicyAcceptedTimeIsNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new HouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                PrivacyPolicyAcceptedTime = null
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.False);
+            Assert.That(householdMember.IsPrivacyPolictyAccepted, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsPrivacyPolictyAccepted returns false when the time that the household member has accepted our privacy policy is in the future.
+        /// </summary>
+        [Test]
+        public void TestThatIsPrivacyPolictyAcceptedGetterReturnsFalseWhenPrivacyPolicyAcceptedTimeIsInFuture()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new HouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                PrivacyPolicyAcceptedTime = DateTime.Now.AddMinutes(random.Next(1, 60))
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.Value, Is.GreaterThan(DateTime.Now));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.IsPrivacyPolictyAccepted, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsPrivacyPolictyAccepted returns true when the time that the household member has accepted our privacy policy is in the past.
+        /// </summary>
+        [Test]
+        public void TestThatIsPrivacyPolictyAcceptedGetterReturnsTrueWhenPrivacyPolicyAcceptedTimeIsInPast()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new HouseholdMember(fixture.Create<string>(), domainObjectValidationsMock)
+            {
+                PrivacyPolicyAcceptedTime = DateTime.Now.AddMinutes(random.Next(1, 60) * -1)
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMember.PrivacyPolicyAcceptedTime.Value, Is.LessThan(DateTime.Now));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.IsPrivacyPolictyAccepted, Is.True);
         }
 
         /// <summary>

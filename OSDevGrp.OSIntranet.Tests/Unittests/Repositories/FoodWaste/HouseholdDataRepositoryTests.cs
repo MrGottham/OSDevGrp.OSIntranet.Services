@@ -105,7 +105,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var mailAddress = fixture.Create<string>();
             householdDataRepository.HouseholdMemberGetByMailAddress(mailAddress);
 
-            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Equal(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,ActivationCode,ActivationTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress))));
+            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Equal(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress))));
         }
 
         /// <summary>

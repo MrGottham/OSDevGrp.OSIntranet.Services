@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
@@ -32,21 +35,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a collection of mockups for some households.
         /// </summary>
         /// <returns>Collection of mockups for some households.</returns>
-        public static IEnumerable<IHousehold> BuildHouseholdMockCollection()
+        public static IEnumerable<IHousehold> BuildHouseholdMockCollection(Membership membership = Membership.Basic)
         {
-            return new List<IHousehold>
+            int numberOfHouseholds;
+            switch (membership)
             {
-                BuildHouseholdMock(),
-                BuildHouseholdMock(),
-                BuildHouseholdMock()
-            };
+                case Membership.Basic:
+                    numberOfHouseholds = 1;
+                    break;
+
+                case Membership.Deluxe:
+                    numberOfHouseholds = 2;
+                    break;
+
+                case Membership.Premium:
+                    numberOfHouseholds = 3;
+                    break;
+
+                default:
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, membership, "membership", MethodBase.GetCurrentMethod().Name));
+            }
+            var householdCollection = new List<IHousehold>(numberOfHouseholds);
+            while (householdCollection.Count < numberOfHouseholds)
+            {
+                householdCollection.Add(BuildHouseholdMock());
+            }
+            return householdCollection;
         }
 
         /// <summary>
         /// Build a mockup for a household member.
         /// </summary>
         /// <returns>Mockup for a household member.</returns>
-        public static IHouseholdMember BuildHouseholdMemberMock()
+        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic)
         {
             var fixture = new Fixture();
             var identfier = Guid.NewGuid();
@@ -58,6 +79,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMemberMock.Stub(m => m.MailAddress)
                 .Return(mailAddress)
                 .Repeat.Any();
+            householdMemberMock.Stub(m => m.Membership)
+                .Return(membership)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.MembershipExpireTime)
+                .Return(membership == Membership.Basic ? null : (DateTime?) DateTime.Now.AddYears(1))
+                .Repeat.Any();
             householdMemberMock.Stub(m => m.ActivationCode)
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
@@ -67,11 +94,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMemberMock.Stub(m => m.IsActivated)
                 .Return(true)
                 .Repeat.Any();
+            householdMemberMock.Stub(m => m.PrivacyPolicyAcceptedTime)
+                .Return(DateTime.Today)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.IsPrivacyPolictyAccepted)
+                .Return(true)
+                .Repeat.Any();
             householdMemberMock.Stub(m => m.CreationTime)
                 .Return(DateTime.Today)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.Households)
-                .Return(BuildHouseholdMockCollection())
+                .Return(BuildHouseholdMockCollection(membership))
                 .Repeat.Any();
             return householdMemberMock;
         }

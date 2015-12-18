@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
@@ -262,9 +263,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map maps HouseholdMember to HouseholdMemberProxy.
         /// </summary>
         [Test]
-        public void TestThatMapMapsHouseholdMemberToHouseholdMemberProxy()
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatMapMapsHouseholdMemberToHouseholdMemberProxy(Membership membership)
         {
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership);
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
@@ -276,11 +280,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.MailAddress, Is.Not.Null);
             Assert.That(householdMemberProxy.MailAddress, Is.Not.Empty);
             Assert.That(householdMemberProxy.MailAddress, Is.EqualTo(householdMemberMock.MailAddress));
+            Assert.That(householdMemberProxy.Membership, Is.EqualTo(householdMemberMock.Membership));
+            Assert.That(householdMemberProxy.MembershipExpireTime, Is.EqualTo(householdMemberMock.MembershipExpireTime));
             Assert.That(householdMemberProxy.ActivationCode, Is.Not.Null);
             Assert.That(householdMemberProxy.ActivationCode, Is.Not.Empty);
             Assert.That(householdMemberProxy.ActivationCode, Is.EqualTo(householdMemberMock.ActivationCode));
             Assert.That(householdMemberProxy.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));
             Assert.That(householdMemberProxy.IsActivated, Is.EqualTo(householdMemberMock.IsActivated));
+            Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime, Is.EqualTo(householdMemberMock.PrivacyPolicyAcceptedTime));
+            Assert.That(householdMemberProxy.IsPrivacyPolictyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolictyAccepted));
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Empty); // TODO: Modify this when HouseholdProxy has been implemented.

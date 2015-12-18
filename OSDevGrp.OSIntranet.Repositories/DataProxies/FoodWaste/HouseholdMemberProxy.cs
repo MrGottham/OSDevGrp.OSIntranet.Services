@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
@@ -37,10 +38,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Creates a data proxy to a household member.
         /// </summary>
         /// <param name="mailAddress">Mail address for the household member.</param>
+        /// <param name="membership">Membership.</param>
+        /// <param name="membershipExpireTime">Date and time for when the membership expires.</param>
         /// <param name="activationCode">Activation code for the household member.</param>
         /// <param name="creationTime">Date and time for when the household member was created.</param>
-        public HouseholdMemberProxy(string mailAddress, string activationCode, DateTime creationTime)
-            : base(mailAddress, activationCode, creationTime)
+        public HouseholdMemberProxy(string mailAddress, Membership membership, DateTime? membershipExpireTime, string activationCode, DateTime creationTime)
+            : base(mailAddress, membership, membershipExpireTime, activationCode, creationTime)
         {
         }
 
@@ -76,7 +79,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             if (householdMember.Identifier.HasValue)
             {
-                return string.Format("SELECT HouseholdMemberIdentifier,MailAddress,ActivationCode,ActivationTime,CreationTime FROM HouseholdMembers WHERE HouseholdMemberIdentifier='{0}'", householdMember.Identifier.Value.ToString("D").ToUpper());
+                return string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE HouseholdMemberIdentifier='{0}'", householdMember.Identifier.Value.ToString("D").ToUpper());
             }
             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, householdMember.Identifier, "Identifier"));
         }
@@ -87,9 +90,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this household member.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            var activationTimeAsSqlValue = DataRepositoryHelper.GetSqlValueForDateTime(ActivationTime.HasValue ? ActivationTime.Value.ToUniversalTime() : (DateTime?) null);
-            var creationTimeAsSqlValue = DataRepositoryHelper.GetSqlValueForDateTime(CreationTime.ToUniversalTime());
-            return string.Format("INSERT INTO HouseholdMembers (HouseholdMemberIdentifier,MailAddress,ActivationCode,ActivationTime,CreationTime) VALUES('{0}','{1}','{2}',{3},{4})", UniqueId, MailAddress, ActivationCode, activationTimeAsSqlValue, creationTimeAsSqlValue);
+            return string.Format("INSERT INTO HouseholdMembers (HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime) VALUES('{0}','{1}',{2},{3},'{4}',{5},{6},{7})", UniqueId, MailAddress, (int) Membership, DataRepositoryHelper.GetSqlValueForDateTime(MembershipExpireTime), ActivationCode, DataRepositoryHelper.GetSqlValueForDateTime(ActivationTime), DataRepositoryHelper.GetSqlValueForDateTime(PrivacyPolicyAcceptedTime), DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
         }
 
         /// <summary>
@@ -98,9 +99,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this household member.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            var activationTimeAsSqlValue = DataRepositoryHelper.GetSqlValueForDateTime(ActivationTime.HasValue ? ActivationTime.Value.ToUniversalTime() : (DateTime?)null);
-            var creationTimeAsSqlValue = DataRepositoryHelper.GetSqlValueForDateTime(CreationTime.ToUniversalTime());
-            return string.Format("UPDATE HouseholdMembers SET MailAddress='{1}',ActivationCode='{2}',ActivationTime={3},CreationTime={4} WHERE HouseholdMemberIdentifier='{0}'", UniqueId, MailAddress, ActivationCode, activationTimeAsSqlValue, creationTimeAsSqlValue);
+            return string.Format("UPDATE HouseholdMembers SET MailAddress='{1}',Membership={2},MembershipExpireTime={3},ActivationCode='{4}',ActivationTime={5},PrivacyPolicyAcceptedTime={6},CreationTime={7} WHERE HouseholdMemberIdentifier='{0}'", UniqueId, MailAddress, (int) Membership, DataRepositoryHelper.GetSqlValueForDateTime(MembershipExpireTime), ActivationCode, DataRepositoryHelper.GetSqlValueForDateTime(ActivationTime), DataRepositoryHelper.GetSqlValueForDateTime(PrivacyPolicyAcceptedTime), DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
         }
 
         /// <summary>
@@ -140,14 +139,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             Identifier = Guid.Parse(mySqlDataReader.GetString("HouseholdMemberIdentifier"));
             MailAddress = mySqlDataReader.GetString("MailAddress");
+            Membership = (Membership) mySqlDataReader.GetInt16("Membership");
+            var membershipExpireTimeColumnNo = mySqlDataReader.GetOrdinal("MembershipExpireTime");
+            if (!mySqlDataReader.IsDBNull(membershipExpireTimeColumnNo))
+            {
+                MembershipExpireTime = mySqlDataReader.GetDateTime(membershipExpireTimeColumnNo).ToLocalTime();
+            }
             ActivationCode = mySqlDataReader.GetString("ActivationCode");
-
             var activationTimeColumnNo = mySqlDataReader.GetOrdinal("ActivationTime");
             if (!mySqlDataReader.IsDBNull(activationTimeColumnNo))
             {
                 ActivationTime = mySqlDataReader.GetDateTime(activationTimeColumnNo).ToLocalTime();
             }
-
+            var privacyPolicyAcceptedTimeColumnNo = mySqlDataReader.GetOrdinal("PrivacyPolicyAcceptedTime");
+            if (!mySqlDataReader.IsDBNull(privacyPolicyAcceptedTimeColumnNo))
+            {
+                PrivacyPolicyAcceptedTime = mySqlDataReader.GetDateTime(privacyPolicyAcceptedTimeColumnNo).ToLocalTime();
+            }
             CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
         }
 

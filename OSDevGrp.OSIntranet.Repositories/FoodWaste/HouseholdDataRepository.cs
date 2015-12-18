@@ -45,7 +45,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             }
             try
             {
-                return DataProvider.GetCollection<HouseholdMemberProxy>(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,ActivationCode,ActivationTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress)).SingleOrDefault();
+                return DataProvider.GetCollection<HouseholdMemberProxy>(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress)).SingleOrDefault();
             }
             catch (IntranetRepositoryException)
             {
