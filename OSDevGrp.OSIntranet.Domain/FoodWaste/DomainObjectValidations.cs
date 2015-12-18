@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 {
@@ -15,6 +19,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         private static readonly object SyncRoot = new object();
 
         #endregion
+
+        #region Methods
 
         /// <summary>
         /// Validates whether a value is a mail address.
@@ -32,6 +38,41 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Gets the limit of households according to a given membership.
+        /// </summary>
+        /// <param name="membership">Membership.</param>
+        /// <returns>Limit of households according to a given membership.</returns>
+        public virtual int GetHouseholdLimit(Membership membership)
+        {
+            switch (membership)
+            {
+                case Membership.Basic:
+                    return 1;
+
+                case Membership.Deluxe:
+                    return 2;
+
+                case Membership.Premium:
+                    return 999;
+
+                default:
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, membership, "membership", MethodBase.GetCurrentMethod().Name));
+            }
+        }
+
+        /// <summary>
+        /// Validates whether the limit of households has been reached accoing to a given membesrhip.
+        /// </summary>
+        /// <param name="membership">Membership.</param>
+        /// <param name="numberOfHouseholds">Number of households.</param>
+        /// <returns>True if the limit of households has been reached otherwise false.</returns>
+        public virtual bool HasReachedHouseholdLimit(Membership membership, int numberOfHouseholds)
+        {
+            var householdLimit = GetHouseholdLimit(membership);
+            return numberOfHouseholds >= householdLimit;
+        }
+
+        /// <summary>
         /// Creates a instance of common validations used by domain objects in the food waste domain.
         /// </summary>
         /// <returns>Instance of common validations used by domain objects in the food waste domain.</returns>
@@ -42,5 +83,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 return _domainObjectValidations ?? (_domainObjectValidations = new DomainObjectValidations());
             }
         }
+
+        #endregion
     }
 }

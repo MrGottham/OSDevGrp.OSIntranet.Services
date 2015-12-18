@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
@@ -69,6 +71,67 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             var result = domainObjectValidations.IsMailAddress(validMailAddress);
             Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that GetHouseholdLimit returns a limit of households for each membership.
+        /// </summary>
+        [Test]
+        public void TestThatGetHouseholdLimitReturnsHouseholdLimitForEachMembership()
+        {
+            var domainObjectValidations = new DomainObjectValidations();
+            Assert.That(domainObjectValidations, Is.Not.Null);
+
+            foreach (var membershipToTest in Enum.GetValues(typeof (Membership)).Cast<Membership>())
+            {
+                var result = domainObjectValidations.GetHouseholdLimit(membershipToTest);
+                Assert.That(result, Is.GreaterThan(0));
+            }
+        }
+
+        /// <summary>
+        /// Tests that GetHouseholdLimit returns the limit of households when a membership is given.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic, 1)]
+        [TestCase(Membership.Deluxe, 2)]
+        [TestCase(Membership.Premium, 999)]
+        public void TestThatGetHouseholdLimitReturnsActualHouseholdLimit(Membership membership, int householdLimit)
+        {
+            var domainObjectValidations = new DomainObjectValidations();
+            Assert.That(domainObjectValidations, Is.Not.Null);
+
+            var result = domainObjectValidations.GetHouseholdLimit(membership);
+            Assert.That(result, Is.EqualTo(householdLimit));
+        }
+
+        /// <summary>
+        /// Tests that HasReachedHouseholdLimit validates whether a household limit has been reached.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic, 0, false)]
+        [TestCase(Membership.Basic, 1, true)]
+        [TestCase(Membership.Basic, 2, true)]
+        [TestCase(Membership.Basic, 3, true)]
+        [TestCase(Membership.Deluxe, 0, false)]
+        [TestCase(Membership.Deluxe, 1, false)]
+        [TestCase(Membership.Deluxe, 2, true)]
+        [TestCase(Membership.Deluxe, 3, true)]
+        [TestCase(Membership.Premium, 0, false)]
+        [TestCase(Membership.Premium, 1, false)]
+        [TestCase(Membership.Premium, 2, false)]
+        [TestCase(Membership.Premium, 3, false)]
+        [TestCase(Membership.Premium, 997, false)]
+        [TestCase(Membership.Premium, 998, false)]
+        [TestCase(Membership.Premium, 999, true)]
+        [TestCase(Membership.Premium, 1000, true)]
+        public void TestThatHasReachedHouseholdLimitValidatesWhetherHouseholdLimitHasBeenReached(Membership membership, int numberOfHouseholds, bool expectedResult)
+        {
+            var domainObjectValidations = new DomainObjectValidations();
+            Assert.That(domainObjectValidations, Is.Not.Null);
+
+            var result = domainObjectValidations.HasReachedHouseholdLimit(membership, numberOfHouseholds);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         /// <summary>
