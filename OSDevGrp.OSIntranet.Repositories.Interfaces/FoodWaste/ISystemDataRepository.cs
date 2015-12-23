@@ -65,6 +65,12 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
         IStaticText StaticTextGetByStaticTextType(StaticTextType staticTextType);
 
         /// <summary>
+        /// Gets all the static texts.
+        /// </summary>
+        /// <returns>All the static texts.</returns>
+        IEnumerable<IStaticText> StaticTextGetAll();
+
+        /// <summary>
         /// Gets the default data provider for food items.
         /// </summary>
         /// <returns>Default data provider for food items.</returns>

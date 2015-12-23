@@ -1166,7 +1166,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeCallsGetCollectionOnFoodWasteDataProvider()
         {
-            var fixture = new Fixture();
             foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
             {
                 var staticTextProxy = new StaticTextProxy(staticTextTypeToTest, Guid.NewGuid());
@@ -1289,6 +1288,107 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StaticTextGetByStaticTextType", exceptionToThrow.Message)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll calls GetCollection on the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllCallsGetCollectionOnFoodWasteDataProvider()
+        {
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                .Return(new List<StaticTextProxy>(0))
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            systemDataRepository.StaticTextGetAll();
+
+            // ReSharper disable AccessToForEachVariableInClosure
+            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Equal("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType")));
+            // ReSharper restore AccessToForEachVariableInClosure
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll returns the result from the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllReturnsResultFromFoodWasteDataProvider()
+        {
+            var fixture = new Fixture();
+
+            var staticTextCollection = fixture.CreateMany<StaticTextProxy>(7).ToList();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                .Return(staticTextCollection)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var result = systemDataRepository.StaticTextGetAll();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(staticTextCollection));
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
+        {
+            var fixture = new Fixture();
+
+            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.StaticTextGetAll());
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll throws an IntranetRepositoryException when an Exception occurs.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+
+            var exceptionToThrow = fixture.Create<Exception>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.StaticTextGetAll());
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "StaticTextGetAll", exceptionToThrow.Message)));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
         }

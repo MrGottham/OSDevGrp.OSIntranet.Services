@@ -484,6 +484,18 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that StaticTextGetAll returns all the static texts.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllReturnsStaticTexts()
+        {
+            var staticTexts = _systemDataRepository.StaticTextGetAll();
+            Assert.That(staticTexts, Is.Not.Null);
+            Assert.That(staticTexts, Is.Not.Empty);
+            Assert.That(staticTexts.Count(),Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
+        }
+
+        /// <summary>
         /// Tests that DataProviderForFoodItemsGet returns the default data provider for foods.
         /// </summary>
         [Test]

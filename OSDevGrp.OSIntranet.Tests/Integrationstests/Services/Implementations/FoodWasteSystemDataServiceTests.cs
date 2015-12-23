@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
 {
@@ -182,6 +183,30 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                     TranslationIdentifier = translationAddResult.Identifier ?? Guid.Empty
                 };
                 _foodWasteSystemDataService.TranslationDelete(translationDeleteCommand);
+            }
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll gets all the static texts.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllGetsStaticTextSystemViewCollection()
+        {
+            var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+            var translationInfoSystemViewCollection = _foodWasteSystemDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+            Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
+            Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+
+            foreach (var translationInfoSystemView in translationInfoSystemViewCollection)
+            {
+                var staticTextCollectionGetQuery = new StaticTextCollectionGetQuery
+                {
+                    TranslationInfoIdentifier = translationInfoSystemView.TranslationInfoIdentifier
+                };
+                var staticTextSystemViewCollection = _foodWasteSystemDataService.StaticTextGetAll(staticTextCollectionGetQuery);
+                Assert.That(staticTextSystemViewCollection, Is.Not.Null);
+                Assert.That(staticTextSystemViewCollection, Is.Not.Empty);
+                Assert.That(staticTextSystemViewCollection.Count(), Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
             }
         }
 

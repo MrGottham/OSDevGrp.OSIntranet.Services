@@ -254,6 +254,26 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Gets all the static texts.
+        /// </summary>
+        /// <returns>All the static texts.</returns>
+        public virtual IEnumerable<IStaticText> StaticTextGetAll()
+        {
+            try
+            {
+                return DataProvider.GetCollection<StaticTextProxy>("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Gets the default data provider for food items.
         /// </summary>
         /// <returns>Default data provider for food items</returns>

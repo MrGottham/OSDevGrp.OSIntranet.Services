@@ -176,6 +176,21 @@ BEGIN
 	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '440DDE45-9D3A-4AF2-9995-7D6005D373B5') = 0) THEN
 		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('440DDE45-9D3A-4AF2-9995-7D6005D373B5','CBFA2654-065E-454A-BA09-8A4BA9EB3CF5','978C7318-AD0A-459C-BEE0-1803A94F50D7','<html><h1>Velkommen til Projektet Formindsk Madspild</h1><br><br>Du er blevet oprettet som husstandsmedlem i Projektet Formindsk Madspild. Dit næste skridt er at aktivere din konto på vores hjemmeside.<br><br>Din aktiveringskode er: <b>[ActivationCode]</b><br><br>Venlig hilsen<br>Projektet Formindsk Madspild<br><br><h2>[PrivacyPoliciesSubject]</h2><br>[PrivacyPoliciesBody]</html>');
 	END IF;
+	IF((SELECT COUNT(*) FROM StaticTexts WHERE StaticTextType=2) = 0) THEN
+		INSERT INTO StaticTexts (StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier) VALUES('651D2814-3D4D-41D6-88CB-C0F8C43BFA8C',2,'D722639D-3680-4273-A5CF-BA6337C7678F','D2C5C01C-9F7C-4E70-B6BE-832EACB31B8F');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '15FD83CA-B141-483C-8AF0-D27008A00353') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('15FD83CA-B141-483C-8AF0-D27008A00353','D722639D-3680-4273-A5CF-BA6337C7678F','807E904D-FDF9-418D-9745-B73821B8D07A','Privacy Policy');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '497B32FD-E521-4342-BDFC-11A5B8CE2A9E') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('497B32FD-E521-4342-BDFC-11A5B8CE2A9E','D2C5C01C-9F7C-4E70-B6BE-832EACB31B8F','807E904D-FDF9-418D-9745-B73821B8D07A','<html>As a household member, you will own the data registered by you within the households where you are a member. The data registered by you within each household will be stored as part of our project and our project can use and share your data with our third party vendors. When we share data, we will anonymize all the data so it will not be possible to trace it back to you.<br><br>Our project will own all the aggregated results we can create using your data. When we make aggregated results, we will anonymize all the data so it will not be possible to trace it back to you.</html>');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '590FF843-B1A7-4BAE-81F9-9C0637D1ED62') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('590FF843-B1A7-4BAE-81F9-9C0637D1ED62','D722639D-3680-4273-A5CF-BA6337C7678F','978C7318-AD0A-459C-BEE0-1803A94F50D7','Fortrolighedspolitik');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'D922E53F-A311-4CE8-BDAC-9BC5293F182E') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('D922E53F-A311-4CE8-BDAC-9BC5293F182E','D2C5C01C-9F7C-4E70-B6BE-832EACB31B8F','978C7318-AD0A-459C-BEE0-1803A94F50D7','<html>Som husstandsmedlem, vil du eje de data, der er registreret af dig i de husstande, hvor du er medlem. De data, der er registreret af dig i hver husstand, vil blive gemt som en del af vores projekt og vores projekt kan bruge og dele dine data med vore tredjepartsleverandører. Når vi deler data, vil vi anonymisere alle data, så det ikke vil være muligt at spore dem tilbage til dig.<br><br>Vores projekt vil eje alle de aggregerede resultater, vi kan skabe ved hjælp af dine data. Når vi laver aggregerede resultater, vil vi anonymisere alle data, så det ikke vil være muligt at spore dem tilbage til dig.</html>');
+	END IF;
 END $$
 DELIMITER ;
 CALL InsertDataIntoStaticTexts();

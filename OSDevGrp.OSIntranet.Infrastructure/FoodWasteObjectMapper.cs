@@ -228,6 +228,22 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     return foreignKeyProxy;
                 });
 
+            Mapper.CreateMap<IStaticText, StaticTextView>()
+                .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
+                .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
+                .ForMember(m => m.BodyTranslation, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslation != null ? s.BodyTranslation.Value : string.Empty : null));
+
+            Mapper.CreateMap<IStaticText, StaticTextSystemView>()
+                .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
+                .ForMember(m => m.SubjectTranslationIdentifier, opt => opt.MapFrom(s => s.SubjectTranslationIdentifier))
+                .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
+                .ForMember(m => m.SubjectTranslations, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.SubjectTranslations)))
+                .ForMember(m => m.BodyTranslationIdentifier, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? (Guid?) s.BodyTranslationIdentifier.Value : null))
+                .ForMember(m => m.BodyTranslation, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslation != null ? s.BodyTranslation.Value : string.Empty : null))
+                .ForMember(m => m.BodyTranslations, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.BodyTranslations) : null));
+
             Mapper.CreateMap<IStaticText, IStaticTextProxy>()
                 .ConvertUsing(m =>
                 {

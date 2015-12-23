@@ -6,6 +6,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
 {
@@ -115,6 +116,41 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                     Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
                     Assert.That(foodGroupTree.FoodGroups.Count(), Is.GreaterThanOrEqualTo(0));
                     Assert.That(foodGroupTree.DataProvider, Is.Not.Null);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
+        /// Tests that PrivacyPolicyGet gets the privacy policy.
+        /// </summary>
+        [Test]
+        public void TestThatPrivacyPolicyGetGetsStaticTextViewForPrivacyPolicy()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+                Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
+                Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+
+                foreach (var translationInfoSystemView in translationInfoSystemViewCollection)
+                {
+                    var privacyPolicyGetQuery = new PrivacyPolicyGetQuery
+                    {
+                        TranslationInfoIdentifier = translationInfoSystemView.TranslationInfoIdentifier
+                    };
+                    var staticTextView = client.PrivacyPolicyGet(privacyPolicyGetQuery);
+                    Assert.That(staticTextView, Is.Not.Null);
+                    Assert.That(staticTextView.StaticTextType, Is.EqualTo((int) StaticTextType.PrivacyPolicy));
+                    Assert.That(staticTextView.SubjectTranslation, Is.Not.Null);
+                    Assert.That(staticTextView.SubjectTranslation, Is.Not.Empty);
+                    Assert.That(staticTextView.BodyTranslation, Is.Not.Null);
+                    Assert.That(staticTextView.BodyTranslation, Is.Not.Empty);
                 }
             }
             finally

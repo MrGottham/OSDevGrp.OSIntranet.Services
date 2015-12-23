@@ -7,6 +7,7 @@ using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using System;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
 {
@@ -236,6 +237,38 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                         TranslationIdentifier = translationAddResult.Identifier ?? Guid.Empty
                     };
                     client.TranslationDelete(translationDeleteCommand);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll gets all the static texts.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllGetsStaticTextSystemViewCollection()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+                Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
+                Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+
+                foreach (var translationInfoSystemView in translationInfoSystemViewCollection)
+                {
+                    var staticTextCollectionGetQuery = new StaticTextCollectionGetQuery
+                    {
+                        TranslationInfoIdentifier = translationInfoSystemView.TranslationInfoIdentifier
+                    };
+                    var staticTextSystemViewCollection = client.StaticTextGetAll(staticTextCollectionGetQuery);
+                    Assert.That(staticTextSystemViewCollection, Is.Not.Null);
+                    Assert.That(staticTextSystemViewCollection, Is.Not.Empty);
+                    Assert.That(staticTextSystemViewCollection.Count(), Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
                 }
             }
             finally

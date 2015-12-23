@@ -306,6 +306,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Gets all the static texts.
+        /// </summary>
+        /// <param name="query">Query for getting all the static texts.</param>
+        /// <returns>Collection of all the static texts.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual IEnumerable<StaticTextSystemView> StaticTextGetAll(StaticTextCollectionGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteSystemDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>

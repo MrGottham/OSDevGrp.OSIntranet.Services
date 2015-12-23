@@ -69,6 +69,7 @@
     <Compile Include="Core\FoodItemCollectionGetQueryHandlerBase.cs" />
     <Compile Include="Core\KalenderQueryHandlerBase.cs" />
     <Compile Include="Core\RegnskabQueryHandlerBase.cs" />
+    <Compile Include="Core\StaticTextGetQueryHandlerBase.cs" />
     <Compile Include="DataProviderCollectionGetQueryHandler.cs" />
     <Compile Include="DebitorGetQueryHandler.cs" />
     <Compile Include="DebitorlisteGetQueryHandler.cs" />
@@ -91,9 +92,11 @@
     <Compile Include="PersonGetQueryHandler.cs" />
     <Compile Include="PersonlisteGetQueryHandler.cs" />
     <Compile Include="PostnumreGetQueryHandler.cs" />
+    <Compile Include="PrivacyPolicyGetQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\QueryHandlerBase.cs" />
     <Compile Include="RegnskabslisteGetQueryHandler.cs" />
+    <Compile Include="StaticTextCollectionGetQueryHandler.cs" />
     <Compile Include="SystemerGetQueryHandler.cs" />
     <Compile Include="TelefonlisteGetQueryHandler.cs" />
     <Compile Include="TranslationInfoCollectionGetQueryHandler.cs" />

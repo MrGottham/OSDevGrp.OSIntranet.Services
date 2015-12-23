@@ -1246,6 +1246,109 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
+        /// Tests that StaticTextGetAll throws an ArgumentNullException when the query for getting all the static texts is null.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllThrowsArgumentNullExceptionIfStaticTextCollectionGetQueryIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.StaticTextGetAll(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("query"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll calls Query on the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllCallsQueryOnQueryBus()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.NotNull))
+                .Return(fixture.CreateMany<StaticTextSystemView>(random.Next(1, 25)).ToList())
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var query = fixture.Create<StaticTextCollectionGetQuery>();
+            foodWasteSystemDataService.StaticTextGetAll(query);
+
+            queryBusMock.AssertWasCalled(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.Equal(query)));
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll returns the result from the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllReturnsResultFromQueryBus()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var translationInfoSystemViewCollection = fixture.CreateMany<StaticTextSystemView>(random.Next(1, 25)).ToList();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.NotNull))
+                .Return(translationInfoSystemViewCollection)
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var result = foodWasteSystemDataService.StaticTextGetAll(fixture.Create<StaticTextCollectionGetQuery>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(translationInfoSystemViewCollection));
+        }
+
+        /// <summary>
+        /// Tests that StaticTextGetAll throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatStaticTextGetAllThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.StaticTextGetAll(fixture.Create<StaticTextCollectionGetQuery>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+        }
+
+        /// <summary>
         /// Tests that TranslationInfoGetAll throws an ArgumentNullException when the query for getting all the translation informations which can be used for translations is null.
         /// </summary>
         [Test]

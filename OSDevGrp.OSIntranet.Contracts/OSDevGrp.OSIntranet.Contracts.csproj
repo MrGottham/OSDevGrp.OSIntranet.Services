@@ -97,7 +97,10 @@
     <Compile Include="Queries\PersonGetQuery.cs" />
     <Compile Include="Queries\PersonlisteGetQuery.cs" />
     <Compile Include="Queries\PostnumreGetQuery.cs" />
+    <Compile Include="Queries\PrivacyPolicyGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
+    <Compile Include="Queries\StaticTextCollectionGetQuery.cs" />
+    <Compile Include="Queries\StaticTextGetQueryBase.cs" />
     <Compile Include="Queries\SystemerGetQuery.cs" />
     <Compile Include="Queries\TelefonlisteGetQuery.cs" />
     <Compile Include="Queries\TranslationInfoCollectionGetQuery.cs" />
@@ -156,6 +159,8 @@
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\SaldoBaseView.cs" />
     <Compile Include="Views\SaldolisteBaseView.cs" />
+    <Compile Include="Views\StaticTextSystemView.cs" />
+    <Compile Include="Views\StaticTextView.cs" />
     <Compile Include="Views\SystemView.cs" />
     <Compile Include="Views\TabelView.cs" />
     <Compile Include="Views\TelefonlisteView.cs" />

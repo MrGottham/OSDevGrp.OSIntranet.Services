@@ -778,6 +778,81 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps StaticText to StaticTextView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStaticTextToStaticTextView()
+        {
+            var staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var staticTextView = foodWasteObjectMapper.Map<IStaticText, StaticTextView>(staticTextMock);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(staticTextView.StaticTextIdentifier, Is.EqualTo(staticTextMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(staticTextView.StaticTextType, Is.EqualTo((int) staticTextMock.Type));
+            Assert.That(staticTextView.SubjectTranslation, Is.Not.Null);
+            Assert.That(staticTextView.SubjectTranslation, Is.Not.Empty);
+            Assert.That(staticTextView.SubjectTranslation, Is.EqualTo(staticTextMock.SubjectTranslation.Value));
+            if (staticTextMock.BodyTranslationIdentifier.HasValue)
+            {
+                Assert.That(staticTextView.BodyTranslation, Is.Not.Null);
+                Assert.That(staticTextView.BodyTranslation, Is.Not.Empty);
+                Assert.That(staticTextView.BodyTranslation, Is.EqualTo(staticTextMock.BodyTranslation.Value));
+                return;
+            }
+            Assert.That(staticTextView.BodyTranslation, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Map maps StaticText to StaticTextSystemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStaticTextToStaticTextSystemView()
+        {
+            var staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var staticTextProxy = foodWasteObjectMapper.Map<IStaticText, StaticTextSystemView>(staticTextMock);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(staticTextProxy.StaticTextIdentifier, Is.EqualTo(staticTextMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(staticTextProxy.StaticTextType, Is.EqualTo((int) staticTextMock.Type));
+            Assert.That(staticTextProxy.SubjectTranslationIdentifier, Is.EqualTo(staticTextMock.SubjectTranslationIdentifier));
+            Assert.That(staticTextProxy.SubjectTranslation, Is.Not.Null);
+            Assert.That(staticTextProxy.SubjectTranslation, Is.Not.Empty);
+            Assert.That(staticTextProxy.SubjectTranslation, Is.EqualTo(staticTextMock.SubjectTranslation.Value));
+            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
+            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Empty);
+            Assert.That(staticTextProxy.SubjectTranslations, Is.TypeOf<List<TranslationSystemView>>());
+            Assert.That(staticTextProxy.SubjectTranslations.Count(), Is.EqualTo(staticTextMock.SubjectTranslations.Count()));
+            if (staticTextMock.BodyTranslationIdentifier.HasValue)
+            {
+                Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Not.Null);
+                Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(staticTextProxy.BodyTranslationIdentifier.Value, Is.EqualTo(staticTextMock.BodyTranslationIdentifier.Value));
+                // ReSharper restore PossibleInvalidOperationException
+                Assert.That(staticTextProxy.BodyTranslation, Is.Not.Null);
+                Assert.That(staticTextProxy.BodyTranslation, Is.Not.Empty);
+                Assert.That(staticTextProxy.BodyTranslation, Is.EqualTo(staticTextMock.BodyTranslation.Value));
+                Assert.That(staticTextProxy.BodyTranslations, Is.Not.Null);
+                Assert.That(staticTextProxy.BodyTranslations, Is.Not.Empty);
+                Assert.That(staticTextProxy.BodyTranslations, Is.TypeOf<List<TranslationSystemView>>());
+                Assert.That(staticTextProxy.BodyTranslations.Count(), Is.EqualTo(staticTextMock.BodyTranslations.Count()));
+                return;
+            }
+            Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Null);
+            Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.False);
+            Assert.That(staticTextProxy.BodyTranslation, Is.Null);
+            Assert.That(staticTextProxy.BodyTranslations, Is.Null);
+        }
+
+        /// <summary>
         /// Tests that Map maps StaticText to StaticTextProxy.
         /// </summary>
         [Test]

@@ -299,6 +299,106 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
+        /// Tests that PrivacyPolicyGet throws an ArgumentNullException when the query for getting the privacy policy is null.
+        /// </summary>
+        [Test]
+        public void TestThatPrivacyPolicyGetThrowsArgumentNullExceptionIfPrivacyPolicyGetQueryIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteHouseHoldService = new FoodWasteHouseHoldService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseHoldService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteHouseHoldService.PrivacyPolicyGet(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("query"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that PrivacyPolicyGet calls Query on the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatPrivacyPolicyGetCallsQueryOnQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<PrivacyPolicyGetQuery, StaticTextView>(Arg<PrivacyPolicyGetQuery>.Is.NotNull))
+                .Return(fixture.Create<StaticTextView>())
+                .Repeat.Any();
+
+            var foodWasteHouseHoldService = new FoodWasteHouseHoldService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseHoldService, Is.Not.Null);
+
+            var query = fixture.Create<PrivacyPolicyGetQuery>();
+            foodWasteHouseHoldService.PrivacyPolicyGet(query);
+
+            queryBusMock.AssertWasCalled(m => m.Query<PrivacyPolicyGetQuery, StaticTextView>(Arg<PrivacyPolicyGetQuery>.Is.Equal(query)));
+        }
+
+        /// <summary>
+        /// Tests that PrivacyPolicyGet returns the result from the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatPrivacyPolicyGetReturnsResultFromQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var staticTextView = fixture.Create<StaticTextView>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<PrivacyPolicyGetQuery, StaticTextView>(Arg<PrivacyPolicyGetQuery>.Is.NotNull))
+                .Return(staticTextView)
+                .Repeat.Any();
+
+            var foodWasteHouseHoldService = new FoodWasteHouseHoldService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseHoldService, Is.Not.Null);
+
+            var result = foodWasteHouseHoldService.PrivacyPolicyGet(fixture.Create<PrivacyPolicyGetQuery>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(staticTextView));
+        }
+
+        /// <summary>
+        /// Tests that PrivacyPolicyGet throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatPrivacyPolicyGetThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<PrivacyPolicyGetQuery, StaticTextView>(Arg<PrivacyPolicyGetQuery>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteHouseHoldService = new FoodWasteHouseHoldService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteHouseHoldService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteHouseHoldService.PrivacyPolicyGet(fixture.Create<PrivacyPolicyGetQuery>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseHoldServiceName), Arg<MethodBase>.Is.NotNull));
+        }
+
+        /// <summary>
         /// Tests that TranslationInfoGetAll throws an ArgumentNullException when the query for getting all the translation informations which can be used for translations is null.
         /// </summary>
         [Test]

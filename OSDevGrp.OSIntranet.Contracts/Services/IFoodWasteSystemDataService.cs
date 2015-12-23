@@ -125,6 +125,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         ServiceReceiptResponse TranslationDelete(TranslationDeleteCommand command);
 
         /// <summary>
+        /// Gets all the static texts.
+        /// </summary>
+        /// <param name="query">Query for getting all the static texts.</param>
+        /// <returns>Collection of all the static texts.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<StaticTextSystemView> StaticTextGetAll(StaticTextCollectionGetQuery query);
+
+            /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>

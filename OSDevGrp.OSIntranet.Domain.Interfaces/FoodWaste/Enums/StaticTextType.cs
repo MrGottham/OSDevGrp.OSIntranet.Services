@@ -5,6 +5,7 @@
     /// </summary>
     public enum StaticTextType
     {
-        WelcomeLetter = 1
+        WelcomeLetter = 1,
+        PrivacyPolicy = 2
     }
 }

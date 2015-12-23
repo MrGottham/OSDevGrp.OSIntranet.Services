@@ -18,7 +18,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting the collection of food items.</param>
         /// <returns>Collection of food items.</returns>
         [OperationContract]
-        [FaultContract(typeof(FoodWasteFault))]
+        [FaultContract(typeof (FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         FoodItemCollectionView FoodItemCollectionGet(FoodItemCollectionGetQuery query);
 
@@ -28,9 +28,19 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting the tree of food groups.</param>
         /// <returns>Tree of food groups.</returns>
         [OperationContract]
-        [FaultContract(typeof(FoodWasteFault))]
+        [FaultContract(typeof (FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         FoodGroupTreeView FoodGroupTreeGet(FoodGroupTreeGetQuery query);
+
+        /// <summary>
+        /// Gets the privacy policy.
+        /// </summary>
+        /// <param name="query">Query for getting the privacy policy.</param>
+        /// <returns>Privacy policy.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        StaticTextView PrivacyPolicyGet(PrivacyPolicyGetQuery query);
 
         /// <summary>
         /// Gets all the translation informations which can be used for translations.
@@ -38,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>
         /// <returns>Collection of all the translation informations which can be used for translations.</returns>
         [OperationContract]
-        [FaultContract(typeof(FoodWasteFault))]
+        [FaultContract(typeof (FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<TranslationInfoSystemView> TranslationInfoGetAll(TranslationInfoCollectionGetQuery query);
     }

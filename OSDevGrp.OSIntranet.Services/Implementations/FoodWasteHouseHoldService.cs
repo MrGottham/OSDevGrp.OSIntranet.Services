@@ -106,6 +106,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Gets the privacy policy.
+        /// </summary>
+        /// <param name="query">Query for getting the privacy policy.</param>
+        /// <returns>Privacy policy.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual StaticTextView PrivacyPolicyGet(PrivacyPolicyGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<PrivacyPolicyGetQuery, StaticTextView>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseHoldServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>
