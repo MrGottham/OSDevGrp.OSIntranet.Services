@@ -66,6 +66,8 @@
     <Compile Include="Core\KalenderCommandHandlerBase.cs" />
     <Compile Include="Core\LogicExecutor.cs" />
     <Compile Include="Core\RegnskabCommandHandlerBase.cs" />
+    <Compile Include="Dispatchers\IStaticTextFieldMerge.cs" />
+    <Compile Include="Dispatchers\StaticTextFieldMerge.cs" />
     <Compile Include="FoodItemImportFromDataProviderCommandHandler.cs" />
     <Compile Include="ForeignKeyAddCommandHandler.cs" />
     <Compile Include="ForeignKeyDeleteCommandHandler.cs" />
