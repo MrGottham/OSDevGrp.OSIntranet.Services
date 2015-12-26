@@ -287,9 +287,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         /// Tests that Merge merges the value from the static text which need to be resolved into the static text.
         /// </summary>
         [Test]
-        [TestCase("[PrivacyPoliciesSubject]", StaticTextType.PrivacyPolicy)]
-        [TestCase("[PrivacyPoliciesBody]", StaticTextType.PrivacyPolicy)]
-        public void TestThatMergeMergesValueFromStaticTextWhichNeedToBeResolved(string mergeField, StaticTextType staticTextType)
+        [TestCase("[PrivacyPoliciesSubject]")]
+        [TestCase("[PrivacyPoliciesBody]")]
+        public void TestThatMergeMergesValueFromStaticTextWhichNeedToBeResolved(string mergeField)
         {
             var fixture = new Fixture();
 
