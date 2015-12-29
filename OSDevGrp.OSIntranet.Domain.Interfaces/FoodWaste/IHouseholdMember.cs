@@ -7,13 +7,8 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
     /// <summary>
     /// Interface for a household member.
     /// </summary>
-    public interface IHouseholdMember : IIdentifiable
+    public interface IHouseholdMember : IStakeholder
     {
-        /// <summary>
-        /// Mail address for the household member.
-        /// </summary>
-        string MailAddress { get; }
-
         /// <summary>
         /// Membership.
         /// </summary>

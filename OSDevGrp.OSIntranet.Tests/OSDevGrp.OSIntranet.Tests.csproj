@@ -150,6 +150,7 @@
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\LogicExecutorTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Dispatchers\DispatcherBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Dispatchers\StaticTextFieldMergeTests.cs" />
     <Compile Include="Unittests\CommandHandlers\FoodItemImportFromDataProviderCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyAddCommandHandlerTests.cs" />

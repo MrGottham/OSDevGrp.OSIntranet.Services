@@ -126,6 +126,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Build a mockup for an internal or external stakeholder.
+        /// </summary>
+        /// <returns>Mockup for an internal or external stakeholder.</returns>
+        public static IStakeholder BuildStakeholderMock()
+        {
+            var identfier = Guid.NewGuid();
+            var mailAddress = string.Format("test.{0}@osdevgrp.dk", identfier.ToString("D").ToLower());
+            var stakeholderMock = MockRepository.GenerateMock<IStakeholder>();
+            stakeholderMock.Stub(m => m.Identifier)
+                .Return(identfier)
+                .Repeat.Any();
+            stakeholderMock.Stub(m => m.MailAddress)
+                .Return(mailAddress)
+                .Repeat.Any();
+            return stakeholderMock;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some internal or external stakeholders.
+        /// </summary>
+        /// <returns>Collection of mockups for some internal or external stakeholders.</returns>
+        public static IEnumerable<IStakeholder> BuildStakeholderMockCollection()
+        {
+            return new List<IStakeholder>
+            {
+                BuildStakeholderMock(),
+                BuildStakeholderMock(),
+                BuildStakeholderMock()
+            };
+        }
+
+        /// <summary>
         /// Build a mockup for a food item.
         /// </summary>
         /// <param name="isActive">Indicates whether the food item should be active or inactive.</param>
