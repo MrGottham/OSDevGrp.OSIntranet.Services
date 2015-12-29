@@ -50,6 +50,69 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         }
 
         /// <summary>
+        /// Tests that AddMergeFields called with a household member throws an ArgumentNullException when the household member is null.
+        /// </summary>
+        [Test]
+        public void TestThatAddMergeFieldsCalledWithHouseholdMemberThrowsArgumentNullExceptionWhenHouseholdMemberIsNull()
+        {
+            var systemDataRepository = MockRepository.GenerateMock<ISystemDataRepository>();
+
+            var staticTextFieldMerge = new StaticTextFieldMerge(systemDataRepository);
+            Assert.That(staticTextFieldMerge, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => staticTextFieldMerge.AddMergeFields(null, DomainObjectMockBuilder.BuildTranslationInfoMock()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that AddMergeFields called with a household member throws an ArgumentNullException when the translation informations used to translate the static text is null.
+        /// </summary>
+        [Test]
+        public void TestThatAddMergeFieldsCalledWithHouseholdMemberThrowsArgumentNullExceptionWhenTranslationInfoIsNull()
+        {
+            var systemDataRepository = MockRepository.GenerateMock<ISystemDataRepository>();
+
+            var staticTextFieldMerge = new StaticTextFieldMerge(systemDataRepository);
+            Assert.That(staticTextFieldMerge, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => staticTextFieldMerge.AddMergeFields(DomainObjectMockBuilder.BuildHouseholdMemberMock(), null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("translationInfo"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that AddMergeFields called with a household member adds merge fields and values for the household member.
+        /// </summary>
+        [Test]
+        public void TestThatAddMergeFieldsCalledWithHouseholdMemberAddsMergeFieldsAndValues()
+        {
+            var systemDataRepository = MockRepository.GenerateMock<ISystemDataRepository>();
+
+            var staticTextFieldMerge = new StaticTextFieldMerge(systemDataRepository);
+            Assert.That(staticTextFieldMerge, Is.Not.Null);
+            Assert.That(staticTextFieldMerge.MergeFields, Is.Not.Null);
+            Assert.That(staticTextFieldMerge.MergeFields, Is.Not.Empty);
+
+            var mergeFieldCollectionCount = staticTextFieldMerge.MergeFields.Count();
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+
+            staticTextFieldMerge.AddMergeFields(householdMemberMock, DomainObjectMockBuilder.BuildTranslationInfoMock());
+            Assert.That(staticTextFieldMerge, Is.Not.Null);
+            Assert.That(staticTextFieldMerge.MergeFields, Is.Not.Null);
+            Assert.That(staticTextFieldMerge.MergeFields, Is.Not.Empty);
+            Assert.That(staticTextFieldMerge.MergeFields.Count(), Is.EqualTo(mergeFieldCollectionCount + 1));
+            Assert.That(staticTextFieldMerge.MergeFields.Any(keyValuePair => String.Compare(keyValuePair.Key, "[ActivationCode]", StringComparison.Ordinal) == 0), Is.True);
+            Assert.That(staticTextFieldMerge.MergeFields.First(keyValuePair => String.Compare(keyValuePair.Key, "[ActivationCode]", StringComparison.Ordinal) == 0).Value, Is.EqualTo(householdMemberMock.ActivationCode));
+        }
+
+        /// <summary>
         /// Tests that Merge throws an ArgumentNullException when the static text is null.
         /// </summary>
         [Test]
@@ -196,6 +259,53 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
             staticTextFieldMerge.Merge(staticTextMock, DomainObjectMockBuilder.BuildTranslationInfoMock());
 
             bodyTranslationMock.AssertWasNotCalled(m => m.Value = Arg<string>.Is.Anything);
+        }
+
+        /// <summary>
+        /// Tests that Merge merges the value from the collection of merge fields and values.
+        /// </summary>
+        [Test]
+        public void TestThatMergeMergesValueFromMergeFieldsAndValues()
+        {
+            var fixture = new Fixture();
+            var systemDataRepository = MockRepository.GenerateMock<ISystemDataRepository>();
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+
+            var subjectTranslation = string.Format("{0}[ActivationCode]{1}", fixture.Create<string>(), fixture.Create<string>());
+            var subjectTranslationMock = MockRepository.GenerateMock<ITranslation>();
+            subjectTranslationMock.Stub(m => m.Value)
+                .Return(subjectTranslation)
+                .Repeat.Any();
+
+            var bodyTranslation = string.Format("{0}[ActivationCode]{1}", fixture.Create<string>(), fixture.Create<string>());
+            var bodyTranslationMock = MockRepository.GenerateMock<ITranslation>();
+            bodyTranslationMock.Stub(m => m.Value)
+                .Return(bodyTranslation)
+                .Repeat.Any();
+
+            var staticTextMock = MockRepository.GenerateMock<IStaticText>();
+            staticTextMock.Stub(m => m.SubjectTranslation)
+                .Return(subjectTranslationMock)
+                .Repeat.Any();
+            staticTextMock.Stub(m => m.BodyTranslation)
+                .Return(bodyTranslationMock)
+                .Repeat.Any();
+
+            var staticTextFieldMerge = new StaticTextFieldMerge(systemDataRepository);
+            Assert.That(staticTextFieldMerge, Is.Not.Null);
+
+            staticTextFieldMerge.AddMergeFields(householdMemberMock, translationInfoMock);
+            Assert.That(staticTextFieldMerge, Is.Not.Null);
+            Assert.That(staticTextFieldMerge.MergeFields, Is.Not.Null);
+            Assert.That(staticTextFieldMerge.MergeFields, Is.Not.Empty);
+            Assert.That(staticTextFieldMerge.MergeFields.Any(keyValuePair => String.Compare(keyValuePair.Key, "[ActivationCode]", StringComparison.Ordinal) == 0), Is.True);
+
+            staticTextFieldMerge.Merge(staticTextMock, translationInfoMock);
+
+            subjectTranslationMock.AssertWasCalled(m => m.Value = Arg<string>.Is.Equal(subjectTranslation.Replace("[ActivationCode]", householdMemberMock.ActivationCode)));
+            bodyTranslationMock.AssertWasCalled(m => m.Value = Arg<string>.Is.Equal(bodyTranslation.Replace("[ActivationCode]", householdMemberMock.ActivationCode)));
         }
 
         /// <summary>

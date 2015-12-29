@@ -58,6 +58,24 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Dispatchers
         #region Methods
 
         /// <summary>
+        /// Adds merge fields and values to the fields and values which can be merged.
+        /// </summary>
+        /// <param name="householdMember">Household member on which merge fields and values should be added.</param>
+        /// <param name="translationInfo">Translation informations used to translate the merge values.</param>
+        public virtual void AddMergeFields(IHouseholdMember householdMember, ITranslationInfo translationInfo)
+        {
+            if (householdMember == null)
+            {
+                throw new ArgumentNullException("householdMember");
+            }
+            if (translationInfo == null)
+            {
+                throw new ArgumentNullException("translationInfo");
+            }
+            _mergeFields.Add("[ActivationCode]", householdMember.ActivationCode);
+        }
+
+        /// <summary>
         /// Merge field values into the static text.
         /// </summary>
         /// <param name="staticText">Static text on which to merge field values.</param>

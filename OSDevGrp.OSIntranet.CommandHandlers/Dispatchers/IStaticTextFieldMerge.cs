@@ -14,6 +14,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Dispatchers
         IEnumerable<KeyValuePair<string, object>> MergeFields { get; }
 
         /// <summary>
+        /// Adds merge fields and values to the fields and values which can be merged.
+        /// </summary>
+        /// <param name="householdMember">Household member on which merge fields and values should be added.</param>
+        /// <param name="translationInfo">Translation informations used to translate the merge values.</param>
+        void AddMergeFields(IHouseholdMember householdMember, ITranslationInfo translationInfo);
+
+        /// <summary>
         /// Merge field values into the static text.
         /// </summary>
         /// <param name="staticText">Static text on which to merge field values.</param>
