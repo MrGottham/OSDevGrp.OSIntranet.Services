@@ -10,7 +10,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     /// Interface for the service which can access and modify data on a house hold in the food waste domain.
     /// </summary>
     [ServiceContract(Name = SoapNamespaces.FoodWasteHouseHoldServiceName, Namespace = SoapNamespaces.FoodWasteNamespace)]
-    public interface IFoodWasteHouseHoldService : IIntranetService
+    public interface IFoodWasteHouseholdService : IIntranetService
     {
         /// <summary>
         /// Gets the collection of food items.

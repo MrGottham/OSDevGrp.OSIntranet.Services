@@ -120,6 +120,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Integrationstests\Flows\FlowTestExecutor.cs" />
+    <Compile Include="Integrationstests\Flows\HouseholdMemberTests.cs" />
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\CommunicationRepositoryTests.cs" />
@@ -131,13 +133,13 @@
     <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteHouseHoldServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteHouseholdServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\Implementations\FoodWasteHouseHoldServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\Implementations\FoodWasteHouseholdServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\TestHelpers.cs" />
@@ -399,7 +401,7 @@
     <Compile Include="Unittests\Services\CommonServiceTests.cs" />
     <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />
     <Compile Include="Unittests\Services\FoodWasteSystemDataServiceTests.cs" />
-    <Compile Include="Unittests\Services\FoodWasteHouseHoldServiceTests.cs" />
+    <Compile Include="Unittests\Services\FoodWasteHouseholdServiceTests.cs" />
     <Compile Include="Unittests\Services\IntranetServiceBaseTests.cs" />
     <Compile Include="Unittests\Services\KalenderServiceTests.cs" />
   </ItemGroup>

@@ -14,11 +14,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
     /// </summary>
     [TestFixture]
     [Category("Integrationstest")]
-    public class FoodWasteHouseHoldServiceTests
+    public class FoodWasteHouseholdServiceTests
     {
         #region Private variables
 
-        private IFoodWasteHouseHoldService _foodWasteHouseHoldService;
+        private IFoodWasteHouseholdService _foodWasteHouseholdService;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         public void TestSetUp()
         {
             var container = ContainerFactory.Create();
-            _foodWasteHouseHoldService = container.Resolve<IFoodWasteHouseHoldService>();
+            _foodWasteHouseholdService = container.Resolve<IFoodWasteHouseholdService>();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodItemCollectionGetGetsFoodItemCollection()
         {
-            var translationInfoCollection = _foodWasteHouseHoldService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            var translationInfoCollection = _foodWasteHouseholdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
             Assert.That(translationInfoCollection, Is.Not.Null);
             Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -48,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 {
                     TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                 };
-                var foodGroupTree = _foodWasteHouseHoldService.FoodGroupTreeGet(foodGroupTreeGetQuery);
+                var foodGroupTree = _foodWasteHouseholdService.FoodGroupTreeGet(foodGroupTreeGetQuery);
                 Assert.That(foodGroupTree, Is.Not.Null);
                 Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
 
@@ -64,7 +64,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                         TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier,
                         FoodGroupIdentifier = foodGroupIdentifier
                     };
-                    var foodItemCollection = _foodWasteHouseHoldService.FoodItemCollectionGet(foodItemCollectionGetQuery);
+                    var foodItemCollection = _foodWasteHouseholdService.FoodItemCollectionGet(foodItemCollectionGetQuery);
                     Assert.That(foodItemCollection, Is.Not.Null);
                     Assert.That(foodItemCollection.FoodItems, Is.Not.Null);
                     Assert.That(foodItemCollection.FoodItems.Count(), Is.GreaterThanOrEqualTo(0));
@@ -79,7 +79,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodGroupTreeGetGetsFoodGroupTree()
         {
-            var translationInfoCollection = _foodWasteHouseHoldService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            var translationInfoCollection = _foodWasteHouseholdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
             Assert.That(translationInfoCollection, Is.Not.Null);
             Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -89,7 +89,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 {
                     TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                 };
-                var foodGroupTree = _foodWasteHouseHoldService.FoodGroupTreeGet(query);
+                var foodGroupTree = _foodWasteHouseholdService.FoodGroupTreeGet(query);
                 Assert.That(foodGroupTree, Is.Not.Null);
                 Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
                 Assert.That(foodGroupTree.FoodGroups.Count(), Is.GreaterThanOrEqualTo(0));
@@ -104,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         public void TestThatPrivacyPolicyGetGetsStaticTextViewForPrivacyPolicy()
         {
             var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-            var translationInfoSystemViewCollection = _foodWasteHouseHoldService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+            var translationInfoSystemViewCollection = _foodWasteHouseholdService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
 
@@ -114,7 +114,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 {
                     TranslationInfoIdentifier = translationInfoSystemView.TranslationInfoIdentifier
                 };
-                var staticTextView = _foodWasteHouseHoldService.PrivacyPolicyGet(privacyPolicyGetQuery);
+                var staticTextView = _foodWasteHouseholdService.PrivacyPolicyGet(privacyPolicyGetQuery);
                 Assert.That(staticTextView, Is.Not.Null);
                 Assert.That(staticTextView.StaticTextType, Is.EqualTo((int) StaticTextType.PrivacyPolicy));
                 Assert.That(staticTextView.SubjectTranslation, Is.Not.Null);
@@ -131,7 +131,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         public void TestThatTranslationInfoGetAllGetsTranslationInfoSystemViewCollection()
         {
             var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-            var translationInfoSystemViewCollection = _foodWasteHouseHoldService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+            var translationInfoSystemViewCollection = _foodWasteHouseholdService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
         }
