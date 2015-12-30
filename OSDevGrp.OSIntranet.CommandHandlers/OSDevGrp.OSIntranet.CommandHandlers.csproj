@@ -69,7 +69,9 @@
     <Compile Include="Dispatchers\DispatcherBase.cs" />
     <Compile Include="Dispatchers\IDispatcher.cs" />
     <Compile Include="Dispatchers\IStaticTextFieldMerge.cs" />
+    <Compile Include="Dispatchers\IWelcomeLetterDispatcher.cs" />
     <Compile Include="Dispatchers\StaticTextFieldMerge.cs" />
+    <Compile Include="Dispatchers\WelcomeLetterDispatcher.cs" />
     <Compile Include="FoodItemImportFromDataProviderCommandHandler.cs" />
     <Compile Include="ForeignKeyAddCommandHandler.cs" />
     <Compile Include="ForeignKeyDeleteCommandHandler.cs" />

@@ -62,6 +62,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
 
             container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)));
 
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers").BasedOn(typeof (IDispatcher<>)).WithService.FromInterface(typeof (IDispatcher<>)));
             container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers").BasedOn(typeof (ICommandHandler)).WithService.FromInterface(typeof (ICommandHandler)));
 
             container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.QueryHandlers").BasedOn(typeof (IQueryHandler)).WithService.FromInterface(typeof (IQueryHandler)));

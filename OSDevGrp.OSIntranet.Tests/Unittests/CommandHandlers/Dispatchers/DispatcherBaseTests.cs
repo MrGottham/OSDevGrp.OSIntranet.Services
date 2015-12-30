@@ -77,12 +77,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         [Test]
         public void TestThatConstructorInitializeDispatcherBase()
         {
-            var communicationRepository = MockRepository.GenerateMock<ICommunicationRepository>();
+            var communicationRepositoryMock = MockRepository.GenerateMock<ICommunicationRepository>();
 
-            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepository);
+            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepositoryMock);
             Assert.That(dispatcherBase, Is.Not.Null);
             Assert.That(dispatcherBase.CommunicationRepository, Is.Not.Null);
-            Assert.That(dispatcherBase.CommunicationRepository, Is.EqualTo(communicationRepository));
+            Assert.That(dispatcherBase.CommunicationRepository, Is.EqualTo(communicationRepositoryMock));
         }
 
         /// <summary>
@@ -105,9 +105,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         [Test]
         public void TestThatDispatchThrowsArgumentNullExceptionWhenStakeholderIsNull()
         {
-            var communicationRepository = MockRepository.GenerateMock<ICommunicationRepository>();
+            var communicationRepositoryMock = MockRepository.GenerateMock<ICommunicationRepository>();
 
-            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepository);
+            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepositoryMock);
             Assert.That(dispatcherBase, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => dispatcherBase.Dispatch(null, MockRepository.GenerateMock<IStakeholder>(), DomainObjectMockBuilder.BuildTranslationInfoMock()));
@@ -124,9 +124,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         [Test]
         public void TestThatDispatchThrowsArgumentNullExceptionWhenDomainObjectIsNull()
         {
-            var communicationRepository = MockRepository.GenerateMock<ICommunicationRepository>();
+            var communicationRepositoryMock = MockRepository.GenerateMock<ICommunicationRepository>();
 
-            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepository);
+            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepositoryMock);
             Assert.That(dispatcherBase, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => dispatcherBase.Dispatch(DomainObjectMockBuilder.BuildStakeholderMock(), null, DomainObjectMockBuilder.BuildTranslationInfoMock()));
@@ -143,9 +143,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         [Test]
         public void TestThatDispatchThrowsArgumentNullExceptionWhenTranslationInfoIsNull()
         {
-            var communicationRepository = MockRepository.GenerateMock<ICommunicationRepository>();
+            var communicationRepositoryMock = MockRepository.GenerateMock<ICommunicationRepository>();
 
-            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepository);
+            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepositoryMock);
             Assert.That(dispatcherBase, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => dispatcherBase.Dispatch(DomainObjectMockBuilder.BuildStakeholderMock(), MockRepository.GenerateMock<IIdentifiable>(), null));
@@ -162,12 +162,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         [Test]
         public void TestThatDispatchCallsTranslateWhenDomainObjectIsTranslatable()
         {
-            var communicationRepository = MockRepository.GenerateMock<ICommunicationRepository>();
+            var communicationRepositoryMock = MockRepository.GenerateMock<ICommunicationRepository>();
             
             var domainObjectMock = MockRepository.GenerateMock<ITranslatable>();
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
 
-            var dispatcherBase = new MyDispatcher<ITranslatable>(communicationRepository);
+            var dispatcherBase = new MyDispatcher<ITranslatable>(communicationRepositoryMock);
             Assert.That(dispatcherBase, Is.Not.Null);
 
             dispatcherBase.Dispatch(DomainObjectMockBuilder.BuildStakeholderMock(), domainObjectMock, translationInfoMock);
@@ -181,9 +181,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Dispatchers
         [Test]
         public void TestThatDispatchCallsHandleCommunication()
         {
-            var communicationRepository = MockRepository.GenerateMock<ICommunicationRepository>();
+            var communicationRepositoryMock = MockRepository.GenerateMock<ICommunicationRepository>();
 
-            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepository);
+            var dispatcherBase = new MyDispatcher<IIdentifiable>(communicationRepositoryMock);
             Assert.That(dispatcherBase, Is.Not.Null);
             Assert.That(dispatcherBase.HandleCommunicationHasBeenCalled, Is.False);
 
