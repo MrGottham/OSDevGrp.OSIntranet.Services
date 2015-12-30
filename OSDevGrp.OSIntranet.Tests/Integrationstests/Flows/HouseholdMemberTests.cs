@@ -1,14 +1,16 @@
-﻿using NUnit.Framework;
-using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
+﻿using System.Linq;
+using NUnit.Framework;
+using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
 {
     /// <summary>
-    /// Integration tests which tests flows with a household member..
+    /// Integration tests which tests flows with a household member.
     /// </summary>
     [TestFixture]
     [Category("Integrationstest")]
@@ -16,7 +18,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
     {
         #region Private variables
 
-        private ICommandBus _commandBus;
+        private ILogicExecutor _logicExecutor;
         private IHouseholdDataRepository _householdDataRepository;
         private IFoodWasteHouseholdService _householdService;
 
@@ -29,7 +31,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         public void TestSetUp()
         {
             var container = ContainerFactory.Create();
-            _commandBus = container.Resolve<ICommandBus>();
+            _logicExecutor = container.Resolve<ILogicExecutor>();
             _householdDataRepository = container.Resolve<IHouseholdDataRepository>();
             _householdService = container.Resolve<IFoodWasteHouseholdService>();
         }
@@ -40,12 +42,23 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         [Test]
         public void TestHouseholdMemberCreationFlow()
         {
-            //using (var executor = new FlowTestExecutor())
-            //{
-            //    var translationInfoCollection = _householdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
-            //    Assert.That(translationInfoCollection, Is.Not.Null);
-            //    Assert.That(translationInfoCollection, Is.Not.Empty);
-            //}
+            using (var executor = new FlowTestExecutor())
+            {
+                var translationInfoCollection = _householdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                var translationInfoIdentifier = translationInfoCollection.Take(1).First().TranslationInfoIdentifier;
+                var householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(executor.MailAddress, translationInfoIdentifier);
+                try
+                {
+                }
+                finally
+                {
+                    var householdMemberToDelete = _householdDataRepository.Get<IHouseholdMember>(householdMemberIdentifier);
+                    _householdDataRepository.Delete(householdMemberToDelete);
+                }
+            }
         }
     }
 }

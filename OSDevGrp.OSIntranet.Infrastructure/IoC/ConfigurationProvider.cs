@@ -49,9 +49,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<IExceptionBuilder>().ImplementedBy<ExceptionBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IFaultExceptionBuilder<FoodWasteFault>>().ImplementedBy<FoodWasteFaultExceptionBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IDomainObjectValidations>().ImplementedBy<DomainObjectValidations>().LifeStyle.Singleton);
-            container.Register(Component.For<ISpecification>().ImplementedBy<Specification>().LifeStyle.Transient);
+
             container.Register(Component.For<ICommandBus>().ImplementedBy<CommandBus>().LifeStyle.Transient);
             container.Register(Component.For<IQueryBus>().ImplementedBy<QueryBus>().LifeStyle.Transient);
+            container.Register(Component.For<IClaimValueProvider>().ImplementedBy<ClaimValueProvider>().LifeStyle.Transient);
+            container.Register(Component.For<ISpecification>().ImplementedBy<Specification>().LifeStyle.Transient);
             container.Register(Component.For<ICommonValidations>().ImplementedBy<CommonValidations>().LifeStyle.Singleton);
             container.Register(Component.For<ILogicExecutor>().ImplementedBy<LogicExecutor>().LifeStyle.Transient);
             container.Register(Component.For<IStaticTextFieldMerge>().ImplementedBy<StaticTextFieldMerge>().LifeStyle.Transient);

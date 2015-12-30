@@ -120,6 +120,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Integrationstests\Flows\ClaimValueProviderTests.cs" />
     <Compile Include="Integrationstests\Flows\FlowTestExecutor.cs" />
     <Compile Include="Integrationstests\Flows\HouseholdMemberTests.cs" />
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
@@ -298,6 +299,7 @@
     <Compile Include="Unittests\Domain\Kalender\BrugeraftaleTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\BrugerlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\BrugerTests.cs" />
+    <Compile Include="Unittests\Infrastructure\ClaimValueProviderTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
     <Compile Include="Unittests\Infrastructure\ExceptionBuilderTests.cs" />
     <Compile Include="Unittests\Infrastructure\FoodWasteFaultExceptionBuilderTests.cs" />

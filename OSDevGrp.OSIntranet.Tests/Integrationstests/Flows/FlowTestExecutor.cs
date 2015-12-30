@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
-using Microsoft.IdentityModel.Claims;
 using OSDevGrp.OSIntranet.Security.Claims;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
@@ -32,7 +31,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         /// Creates an instance of the internal class which can setup, execute and dispose the environment a flow test.
         /// </summary>
         /// <param name="mailAddress">Mail address used in the flow test.</param>
-        private FlowTestExecutor(string mailAddress)
+        public FlowTestExecutor(string mailAddress)
         {
             if (mailAddress == null)
             {
@@ -41,12 +40,12 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
 
             _currentPrincipal = Thread.CurrentPrincipal;
 
-            var claimPrincipal = new ClaimsPrincipal(_currentPrincipal);
-            claimPrincipal.Identities.ElementAt(0).Claims.Add(new Claim(ClaimTypes.Email, mailAddress));
-            claimPrincipal.Identities.ElementAt(0).Claims.Add(new Claim(FoodWasteClaimTypes.ValidatedUser, mailAddress));
-            claimPrincipal.Identities.ElementAt(0).Claims.Add(new Claim(FoodWasteClaimTypes.HouseHoldManagement, mailAddress));
+            var claimsIdentity = new ClaimsIdentity(WindowsIdentity.GetCurrent());
+            claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, mailAddress));
+            claimsIdentity.AddClaim(new Claim(FoodWasteClaimTypes.ValidatedUser, mailAddress));
+            claimsIdentity.AddClaim(new Claim(FoodWasteClaimTypes.HouseHoldManagement, mailAddress));
 
-            Thread.CurrentPrincipal = claimPrincipal;
+            Thread.CurrentPrincipal = new ClaimsPrincipal(claimsIdentity);
         }
 
         #endregion
@@ -60,8 +59,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         {
             get
             {
-                var claimPrincipal = Thread.CurrentPrincipal as IClaimsPrincipal;
-                return claimPrincipal == null ? string.Empty : claimPrincipal.Identities.ElementAt(0).Claims.First(claim => String.Compare(claim.ClaimType, ClaimTypes.Email, StringComparison.Ordinal) == 0).Value;
+                var claimsPrincipal = new ClaimsPrincipal(Thread.CurrentPrincipal);
+                var emailClaim = claimsPrincipal.FindFirst(ClaimTypes.Email);
+                return emailClaim == null ? string.Empty : emailClaim.Value;
             }
         }
 
