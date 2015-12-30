@@ -1091,5 +1091,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(serviceReceiptResponse.Identifier, Is.EqualTo(identifiableMock.Identifier));
             Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
         }
+
+        /// <summary>
+        /// Tests that Map maps a boolean to BooleanResultResponse.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapMapsBooleanToBooleanResultResponse(bool testValue)
+        {
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var serviceReceiptResponse = foodWasteObjectMapper.Map<bool, BooleanResultResponse>(testValue);
+            Assert.That(serviceReceiptResponse.Result, Is.EqualTo(testValue));
+            Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+        }
     }
 }

@@ -5,31 +5,31 @@ using Ploeh.AutoFixture;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
 {
     /// <summary>
-    /// Tests the response for a boolean receipt.
+    /// Tests the response for a boolean result.
     /// </summary>
     [TestFixture]
-    public class BooleanReceiptResponseTests
+    public class BooleanResultResponseTests
     {
         /// <summary>
-        /// Tests that the response for a service receipt can be initialized.
+        /// Tests that the response for a boolean result can be initialized.
         /// </summary>
         [Test]
-        public void TestThatBooleanReceiptResponseCanBeInitialized()
+        public void TestThatBooleanResultResponseCanBeInitialized()
         {
             var fixture = new Fixture();
-            var serviceReceiptResponse = fixture.Create<BooleanReceiptResponse>();
-            DataContractTestHelper.TestAtContractErInitieret(serviceReceiptResponse);
+            var booleanResultResponse = fixture.Create<BooleanResultResponse>();
+            DataContractTestHelper.TestAtContractErInitieret(booleanResultResponse);
         }
 
         /// <summary>
-        /// Tests that the response for a service receipt can be serialized.
+        /// Tests that the response for a boolean result can be serialized.
         /// </summary>
         [Test]
-        public void TestThatBooleanReceiptResponseCanBeSerialized()
+        public void TestThatBooleanResultResponseCanBeSerialized()
         {
             var fixture = new Fixture();
-            var serviceReceiptResponse = fixture.Create<ServiceReceiptResponse>();
-            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(serviceReceiptResponse);
+            var booleanResultResponse = fixture.Create<BooleanResultResponse>();
+            DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(booleanResultResponse);
         }
     }
 }

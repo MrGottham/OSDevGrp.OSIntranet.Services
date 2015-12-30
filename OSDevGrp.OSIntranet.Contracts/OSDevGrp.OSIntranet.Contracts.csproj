@@ -107,7 +107,7 @@
     <Compile Include="Queries\TranslationInfoCollectionGetQuery.cs" />
     <Compile Include="Responses\BogføringsadvarselResponse.cs" />
     <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
-    <Compile Include="Responses\BooleanReceiptResponse.cs" />
+    <Compile Include="Responses\BooleanResultResponse.cs" />
     <Compile Include="Responses\ServiceReceiptResponse.cs" />
     <Compile Include="Services\IAdressekartotekService.cs" />
     <Compile Include="Services\ICommonService.cs" />

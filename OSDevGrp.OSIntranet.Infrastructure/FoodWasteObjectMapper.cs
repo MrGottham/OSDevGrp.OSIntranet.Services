@@ -335,6 +335,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     EventDate = DateTime.Now
                 });
 
+            Mapper.CreateMap<bool, BooleanResultResponse>()
+                .ConvertUsing(m => new BooleanResultResponse
+                {
+                    Result = m,
+                    EventDate = DateTime.Now
+                });
+
             Mapper.AssertConfigurationIsValid();
         }
 
