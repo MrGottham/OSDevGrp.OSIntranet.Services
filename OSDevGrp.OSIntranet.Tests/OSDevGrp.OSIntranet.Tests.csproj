@@ -217,7 +217,7 @@
     <Compile Include="Unittests\Contracts\Queries\TranslationInfoCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringsadvarselResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BogføringslinjeOpretResponseTests.cs" />
-    <Compile Include="Unittests\Contracts\Responses\BooleanResponseTests.cs" />
+    <Compile Include="Unittests\Contracts\Responses\BooleanReceiptResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\ServiceReceiptResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressegruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\AdressekontolisteViewTests.cs" />

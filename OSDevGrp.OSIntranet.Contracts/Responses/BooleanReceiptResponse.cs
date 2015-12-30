@@ -5,10 +5,10 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 namespace OSDevGrp.OSIntranet.Contracts.Responses
 {
     /// <summary>
-    /// Response for a boolean.
+    /// Response for a boolean receipt.
     /// </summary>
-    [DataContract(Name = "BooleanResponse", Namespace = SoapNamespaces.FoodWasteNamespace)]
-    public class BooleanResponse : IView
+    [DataContract(Name = "BooleanReceipt", Namespace = SoapNamespaces.FoodWasteNamespace)]
+    public class BooleanReceiptResponse : IView
     {
         /// <summary>
         /// Gets or sets the event date.
