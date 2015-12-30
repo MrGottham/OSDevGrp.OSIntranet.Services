@@ -47,6 +47,59 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberAdd calls Publish on the command bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberAddCallsPublishOnCommandBus()
+        {
+            var fixture = new Fixture();
+
+            var mailAddress = fixture.Create<string>();
+            var translationInfoIdentifier = Guid.NewGuid();
+
+            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
+            commandBusMock.Stub(m =>m.Publish<HouseholdMemberAddCommand, ServiceReceiptResponse>(Arg<HouseholdMemberAddCommand>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var command = (HouseholdMemberAddCommand) e.Arguments.ElementAt(0);
+                    Assert.That(command.MailAddress, Is.Not.Null);
+                    Assert.That(command.MailAddress, Is.Not.Empty);
+                    Assert.That(command.MailAddress, Is.EqualTo(mailAddress));
+                    Assert.That(command.TranslationInfoIdentifier, Is.EqualTo(translationInfoIdentifier));
+                })
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
+
+            logicExecutor.HouseholdMemberAdd(mailAddress, translationInfoIdentifier);
+
+            commandBusMock.AssertWasCalled(m => m.Publish<HouseholdMemberAddCommand, ServiceReceiptResponse>(Arg<HouseholdMemberAddCommand>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberAdd returns identifier from the returned service receipt.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberAddReturnsIdentifierFromServiceReceiptResponse()
+        {
+            var fixture = new Fixture();
+
+            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
+            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
+            commandBusMock.Stub(m => m.Publish<HouseholdMemberAddCommand, ServiceReceiptResponse>(Arg<HouseholdMemberAddCommand>.Is.Anything))
+                .Return(serviceReceipt)
+                .Repeat.Any();
+
+            var logicExecutor = new LogicExecutor(commandBusMock);
+            Assert.That(logicExecutor, Is.Not.Null);
+
+            var result = logicExecutor.HouseholdMemberAdd(fixture.Create<string>(), Guid.NewGuid());
+            Assert.That(result, Is.EqualTo(serviceReceipt.Identifier));
+        }
+
+        /// <summary>
         /// Tests that ForeignKeyAdd throws an ArgumentNullException when the foreign key to add is null.
         /// </summary>
         [Test]

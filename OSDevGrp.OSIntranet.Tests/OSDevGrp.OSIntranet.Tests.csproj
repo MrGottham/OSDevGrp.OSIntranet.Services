@@ -145,6 +145,7 @@
     <Compile Include="Unittests\CommandHandlers\BogføringslinjeOpretCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\AdressekartotekCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FinansstyringCommandHandlerBaseTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\Core\FoodWasteHouseholdDataCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FoodWasteSystemDataCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Unittests\CommandHandlers\ForeignKeyDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\ForeignKeyModifyCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\FoodGroupImportFromDataProviderCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\HouseholdMemberAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationModifyCommandHandlerTests.cs" />
@@ -168,6 +170,7 @@
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyDeleteCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyModifyCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\FoodGroupImportFromDataProviderCommandTests.cs" />
+    <Compile Include="Unittests\Contracts\Commands\HouseholdMemberAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationDeleteCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationModifyCommandTests.cs" />

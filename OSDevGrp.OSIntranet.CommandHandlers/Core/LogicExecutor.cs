@@ -40,6 +40,23 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         #region Methods
 
         /// <summary>
+        /// Executes functionality which adds a household member.
+        /// </summary>
+        /// <param name="mailAddress">Mail address for the household member to add.</param>
+        /// <param name="translationInfoIdentifier">Identifier for the transation informations used for translations.</param>
+        /// <returns>Identifier for the added household member.</returns>
+        public virtual Guid HouseholdMemberAdd(string mailAddress, Guid translationInfoIdentifier)
+        {
+            var command = new HouseholdMemberAddCommand
+            {
+                MailAddress = mailAddress,
+                TranslationInfoIdentifier = translationInfoIdentifier
+            };
+            var serviceReceipt = Execute<HouseholdMemberAddCommand, ServiceReceiptResponse>(command);
+            return serviceReceipt.Identifier.HasValue ? serviceReceipt.Identifier.Value : default(Guid);
+        }
+
+        /// <summary>
         /// Executes functionality which adds a foreign key to a domain object.
         /// </summary>
         /// <param name="foreignKey">Foreign key to add.</param>

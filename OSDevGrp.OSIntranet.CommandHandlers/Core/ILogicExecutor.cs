@@ -9,6 +9,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
     public interface ILogicExecutor
     {
         /// <summary>
+        /// Executes functionality which adds a household member.
+        /// </summary>
+        /// <param name="mailAddress">Mail address for the household member to add.</param>
+        /// <param name="translationInfoIdentifier">Identifier for the transation informations used for translations.</param>
+        /// <returns>Identifier for the added household member.</returns>
+        Guid HouseholdMemberAdd(string mailAddress, Guid translationInfoIdentifier);
+
+        /// <summary>
         /// Executes functionality which adds a foreign key to a domain object.
         /// </summary>
         /// <param name="foreignKey">Foreign key to add.</param>
