@@ -13,6 +13,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Dispatchers
         /// </summary>
         /// <param name="stakeholder">Stakeholder which data should be dispatched to.</param>
         /// <param name="domainObject">Domain object which provides data to dispatch.</param>
-        void Dispatch(IStakeholder stakeholder, TDomainObject domainObject);
+        /// <param name="translationInfo">Translation informations used to translate the data to dispatch.</param>
+        void Dispatch(IStakeholder stakeholder, TDomainObject domainObject, ITranslationInfo translationInfo);
     }
 }

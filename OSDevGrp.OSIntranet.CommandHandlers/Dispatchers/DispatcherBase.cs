@@ -52,10 +52,38 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Dispatchers
         /// </summary>
         /// <param name="stakeholder">Stakeholder which data should be dispatched to.</param>
         /// <param name="domainObject">Domain object which provides data to dispatch.</param>
-        public virtual void Dispatch(IStakeholder stakeholder, TDomainObject domainObject)
+        /// <param name="translationInfo">Translation informations used to translate the data to dispatch.</param>
+        public virtual void Dispatch(IStakeholder stakeholder, TDomainObject domainObject, ITranslationInfo translationInfo)
         {
-            throw new NotImplementedException();
+            if (stakeholder == null)
+            {
+                throw new ArgumentNullException("stakeholder");
+            }
+            if (Equals(domainObject, null))
+            {
+                throw new ArgumentNullException("domainObject");
+            }
+            if (translationInfo == null)
+            {
+                throw new ArgumentNullException("translationInfo");
+            }
+
+            var translatableDomainObject = domainObject as ITranslatable;
+            if (translatableDomainObject != null)
+            {
+                translatableDomainObject.Translate(translationInfo.CultureInfo);
+            }
+
+            HandleCommunication(stakeholder, domainObject, translationInfo);
         }
+
+        /// <summary>
+        /// Handles the communication so data will be dispatched to the stakeholder.
+        /// </summary>
+        /// <param name="stakeholder">Stakeholder which data should be dispatched to.</param>
+        /// <param name="domainObject">Domain object which provides data to dispatch.</param>
+        /// <param name="translationInfo">Translation informations used to translate the data to dispatch.</param>
+        protected abstract void HandleCommunication(IStakeholder stakeholder, TDomainObject domainObject, ITranslationInfo translationInfo);
 
         #endregion
     }
