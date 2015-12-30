@@ -87,6 +87,9 @@
     <Compile Include="Queries\FirmalisteGetQuery.cs" />
     <Compile Include="Queries\FoodGroupTreeGetQuery.cs" />
     <Compile Include="Queries\FoodItemCollectionGetQuery.cs" />
+    <Compile Include="Queries\HouseholdMemberDataGetQueryBase.cs" />
+    <Compile Include="Queries\HouseholdMemberIsCreatedQuery.cs" />
+    <Compile Include="Queries\HouseholdMemberTranslatableDataGetQueryBase.cs" />
     <Compile Include="Queries\KalenderbrugerAftaleGetQuery.cs" />
     <Compile Include="Queries\KalenderbrugerAftalerGetQuery.cs" />
     <Compile Include="Queries\KalenderbrugereGetQuery.cs" />

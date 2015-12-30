@@ -55,8 +55,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                 }
                 finally
                 {
-                    var householdMemberToDelete = _householdDataRepository.Get<IHouseholdMember>(householdMemberIdentifier);
-                    _householdDataRepository.Delete(householdMemberToDelete);
+                    _householdDataRepository.Delete(_householdDataRepository.Get<IHouseholdMember>(householdMemberIdentifier));
                 }
             }
         }
