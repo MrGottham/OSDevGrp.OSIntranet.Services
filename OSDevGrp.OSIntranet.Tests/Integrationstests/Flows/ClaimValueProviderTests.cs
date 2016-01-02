@@ -35,7 +35,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         public void TestThatClaimValuesCanBeResolved()
         {
             var mailAddress = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower());
-            using (new FlowTestExecutor(mailAddress))
+            using (new ClaimsPrincipalTestExecutor(mailAddress))
             {
                 Assert.That(_claimValueProvider.MailAddress, Is.Not.Null);
                 Assert.That(_claimValueProvider.MailAddress, Is.Not.Empty);

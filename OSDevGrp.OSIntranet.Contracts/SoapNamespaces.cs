@@ -44,6 +44,6 @@
         /// <summary>
         /// Name for the service which can access and modify data on a house hold in the food waste domain.
         /// </summary>
-        public const string FoodWasteHouseHoldServiceName = "HouseHoldService";
+        public const string FoodWasteHouseholdServiceName = "HouseholdService";
     }
 }

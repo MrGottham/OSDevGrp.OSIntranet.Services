@@ -42,7 +42,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         [Test]
         public void TestHouseholdMemberCreationFlow()
         {
-            using (var executor = new FlowTestExecutor())
+            using (var executor = new ClaimsPrincipalTestExecutor())
             {
                 var translationInfoCollection = _householdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
                 Assert.That(translationInfoCollection, Is.Not.Null);
@@ -52,6 +52,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                 var householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(executor.MailAddress, translationInfoIdentifier);
                 try
                 {
+                    var householdMemberIsCreated = _householdService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                    Assert.That(householdMemberIsCreated, Is.Not.Null);
+                    Assert.That(householdMemberIsCreated.Result, Is.True);
                 }
                 finally
                 {

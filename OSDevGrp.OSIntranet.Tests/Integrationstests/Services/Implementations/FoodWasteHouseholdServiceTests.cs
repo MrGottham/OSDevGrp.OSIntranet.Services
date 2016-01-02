@@ -33,6 +33,21 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberIsCreated returns boolean result where the result is false.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberIsCreatedReturnsBooleanResultWhereResultIsFalse()
+        {
+            using (new ClaimsPrincipalTestExecutor())
+            {
+                var booleanResult = _foodWasteHouseholdService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                Assert.That(booleanResult, Is.Not.Null);
+                Assert.That(booleanResult.Result, Is.EqualTo(false));
+                Assert.That(booleanResult.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            }
+        }
+
+        /// <summary>
         /// Tests that FoodItemCollectionGet gets the collection of food items.
         /// </summary>
         [Test]

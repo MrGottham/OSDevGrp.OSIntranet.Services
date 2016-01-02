@@ -44,6 +44,26 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberIsCreated returns boolean result where the result is false.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberIsCreatedReturnsBooleanResultWhereResultIsFalse()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var booleanResult = client.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                Assert.That(booleanResult, Is.Not.Null);
+                Assert.That(booleanResult.Result, Is.EqualTo(false));
+                Assert.That(booleanResult.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that FoodItemCollectionGet gets the collection of food items.
         /// </summary>
         [Test]

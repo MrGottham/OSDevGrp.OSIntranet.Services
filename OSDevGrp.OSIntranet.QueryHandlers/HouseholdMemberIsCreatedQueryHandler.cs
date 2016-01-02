@@ -1,4 +1,7 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
@@ -7,7 +10,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
     /// <summary>
     /// Query handler which handles the query which can check whether the current user has been created as a household member.
     /// </summary>
-    public class HouseholdMemberIsCreatedQueryHandler
+    public class HouseholdMemberIsCreatedQueryHandler : IQueryHandler<HouseholdMemberIsCreatedQuery, BooleanResultResponse>
     {
         #region Private variables
 
@@ -42,6 +45,27 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             _householdDataRepository = householdDataRepository;
             _claimValueProvider = claimValueProvider;
             _objectMapper = foodWasteObjectMapper;
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Handles the query which can check whether the current user has been created as a household member.
+        /// </summary>
+        /// <param name="query">Query which can check whether the current user has been created as a household member.</param>
+        /// <returns>Boolean result.</returns>
+        public virtual BooleanResultResponse Query(HouseholdMemberIsCreatedQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+
+            var householdMember = _householdDataRepository.HouseholdMemberGetByMailAddress(_claimValueProvider.MailAddress);
+
+            return _objectMapper.Map<bool, BooleanResultResponse>(householdMember != null);
         }
 
         #endregion

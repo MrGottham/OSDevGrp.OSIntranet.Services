@@ -9,6 +9,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Contracts;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Services.Implementations;
@@ -94,6 +95,106 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("foodWasteFaultExceptionBuilder"));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberIsCreated throws an ArgumentNullException when the query which can check whether the caller caller has been created as a household member is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberIsCreatedThrowsArgumentNullExceptionIfHouseholdMemberIsCreatedQueryIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteHouseholdService.HouseholdMemberIsCreated(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("query"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberIsCreated calls Query on the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberIsCreatedCallsQueryOnQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<HouseholdMemberIsCreatedQuery, BooleanResultResponse>(Arg<HouseholdMemberIsCreatedQuery>.Is.NotNull))
+                .Return(fixture.Create<BooleanResultResponse>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var query = fixture.Create<HouseholdMemberIsCreatedQuery>();
+            foodWasteHouseholdService.HouseholdMemberIsCreated(query);
+
+            queryBusMock.AssertWasCalled(m => m.Query<HouseholdMemberIsCreatedQuery, BooleanResultResponse>(Arg<HouseholdMemberIsCreatedQuery>.Is.Equal(query)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberIsCreated returns the result from the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberIsCreatedReturnsResultFromQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var booleanResultResponse = fixture.Create<BooleanResultResponse>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<HouseholdMemberIsCreatedQuery, BooleanResultResponse>(Arg<HouseholdMemberIsCreatedQuery>.Is.NotNull))
+                .Return(booleanResultResponse)
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var result = foodWasteHouseholdService.HouseholdMemberIsCreated(fixture.Create<HouseholdMemberIsCreatedQuery>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(booleanResultResponse));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberIsCreated throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberIsCreatedThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<HouseholdMemberIsCreatedQuery, BooleanResultResponse>(Arg<HouseholdMemberIsCreatedQuery>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteHouseholdService.HouseholdMemberIsCreated(fixture.Create<HouseholdMemberIsCreatedQuery>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -193,7 +294,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseHoldServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -295,7 +396,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseHoldServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -395,7 +496,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseHoldServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -498,7 +599,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseHoldServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
         }
     }
 }

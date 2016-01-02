@@ -2,6 +2,7 @@
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 
 namespace OSDevGrp.OSIntranet.Contracts.Services
@@ -9,9 +10,19 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     /// <summary>
     /// Interface for the service which can access and modify data on a house hold in the food waste domain.
     /// </summary>
-    [ServiceContract(Name = SoapNamespaces.FoodWasteHouseHoldServiceName, Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [ServiceContract(Name = SoapNamespaces.FoodWasteHouseholdServiceName, Namespace = SoapNamespaces.FoodWasteNamespace)]
     public interface IFoodWasteHouseholdService : IIntranetService
     {
+        /// <summary>
+        /// Gets whether the current caller has been created as a household member.
+        /// </summary>
+        /// <param name="query">Query which can check whether the caller caller has been created as a household member.</param>
+        /// <returns>Boolean result.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        BooleanResultResponse HouseholdMemberIsCreated(HouseholdMemberIsCreatedQuery query);
+
         /// <summary>
         /// Gets the collection of food items.
         /// </summary>

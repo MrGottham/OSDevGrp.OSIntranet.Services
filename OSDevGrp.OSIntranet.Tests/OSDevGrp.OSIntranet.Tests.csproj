@@ -120,8 +120,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Integrationstests\ClaimsPrincipalTestExecutor.cs" />
     <Compile Include="Integrationstests\Flows\ClaimValueProviderTests.cs" />
-    <Compile Include="Integrationstests\Flows\FlowTestExecutor.cs" />
     <Compile Include="Integrationstests\Flows\HouseholdMemberTests.cs" />
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />

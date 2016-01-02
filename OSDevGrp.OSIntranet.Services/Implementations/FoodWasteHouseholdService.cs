@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
@@ -62,6 +63,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Gets whether the current caller has been created as a household member.
+        /// </summary>
+        /// <param name="query">Query which can check whether the caller caller has been created as a household member.</param>
+        /// <returns>Boolean result.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual BooleanResultResponse HouseholdMemberIsCreated(HouseholdMemberIsCreatedQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<HouseholdMemberIsCreatedQuery, BooleanResultResponse>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>
@@ -79,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseHoldServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -101,7 +124,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseHoldServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -123,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseHoldServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -145,7 +168,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseHoldServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
