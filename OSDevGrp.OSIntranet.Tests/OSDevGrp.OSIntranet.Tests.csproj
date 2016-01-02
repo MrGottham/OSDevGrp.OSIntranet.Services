@@ -323,6 +323,7 @@
     <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FoodGroupTreeGetQueryHandlerBaseTest.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FoodItemCollectionGetQueryHandlerBaseTest.cs" />
+    <Compile Include="Unittests\QueryHandlers\Core\HouseholdMemberDataGetQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\KalenderQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\RegnskabQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\StaticTextGetQueryHandlerBaseTests.cs" />
