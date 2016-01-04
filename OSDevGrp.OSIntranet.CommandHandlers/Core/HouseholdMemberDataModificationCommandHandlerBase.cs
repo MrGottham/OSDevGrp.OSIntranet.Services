@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Reflection;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
+using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -11,7 +15,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
     /// Basic functionality which can handle a command for modifying some data on a household member.
     /// </summary>
     /// <typeparam name="TCommand">Type of the command for modifying some data on a household member.</typeparam>
-    public abstract class HouseholdMemberDataModificationCommandHandlerBase<TCommand> : FoodWasteHouseholdDataCommandHandlerBase where TCommand : HouseholdMemberDataModificationCommandBase
+    public abstract class HouseholdMemberDataModificationCommandHandlerBase<TCommand> : FoodWasteHouseholdDataCommandHandlerBase, ICommandHandler<TCommand, ServiceReceiptResponse> where TCommand : HouseholdMemberDataModificationCommandBase
     {
         #region Private variables
 
@@ -45,11 +49,64 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         #region Properties
 
         /// <summary>
+        /// Gets whether the household member should be activated to execute the command handled by this command handler.
+        /// </summary>
+        public virtual bool ShouldBeActivated
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Gets whether the household member should have accepted the privacy policy to execute the command handled by this command handler.
+        /// </summary>
+        public virtual bool ShouldHaveAcceptedPrivacyPolicy
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Gets the requeired membership which the household member should have to execute the command handled by this command handler.
+        /// </summary>
+        public virtual Membership RequiredMembership
+        {
+            get { return Membership.Basic; }
+        }
+
+        /// <summary>
         /// Gets the provider which can resolve values from the current users claims.
         /// </summary>
         protected virtual IClaimValueProvider ClaimValueProvider
         {
             get { return _claimValueProvider; }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Executes the functionality which can handle a command for modifying some data on a household member.
+        /// </summary>
+        /// <param name="command">Command for modifying some data on a household member.</param>
+        /// <returns>Service receipt.</returns>
+        public virtual ServiceReceiptResponse Execute(TCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Handles an exception which has occurred when executing the functionality which can handle a command for modifying some data on a household member.
+        /// </summary>
+        /// <param name="command">Command for modifying some data on a household member.</param>
+        /// <param name="exception">Exception.</param>
+        public virtual void HandleException(TCommand command, Exception exception)
+        {
+            throw ExceptionBuilder.Build(exception, MethodBase.GetCurrentMethod());
         }
 
         #endregion

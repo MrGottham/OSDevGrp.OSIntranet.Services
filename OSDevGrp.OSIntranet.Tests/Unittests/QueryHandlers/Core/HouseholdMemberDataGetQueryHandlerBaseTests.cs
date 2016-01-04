@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -33,8 +34,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
         /// Private class for testing the basic functionality which can handle a query for getting some data for a household member.
         /// </summary>
         /// <typeparam name="TQuery">Type of the query for getting some data for a household member.</typeparam>
-        private class MyHouseholdMemberDataGetQueryHandler<TQuery> : HouseholdMemberDataGetQueryHandlerBase<TQuery, object, IView> where TQuery : HouseholdMemberDataGetQueryBase
+        private class MyHouseholdMemberDataGetQueryHandler<TQuery> : HouseholdMemberDataGetQueryHandlerBase<TQuery, object, IView> where TQuery : HouseholdMemberDataGetQueryBase, new()
         {
+            #region Private variables
+
+            private TQuery _query;
+
+            #endregion
+
             #region Constructor
 
             /// <summary>
@@ -79,6 +86,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
                 return base.ObjectMapper;
             }
 
+            /// <summary>
+            /// Generate and returns a query which can be used with this query handler.
+            /// </summary>
+            /// <returns>Query which can be used with this query handler.</returns>
+            public TQuery GenerateQuery()
+            {
+                if (_query != null)
+                {
+                    return _query;
+                }
+                _query = new TQuery();
+                if (_query is HouseholdMemberTranslatableDataGetQueryBase)
+                {
+                    (_query as HouseholdMemberTranslatableDataGetQueryBase).TranslationInfoIdentifier = Guid.NewGuid();
+                }
+                return _query;
+            }
+
             #endregion
         }
 
@@ -94,6 +119,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
             Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+            Assert.That(householdMemberDataGetQueryHandlerBase.ShouldBeActivated, Is.True);
+            Assert.That(householdMemberDataGetQueryHandlerBase.ShouldHaveAcceptedPrivacyPolicy, Is.True);
+            Assert.That(householdMemberDataGetQueryHandlerBase.RequiredMembership, Is.EqualTo(Membership.Basic));
             Assert.That(householdMemberDataGetQueryHandlerBase.GetHouseholdDataRepository(), Is.Not.Null);
             Assert.That(householdMemberDataGetQueryHandlerBase.GetHouseholdDataRepository(), Is.EqualTo(householdDataRepositoryMock));
             Assert.That(householdMemberDataGetQueryHandlerBase.GetClaimValueProvider(), Is.Not.Null);
@@ -140,7 +168,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
         /// Tests that the constructor throws an ArgumentNullException when the object mapper which can map objects in the food waste domain is null.
         /// </summary>
         [Test]
-        public void TestThatConstructorThrowsArgumentNullExceptionWhenHouseholdFoodWasteObjectMapperIsNull()
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenFoodWasteObjectMapperIsNull()
         {
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -150,6 +178,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("foodWasteObjectMapper"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Query throws an ArgumentNullException when the query for getting some data for a household member is null.
+        /// </summary>
+        [Test]
+        public void TestThatQueryThrowsArgumentNullExceptionWhenQueryIsNull()
+        {
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMemberDataGetQueryHandlerBase.Query(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("query"));
             Assert.That(exception.InnerException, Is.Null);
         }
     }

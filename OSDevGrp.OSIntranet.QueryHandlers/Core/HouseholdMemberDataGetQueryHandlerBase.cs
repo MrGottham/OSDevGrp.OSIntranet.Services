@@ -1,5 +1,7 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
@@ -11,7 +13,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
     /// <typeparam name="TQuery">Type of the query for getting some data for a household member.</typeparam>
     /// <typeparam name="TData">Type of the data which query should select.</typeparam>
     /// <typeparam name="TView">Type of the view which should return the selected data.</typeparam>
-    public abstract class HouseholdMemberDataGetQueryHandlerBase<TQuery, TData, TView> where TQuery : HouseholdMemberDataGetQueryBase
+    public abstract class HouseholdMemberDataGetQueryHandlerBase<TQuery, TData, TView> : IQueryHandler<TQuery, TView> where TQuery : HouseholdMemberDataGetQueryBase
     {
         #region Private variables
 
@@ -53,6 +55,30 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         #region Properties
 
         /// <summary>
+        /// Gets whether the household member should be activated to get the data for the query handled by this query handler.
+        /// </summary>
+        public virtual bool ShouldBeActivated
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Gets whether the household member should have accepted the privacy policy to get the data for the query handled by this query handler.
+        /// </summary>
+        public virtual bool ShouldHaveAcceptedPrivacyPolicy
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Gets the requeired membership which the household member should have to get the data for the query handled by this query handler.
+        /// </summary>
+        public virtual Membership RequiredMembership
+        {
+            get { return Membership.Basic; }
+        }
+
+        /// <summary>
         /// Gets the repository which can access household data for the food waste domain.
         /// </summary>
         protected virtual IHouseholdDataRepository HouseholdDataRepository
@@ -74,6 +100,25 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         protected virtual IFoodWasteObjectMapper ObjectMapper
         {
             get { return _objectMapper; }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Functionality which can handle a query for getting some data for a household member.
+        /// </summary>
+        /// <param name="query">Query for getting some data for a household member.</param>
+        /// <returns>View of the selected data.</returns>
+        public virtual TView Query(TQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+
+            throw new NotImplementedException();
         }
 
         #endregion
