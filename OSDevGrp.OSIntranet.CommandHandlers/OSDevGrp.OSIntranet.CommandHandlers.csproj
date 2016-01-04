@@ -63,6 +63,7 @@
     <Compile Include="Core\FoodWasteHouseholdDataCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteSystemDataCommandHandlerBase.cs" />
     <Compile Include="Core\FællesElementCommandHandlerBase.cs" />
+    <Compile Include="Core\HouseholdMemberDataModificationCommandHandlerBase.cs" />
     <Compile Include="Core\ILogicExecutor.cs" />
     <Compile Include="Core\KalenderCommandHandlerBase.cs" />
     <Compile Include="Core\LogicExecutor.cs" />

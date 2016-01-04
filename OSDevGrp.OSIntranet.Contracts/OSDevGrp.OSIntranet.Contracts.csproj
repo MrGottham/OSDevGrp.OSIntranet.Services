@@ -61,6 +61,7 @@
     <Compile Include="Commands\ForeignKeyModifyCommand.cs" />
     <Compile Include="Commands\FoodGroupImportFromDataProviderCommand.cs" />
     <Compile Include="Commands\HouseholdMemberAddCommand.cs" />
+    <Compile Include="Commands\HouseholdMemberDataModificationCommandBase.cs" />
     <Compile Include="Commands\TranslationAddCommand.cs" />
     <Compile Include="Commands\TranslationDeleteCommand.cs" />
     <Compile Include="Commands\TranslationModifyCommand.cs" />
