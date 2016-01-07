@@ -2,10 +2,15 @@
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
+using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
+using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
@@ -39,6 +44,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             #region Private variables
 
             private TQuery _query;
+            private readonly bool? _shouldBeActivated;
+            private readonly bool? _shouldHaveAcceptedPrivacyPolicy;
+            private readonly Membership? _requiredMembership;
 
             #endregion
 
@@ -50,9 +58,43 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             /// <param name="householdDataRepository">Implementation of a repository which can access household data for the food waste domain.</param>
             /// <param name="claimValueProvider">Implementation of a provider which can resolve values from the current users claims.</param>
             /// <param name="foodWasteObjectMapper">Implementation of an object mapper which can map objects in the food waste domain.</param>
-            public MyHouseholdMemberDataGetQueryHandler(IHouseholdDataRepository householdDataRepository, IClaimValueProvider claimValueProvider, IFoodWasteObjectMapper foodWasteObjectMapper)
+            /// <param name="shouldBeActivated">Overrides whether the household member should be activated to get the data for the query handled by this query handler.</param>
+            /// <param name="shouldHaveAcceptedPrivacyPolicy">Overrides whether the household member should have accepted the privacy policy to get the data for the query handled by this query handler.</param>
+            /// <param name="requiredMembership">Overrides the requeired membership which the household member should have to get the data for the query handled by this query handler.</param>
+            public MyHouseholdMemberDataGetQueryHandler(IHouseholdDataRepository householdDataRepository, IClaimValueProvider claimValueProvider, IFoodWasteObjectMapper foodWasteObjectMapper, bool? shouldBeActivated = null, bool? shouldHaveAcceptedPrivacyPolicy = null, Membership? requiredMembership = null)
                 : base(householdDataRepository, claimValueProvider, foodWasteObjectMapper)
             {
+                _shouldBeActivated = shouldBeActivated;
+                _shouldHaveAcceptedPrivacyPolicy = shouldHaveAcceptedPrivacyPolicy;
+                _requiredMembership = requiredMembership;
+            }
+
+            #endregion
+
+            #region Properties
+
+            /// <summary>
+            /// Gets whether the household member should be activated to get the data for the query handled by this query handler.
+            /// </summary>
+            public override bool ShouldBeActivated
+            {
+                get { return _shouldBeActivated.HasValue ? _shouldBeActivated.Value : base.ShouldBeActivated; }
+            }
+
+            /// <summary>
+            /// Gets whether the household member should have accepted the privacy policy to get the data for the query handled by this query handler.
+            /// </summary>
+            public override bool ShouldHaveAcceptedPrivacyPolicy
+            {
+                get { return _shouldHaveAcceptedPrivacyPolicy.HasValue ? _shouldHaveAcceptedPrivacyPolicy.Value : base.ShouldHaveAcceptedPrivacyPolicy; }
+            }
+
+            /// <summary>
+            /// Gets the requeired membership which the household member should have to get the data for the query handled by this query handler.
+            /// </summary>
+            public override Membership RequiredMembership
+            {
+                get { return _requiredMembership.HasValue ? _requiredMembership.Value : base.RequiredMembership; }
             }
 
             #endregion
@@ -199,6 +241,266 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("query"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Query does not call Get for TranslationInfo on the repository which can access household data for the food waste domain when the query for getting some data for a household member is not a query which can get some translatable data for a household member.
+        /// </summary>
+        [Test]
+        public void TestThatQueryDoesNotCallGetForTranslationInfoOnHouseholdDataRepositoryWhenQueryIsNotHouseholdMemberTranslatableDataGetQueryBase()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+
+            householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery());
+
+            householdDataRepositoryMock.AssertWasNotCalled(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that Query calls Get for TranslationInfoIdentifier on the repository which can access household data for the food waste domain when the query for getting some data for a household member is a query which can get some translatable data for a household member.
+        /// </summary>
+        [Test]
+        public void TestThatQueryCallsGetForTranslationInfoIdentifierOnHouseholdDataRepositoryWhenQueryIsHouseholdMemberTranslatableDataGetQueryBase()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberTranslatableDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+
+            var query = householdMemberDataGetQueryHandlerBase.GenerateQuery();
+            householdMemberDataGetQueryHandlerBase.Query(query);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Equal(query.TranslationInfoIdentifier)));
+        }
+
+        /// <summary>
+        /// Tests that Query throws an IntranetBusinessException when translation informations for TranslationInfoIdentifier does not exist.
+        /// </summary>
+        [Test]
+        public void TestThatQueryThrowsIntranetBusinessExceptionWhenTranslationInfoForTranslationInfoIdentifierDoesNotExist()
+        {
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(null)
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberTranslatableDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+
+            var query = householdMemberDataGetQueryHandlerBase.GenerateQuery();
+
+            var exception = Assert.Throws<IntranetBusinessException>(() => householdMemberDataGetQueryHandlerBase.Query(query));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, query.TranslationInfoIdentifier)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Query calls MailAddress on the provider which can resolve values from the current users claims.
+        /// </summary>
+        [Test]
+        public void TestThatQueryCallsMailAddressOnClaimValueProvider()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+
+            householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery());
+
+            claimValueProviderMock.AssertWasCalled(m => m.MailAddress);
+        }
+
+        /// <summary>
+        /// Tests that Query calls HouseholdMemberGetByMailAddress on the repository which can access household data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatQueryCallsHouseholdMemberGetByMailAddressOnHouseholdDataRepository()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var mailAddress = fixture.Create<string>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(mailAddress)
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+
+            householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery());
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Equal(mailAddress)));
+        }
+
+        /// <summary>
+        /// Tests that Query throws an IntranetBusinessException when the mail address has not been created as a household member.
+        /// </summary>
+        [Test]
+        public void TestThatQueryThrowsIntranetBusinessExceptionWhenMailAddressHasNotBeenCreatedAsHouseholdMember()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(null)
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetBusinessException>(() => householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Query does not call IsActivated on the household member when the household member does not need to be activated.
+        /// </summary>
+        [Test]
+        public void TestThatQueryDoesNotCallIsActivatedOnHouseholdMemberWhenHouseholdMemberDoesNotNeedToBeActivated()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(householdMemberMock)
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, false);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+            Assert.That(householdMemberDataGetQueryHandlerBase.ShouldBeActivated, Is.False);
+
+            householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery());
+
+            householdMemberMock.AssertWasNotCalled(m => m.IsActivated);
+        }
+
+        /// <summary>
+        /// Tests that Query calls IsActivated on the household member when the household member should be activated.
+        /// </summary>
+        [Test]
+        public void TestThatQueryCallsIsActivatedOnHouseholdMemberWhenHouseholdMemberShouldBeActivated()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(householdMemberMock)
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+            Assert.That(householdMemberDataGetQueryHandlerBase.ShouldBeActivated, Is.True);
+
+            householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery());
+
+            householdMemberMock.AssertWasCalled(m => m.IsActivated);
+        }
+
+        /// <summary>
+        /// Tests that Query throws an IntranetBusinessException when the household member should be activated but is not.
+        /// </summary>
+        [Test]
+        public void TestThatQueryThrowsIntranetBusinessExceptionWhenHouseholdMemberShouldBeActivatedButIsNot()
+        {
+            var fixture = new Fixture();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(isActivated: false);
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(householdMemberMock)
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var householdMemberDataGetQueryHandlerBase = new MyHouseholdMemberDataGetQueryHandler<MyHouseholdMemberDataGetQuery>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandlerBase, Is.Not.Null);
+            Assert.That(householdMemberDataGetQueryHandlerBase.ShouldBeActivated, Is.True);
+
+            var exception = Assert.Throws<IntranetBusinessException>(() => householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated)));
             Assert.That(exception.InnerException, Is.Null);
         }
     }

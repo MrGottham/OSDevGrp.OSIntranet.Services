@@ -36,6 +36,8 @@
         IdentifierUnknownToSystem,
         ValueMustBeGivenForProperty,
         ValueForPropertyContainsIllegalChars,
-        HouseholdLimitHasBeenReached
+        HouseholdLimitHasBeenReached,
+        HouseholdMemberNotCreated,
+        HouseholdMemberNotActivated
     }
 }

@@ -6,8 +6,10 @@ using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 {
@@ -96,7 +98,15 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
                 throw new ArgumentNullException("command");
             }
 
-            throw new NotImplementedException();
+            var householdMember = HouseholdDataRepository.HouseholdMemberGetByMailAddress(ClaimValueProvider.MailAddress);
+
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(householdMember),
+                new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)))
+                .IsSatisfiedBy(() => ShouldBeActivated == false || householdMember.IsActivated,
+                    new IntranetBusinessException(
+                        Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated)));
+
+            return null;
         }
 
         /// <summary>

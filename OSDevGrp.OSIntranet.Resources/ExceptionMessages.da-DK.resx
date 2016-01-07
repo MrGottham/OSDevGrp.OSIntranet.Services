@@ -229,4 +229,10 @@
   <data name="HouseholdLimitHasBeenReached" xml:space="preserve">
     <value>Grænsen for antallet af husholdninger til husstandsmedlemmet er nået.</value>
   </data>
+  <data name="HouseholdMemberNotCreated" xml:space="preserve">
+    <value>Din mailadresse er ikke blevet oprettet som husstandsmedlem.</value>
+  </data>
+  <data name="HouseholdMemberNotActivated" xml:space="preserve">
+    <value>Dit husstandsmedlemsskabt er ikke blevet aktiveret.</value>
+  </data>
 </root>

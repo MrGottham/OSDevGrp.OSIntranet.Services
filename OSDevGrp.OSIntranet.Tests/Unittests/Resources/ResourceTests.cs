@@ -481,6 +481,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for HouseholdMemberNotCreated hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForHouseholdMemberNotCreatedHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for HouseholdMemberNotActivated hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForHouseholdMemberNotActivatedHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]

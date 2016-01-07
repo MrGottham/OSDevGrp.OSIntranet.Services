@@ -1,9 +1,12 @@
 ﻿using System;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers.Core
 {
@@ -118,7 +121,45 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
                 throw new ArgumentNullException("query");
             }
 
-            throw new NotImplementedException();
+            var translationInfo = GetTranslationInfo(query);
+
+            var householdMember = HouseholdDataRepository.HouseholdMemberGetByMailAddress(ClaimValueProvider.MailAddress);
+            if (householdMember == null)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated));
+            }
+            if (ShouldBeActivated && householdMember.IsActivated == false)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated));
+            }
+
+            return ObjectMapper.Map<object, TView>(null);
+        }
+
+        /// <summary>
+        /// Gets the translation informations which should be used to translate data selected by this query.
+        /// </summary>
+        /// <param name="query">Query for getting some data for a household member.</param>
+        /// <returns>Translation informations which should be used to translate data selected by this query.</returns>
+        private ITranslationInfo GetTranslationInfo(TQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+
+            var householdMemberTranslatableDataGetQuery = query as HouseholdMemberTranslatableDataGetQueryBase;
+            if (householdMemberTranslatableDataGetQuery == null)
+            {
+                return null;
+            }
+
+            var translationInfo = HouseholdDataRepository.Get<ITranslationInfo>(householdMemberTranslatableDataGetQuery.TranslationInfoIdentifier);
+            if (translationInfo == null)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, householdMemberTranslatableDataGetQuery.TranslationInfoIdentifier));
+            }
+            return translationInfo;
         }
 
         #endregion

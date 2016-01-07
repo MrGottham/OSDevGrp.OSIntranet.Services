@@ -229,4 +229,10 @@
   <data name="HouseholdLimitHasBeenReached" xml:space="preserve">
     <value>The household limit for the household member has been reached.</value>
   </data>
+  <data name="HouseholdMemberNotCreated" xml:space="preserve">
+    <value>Your mail address has not been created as a household member.</value>
+  </data>
+  <data name="HouseholdMemberNotActivated" xml:space="preserve">
+    <value>Your household member account has not been activated.</value>
+  </data>
 </root>
