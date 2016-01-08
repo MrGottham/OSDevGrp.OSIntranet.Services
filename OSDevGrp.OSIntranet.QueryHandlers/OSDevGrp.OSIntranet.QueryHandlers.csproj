@@ -82,6 +82,7 @@
     <Compile Include="FoodGroupTreeGetQueryHandlerForSystemView.cs" />
     <Compile Include="FoodItemCollectionGetQueryHandler.cs" />
     <Compile Include="FoodItemCollectionGetQueryHandlerForSystemView.cs" />
+    <Compile Include="HouseholdMemberHasAcceptedPrivacyPolicyQueryHandler.cs" />
     <Compile Include="HouseholdMemberIsActivatedQueryHandler.cs" />
     <Compile Include="HouseholdMemberIsCreatedQueryHandler.cs" />
     <Compile Include="KalenderbrugerAftaleGetQueryHandler.cs" />

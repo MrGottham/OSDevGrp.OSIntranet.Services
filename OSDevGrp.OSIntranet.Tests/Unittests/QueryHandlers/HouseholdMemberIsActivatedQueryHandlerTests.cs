@@ -12,7 +12,7 @@ using Rhino.Mocks;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 {
     /// <summary>
-    /// Tests the query handler which handles the query for checking whether the current user has been activated.
+    /// Test the query handler which handles the query for checking whether the current user has been activated.
     /// </summary>
     [TestFixture]
     public class HouseholdMemberIsActivatedQueryHandlerTests

@@ -98,6 +98,37 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberHasAcceptedPrivacyPolicy throws an FaultException when the household member has not been created.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberHasAcceptedPrivacyPolicyThrowsFaultExceptionWhenHouseholdMemberHasNotBeenCreated()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery()));
+                Assert.That(faultException, Is.Not.Null);
+                Assert.That(faultException.Detail, Is.Not.Null);
+                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdServiceName));
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberHasAcceptedPrivacyPolicy"));
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that FoodItemCollectionGet gets the collection of food items.
         /// </summary>
         [Test]

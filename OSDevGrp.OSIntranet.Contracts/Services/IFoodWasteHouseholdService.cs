@@ -34,6 +34,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         BooleanResultResponse HouseholdMemberIsActivated(HouseholdMemberIsActivatedQuery query);
 
         /// <summary>
+        /// Gets whether the current caller has accepted the privacy policy.
+        /// </summary>
+        /// <param name="query">Query which can check whether the current user has accepted the privacy policy.</param>
+        /// <returns>Boolean result.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        BooleanResultResponse HouseholdMemberHasAcceptedPrivacyPolicy(HouseholdMemberHasAcceptedPrivacyPolicyQuery query);
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>

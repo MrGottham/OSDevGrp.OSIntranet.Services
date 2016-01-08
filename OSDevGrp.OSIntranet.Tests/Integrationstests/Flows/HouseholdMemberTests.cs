@@ -59,6 +59,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     var householdMemberIsActivated = _householdService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
                     Assert.That(householdMemberIsActivated, Is.Not.Null);
                     Assert.That(householdMemberIsActivated.Result, Is.False);
+
+                    var householdMemberHasAcceptedPrivacyPolicy = _householdService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.False);
                 }
                 finally
                 {

@@ -298,6 +298,106 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberHasAcceptedPrivacyPolicy throws an ArgumentNullException when the query which can check whether the current user has accepted the privacy policy is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberHasAcceptedPrivacyPolicyThrowsArgumentNullExceptionIfHouseholdMemberHasAcceptedPrivacyPolicyQueryIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteHouseholdService.HouseholdMemberHasAcceptedPrivacyPolicy(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("query"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberHasAcceptedPrivacyPolicy calls Query on the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberHasAcceptedPrivacyPolicyCallsQueryOnQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<HouseholdMemberHasAcceptedPrivacyPolicyQuery, BooleanResultResponse>(Arg<HouseholdMemberHasAcceptedPrivacyPolicyQuery>.Is.NotNull))
+                .Return(fixture.Create<BooleanResultResponse>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var query = fixture.Create<HouseholdMemberHasAcceptedPrivacyPolicyQuery>();
+            foodWasteHouseholdService.HouseholdMemberHasAcceptedPrivacyPolicy(query);
+
+            queryBusMock.AssertWasCalled(m => m.Query<HouseholdMemberHasAcceptedPrivacyPolicyQuery, BooleanResultResponse>(Arg<HouseholdMemberHasAcceptedPrivacyPolicyQuery>.Is.Equal(query)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberHasAcceptedPrivacyPolicy returns the result from the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberHasAcceptedPrivacyPolicyReturnsResultFromQueryBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var booleanResultResponse = fixture.Create<BooleanResultResponse>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<HouseholdMemberHasAcceptedPrivacyPolicyQuery, BooleanResultResponse>(Arg<HouseholdMemberHasAcceptedPrivacyPolicyQuery>.Is.NotNull))
+                .Return(booleanResultResponse)
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var result = foodWasteHouseholdService.HouseholdMemberHasAcceptedPrivacyPolicy(fixture.Create<HouseholdMemberHasAcceptedPrivacyPolicyQuery>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(booleanResultResponse));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberHasAcceptedPrivacyPolicy throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberHasAcceptedPrivacyPolicyThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
+            queryBusMock.Stub(m => m.Query<HouseholdMemberHasAcceptedPrivacyPolicyQuery, BooleanResultResponse>(Arg<HouseholdMemberHasAcceptedPrivacyPolicyQuery>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteHouseholdService.HouseholdMemberHasAcceptedPrivacyPolicy(fixture.Create<HouseholdMemberHasAcceptedPrivacyPolicyQuery>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+        }
+
+        /// <summary>
         /// Tests that FoodItemCollectionGet throws an ArgumentNullException when the query for getting all the collection of food items is null.
         /// </summary>
         [Test]

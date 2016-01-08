@@ -107,6 +107,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Gets whether the current caller has accepted the privacy policy.
+        /// </summary>
+        /// <param name="query">Query which can check whether the current user has accepted the privacy policy.</param>
+        /// <returns>Boolean result.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual BooleanResultResponse HouseholdMemberHasAcceptedPrivacyPolicy(HouseholdMemberHasAcceptedPrivacyPolicyQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<HouseholdMemberHasAcceptedPrivacyPolicyQuery, BooleanResultResponse>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>
