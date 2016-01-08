@@ -143,7 +143,7 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
 
             var data = GetData(householdMember, query, translationInfo);
 
-            return ObjectMapper.Map<object, TView>(data, translationInfo == null ? null : translationInfo.CultureInfo);
+            return ObjectMapper.Map<TData, TView>(data, translationInfo == null ? null : translationInfo.CultureInfo);
         }
 
         /// <summary>

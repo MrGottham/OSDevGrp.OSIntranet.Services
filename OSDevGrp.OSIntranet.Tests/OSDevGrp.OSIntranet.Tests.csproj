@@ -199,6 +199,7 @@
     <Compile Include="Unittests\Contracts\Queries\FirmalisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodGroupTreeGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodItemCollectionGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\HouseholdMemberIsActivatedQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdMemberIsCreatedQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftaleGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftalerGetQueryTests.cs" />
@@ -339,6 +340,7 @@
     <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerForSystemViewTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerTest.cs" />
+    <Compile Include="Unittests\QueryHandlers\HouseholdMemberIsActivatedQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\HouseholdMemberIsCreatedQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftaleGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftalerGetQueryHandlerTests.cs" />

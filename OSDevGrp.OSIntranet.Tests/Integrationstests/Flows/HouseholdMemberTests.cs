@@ -55,6 +55,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     var householdMemberIsCreated = _householdService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
                     Assert.That(householdMemberIsCreated, Is.Not.Null);
                     Assert.That(householdMemberIsCreated.Result, Is.True);
+
+                    var householdMemberIsActivated = _householdService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    Assert.That(householdMemberIsActivated, Is.Not.Null);
+                    Assert.That(householdMemberIsActivated.Result, Is.False);
                 }
                 finally
                 {

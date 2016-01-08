@@ -85,6 +85,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Gets whether the current caller has been activated.
+        /// </summary>
+        /// <param name="query">Query which can check whether the current user has been activated.</param>
+        /// <returns>Boolean result.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual BooleanResultResponse HouseholdMemberIsActivated(HouseholdMemberIsActivatedQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<HouseholdMemberIsActivatedQuery, BooleanResultResponse>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>

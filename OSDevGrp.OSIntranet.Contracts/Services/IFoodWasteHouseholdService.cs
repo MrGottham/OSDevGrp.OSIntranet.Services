@@ -24,6 +24,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         BooleanResultResponse HouseholdMemberIsCreated(HouseholdMemberIsCreatedQuery query);
 
         /// <summary>
+        /// Gets whether the current caller has been activated.
+        /// </summary>
+        /// <param name="query">Query which can check whether the current user has been activated.</param>
+        /// <returns>Boolean result.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        BooleanResultResponse HouseholdMemberIsActivated(HouseholdMemberIsActivatedQuery query);
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>
