@@ -936,6 +936,64 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that HasRequiredMembership calls HasRequiredMembership on the common validations used by domain objects in the food waste domain.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic, Membership.Basic)]
+        [TestCase(Membership.Basic, Membership.Deluxe)]
+        [TestCase(Membership.Basic, Membership.Premium)]
+        [TestCase(Membership.Deluxe, Membership.Basic)]
+        [TestCase(Membership.Deluxe, Membership.Deluxe)]
+        [TestCase(Membership.Deluxe, Membership.Premium)]
+        [TestCase(Membership.Premium, Membership.Basic)]
+        [TestCase(Membership.Premium, Membership.Deluxe)]
+        [TestCase(Membership.Premium, Membership.Premium)]
+        public void TestThatHasRequiredMembershipCallsHasRequiredMembershipOnDomainObjectValidations(Membership currentMembership, Membership requiredMembership)
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasRequiredMembership(Arg<Membership>.Is.Anything, Arg<Membership>.Is.Anything))
+                .Return(fixture.Create<bool>())
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), currentMembership, currentMembership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(currentMembership));
+
+            householdMember.HasRequiredMembership(requiredMembership);
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.HasRequiredMembership(Arg<Membership>.Is.Equal(currentMembership), Arg<Membership>.Is.Equal(requiredMembership)));
+        }
+
+        /// <summary>
+        /// Tests that HasRequiredMembership returns the result from HasRequiredMembership on the common validations used by domain objects in the food waste domain.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatHasRequiredMembershipReturnsResultFromHasRequiredMembershipOnDomainObjectValidations(bool hasRequiredMembership)
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasRequiredMembership(Arg<Membership>.Is.Anything, Arg<Membership>.Is.Anything))
+                .Return(hasRequiredMembership)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
+
+            var result = householdMember.HasRequiredMembership(Membership.Basic);
+            Assert.That(result, Is.EqualTo(hasRequiredMembership));
+        }
+
+        /// <summary>
         /// Tests that HouseholdApply applies the basic membership.
         /// </summary>
         [Test]

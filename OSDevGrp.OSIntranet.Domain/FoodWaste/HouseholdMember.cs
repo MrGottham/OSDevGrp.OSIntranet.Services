@@ -236,6 +236,16 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Validates whether the household members current membership matches the required membership.
+        /// </summary>
+        /// <param name="requiredMembership">Required membership.</param>
+        /// <returns>True when the household members current membership matches the required membership otherwise false.</returns>
+        public virtual bool HasRequiredMembership(Membership requiredMembership)
+        {
+            return _domainObjectValidations.HasRequiredMembership(Membership, requiredMembership);
+        }
+
+        /// <summary>
         /// Applies a new membership to the household member.
         /// </summary>
         /// <param name="membership">Membership which should be applied to the household member.</param>

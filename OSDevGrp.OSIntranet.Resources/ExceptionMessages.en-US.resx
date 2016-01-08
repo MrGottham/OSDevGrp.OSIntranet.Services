@@ -235,4 +235,10 @@
   <data name="HouseholdMemberNotActivated" xml:space="preserve">
     <value>Your household member account has not been activated.</value>
   </data>
+  <data name="HouseholdMemberHasNotAcceptedPrivacyPolicy" xml:space="preserve">
+    <value>You has not accepted our privacy policy with your household member account.</value>
+  </data>
+  <data name="HouseholdMemberHasNotRequiredMembership" xml:space="preserve">
+    <value>You does not have the required membership on your household member account.</value>
+  </data>
 </root>

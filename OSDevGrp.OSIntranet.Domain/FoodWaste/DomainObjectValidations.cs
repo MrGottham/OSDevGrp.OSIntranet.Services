@@ -73,6 +73,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Validates whether a given membership matches the required membership.
+        /// </summary>
+        /// <param name="membership">Membership which should match the required membership.</param>
+        /// <param name="requiredMembership">Required membership.</param>
+        /// <returns>True if the given membership matches the required membership otherwise false.</returns>
+        public virtual bool HasRequiredMembership(Membership membership, Membership requiredMembership)
+        {
+            return (int) membership >= (int) requiredMembership;
+        }
+
+        /// <summary>
         /// Creates a instance of common validations used by domain objects in the food waste domain.
         /// </summary>
         /// <returns>Instance of common validations used by domain objects in the food waste domain.</returns>

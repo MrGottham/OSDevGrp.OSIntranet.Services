@@ -135,6 +135,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that HasRequiredMembership validates whether a given membership matches a required membership.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic, Membership.Basic, true)]
+        [TestCase(Membership.Basic, Membership.Deluxe, false)]
+        [TestCase(Membership.Basic, Membership.Premium, false)]
+        [TestCase(Membership.Deluxe, Membership.Basic, true)]
+        [TestCase(Membership.Deluxe, Membership.Deluxe, true)]
+        [TestCase(Membership.Deluxe, Membership.Premium, false)]
+        [TestCase(Membership.Premium, Membership.Basic, true)]
+        [TestCase(Membership.Premium, Membership.Deluxe, true)]
+        [TestCase(Membership.Premium, Membership.Premium, true)]
+        public void TestThatHasRequiredMembershipValidatedsWhetherMembershipMatchesRequiredMembership(Membership membership, Membership requiredMembership, bool expectedResult)
+        {
+            var domainObjectValidations = new DomainObjectValidations();
+            Assert.That(domainObjectValidations, Is.Not.Null);
+
+            var result = domainObjectValidations.HasRequiredMembership(membership, requiredMembership);
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        /// <summary>
         /// Tests that Create initialize common validations used by domain objects in the food waste domain.
         /// </summary>
         [Test]

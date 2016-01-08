@@ -233,6 +233,12 @@
     <value>Din mailadresse er ikke blevet oprettet som husstandsmedlem.</value>
   </data>
   <data name="HouseholdMemberNotActivated" xml:space="preserve">
-    <value>Dit husstandsmedlemsskabt er ikke blevet aktiveret.</value>
+    <value>Dit husstandsmedlemsskab er ikke blevet aktiveret.</value>
+  </data>
+  <data name="HouseholdMemberHasNotAcceptedPrivacyPolicy" xml:space="preserve">
+    <value>Du har ikke accepteret vores fortrolighedspolitik med dit husstandsmedlemsskab.</value>
+  </data>
+  <data name="HouseholdMemberHasNotRequiredMembership" xml:space="preserve">
+    <value>Du har ikke det krævende medlemsskab til dit husstandsmedlemsskab.</value>
   </data>
 </root>

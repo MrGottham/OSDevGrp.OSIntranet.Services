@@ -4,6 +4,7 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -100,13 +101,18 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 
             var householdMember = HouseholdDataRepository.HouseholdMemberGetByMailAddress(ClaimValueProvider.MailAddress);
 
-            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(householdMember),
-                new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)))
-                .IsSatisfiedBy(() => ShouldBeActivated == false || householdMember.IsActivated,
-                    new IntranetBusinessException(
-                        Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated)));
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(householdMember), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)))
+                .IsSatisfiedBy(() => ShouldBeActivated == false || householdMember.IsActivated, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated)))
+                .IsSatisfiedBy(() => ShouldHaveAcceptedPrivacyPolicy == false || householdMember.IsPrivacyPolictyAccepted, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy)))
+                .IsSatisfiedBy(() => householdMember.HasRequiredMembership(RequiredMembership), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership)));
 
-            return null;
+            AddValidationRules(householdMember, command, Specification);
+            
+            Specification.Evaluate();
+
+            var identifiableDomainObject = ModifyData(householdMember, command);
+
+            return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(identifiableDomainObject);
         }
 
         /// <summary>
@@ -118,6 +124,22 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         {
             throw ExceptionBuilder.Build(exception, MethodBase.GetCurrentMethod());
         }
+
+        /// <summary>
+        /// Adds validation rules to the specification which encapsulates validation rules.
+        /// </summary>
+        /// <param name="householdMember">Household member for which to modify data.</param>
+        /// <param name="command">Command for modifying some data on a household member.</param>
+        /// <param name="specification">Specification which encapsulates validation rules.</param>
+        public abstract void AddValidationRules(IHouseholdMember householdMember, TCommand command, ISpecification specification);
+
+        /// <summary>
+        /// Modifies the data.
+        /// </summary>
+        /// <param name="householdMember">Household member for which to modify data.</param>
+        /// <param name="command">Command for modifying some data on a household member.</param>
+        /// <returns>An identifiable domain object in the food waste domain.</returns>
+        public abstract IIdentifiable ModifyData(IHouseholdMember householdMember, TCommand command);
 
         #endregion
     }

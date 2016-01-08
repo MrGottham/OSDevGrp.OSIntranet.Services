@@ -38,6 +38,8 @@
         ValueForPropertyContainsIllegalChars,
         HouseholdLimitHasBeenReached,
         HouseholdMemberNotCreated,
-        HouseholdMemberNotActivated
+        HouseholdMemberNotActivated,
+        HouseholdMemberHasNotAcceptedPrivacyPolicy,
+        HouseholdMemberHasNotRequiredMembership
     }
 }

@@ -132,9 +132,28 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             {
                 throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated));
             }
+            if (ShouldHaveAcceptedPrivacyPolicy && householdMember.IsPrivacyPolictyAccepted == false)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy));
+            }
+            if (householdMember.HasRequiredMembership(RequiredMembership) == false)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership));
+            }
 
-            return ObjectMapper.Map<object, TView>(null);
+            var data = GetData(householdMember, query, translationInfo);
+
+            return ObjectMapper.Map<object, TView>(data, translationInfo == null ? null : translationInfo.CultureInfo);
         }
+
+        /// <summary>
+        /// Gets the data for the household member.
+        /// </summary>
+        /// <param name="householdMember">Household member for which to get the data.</param>
+        /// <param name="query">Query for getting some data for a household member.</param>
+        /// <param name="translationInfo">Translation informations.</param>
+        /// <returns>Data for the household member.</returns>
+        public abstract TData GetData(IHouseholdMember householdMember, TQuery query, ITranslationInfo translationInfo);
 
         /// <summary>
         /// Gets the translation informations which should be used to translate data selected by this query.

@@ -503,6 +503,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for HouseholdMemberHasNotAcceptedPrivacyPolicy hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForHouseholdMemberHasNotAcceptedPrivacyPolicyHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for HouseholdMemberHasNotRequiredMembership hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForHouseholdMemberHasNotRequiredMembershipHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]
