@@ -34,5 +34,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
         /// <param name="value">Object.</param>
         /// <returns>True when the object is not null otherwise false.</returns>
         bool IsNotNull(object value);
+
+        /// <summary>
+        /// Checks whether two strings are equal or not.
+        /// </summary>
+        /// <param name="xValue">String.</param>
+        /// <param name="yValue">String.</param>
+        /// <param name="comparisonType">Comparison type.</param>
+        /// <returns>True when the two string are equal otherwise false.</returns>
+        bool Equals(string xValue, string yValue, StringComparison comparisonType = StringComparison.Ordinal);
     }
 }

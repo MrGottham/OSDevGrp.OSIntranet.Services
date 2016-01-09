@@ -5,6 +5,7 @@ using System.ServiceModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Contracts;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Queries;
@@ -119,6 +120,41 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
                 Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberHasAcceptedPrivacyPolicy"));
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberActivate throws an FaultException when the household member has not been created.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberActivateThrowsFaultExceptionWhenHouseholdMemberHasNotBeenCreated()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var householdMemberActivateCommand = new HouseholdMemberActivateCommand
+                {
+                    ActivationCode = Guid.NewGuid().ToString("N")
+                };
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberActivate(householdMemberActivateCommand));
+                Assert.That(faultException, Is.Not.Null);
+                Assert.That(faultException.Detail, Is.Not.Null);
+                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdServiceName));
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberActivate"));
                 Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
                 Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
             }

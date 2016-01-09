@@ -241,4 +241,7 @@
   <data name="HouseholdMemberHasNotRequiredMembership" xml:space="preserve">
     <value>Du har ikke det krævende medlemsskab til dit husstandsmedlemsskab.</value>
   </data>
+  <data name="WrongActivationCodeForHouseholdMember" xml:space="preserve">
+    <value>Den angivne aktiveringskode er invalid for dit husstandsmedlemsskab.</value>
+  </data>
 </root>

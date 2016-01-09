@@ -155,5 +155,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
 
             Assert.That(commonValidations.IsNotNull(null), Is.False);
         }
+
+        /// <summary>
+        /// Tests that Equals for two strings returns whether the two string are equal or not.
+        /// </summary>
+        [Test]
+        [TestCase(null, null, StringComparison.Ordinal, true)]
+        [TestCase(null, null, StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("", "", StringComparison.Ordinal, true)]
+        [TestCase("", "", StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("XXX", "xxx", StringComparison.Ordinal, false)]
+        [TestCase("XXX", "xxx", StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("xxx", "XXX", StringComparison.Ordinal, false)]
+        [TestCase("xxx", "XXX", StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("XXX", "YYY", StringComparison.Ordinal, false)]
+        [TestCase("XXX", "YYY", StringComparison.OrdinalIgnoreCase, false)]
+        public void TestThatEqualsForTwoStringsReturnsCompareResult(string xValue, string yValue, StringComparison comparisonType, bool expectedResult)
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.Equals(xValue, yValue, comparisonType);
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.ServiceModel;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Responses;
@@ -65,7 +66,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <summary>
         /// Gets whether the current caller has been created as a household member.
         /// </summary>
-        /// <param name="query">Query which can check whether the caller caller has been created as a household member.</param>
+        /// <param name="query">Query which can check whether the current caller has been created as a household member.</param>
         /// <returns>Boolean result.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual BooleanResultResponse HouseholdMemberIsCreated(HouseholdMemberIsCreatedQuery query)
@@ -87,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <summary>
         /// Gets whether the current caller has been activated.
         /// </summary>
-        /// <param name="query">Query which can check whether the current user has been activated.</param>
+        /// <param name="query">Query which can check whether the current caller has been activated.</param>
         /// <returns>Boolean result.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual BooleanResultResponse HouseholdMemberIsActivated(HouseholdMemberIsActivatedQuery query)
@@ -109,7 +110,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <summary>
         /// Gets whether the current caller has accepted the privacy policy.
         /// </summary>
-        /// <param name="query">Query which can check whether the current user has accepted the privacy policy.</param>
+        /// <param name="query">Query which can check whether the current caller has accepted the privacy policy.</param>
         /// <returns>Boolean result.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual BooleanResultResponse HouseholdMemberHasAcceptedPrivacyPolicy(HouseholdMemberHasAcceptedPrivacyPolicyQuery query)
@@ -121,6 +122,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             try
             {
                 return _queryBus.Query<HouseholdMemberHasAcceptedPrivacyPolicyQuery, BooleanResultResponse>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
+        /// Activates the current caller.
+        /// </summary>
+        /// <param name="command">Command for activating the current caller household member account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse HouseholdMemberActivate(HouseholdMemberActivateCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<HouseholdMemberActivateCommand, ServiceReceiptResponse>(command);
             }
             catch (Exception ex)
             {

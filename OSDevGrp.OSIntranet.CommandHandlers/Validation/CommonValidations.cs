@@ -61,6 +61,18 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
             return value != null;
         }
 
+        /// <summary>
+        /// Checks whether two strings are equal or not.
+        /// </summary>
+        /// <param name="xValue">String.</param>
+        /// <param name="yValue">String.</param>
+        /// <param name="comparisonType">Comparison type.</param>
+        /// <returns>True when the two string are equal otherwise false.</returns>
+        public virtual bool Equals(string xValue, string yValue, StringComparison comparisonType = StringComparison.Ordinal)
+        {
+            return string.Compare(xValue, yValue, comparisonType) == 0;
+        }
+
         #endregion
     }
 }

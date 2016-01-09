@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Responses;
@@ -16,7 +17,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <summary>
         /// Gets whether the current caller has been created as a household member.
         /// </summary>
-        /// <param name="query">Query which can check whether the caller caller has been created as a household member.</param>
+        /// <param name="query">Query which can check whether the current caller has been created as a household member.</param>
         /// <returns>Boolean result.</returns>
         [OperationContract]
         [FaultContract(typeof (FoodWasteFault))]
@@ -26,7 +27,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <summary>
         /// Gets whether the current caller has been activated.
         /// </summary>
-        /// <param name="query">Query which can check whether the current user has been activated.</param>
+        /// <param name="query">Query which can check whether the current caller has been activated.</param>
         /// <returns>Boolean result.</returns>
         [OperationContract]
         [FaultContract(typeof (FoodWasteFault))]
@@ -36,12 +37,22 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <summary>
         /// Gets whether the current caller has accepted the privacy policy.
         /// </summary>
-        /// <param name="query">Query which can check whether the current user has accepted the privacy policy.</param>
+        /// <param name="query">Query which can check whether the current caller has accepted the privacy policy.</param>
         /// <returns>Boolean result.</returns>
         [OperationContract]
         [FaultContract(typeof (FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         BooleanResultResponse HouseholdMemberHasAcceptedPrivacyPolicy(HouseholdMemberHasAcceptedPrivacyPolicyQuery query);
+
+        /// <summary>
+        /// Activates the current caller.
+        /// </summary>
+        /// <param name="command">Command for activating the current caller household member account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse HouseholdMemberActivate(HouseholdMemberActivateCommand command);
 
         /// <summary>
         /// Gets the collection of food items.

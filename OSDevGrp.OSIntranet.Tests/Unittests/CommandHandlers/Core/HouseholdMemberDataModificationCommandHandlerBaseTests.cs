@@ -852,10 +852,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Tests that Execute calls Evaluate on the specification which encapsulates validation rules after call to the method which adds validation rules to the specification which encapsulates validation rules.
+        /// Tests that Execute calls Evaluate on the specification which encapsulates validation rules 2 times.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsEvaluateOnSpecificationAfterCallToAddValidationRules()
+        public void TestThatExecuteCallsEvaluateOnSpecification2Times()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -884,15 +884,67 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             var householdMemberDataModificationCommandHandlerBase = new MyHouseholdMemberDataModificationCommandHandler<MyHouseholdMemberDataModificationCommand>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, householdMemberMock);
             Assert.That(householdMemberDataModificationCommandHandlerBase, Is.Not.Null);
-            Assert.That(householdMemberDataModificationCommandHandlerBase.AddValidationRulesWasCalled, Is.False);
 
+            householdMemberDataModificationCommandHandlerBase.Execute(householdMemberDataModificationCommandHandlerBase.GenerateCommand());
+
+            specificationMock.AssertWasCalled(m => m.Evaluate(), opt => opt.Repeat.Times(2));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Evaluate on the specification which encapsulates validation once before the call to method which add validation rules and once after the call to method which add validation rules.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsEvaluateOnSpecificationOnceBeforeCallToAddValidationRulesAndOnceAfterCallToAddValidationRules()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(householdMemberMock)
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var householdMemberDataModificationCommandHandlerBase = new MyHouseholdMemberDataModificationCommandHandler<MyHouseholdMemberDataModificationCommand>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock, householdMemberMock);
+            Assert.That(householdMemberDataModificationCommandHandlerBase, Is.Not.Null);
+
+            var numberOfCalls = 0;
             specificationMock.Stub(m => m.Evaluate())
-                .WhenCalled(e => Assert.That(householdMemberDataModificationCommandHandlerBase.AddValidationRulesWasCalled, Is.True))
+                .WhenCalled(e =>
+                {
+                    numberOfCalls += 1;
+                    switch (numberOfCalls)
+                    {
+                        case 1:
+                            Assert.That(householdMemberDataModificationCommandHandlerBase.AddValidationRulesWasCalled, Is.False);
+                            break;
+
+                        case 2:
+                            Assert.That(householdMemberDataModificationCommandHandlerBase.AddValidationRulesWasCalled, Is.True);
+                            break;
+                    }
+                })
                 .Repeat.Any();
 
             householdMemberDataModificationCommandHandlerBase.Execute(householdMemberDataModificationCommandHandlerBase.GenerateCommand());
 
-            specificationMock.AssertWasCalled(m => m.Evaluate());
+            specificationMock.AssertWasCalled(m => m.Evaluate(), opt => opt.Repeat.Times(2));
         }
 
         /// <summary>

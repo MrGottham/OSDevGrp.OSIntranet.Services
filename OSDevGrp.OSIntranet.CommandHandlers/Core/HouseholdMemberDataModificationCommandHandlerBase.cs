@@ -104,7 +104,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(householdMember), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)))
                 .IsSatisfiedBy(() => ShouldBeActivated == false || householdMember.IsActivated, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated)))
                 .IsSatisfiedBy(() => ShouldHaveAcceptedPrivacyPolicy == false || householdMember.IsPrivacyPolictyAccepted, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy)))
-                .IsSatisfiedBy(() => householdMember.HasRequiredMembership(RequiredMembership), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership)));
+                .IsSatisfiedBy(() => householdMember.HasRequiredMembership(RequiredMembership), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership)))
+                .Evaluate();
 
             AddValidationRules(householdMember, command, Specification);
             

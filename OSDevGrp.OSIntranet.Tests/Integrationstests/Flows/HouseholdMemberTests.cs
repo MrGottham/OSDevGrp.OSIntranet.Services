@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
+using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -59,6 +60,18 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     var householdMemberIsActivated = _householdService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
                     Assert.That(householdMemberIsActivated, Is.Not.Null);
                     Assert.That(householdMemberIsActivated.Result, Is.False);
+
+                    var householdMemberActivateCommand = new HouseholdMemberActivateCommand
+                    {
+                        ActivationCode = _householdDataRepository.Get<IHouseholdMember>(householdMemberIdentifier).ActivationCode
+                    };
+                    var householdMemberActivate = _householdService.HouseholdMemberActivate(householdMemberActivateCommand);
+                    Assert.That(householdMemberActivate, Is.Not.Null);
+                    Assert.That(householdMemberActivate.Identifier, Is.EqualTo(householdMemberIdentifier));
+
+                    householdMemberIsActivated = _householdService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    Assert.That(householdMemberIsActivated, Is.Not.Null);
+                    Assert.That(householdMemberIsActivated.Result, Is.True);
 
                     var householdMemberHasAcceptedPrivacyPolicy = _householdService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);

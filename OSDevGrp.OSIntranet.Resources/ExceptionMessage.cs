@@ -40,6 +40,7 @@
         HouseholdMemberNotCreated,
         HouseholdMemberNotActivated,
         HouseholdMemberHasNotAcceptedPrivacyPolicy,
-        HouseholdMemberHasNotRequiredMembership
+        HouseholdMemberHasNotRequiredMembership,
+        WrongActivationCodeForHouseholdMember
     }
 }

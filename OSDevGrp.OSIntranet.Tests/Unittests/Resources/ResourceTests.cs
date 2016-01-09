@@ -525,6 +525,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for WrongActivationCodeForHouseholdMember hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForWrongActivationCodeForHouseholdMemberHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.WrongActivationCodeForHouseholdMember);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]
