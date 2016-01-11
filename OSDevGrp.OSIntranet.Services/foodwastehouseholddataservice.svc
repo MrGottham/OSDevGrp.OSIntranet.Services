@@ -1,1 +1,1 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="OSDevGrp.OSIntranet.Services.Implementations.FoodWasteHouseholdService" CodeBehind="Implementations/FoodWasteHouseholdService.cs" %>
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="OSDevGrp.OSIntranet.Services.Implementations.FoodWasteHouseholdDataService" CodeBehind="Implementations/FoodWasteHouseholdDataService.cs" %>

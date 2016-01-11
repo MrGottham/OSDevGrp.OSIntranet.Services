@@ -24,9 +24,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <returns>Mockup for a household.</returns>
         public static IHousehold BuildHouseholdMock()
         {
+            var fixture = new Fixture();
             var householdMock = MockRepository.GenerateMock<IHousehold>();
             householdMock.Stub(m => m.Identifier)
                 .Return(Guid.NewGuid())
+                .Repeat.Any();
+            householdMock.Stub(m => m.Description)
+                .Return(fixture.Create<string>())
                 .Repeat.Any();
             return householdMock;
         }

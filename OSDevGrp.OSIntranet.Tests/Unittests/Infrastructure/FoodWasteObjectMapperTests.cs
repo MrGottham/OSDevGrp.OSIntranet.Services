@@ -260,6 +260,85 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps Household to HouseholdIdentificationView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsHouseholdMemberToHouseholdIdentificationView()
+        {
+            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var householdIdentificationView = foodWasteObjectMapper.Map<IHousehold, HouseholdIdentificationView>(householdMock);
+            Assert.That(householdIdentificationView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdIdentificationView.HouseholdIdentifier, Is.EqualTo(householdMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdIdentificationView.Description, Is.Not.Null);
+            Assert.That(householdIdentificationView.Description, Is.Not.Empty);
+            Assert.That(householdIdentificationView.Description, Is.EqualTo(householdMock.Description));
+        }
+
+        /// <summary>
+        /// Tests that Map maps HouseholdMember to HouseholdMemberIdentificationView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsHouseholdMemberToHouseholdMemberIdentificationView()
+        {
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var householdMemberIdentificationView = foodWasteObjectMapper.Map<IHouseholdMember, HouseholdMemberIdentificationView>(householdMemberMock);
+            Assert.That(householdMemberIdentificationView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMemberIdentificationView.HouseholdMemberIdentifier, Is.EqualTo(householdMemberMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMemberIdentificationView.MailAddress, Is.Not.Null);
+            Assert.That(householdMemberIdentificationView.MailAddress, Is.Not.Empty);
+            Assert.That(householdMemberIdentificationView.MailAddress, Is.EqualTo(householdMemberMock.MailAddress));
+        }
+
+        /// <summary>
+        /// Tests that Map maps HouseholdMember to HouseholdMemberView.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatMapMapsHouseholdMemberToHouseholdMemberView(Membership membership)
+        {
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var householdMemberView = foodWasteObjectMapper.Map<IHouseholdMember, HouseholdMemberView>(householdMemberMock);
+            Assert.That(householdMemberView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdMemberView.HouseholdMemberIdentifier, Is.EqualTo(householdMemberMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMemberView.MailAddress, Is.Not.Null);
+            Assert.That(householdMemberView.MailAddress, Is.Not.Empty);
+            Assert.That(householdMemberView.MailAddress, Is.EqualTo(householdMemberMock.MailAddress));
+            Assert.That(householdMemberView.Membership, Is.Not.Null);
+            Assert.That(householdMemberView.Membership, Is.Not.Empty);
+            Assert.That(householdMemberView.Membership, Is.EqualTo(householdMemberMock.Membership.ToString()));
+            Assert.That(householdMemberView.MembershipExpireTime, Is.EqualTo(householdMemberMock.MembershipExpireTime));
+            Assert.That(householdMemberView.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));
+            Assert.That(householdMemberView.IsActivated, Is.EqualTo(householdMemberMock.IsActivated));
+            Assert.That(householdMemberView.PrivacyPolicyAcceptedTime, Is.EqualTo(householdMemberMock.PrivacyPolicyAcceptedTime));
+            Assert.That(householdMemberView.IsPrivacyPolictyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolictyAccepted));
+            Assert.That(householdMemberView.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
+            Assert.That(householdMemberView.Households, Is.Not.Null);
+            Assert.That(householdMemberView.Households, Is.Not.Empty);
+            Assert.That(householdMemberView.Households, Is.TypeOf<List<HouseholdIdentificationView>>());
+            Assert.That(householdMemberView.Households.Count(), Is.EqualTo(householdMemberMock.Households.Count()));
+        }
+
+        /// <summary>
         /// Tests that Map maps HouseholdMember to HouseholdMemberProxy.
         /// </summary>
         [Test]

@@ -19,17 +19,17 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
     /// </summary>
     [TestFixture]
     [Category("Integrationstest")]
-    public class FoodWasteHouseHoldServiceTests
+    public class FoodWasteHouseholdDataServiceTests
     {
         #region Private constants
 
-        private const string ClientEndpointName = "FoodWasteHouseholdServiceIntegrationstest";
+        private const string ClientEndpointName = "FoodWasteHouseholdDataServiceIntegrationstest";
 
         #endregion
 
         #region Private variables
 
-        private ChannelFactory<IFoodWasteHouseholdService> _channelFactory;
+        private ChannelFactory<IFoodWasteHouseholdDataService> _channelFactory;
 
         #endregion
 
@@ -39,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         [TestFixtureSetUp]
         public void TestSetUp()
         {
-            _channelFactory = new ChannelFactory<IFoodWasteHouseholdService>(ClientEndpointName);
+            _channelFactory = new ChannelFactory<IFoodWasteHouseholdDataService>(ClientEndpointName);
             if (_channelFactory.Credentials == null)
             {
                 return;

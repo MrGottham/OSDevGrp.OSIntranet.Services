@@ -21,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
 
         private ILogicExecutor _logicExecutor;
         private IHouseholdDataRepository _householdDataRepository;
-        private IFoodWasteHouseholdService _householdService;
+        private IFoodWasteHouseholdDataService _householdDataService;
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
             var container = ContainerFactory.Create();
             _logicExecutor = container.Resolve<ILogicExecutor>();
             _householdDataRepository = container.Resolve<IHouseholdDataRepository>();
-            _householdService = container.Resolve<IFoodWasteHouseholdService>();
+            _householdDataService = container.Resolve<IFoodWasteHouseholdDataService>();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         {
             using (var executor = new ClaimsPrincipalTestExecutor())
             {
-                var translationInfoCollection = _householdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                var translationInfoCollection = _householdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -53,11 +53,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                 var householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(executor.MailAddress, translationInfoIdentifier);
                 try
                 {
-                    var householdMemberIsCreated = _householdService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                    var householdMemberIsCreated = _householdDataService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
                     Assert.That(householdMemberIsCreated, Is.Not.Null);
                     Assert.That(householdMemberIsCreated.Result, Is.True);
 
-                    var householdMemberIsActivated = _householdService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    var householdMemberIsActivated = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
                     Assert.That(householdMemberIsActivated, Is.Not.Null);
                     Assert.That(householdMemberIsActivated.Result, Is.False);
 
@@ -65,17 +65,25 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     {
                         ActivationCode = _householdDataRepository.Get<IHouseholdMember>(householdMemberIdentifier).ActivationCode
                     };
-                    var householdMemberActivate = _householdService.HouseholdMemberActivate(householdMemberActivateCommand);
+                    var householdMemberActivate = _householdDataService.HouseholdMemberActivate(householdMemberActivateCommand);
                     Assert.That(householdMemberActivate, Is.Not.Null);
                     Assert.That(householdMemberActivate.Identifier, Is.EqualTo(householdMemberIdentifier));
 
-                    householdMemberIsActivated = _householdService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    householdMemberIsActivated = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
                     Assert.That(householdMemberIsActivated, Is.Not.Null);
                     Assert.That(householdMemberIsActivated.Result, Is.True);
 
-                    var householdMemberHasAcceptedPrivacyPolicy = _householdService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    var householdMemberHasAcceptedPrivacyPolicy = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.False);
+
+                    var householdMemberAcceptPrivacyPolicy = _householdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand());
+                    Assert.That(householdMemberAcceptPrivacyPolicy, Is.Not.Null);
+                    Assert.That(householdMemberAcceptPrivacyPolicy.Identifier, Is.EqualTo(householdMemberIdentifier));
+
+                    householdMemberHasAcceptedPrivacyPolicy = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.True);
                 }
                 finally
                 {

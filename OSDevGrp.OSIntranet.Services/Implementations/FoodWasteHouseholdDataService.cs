@@ -22,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall, Namespace = SoapNamespaces.FoodWasteNamespace)]
     [RequiredClaimType(FoodWasteClaimTypes.HouseHoldManagement)]
     [RequiredClaimType(FoodWasteClaimTypes.ValidatedUser)]
-    public class FoodWasteHouseholdService : IFoodWasteHouseholdService
+    public class FoodWasteHouseholdDataService : IFoodWasteHouseholdDataService
     {
         #region Private variables
 
@@ -40,7 +40,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <param name="commandBus">Implementation of the command bus.</param>
         /// <param name="queryBus">Implementation of the query bus.</param>
         /// <param name="foodWasteFaultExceptionBuilder">Implementation of builder which can generate faults.</param>
-        public FoodWasteHouseholdService(ICommandBus commandBus, IQueryBus queryBus, IFaultExceptionBuilder<FoodWasteFault> foodWasteFaultExceptionBuilder)
+        public FoodWasteHouseholdDataService(ICommandBus commandBus, IQueryBus queryBus, IFaultExceptionBuilder<FoodWasteFault> foodWasteFaultExceptionBuilder)
         {
             if (commandBus == null)
             {

@@ -27,6 +27,26 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
+            Mapper.CreateMap<IHousehold, HouseholdIdentificationView>()
+                .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description));
+
+            Mapper.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
+                .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress));
+
+            Mapper.CreateMap<IHouseholdMember, HouseholdMemberView>()
+                .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress))
+                .ForMember(m => m.Membership, opt => opt.MapFrom(s => s.Membership))
+                .ForMember(m => m.MembershipExpireTime, opt => opt.MapFrom(s => s.MembershipExpireTime))
+                .ForMember(m => m.ActivationTime, opt => opt.MapFrom(s => s.ActivationTime))
+                .ForMember(m => m.IsActivated, opt => opt.MapFrom(s => s.IsActivated))
+                .ForMember(m => m.PrivacyPolicyAcceptedTime, opt => opt.MapFrom(s => s.PrivacyPolicyAcceptedTime))
+                .ForMember(m => m.IsPrivacyPolictyAccepted, opt => opt.MapFrom(s => s.IsPrivacyPolictyAccepted))
+                .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
+                .ForMember(m => m.Households, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IHousehold>, IEnumerable<HouseholdIdentificationView>>(s.Households)));
+
             Mapper.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
                 .ConstructUsing(m =>
                 {

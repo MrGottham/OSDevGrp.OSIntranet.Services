@@ -19,11 +19,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
     /// </summary>
     [TestFixture]
     [Category("Integrationstest")]
-    public class FoodWasteHouseholdServiceTests
+    public class FoodWasteHouseholdDataServiceTests
     {
         #region Private variables
 
-        private IFoodWasteHouseholdService _foodWasteHouseholdService;
+        private IFoodWasteHouseholdDataService _foodWasteHouseholdDataService;
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         public void TestSetUp()
         {
             var container = ContainerFactory.Create();
-            _foodWasteHouseholdService = container.Resolve<IFoodWasteHouseholdService>();
+            _foodWasteHouseholdDataService = container.Resolve<IFoodWasteHouseholdDataService>();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             using (new ClaimsPrincipalTestExecutor())
             {
-                var booleanResult = _foodWasteHouseholdService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                var booleanResult = _foodWasteHouseholdDataService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
                 Assert.That(booleanResult, Is.Not.Null);
                 Assert.That(booleanResult.Result, Is.EqualTo(false));
                 Assert.That(booleanResult.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
@@ -60,7 +60,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             using (new ClaimsPrincipalTestExecutor())
             {
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery()));
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery()));
                 Assert.That(faultException, Is.Not.Null);
                 Assert.That(faultException.Detail, Is.Not.Null);
                 Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
@@ -86,7 +86,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             using (new ClaimsPrincipalTestExecutor())
             {
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery()));
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery()));
                 Assert.That(faultException, Is.Not.Null);
                 Assert.That(faultException.Detail, Is.Not.Null);
                 Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
@@ -116,7 +116,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 {
                     ActivationCode = Guid.NewGuid().ToString("N")
                 };
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdService.HouseholdMemberActivate(householdMemberActivateCommand));
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberActivate(householdMemberActivateCommand));
                 Assert.That(faultException, Is.Not.Null);
                 Assert.That(faultException.Detail, Is.Not.Null);
                 Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
@@ -142,7 +142,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             using (new ClaimsPrincipalTestExecutor())
             {
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand()));
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand()));
                 Assert.That(faultException, Is.Not.Null);
                 Assert.That(faultException.Detail, Is.Not.Null);
                 Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
@@ -166,7 +166,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodItemCollectionGetGetsFoodItemCollection()
         {
-            var translationInfoCollection = _foodWasteHouseholdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            var translationInfoCollection = _foodWasteHouseholdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
             Assert.That(translationInfoCollection, Is.Not.Null);
             Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -176,7 +176,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 {
                     TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                 };
-                var foodGroupTree = _foodWasteHouseholdService.FoodGroupTreeGet(foodGroupTreeGetQuery);
+                var foodGroupTree = _foodWasteHouseholdDataService.FoodGroupTreeGet(foodGroupTreeGetQuery);
                 Assert.That(foodGroupTree, Is.Not.Null);
                 Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
 
@@ -192,7 +192,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                         TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier,
                         FoodGroupIdentifier = foodGroupIdentifier
                     };
-                    var foodItemCollection = _foodWasteHouseholdService.FoodItemCollectionGet(foodItemCollectionGetQuery);
+                    var foodItemCollection = _foodWasteHouseholdDataService.FoodItemCollectionGet(foodItemCollectionGetQuery);
                     Assert.That(foodItemCollection, Is.Not.Null);
                     Assert.That(foodItemCollection.FoodItems, Is.Not.Null);
                     Assert.That(foodItemCollection.FoodItems.Count(), Is.GreaterThanOrEqualTo(0));
@@ -207,7 +207,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodGroupTreeGetGetsFoodGroupTree()
         {
-            var translationInfoCollection = _foodWasteHouseholdService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            var translationInfoCollection = _foodWasteHouseholdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
             Assert.That(translationInfoCollection, Is.Not.Null);
             Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -217,7 +217,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 {
                     TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                 };
-                var foodGroupTree = _foodWasteHouseholdService.FoodGroupTreeGet(query);
+                var foodGroupTree = _foodWasteHouseholdDataService.FoodGroupTreeGet(query);
                 Assert.That(foodGroupTree, Is.Not.Null);
                 Assert.That(foodGroupTree.FoodGroups, Is.Not.Null);
                 Assert.That(foodGroupTree.FoodGroups.Count(), Is.GreaterThanOrEqualTo(0));
@@ -232,7 +232,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         public void TestThatPrivacyPolicyGetGetsStaticTextViewForPrivacyPolicy()
         {
             var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-            var translationInfoSystemViewCollection = _foodWasteHouseholdService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+            var translationInfoSystemViewCollection = _foodWasteHouseholdDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
 
@@ -242,7 +242,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 {
                     TranslationInfoIdentifier = translationInfoSystemView.TranslationInfoIdentifier
                 };
-                var staticTextView = _foodWasteHouseholdService.PrivacyPolicyGet(privacyPolicyGetQuery);
+                var staticTextView = _foodWasteHouseholdDataService.PrivacyPolicyGet(privacyPolicyGetQuery);
                 Assert.That(staticTextView, Is.Not.Null);
                 Assert.That(staticTextView.StaticTextType, Is.EqualTo((int) StaticTextType.PrivacyPolicy));
                 Assert.That(staticTextView.SubjectTranslation, Is.Not.Null);
@@ -259,7 +259,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         public void TestThatTranslationInfoGetAllGetsTranslationInfoSystemViewCollection()
         {
             var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-            var translationInfoSystemViewCollection = _foodWasteHouseholdService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+            var translationInfoSystemViewCollection = _foodWasteHouseholdDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
         }

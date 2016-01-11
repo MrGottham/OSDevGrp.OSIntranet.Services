@@ -134,13 +134,13 @@
     <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteHouseholdServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\CommonServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\Implementations\FoodWasteHouseholdServiceTests.cs" />
+    <Compile Include="Integrationstests\Services\Implementations\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\TestHelpers.cs" />
@@ -203,6 +203,7 @@
     <Compile Include="Unittests\Contracts\Queries\FirmalisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodGroupTreeGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodItemCollectionGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\HouseholdMemberDataGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdMemberHasAcceptedPrivacyPolicyQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdMemberIsActivatedQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdMemberIsCreatedQueryTests.cs" />
@@ -255,6 +256,9 @@
     <Compile Include="Unittests\Contracts\Views\FoodItemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\ForeignKeySystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\ForeignKeyViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\HouseholdIdentificationViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\HouseholdMemberIdentificationViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\HouseholdMemberViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerAftaleViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />
@@ -345,6 +349,7 @@
     <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerForSystemViewTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerTest.cs" />
+    <Compile Include="Unittests\QueryHandlers\HouseholdMemberDataGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\HouseholdMemberHasAcceptedPrivacyPolicyQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\HouseholdMemberIsActivatedQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\HouseholdMemberIsCreatedQueryHandlerTests.cs" />
@@ -416,7 +421,7 @@
     <Compile Include="Unittests\Services\CommonServiceTests.cs" />
     <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />
     <Compile Include="Unittests\Services\FoodWasteSystemDataServiceTests.cs" />
-    <Compile Include="Unittests\Services\FoodWasteHouseholdServiceTests.cs" />
+    <Compile Include="Unittests\Services\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Unittests\Services\IntranetServiceBaseTests.cs" />
     <Compile Include="Unittests\Services\KalenderServiceTests.cs" />
   </ItemGroup>
