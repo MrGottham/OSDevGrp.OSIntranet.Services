@@ -81,7 +81,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -103,7 +103,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -125,14 +125,14 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
         /// <summary>
         /// Activates the current caller.
         /// </summary>
-        /// <param name="command">Command for activating the current caller household member account.</param>
+        /// <param name="command">Command for activating the current callers household member account.</param>
         /// <returns>Service receipt.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual ServiceReceiptResponse HouseholdMemberActivate(HouseholdMemberActivateCommand command)
@@ -147,7 +147,29 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
+        /// Accepts privacy policy for the current caller.
+        /// </summary>
+        /// <param name="command">Command for accepting privacy policy on the current callers household member account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse HouseholdMemberAcceptPrivacyPolicy(HouseholdMemberAcceptPrivacyPolicyCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<HouseholdMemberAcceptPrivacyPolicyCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -169,7 +191,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -191,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -213,7 +235,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 
@@ -235,7 +257,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdServiceName, MethodBase.GetCurrentMethod());
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
         }
 

@@ -11,7 +11,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     /// <summary>
     /// Interface for the service which can access and modify data on a house hold in the food waste domain.
     /// </summary>
-    [ServiceContract(Name = SoapNamespaces.FoodWasteHouseholdServiceName, Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [ServiceContract(Name = SoapNamespaces.FoodWasteHouseholdDataServiceName, Namespace = SoapNamespaces.FoodWasteNamespace)]
     public interface IFoodWasteHouseholdService : IIntranetService
     {
         /// <summary>
@@ -47,12 +47,22 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <summary>
         /// Activates the current caller.
         /// </summary>
-        /// <param name="command">Command for activating the current caller household member account.</param>
+        /// <param name="command">Command for activating the current callers household member account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
         [FaultContract(typeof (FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdMemberActivate(HouseholdMemberActivateCommand command);
+
+        /// <summary>
+        /// Accepts privacy policy for the current caller.
+        /// </summary>
+        /// <param name="command">Command for accepting privacy policy on the current callers household member account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse HouseholdMemberAcceptPrivacyPolicy(HouseholdMemberAcceptPrivacyPolicyCommand command);
 
         /// <summary>
         /// Gets the collection of food items.

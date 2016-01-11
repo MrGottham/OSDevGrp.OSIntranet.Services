@@ -195,7 +195,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -295,7 +295,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -395,11 +395,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
-        /// Tests that HouseholdMemberActivate throws an ArgumentNullException when the command for activating the current caller household member account is null.
+        /// Tests that HouseholdMemberActivate throws an ArgumentNullException when the command for activating the current callers household member account is null.
         /// </summary>
         [Test]
         public void TestThatHouseholdMemberActivateThrowsArgumentNullExceptionIfHouseholdMemberActivateCommandIsNull()
@@ -495,7 +495,107 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberAcceptPrivacyPolicy throws an ArgumentNullException when the command for accepting privacy policy on the current callers household member account is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberAcceptPrivacyPolicyThrowsArgumentNullExceptionIfHouseholdMemberAcceptPrivacyPolicyIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteHouseholdService.HouseholdMemberAcceptPrivacyPolicy(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("command"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberAcceptPrivacyPolicy calls Publish on the command bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberAcceptPrivacyPolicyCallsPublishOnCommandBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var commandBus = MockRepository.GenerateMock<ICommandBus>();
+            commandBus.Stub(m => m.Publish<HouseholdMemberAcceptPrivacyPolicyCommand, ServiceReceiptResponse>(Arg<HouseholdMemberAcceptPrivacyPolicyCommand>.Is.NotNull))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(commandBus, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var command = fixture.Create<HouseholdMemberAcceptPrivacyPolicyCommand>();
+            foodWasteHouseholdService.HouseholdMemberAcceptPrivacyPolicy(command);
+
+            commandBus.AssertWasCalled(m => m.Publish<HouseholdMemberAcceptPrivacyPolicyCommand, ServiceReceiptResponse>(Arg<HouseholdMemberAcceptPrivacyPolicyCommand>.Is.Equal(command)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberAcceptPrivacyPolicy returns the result from the command bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberAcceptPrivacyPolicyReturnsResultFromCommand()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var serviceReceiptResponse = fixture.Create<ServiceReceiptResponse>();
+            var commandBus = MockRepository.GenerateMock<ICommandBus>();
+            commandBus.Stub(m => m.Publish<HouseholdMemberAcceptPrivacyPolicyCommand, ServiceReceiptResponse>(Arg<HouseholdMemberAcceptPrivacyPolicyCommand>.Is.NotNull))
+                .Return(serviceReceiptResponse)
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(commandBus, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var result = foodWasteHouseholdService.HouseholdMemberAcceptPrivacyPolicy(fixture.Create<HouseholdMemberAcceptPrivacyPolicyCommand>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(serviceReceiptResponse));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberAcceptPrivacyPolicy throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberAcceptPrivacyPolicyThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var commandBus = MockRepository.GenerateMock<ICommandBus>();
+            commandBus.Stub(m => m.Publish<HouseholdMemberAcceptPrivacyPolicyCommand, ServiceReceiptResponse>(Arg<HouseholdMemberAcceptPrivacyPolicyCommand>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdService = new FoodWasteHouseholdService(commandBus, fixture.Create<IQueryBus>(), foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteHouseholdService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteHouseholdService.HouseholdMemberAcceptPrivacyPolicy(fixture.Create<HouseholdMemberAcceptPrivacyPolicyCommand>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -595,7 +695,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -697,7 +797,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -797,7 +897,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
 
         /// <summary>
@@ -900,7 +1000,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
             Assert.That(faultException, Is.Not.Null);
             Assert.That(faultException.Detail, Is.Not.Null);
 
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdServiceName), Arg<MethodBase>.Is.NotNull));
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
         }
     }
 }

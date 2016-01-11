@@ -69,7 +69,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
                 Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
                 Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdServiceName));
+                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
                 Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberIsActivated"));
@@ -95,7 +95,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
                 Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
                 Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdServiceName));
+                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
                 Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberHasAcceptedPrivacyPolicy"));
@@ -125,10 +125,36 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
                 Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
                 Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdServiceName));
+                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
                 Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
                 Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberActivate"));
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberAcceptPrivacyPolicy throws an FaultException when the household member has not been created.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberAcceptPrivacyPolicyThrowsFaultExceptionWhenHouseholdMemberHasNotBeenCreated()
+        {
+            using (new ClaimsPrincipalTestExecutor())
+            {
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand()));
+                Assert.That(faultException, Is.Not.Null);
+                Assert.That(faultException.Detail, Is.Not.Null);
+                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberAcceptPrivacyPolicy"));
                 Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
                 Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
             }
