@@ -74,6 +74,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{BFDF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Security", "OSDevGrp.OSIntranet.Security\OSDevGrp.OSIntranet.Security.csproj", "{4D0F45A5-5620-4A70-AD26-515DBD872998}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E4C63018-B79F-4300-93E4-0190960F6349}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
 		SccNumberOfProjects = 14
