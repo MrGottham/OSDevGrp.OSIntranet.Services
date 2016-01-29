@@ -67,13 +67,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Domain.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Domain", "OSDevGrp.OSIntranet.Domain\OSDevGrp.OSIntranet.Domain.csproj", "{B02149C7-DBE2-42CA-AA67-AF18B3D1D321}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{F5E1CF7B-7D54-4565-8B12-CD46EF0F3993}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{BFDFE114-EBF5-4453-9F56-0081602C6A54}"
 	ProjectSection(SolutionItems) = preProject
 		Scripts\FoodWasteDb.sql = Scripts\FoodWasteDb.sql
