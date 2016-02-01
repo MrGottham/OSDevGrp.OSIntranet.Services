@@ -20,6 +20,12 @@ namespace OSDevGrp.OSIntranet.Infrastructure
     /// </summary>
     public class FoodWasteObjectMapper : IFoodWasteObjectMapper
     {
+        #region Private variables
+
+        private static readonly IMapper Mapper = null;
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -27,342 +33,386 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// </summary>
         static FoodWasteObjectMapper()
         {
-            Mapper.CreateMap<IHousehold, HouseholdIdentificationView>()
-                .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description));
+            var mapperConfiguration = new MapperConfiguration(config =>
+            {
+                config.CreateMap<IHousehold, HouseholdIdentificationView>()
+                    .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description));
 
-            Mapper.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
-                .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress));
+                config.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
+                    .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress));
 
-            Mapper.CreateMap<IHouseholdMember, HouseholdMemberView>()
-                .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress))
-                .ForMember(m => m.Membership, opt => opt.MapFrom(s => s.Membership))
-                .ForMember(m => m.MembershipExpireTime, opt => opt.MapFrom(s => s.MembershipExpireTime))
-                .ForMember(m => m.ActivationTime, opt => opt.MapFrom(s => s.ActivationTime))
-                .ForMember(m => m.IsActivated, opt => opt.MapFrom(s => s.IsActivated))
-                .ForMember(m => m.PrivacyPolicyAcceptedTime, opt => opt.MapFrom(s => s.PrivacyPolicyAcceptedTime))
-                .ForMember(m => m.IsPrivacyPolictyAccepted, opt => opt.MapFrom(s => s.IsPrivacyPolictyAccepted))
-                .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
-                .ForMember(m => m.Households, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IHousehold>, IEnumerable<HouseholdIdentificationView>>(s.Households)));
+                config.CreateMap<IHouseholdMember, HouseholdMemberView>()
+                    .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress))
+                    .ForMember(m => m.Membership, opt => opt.MapFrom(s => s.Membership))
+                    .ForMember(m => m.MembershipExpireTime, opt => opt.MapFrom(s => s.MembershipExpireTime))
+                    .ForMember(m => m.ActivationTime, opt => opt.MapFrom(s => s.ActivationTime))
+                    .ForMember(m => m.IsActivated, opt => opt.MapFrom(s => s.IsActivated))
+                    .ForMember(m => m.PrivacyPolicyAcceptedTime, opt => opt.MapFrom(s => s.PrivacyPolicyAcceptedTime))
+                    .ForMember(m => m.IsPrivacyPolictyAccepted, opt => opt.MapFrom(s => s.IsPrivacyPolictyAccepted))
+                    .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
+                    .ForMember(m => m.Households, opt => opt.MapFrom(s => s.Households));
 
-            Mapper.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
-                .ConstructUsing(m =>
-                {
-                    if (m as IHouseholdMemberProxy != null)
+                config.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
+                    .ConstructUsing(m =>
                     {
-                        return (IHouseholdMemberProxy) m;
-                    }
-                    var householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.Membership, m.MembershipExpireTime, m.ActivationCode, m.CreationTime)
-                    {
-                        Identifier = m.Identifier,
-                        ActivationTime = m.ActivationTime,
-                        PrivacyPolicyAcceptedTime = m.PrivacyPolicyAcceptedTime
-                    };
-                    foreach (var household in m.Households)
-                    {
-                        // TODO: Convert household to proxy and add (modify the test).
-                    }
-                    return householdMemberProxy;
-                });
-
-            Mapper.CreateMap<IFoodItemCollection, FoodItemCollectionView>()
-                .ForMember(m => m.FoodItems, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodItem>, IEnumerable<FoodItemView>>(s)))
-                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
-
-            Mapper.CreateMap<IFoodItemCollection, FoodItemCollectionSystemView>()
-                .ForMember(m => m.FoodItems, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodItem>, IEnumerable<FoodItemSystemView>>(s)))
-                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
-
-            Mapper.CreateMap<IFoodItem, FoodItemIdentificationView>()
-                .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
-
-            Mapper.CreateMap<IFoodItem, FoodItemView>()
-                .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
-                .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.PrimaryFoodGroup)))
-                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
-                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupIdentificationView>>(s.FoodGroups)));
-
-            Mapper.CreateMap<IFoodItem, FoodItemSystemView>()
-                .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
-                .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.PrimaryFoodGroup)))
-                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
-                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupSystemView>>(s.FoodGroups)))
-                .ForMember(m => m.Translations, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.Translations)))
-                .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IForeignKey>, IEnumerable<ForeignKeySystemView>>(s.ForeignKeys)));
-
-            Mapper.CreateMap<IFoodItem, IFoodItemProxy>()
-                .ConvertUsing(m =>
-                {
-                    if (m as IFoodItemProxy != null)
-                    {
-                        return (IFoodItemProxy) m;
-                    }
-                    var primaryFoodGroup = m.PrimaryFoodGroup == null ? null : (m.PrimaryFoodGroup as IFoodGroupProxy) != null ? (IFoodGroupProxy) m.PrimaryFoodGroup : Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.PrimaryFoodGroup);
-                    var foodItemProxy = new FoodItemProxy(primaryFoodGroup)
-                    {
-                        Identifier = m.Identifier,
-                        IsActive = m.IsActive
-                    };
-                    foreach (var foodGroup in m.FoodGroups)
-                    {
-                        if (primaryFoodGroup != null && primaryFoodGroup.Identifier == foodGroup.Identifier)
+                        if (m as IHouseholdMemberProxy != null)
                         {
-                            continue;
+                            return (IHouseholdMemberProxy) m;
                         }
-                        if (foodGroup as IFoodGroupProxy != null)
+                        var householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.Membership, m.MembershipExpireTime, m.ActivationCode, m.CreationTime)
                         {
-                            foodItemProxy.FoodGroupAdd(foodGroup);
-                            continue;
-                        }
-                        foodItemProxy.FoodGroupAdd(Mapper.Map<IFoodGroup, IFoodGroupProxy>(foodGroup));
-                    }
-                    foreach (var translation in m.Translations)
-                    {
-                        if (translation as ITranslationProxy != null)
+                            Identifier = m.Identifier,
+                            ActivationTime = m.ActivationTime,
+                            PrivacyPolicyAcceptedTime = m.PrivacyPolicyAcceptedTime
+                        };
+                        foreach (var household in m.Households)
                         {
-                            foodItemProxy.TranslationAdd(translation);
-                            continue;
+                            // TODO: Convert household to proxy and add (modify the test).
                         }
-                        foodItemProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                    }
-                    foreach (var foreignKey in m.ForeignKeys)
+                        return householdMemberProxy;
+                    });
+
+                config.CreateMap<IFoodItemCollection, FoodItemCollectionView>()
+                    .ForMember(m => m.FoodItems, opt => opt.MapFrom<IEnumerable<IFoodItem>>(s => s))
+                    .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider));
+
+                config.CreateMap<IFoodItemCollection, FoodItemCollectionSystemView>()
+                    .ForMember(m => m.FoodItems, opt => opt.MapFrom(s => s))
+                    .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider));
+
+                config.CreateMap<IFoodItem, FoodItemIdentificationView>()
+                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
+
+                config.CreateMap<IFoodItem, FoodItemView>()
+                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => s.PrimaryFoodGroup))
+                    .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                    .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => s.FoodGroups));
+
+                config.CreateMap<IFoodItem, FoodItemSystemView>()
+                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => s.PrimaryFoodGroup))
+                    .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                    .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => s.FoodGroups))
+                    .ForMember(m => m.Translations, opt => opt.MapFrom(s => s.Translations))
+                    .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => s.ForeignKeys));
+
+                config.CreateMap<IFoodItem, IFoodItemProxy>()
+                    .ConvertUsing(m =>
                     {
-                        if (foreignKey as IForeignKeyProxy != null)
+                        if (m as IFoodItemProxy != null)
                         {
-                            foodItemProxy.ForeignKeyAdd(foreignKey);
-                            continue;
+                            return (IFoodItemProxy) m;
                         }
-                        foodItemProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
-                    }
-                    return foodItemProxy;
-                });
-
-            Mapper.CreateMap<IFoodGroupCollection, FoodGroupTreeView>()
-                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupView>>(s)))
-                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
-
-            Mapper.CreateMap<IFoodGroupCollection, FoodGroupTreeSystemView>()
-                .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupSystemView>>(s)))
-                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)));
-
-            Mapper.CreateMap<IFoodGroup, FoodGroupIdentificationView>()
-                .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
-
-            Mapper.CreateMap<IFoodGroup, FoodGroupView>()
-                .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
-                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
-                .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent == null ? null : Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.Parent)))
-                .ForMember(m => m.Children, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupView>>(s.Children)));
-
-            Mapper.CreateMap<IFoodGroup, FoodGroupSystemView>()
-                .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
-                .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
-                .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent == null ? null : Mapper.Map<IFoodGroup, FoodGroupIdentificationView>(s.Parent)))
-                .ForMember(m => m.Translations, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.Translations)))
-                .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IForeignKey>, IEnumerable<ForeignKeySystemView>>(s.ForeignKeys)))
-                .ForMember(m => m.Children, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<IFoodGroup>, IEnumerable<FoodGroupSystemView>>(s.Children)));
-
-            Mapper.CreateMap<IFoodGroup, IFoodGroupProxy>()
-                .ConvertUsing(m =>
-                {
-                    if (m as IFoodGroupProxy != null)
-                    {
-                        return (IFoodGroupProxy) m;
-                    }
-                    var parentFoodGroupProxy = m.Parent == null ? null : (m.Parent as IFoodGroupProxy) != null ? (IFoodGroupProxy) m.Parent : Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.Parent);
-                    var childFoodGroupProxyCollection = new List<IFoodGroupProxy>();
-                    foreach (var child in m.Children)
-                    {
-                        if (child as IFoodGroupProxy != null)
+                        IFoodGroupProxy primaryFoodGroup = null;
+                        if (m.PrimaryFoodGroup != null)
                         {
-                            childFoodGroupProxyCollection.Add((IFoodGroupProxy) child);
-                            continue;
+                            primaryFoodGroup = m.PrimaryFoodGroup as IFoodGroupProxy;
+                            if (primaryFoodGroup == null && Mapper != null)
+                            {
+                                primaryFoodGroup = Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.PrimaryFoodGroup);
+                            }
                         }
-                        var childFoodGroupProxy = new FoodGroupProxy
+                        var foodItemProxy = new FoodItemProxy(primaryFoodGroup)
+                        {
+                            Identifier = m.Identifier,
+                            IsActive = m.IsActive
+                        };
+                        foreach (var foodGroup in m.FoodGroups)
+                        {
+                            if (primaryFoodGroup != null && primaryFoodGroup.Identifier == foodGroup.Identifier)
+                            {
+                                continue;
+                            }
+                            if (foodGroup as IFoodGroupProxy != null)
+                            {
+                                foodItemProxy.FoodGroupAdd(foodGroup);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                foodItemProxy.FoodGroupAdd(Mapper.Map<IFoodGroup, IFoodGroupProxy>(foodGroup));
+                            }
+                        }
+                        foreach (var translation in m.Translations)
+                        {
+                            if (translation as ITranslationProxy != null)
+                            {
+                                foodItemProxy.TranslationAdd(translation);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                foodItemProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                            }
+                        }
+                        foreach (var foreignKey in m.ForeignKeys)
+                        {
+                            if (foreignKey as IForeignKeyProxy != null)
+                            {
+                                foodItemProxy.ForeignKeyAdd(foreignKey);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                foodItemProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
+                            }
+                        }
+                        return foodItemProxy;
+                    });
+
+                config.CreateMap<IFoodGroupCollection, FoodGroupTreeView>()
+                    .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => s))
+                    .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider));
+
+                config.CreateMap<IFoodGroupCollection, FoodGroupTreeSystemView>()
+                    .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => s))
+                    .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider));
+
+                config.CreateMap<IFoodGroup, FoodGroupIdentificationView>()
+                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
+
+                config.CreateMap<IFoodGroup, FoodGroupView>()
+                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                    .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent))
+                    .ForMember(m => m.Children, opt => opt.MapFrom(s => s.Children));
+
+                config.CreateMap<IFoodGroup, FoodGroupSystemView>()
+                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
+                    .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent))
+                    .ForMember(m => m.Translations, opt => opt.MapFrom(s => s.Translations))
+                    .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => s.ForeignKeys))
+                    .ForMember(m => m.Children, opt => opt.MapFrom(s => s.Children));
+
+                config.CreateMap<IFoodGroup, IFoodGroupProxy>()
+                    .ConvertUsing(m =>
+                    {
+                        if (m as IFoodGroupProxy != null)
+                        {
+                            return (IFoodGroupProxy) m;
+                        }
+                        IFoodGroupProxy parentFoodGroupProxy = null;
+                        if (m.Parent != null)
+                        {
+                            parentFoodGroupProxy = m.Parent as IFoodGroupProxy;
+                            if (parentFoodGroupProxy == null && Mapper != null)
+                            {
+                                parentFoodGroupProxy = Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.Parent);
+                            }
+                        }
+                        var childFoodGroupProxyCollection = new List<IFoodGroupProxy>();
+                        foreach (var child in m.Children)
+                        {
+                            if (child as IFoodGroupProxy != null)
+                            {
+                                childFoodGroupProxyCollection.Add((IFoodGroupProxy) child);
+                                continue;
+                            }
+                            var childFoodGroupProxy = new FoodGroupProxy
+                            {
+                                Identifier = m.Identifier,
+                                Parent = parentFoodGroupProxy,
+                                IsActive = m.IsActive
+                            };
+                            childFoodGroupProxyCollection.Add(childFoodGroupProxy);
+                        }
+                        var foodGroupProxy = new FoodGroupProxy(childFoodGroupProxyCollection)
                         {
                             Identifier = m.Identifier,
                             Parent = parentFoodGroupProxy,
                             IsActive = m.IsActive
                         };
-                        childFoodGroupProxyCollection.Add(childFoodGroupProxy);
-                    }
-                    var foodGroupProxy = new FoodGroupProxy(childFoodGroupProxyCollection)
-                    {
-                        Identifier = m.Identifier,
-                        Parent = parentFoodGroupProxy,
-                        IsActive = m.IsActive
-                    };
-                    foreach (var translation in m.Translations)
-                    {
-                        if (translation as ITranslationProxy != null)
+                        foreach (var translation in m.Translations)
                         {
-                            foodGroupProxy.TranslationAdd(translation);
-                            continue;
+                            if (translation as ITranslationProxy != null)
+                            {
+                                foodGroupProxy.TranslationAdd(translation);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                foodGroupProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                            }
                         }
-                        foodGroupProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                    }
-                    foreach (var foreignKey in m.ForeignKeys)
-                    {
-                        if (foreignKey as IForeignKeyProxy != null)
+                        foreach (var foreignKey in m.ForeignKeys)
                         {
-                            foodGroupProxy.ForeignKeyAdd(foreignKey);
-                            continue;
+                            if (foreignKey as IForeignKeyProxy != null)
+                            {
+                                foodGroupProxy.ForeignKeyAdd(foreignKey);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                foodGroupProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
+                            }
                         }
-                        foodGroupProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
-                    }
-                    return foodGroupProxy;
-                });
+                        return foodGroupProxy;
+                    });
 
-            Mapper.CreateMap<IForeignKey, ForeignKeyView>()
-                .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderView>(s.DataProvider)))
-                .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
-                .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
+                config.CreateMap<IForeignKey, ForeignKeyView>()
+                    .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider))
+                    .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
+                    .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
 
-            Mapper.CreateMap<IForeignKey, ForeignKeySystemView>()
-                .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => Mapper.Map<IDataProvider, DataProviderSystemView>(s.DataProvider)))
-                .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
-                .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
-                
-            Mapper.CreateMap<IForeignKey, IForeignKeyProxy>()
-                .ConvertUsing(m =>
-                {
-                    if (m as IForeignKeyProxy != null)
-                    {
-                        return (IForeignKeyProxy) m;
-                    }
-                    var dataProider = (m.DataProvider as IDataProviderProxy) != null ? (IDataProviderProxy) m.DataProvider : Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
-                    var foreignKeyProxy = new ForeignKeyProxy(dataProider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
-                    {
-                        Identifier = m.Identifier
-                    };
-                    return foreignKeyProxy;
-                });
+                config.CreateMap<IForeignKey, ForeignKeySystemView>()
+                    .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider))
+                    .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
+                    .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
 
-            Mapper.CreateMap<IStaticText, StaticTextView>()
-                .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
-                .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
-                .ForMember(m => m.BodyTranslation, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslation != null ? s.BodyTranslation.Value : string.Empty : null));
-
-            Mapper.CreateMap<IStaticText, StaticTextSystemView>()
-                .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
-                .ForMember(m => m.SubjectTranslationIdentifier, opt => opt.MapFrom(s => s.SubjectTranslationIdentifier))
-                .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
-                .ForMember(m => m.SubjectTranslations, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.SubjectTranslations)))
-                .ForMember(m => m.BodyTranslationIdentifier, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? (Guid?) s.BodyTranslationIdentifier.Value : null))
-                .ForMember(m => m.BodyTranslation, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslation != null ? s.BodyTranslation.Value : string.Empty : null))
-                .ForMember(m => m.BodyTranslations, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.BodyTranslations) : null));
-
-            Mapper.CreateMap<IStaticText, IStaticTextProxy>()
-                .ConvertUsing(m =>
-                {
-                    if (m as IStaticTextProxy != null)
+                config.CreateMap<IForeignKey, IForeignKeyProxy>()
+                    .ConvertUsing(m =>
                     {
-                        return (IStaticTextProxy) m;
-                    }
-                    var staticTextProxy = new StaticTextProxy(m.Type, m.SubjectTranslationIdentifier, m.BodyTranslationIdentifier)
-                    {
-                        Identifier = m.Identifier
-                    };
-                    foreach (var translation in m.Translations)
-                    {
-                        if (translation as ITranslationProxy != null)
+                        if (m as IForeignKeyProxy != null)
                         {
-                            staticTextProxy.TranslationAdd(translation);
-                            continue;
+                            return (IForeignKeyProxy) m;
                         }
-                        staticTextProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                    }
-                    return staticTextProxy;
-                });
-
-            Mapper.CreateMap<IDataProvider, DataProviderView>()
-                .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
-                .ForMember(m => m.DataSourceStatement, opt => opt.MapFrom(s => s.DataSourceStatement != null ? s.DataSourceStatement.Value : string.Empty));
-
-            Mapper.CreateMap<IDataProvider, DataProviderSystemView>()
-                .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
-                .ForMember(m => m.DataSourceStatementIdentifier, opt => opt.MapFrom(s => s.DataSourceStatementIdentifier))
-                .ForMember(m => m.DataSourceStatements, opt => opt.MapFrom(s => Mapper.Map<IEnumerable<ITranslation>, IEnumerable<TranslationSystemView>>(s.DataSourceStatements)));
-
-            Mapper.CreateMap<IDataProvider, IDataProviderProxy>()
-                .ConvertUsing(m =>
-                {
-                    if (m as IDataProviderProxy != null)
-                    {
-                        return (IDataProviderProxy) m;
-                    }
-                    var dataProviderProxy = new DataProviderProxy(m.Name, m.DataSourceStatementIdentifier)
-                    {
-                        Identifier = m.Identifier
-                    };
-                    foreach (var translation in m.Translations)
-                    {
-                        if (translation as ITranslationProxy != null)
+                        var dataProvider = m.DataProvider as IDataProviderProxy;
+                        if (dataProvider == null && Mapper != null)
                         {
-                            dataProviderProxy.TranslationAdd(translation);
-                            continue;
+                            dataProvider = Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
                         }
-                        dataProviderProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                    }
-                    return dataProviderProxy;
-                });
+                        var foreignKeyProxy = new ForeignKeyProxy(dataProvider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
+                        {
+                            Identifier = m.Identifier
+                        };
+                        return foreignKeyProxy;
+                    });
 
-            Mapper.CreateMap<ITranslation, TranslationSystemView>()
-                .ForMember(m => m.TranslationIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.TranslationOfIdentifier, opt => opt.MapFrom(s => s.TranslationOfIdentifier))
-                .ForMember(m => m.TranslationInfo, opt => opt.MapFrom(s => Mapper.Map<ITranslationInfo, TranslationInfoSystemView>(s.TranslationInfo)))
-                .ForMember(m => m.Translation, opt => opt.MapFrom(s => s.Value));
+                config.CreateMap<IStaticText, StaticTextView>()
+                    .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
+                    .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
+                    .ForMember(m => m.BodyTranslation, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslation != null ? s.BodyTranslation.Value : string.Empty : null));
 
-            Mapper.CreateMap<ITranslation, ITranslationProxy>()
-                .ConvertUsing(m =>
-                {
-                    if (m as ITranslationProxy != null)
+                config.CreateMap<IStaticText, StaticTextSystemView>()
+                    .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
+                    .ForMember(m => m.SubjectTranslationIdentifier, opt => opt.MapFrom(s => s.SubjectTranslationIdentifier))
+                    .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
+                    .ForMember(m => m.SubjectTranslations, opt => opt.MapFrom(s => s.SubjectTranslations))
+                    .ForMember(m => m.BodyTranslationIdentifier, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? (Guid?) s.BodyTranslationIdentifier.Value : null))
+                    .ForMember(m => m.BodyTranslation, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslation != null ? s.BodyTranslation.Value : string.Empty : null))
+                    .ForMember(m => m.BodyTranslations, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslations : null));
+
+                config.CreateMap<IStaticText, IStaticTextProxy>()
+                    .ConvertUsing(m =>
                     {
-                        return (ITranslationProxy) m;
-                    }
-                    var translationInfoProxy = (m.TranslationInfo as ITranslationInfoProxy) != null ? (ITranslationInfoProxy) m.TranslationInfo : Mapper.Map<ITranslationInfo, ITranslationInfoProxy>(m.TranslationInfo);
-                    return new TranslationProxy(m.TranslationOfIdentifier, translationInfoProxy, m.Value)
+                        if (m as IStaticTextProxy != null)
+                        {
+                            return (IStaticTextProxy) m;
+                        }
+                        var staticTextProxy = new StaticTextProxy(m.Type, m.SubjectTranslationIdentifier, m.BodyTranslationIdentifier)
+                        {
+                            Identifier = m.Identifier
+                        };
+                        foreach (var translation in m.Translations)
+                        {
+                            if (translation as ITranslationProxy != null)
+                            {
+                                staticTextProxy.TranslationAdd(translation);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                staticTextProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                            }
+                        }
+                        return staticTextProxy;
+                    });
+
+                config.CreateMap<IDataProvider, DataProviderView>()
+                    .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
+                    .ForMember(m => m.DataSourceStatement, opt => opt.MapFrom(s => s.DataSourceStatement != null ? s.DataSourceStatement.Value : string.Empty));
+
+                config.CreateMap<IDataProvider, DataProviderSystemView>()
+                    .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
+                    .ForMember(m => m.DataSourceStatementIdentifier, opt => opt.MapFrom(s => s.DataSourceStatementIdentifier))
+                    .ForMember(m => m.DataSourceStatements, opt => opt.MapFrom(s => s.DataSourceStatements));
+
+                config.CreateMap<IDataProvider, IDataProviderProxy>()
+                    .ConvertUsing(m =>
                     {
-                        Identifier = m.Identifier
-                    };
-                });
+                        if (m as IDataProviderProxy != null)
+                        {
+                            return (IDataProviderProxy) m;
+                        }
+                        var dataProviderProxy = new DataProviderProxy(m.Name, m.DataSourceStatementIdentifier)
+                        {
+                            Identifier = m.Identifier
+                        };
+                        foreach (var translation in m.Translations)
+                        {
+                            if (translation as ITranslationProxy != null)
+                            {
+                                dataProviderProxy.TranslationAdd(translation);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                dataProviderProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                            }
+                        }
+                        return dataProviderProxy;
+                    });
 
-            Mapper.CreateMap<ITranslationInfo, TranslationInfoSystemView>()
-                .ForMember(m => m.TranslationInfoIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                .ForMember(m => m.CultureName, opt => opt.MapFrom(s => s.CultureName));
+                config.CreateMap<ITranslation, TranslationSystemView>()
+                    .ForMember(m => m.TranslationIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.TranslationOfIdentifier, opt => opt.MapFrom(s => s.TranslationOfIdentifier))
+                    .ForMember(m => m.TranslationInfo, opt => opt.MapFrom(s => s.TranslationInfo))
+                    .ForMember(m => m.Translation, opt => opt.MapFrom(s => s.Value));
 
-            Mapper.CreateMap<ITranslationInfo, ITranslationInfoProxy>()
-                .ConvertUsing(m => (m as ITranslationInfoProxy) != null ? (ITranslationInfoProxy) m : new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
+                config.CreateMap<ITranslation, ITranslationProxy>()
+                    .ConvertUsing(m =>
+                    {
+                        if (m as ITranslationProxy != null)
+                        {
+                            return (ITranslationProxy) m;
+                        }
+                        var translationInfoProxy = m.TranslationInfo as ITranslationInfoProxy;
+                        if (translationInfoProxy == null && Mapper != null)
+                        {
+                            translationInfoProxy = Mapper.Map<ITranslationInfo, ITranslationInfoProxy>(m.TranslationInfo);
+                        }
+                        return new TranslationProxy(m.TranslationOfIdentifier, translationInfoProxy, m.Value)
+                        {
+                            Identifier = m.Identifier
+                        };
+                    });
 
-            Mapper.CreateMap<IIdentifiable, ServiceReceiptResponse>()
-                .ConvertUsing(m => new ServiceReceiptResponse
-                {
-                    Identifier = m.Identifier,
-                    EventDate = DateTime.Now
-                });
+                config.CreateMap<ITranslationInfo, TranslationInfoSystemView>()
+                    .ForMember(m => m.TranslationInfoIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.CultureName, opt => opt.MapFrom(s => s.CultureName));
 
-            Mapper.CreateMap<bool, BooleanResultResponse>()
-                .ConvertUsing(m => new BooleanResultResponse
-                {
-                    Result = m,
-                    EventDate = DateTime.Now
-                });
+                config.CreateMap<ITranslationInfo, ITranslationInfoProxy>()
+                    .ConvertUsing(m => (m as ITranslationInfoProxy) != null ? (ITranslationInfoProxy) m : new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
 
-            Mapper.AssertConfigurationIsValid();
+                config.CreateMap<IIdentifiable, ServiceReceiptResponse>()
+                    .ForMember(m => m.Identifier, opt => opt.MapFrom(s => s.Identifier))
+                    .ForMember(m => m.EventDate, opt => opt.MapFrom(s => DateTime.Now));
+
+                config.CreateMap<bool, BooleanResultResponse>()
+                    .ForMember(m => m.Result, opt => opt.MapFrom(s => s))
+                    .ForMember(m => m.EventDate, opt => opt.MapFrom(s => DateTime.Now));
+            });
+
+            mapperConfiguration.AssertConfigurationIsValid();
+
+            Mapper = mapperConfiguration.CreateMapper();
         }
 
         #endregion
