@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
@@ -6,6 +7,7 @@ using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
@@ -84,6 +86,33 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     householdMemberHasAcceptedPrivacyPolicy = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.True);
+
+                    var householdMemberData = _householdDataService.HouseholdMemberDataGet(new HouseholdMemberDataGetQuery());
+                    Assert.That(householdMemberData, Is.Not.Null);
+                    Assert.That(householdMemberData.HouseholdMemberIdentifier, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(householdMemberData.MailAddress, Is.Not.Null);
+                    Assert.That(householdMemberData.MailAddress, Is.Not.Empty);
+                    Assert.That(householdMemberData.MailAddress, Is.EqualTo(executor.MailAddress));
+                    Assert.That(householdMemberData.Membership, Is.Not.Null);
+                    Assert.That(householdMemberData.Membership, Is.Not.Empty);
+                    Assert.That(householdMemberData.Membership, Is.EqualTo(Convert.ToString(Membership.Basic)));
+                    Assert.That(householdMemberData.MembershipExpireTime, Is.Null);
+                    Assert.That(householdMemberData.MembershipExpireTime.HasValue, Is.False);
+                    Assert.That(householdMemberData.ActivationTime, Is.Not.Null);
+                    Assert.That(householdMemberData.ActivationTime.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(householdMemberData.ActivationTime.Value, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(householdMemberData.IsActivated, Is.True);
+                    Assert.That(householdMemberData.PrivacyPolicyAcceptedTime, Is.Not.Null);
+                    Assert.That(householdMemberData.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(householdMemberData.PrivacyPolicyAcceptedTime.Value, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(householdMemberData.IsPrivacyPolictyAccepted, Is.True);
+                    Assert.That(householdMemberData.CreationTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    Assert.That(householdMemberData.Households, Is.Not.Null);
+                    Assert.That(householdMemberData.Households, Is.Empty);
                 }
                 finally
                 {

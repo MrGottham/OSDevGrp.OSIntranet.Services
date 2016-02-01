@@ -130,6 +130,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Gets household member data for the current caller.
+        /// </summary>
+        /// <param name="query">Query which can get household member data for the current caller.</param>
+        /// <returns>Household member data for the current caller.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual HouseholdMemberView HouseholdMemberDataGet(HouseholdMemberDataGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<HouseholdMemberDataGetQuery, HouseholdMemberView>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Activates the current caller.
         /// </summary>
         /// <param name="command">Command for activating the current callers household member account.</param>

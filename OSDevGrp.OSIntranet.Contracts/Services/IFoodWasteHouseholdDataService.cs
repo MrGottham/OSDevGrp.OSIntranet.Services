@@ -45,6 +45,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         BooleanResultResponse HouseholdMemberHasAcceptedPrivacyPolicy(HouseholdMemberHasAcceptedPrivacyPolicyQuery query);
 
         /// <summary>
+        /// Gets household member data for the current caller.
+        /// </summary>
+        /// <param name="query">Query which can get household member data for the current caller.</param>
+        /// <returns>Household member data for the current caller.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        HouseholdMemberView HouseholdMemberDataGet(HouseholdMemberDataGetQuery query);
+
+        /// <summary>
         /// Activates the current caller.
         /// </summary>
         /// <param name="command">Command for activating the current callers household member account.</param>

@@ -39,7 +39,15 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
         /// <returns>Household member data for the current user.</returns>
         public override IHouseholdMember GetData(IHouseholdMember householdMember, HouseholdMemberDataGetQuery query, ITranslationInfo translationInfo)
         {
-            throw new NotImplementedException();
+            if (householdMember == null)
+            {
+                throw new ArgumentNullException("householdMember");
+            }
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            return householdMember;
         }
 
         #endregion

@@ -130,6 +130,39 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberDataGet throws an FaultException when the household member has not been created.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberDataGetThrowsFaultExceptionWhenHouseholdMemberHasNotBeenCreated()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberDataGet(new HouseholdMemberDataGetQuery()));
+                Assert.That(faultException, Is.Not.Null);
+                Assert.That(faultException.Detail, Is.Not.Null);
+                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+                Assert.That(faultException.Detail.ErrorMessage,
+                    Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceName,
+                    Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberDataGet"));
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that HouseholdMemberActivate throws an FaultException when the household member has not been created.
         /// </summary>
         [Test]
