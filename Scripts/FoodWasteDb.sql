@@ -107,6 +107,7 @@ DROP PROCEDURE GrantRightsForTranslations;
 CREATE TABLE IF NOT EXISTS DataProviders (
 	DataProviderIdentifier CHAR(36) NOT NULL,
 	Name NVARCHAR(256) NOT NULL,
+	HandlesPayments BIT NOT NULL,
 	DataSourceStatementIdentifier CHAR(36) NOT NULL,
 	PRIMARY KEY (DataProviderIdentifier),
 	UNIQUE INDEX IX_DataProviders_DataSourceStatementIdentifier (DataSourceStatementIdentifier)
@@ -125,6 +126,11 @@ BEGIN
 	IF((SELECT LOWER(Data_Type) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='DataProviders' AND Column_Name='DataSourceStatementIdentifier') = 'varchar') THEN
 		ALTER TABLE DataProviders MODIFY DataSourceStatementIdentifier CHAR(36) NOT NULL;
 	END IF;
+	IF((SELECT COUNT(*) FROM information_schema.Columns WHERE Table_Schema=DATABASE() AND Table_Name='DataProviders' AND Column_Name='HandlesPayments') = 0) THEN
+		ALTER TABLE DataProviders ADD HandlesPayments BIT NULL;
+		UPDATE DataProviders SET HandlesPayments=0;
+		ALTER TABLE DataProviders MODIFY HandlesPayments BIT NOT NULL;
+	END IF;
 END $$
 DELIMITER ;
 CALL AlterDataProviders();
@@ -135,13 +141,22 @@ DELIMITER $$
 CREATE PROCEDURE InsertDataIntoDataProviders()
 BEGIN
 	IF((SELECT COUNT(*) FROM DataProviders WHERE DataProviderIdentifier = '5A1B9283-6406-44DF-91C5-F2FB83CC9A42') = 0) THEN
-		INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('5A1B9283-6406-44DF-91C5-F2FB83CC9A42','DTU Fødevareinstituttet','4980BD1C-17D5-4E77-ABA5-BC6E065E6155');
+		INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES('5A1B9283-6406-44DF-91C5-F2FB83CC9A42','DTU Fødevareinstituttet',0,'4980BD1C-17D5-4E77-ABA5-BC6E065E6155');
 	END IF;
 	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'AA99AFDD-4FF4-48E8-9AA9-B34D00F5DF11') = 0) THEN
 		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('AA99AFDD-4FF4-48E8-9AA9-B34D00F5DF11','4980BD1C-17D5-4E77-ABA5-BC6E065E6155','807E904D-FDF9-418D-9745-B73821B8D07A','Data source for food groups and food data: http://www.foodcomp.dk');
 	END IF;
 	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '851F635C-F87E-44E8-A1AA-26C249F8CCC0') = 0) THEN
 		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('851F635C-F87E-44E8-A1AA-26C249F8CCC0','4980BD1C-17D5-4E77-ABA5-BC6E065E6155','978C7318-AD0A-459C-BEE0-1803A94F50D7','Datakilde for fødevare grupperinger og fødevaredata: http://www.foodcomp.dk');
+	END IF;
+	IF((SELECT COUNT(*) FROM DataProviders WHERE DataProviderIdentifier = '9FF5EB98-B475-4FEB-A621-0DFBEA881552') = 0) THEN
+		INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES('9FF5EB98-B475-4FEB-A621-0DFBEA881552','PayPal',1,'9D7CF514-380D-4BD9-822D-7CE70B30D061');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'FFE92175-FF98-4CE7-8CD6-89B08DF1A8D6') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('FFE92175-FF98-4CE7-8CD6-89B08DF1A8D6','9D7CF514-380D-4BD9-822D-7CE70B30D061','807E904D-FDF9-418D-9745-B73821B8D07A','N/A');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '8B86E508-F7A2-4F01-8FD5-F14854FD0435') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('8B86E508-F7A2-4F01-8FD5-F14854FD0435','9D7CF514-380D-4BD9-822D-7CE70B30D061','978C7318-AD0A-459C-BEE0-1803A94F50D7','N/A');
 	END IF;
 END $$
 DELIMITER ;

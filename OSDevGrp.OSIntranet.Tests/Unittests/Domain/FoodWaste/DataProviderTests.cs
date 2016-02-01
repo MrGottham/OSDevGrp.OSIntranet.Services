@@ -15,13 +15,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Tests that the contructor initialize a data provider.
         /// </summary>
         [Test]
-        public void TestThatConstructorInitializeDataProvider()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatConstructorInitializeDataProvider(bool handlesPayments)
         {
             var fixture = new Fixture();
             var name = fixture.Create<string>();
             var dataSourceStatementIdentifier = Guid.NewGuid();
 
-            var dataProvider = new DataProvider(name, dataSourceStatementIdentifier);
+            var dataProvider = new DataProvider(name, handlesPayments, dataSourceStatementIdentifier);
             Assert.That(dataProvider, Is.Not.Null);
             Assert.That(dataProvider.Identifier, Is.Null);
             Assert.That(dataProvider.Identifier.HasValue, Is.False);
@@ -31,6 +33,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(dataProvider.Name, Is.Not.Null);
             Assert.That(dataProvider.Name, Is.Not.Empty);
             Assert.That(dataProvider.Name, Is.EqualTo(name));
+            Assert.That(dataProvider.HandlesPayments, Is.EqualTo(handlesPayments));
             Assert.That(dataProvider.DataSourceStatementIdentifier, Is.EqualTo(dataSourceStatementIdentifier));
             Assert.That(dataProvider.DataSourceStatement, Is.Null);
             Assert.That(dataProvider.DataSourceStatements, Is.Not.Null);
@@ -45,7 +48,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase("")]
         public void TestThatConstructorThrowsArgumentNullExceptionForIllegalName(string illegalValue)
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new DataProvider(illegalValue, Guid.NewGuid()));
+            var fixture = new Fixture();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new DataProvider(illegalValue, fixture.Create<bool>(), Guid.NewGuid()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -62,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var fixture = new Fixture();
             var dataSourceStatementIdentifier = Guid.NewGuid();
 
-            var dataProvider = new DataProvider(fixture.Create<string>(), dataSourceStatementIdentifier);
+            var dataProvider = new DataProvider(fixture.Create<string>(), fixture.Create<bool>(), dataSourceStatementIdentifier);
             Assert.That(dataProvider, Is.Not.Null);
             Assert.That(dataProvider.DataSourceStatementIdentifier, Is.EqualTo(dataSourceStatementIdentifier));
             Assert.That(dataProvider.DataSourceStatement, Is.Null);

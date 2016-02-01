@@ -14,6 +14,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Private variables
 
         private string _name;
+        private bool _handlesPayments;
         private Guid _dataSourceStatementIdentifier;
 
         #endregion
@@ -31,14 +32,16 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// Creates a data provider.
         /// </summary>
         /// <param name="name">Name for the data provider.</param>
+        /// <param name="handlesPayments">Indication of whether the data provider handles payments.</param>
         /// <param name="dataSourceStatementIdentifier">Identifier for the data source statement.</param>
-        public DataProvider(string name, Guid dataSourceStatementIdentifier)
+        public DataProvider(string name, bool handlesPayments, Guid dataSourceStatementIdentifier)
         {
             if (string.IsNullOrEmpty(name))
             {
                 throw new ArgumentNullException("name");
             }
             _name = name;
+            _handlesPayments = handlesPayments;
             _dataSourceStatementIdentifier = dataSourceStatementIdentifier;
         }
 
@@ -63,6 +66,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 }
                 _name = value;
             }
+        }
+
+        /// <summary>
+        /// Gets whether the data provider handles payments.
+        /// </summary>
+        public virtual bool HandlesPayments
+        {
+            get { return _handlesPayments; }
+            protected set { _handlesPayments = value; }
         }
 
         /// <summary>

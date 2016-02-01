@@ -382,8 +382,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <summary>
         /// Build a mockup for a data provider.
         /// </summary>
+        /// <param name="handlesPayments">Indication of whether the data provider handles payments.</param>
         /// <returns>Mockup for a data provider.</returns>
-        public static IDataProvider BuildDataProviderMock()
+        public static IDataProvider BuildDataProviderMock(bool handlesPayments = false)
         {
             var fixture = new Fixture();
             var dataSourceStatementIdentifier = Guid.NewGuid();
@@ -400,6 +401,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             dataProviderMock.Stub(m => m.Name)
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
+            dataProviderMock.Stub(m => m.HandlesPayments)
+                .Return(handlesPayments)
+                .Repeat.Any();
             dataProviderMock.Stub(m => m.DataSourceStatementIdentifier)
                 .Return(dataSourceStatementIdentifier)
                 .Repeat.Any();
@@ -415,14 +419,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <summary>
         /// Build a collection of mockups for some data providers.
         /// </summary>
+        /// <param name="handlesPayments">Indication of whether the data provider handles payments.</param>
         /// <returns>Collection of mockups for some data providers.</returns>
-        public static IEnumerable<IDataProvider> BuildDataProviderMockCollection()
+        public static IEnumerable<IDataProvider> BuildDataProviderMockCollection(bool handlesPayments = false)
         {
             return new List<IDataProvider>
             {
-                BuildDataProviderMock(),
-                BuildDataProviderMock(),
-                BuildDataProviderMock()
+                BuildDataProviderMock(handlesPayments),
+                BuildDataProviderMock(handlesPayments),
+                BuildDataProviderMock(handlesPayments)
             };
         }
 

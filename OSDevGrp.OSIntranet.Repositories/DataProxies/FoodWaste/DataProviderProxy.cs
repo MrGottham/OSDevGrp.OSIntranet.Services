@@ -30,7 +30,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="name">Name for the data provider.</param>
         /// <param name="dataSourceStatementIdentifier">Identifier for the data source statement.</param>
         public DataProviderProxy(string name, Guid dataSourceStatementIdentifier)
-            : base(name, dataSourceStatementIdentifier)
+            : base(name, false, dataSourceStatementIdentifier)
         {
         }
 

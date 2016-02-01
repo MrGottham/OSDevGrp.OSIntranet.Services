@@ -14,6 +14,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         string Name { get; }
 
         /// <summary>
+        /// Gets whether the data provider handles payments.
+        /// </summary>
+        bool HandlesPayments { get; }
+
+        /// <summary>
         /// Gets the identifier for the data source statement.
         /// </summary>
         Guid DataSourceStatementIdentifier { get; }
