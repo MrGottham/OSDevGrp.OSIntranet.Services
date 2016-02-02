@@ -195,6 +195,7 @@
     <Compile Include="Unittests\Contracts\Queries\BudgetkontogrupperGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DataProviderCollectionGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\DataProviderWhoHandlesPaymentsCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DebitorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DebitorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FirmaGetQueryTests.cs" />
@@ -337,6 +338,7 @@
     <Compile Include="Unittests\QueryHandlers\Core\RegnskabQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\StaticTextGetQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DataProviderCollectionGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\DataProviderWhoHandlesPaymentsCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FinansstyringQueryHandlerBaseTests.cs" />

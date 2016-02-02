@@ -1710,6 +1710,104 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that DataProviderWhoHandlesPaymentsGetAll calls GetCollection on the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderWhoHandlesPaymentsGetAllCallsGetCollectionOnFoodWasteDataProvider()
+        {
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Anything))
+                .Return(new List<DataProviderProxy>(0))
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            systemDataRepository.DataProviderWhoHandlesPaymentsGetAll();
+
+            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Equal("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name")));
+        }
+
+        /// <summary>
+        /// Tests that DataProviderWhoHandlesPaymentsGetAll returns the result from the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderWhoHandlesPaymentsGetAllReturnsResultFromFoodWasteDataProvider()
+        {
+            var fixture = new Fixture();
+
+            var dataProviderCollection = fixture.CreateMany<DataProviderProxy>(25).ToList();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Anything))
+                .Return(dataProviderCollection)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var result = systemDataRepository.DataProviderWhoHandlesPaymentsGetAll();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(dataProviderCollection));
+        }
+
+        /// <summary>
+        /// Tests that DataProviderWhoHandlesPaymentsGetAll throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderWhoHandlesPaymentsGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
+        {
+            var fixture = new Fixture();
+
+            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Anything))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.DataProviderWhoHandlesPaymentsGetAll());
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that DataProviderWhoHandlesPaymentsGetAll throws an IntranetRepositoryException when an Exception occurs.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderWhoHandlesPaymentsGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+
+            var exceptionToThrow = fixture.Create<Exception>();
+            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Anything))
+                .Throw(exceptionToThrow)
+                .Repeat.Any();
+
+            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
+            Assert.That(systemDataRepository, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.DataProviderWhoHandlesPaymentsGetAll());
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "DataProviderWhoHandlesPaymentsGetAll", exceptionToThrow.Message)));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+        }
+
+        /// <summary>
         /// Tests that TranslationsForDomainObjectGet throws an ArgumentNullException when the identifiable domain object is null.
         /// </summary>
         [Test]

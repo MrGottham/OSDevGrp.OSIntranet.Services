@@ -279,6 +279,28 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tests that DataProviderWhoHandlesPaymentsCollectionGet gets all the data providers who handles payments.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderWhoHandlesPaymentsCollectionGetGetsDataProviderWhoHandlesPaymentsCollecti()
+        {
+            var translationInfoCollection = _foodWasteHouseholdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
+
+            foreach (var translationInfo in translationInfoCollection)
+            {
+                var dataProviderWhoHandlesPaymentsCollectionGetQuery = new DataProviderWhoHandlesPaymentsCollectionGetQuery
+                {
+                    TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                };
+                var dataProviderWhoHandlesPaymentsCollection = _foodWasteHouseholdDataService.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery);
+                Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Null);
+                Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Empty);
+            }
+        }
+
+        /// <summary>
         /// Tests that TranslationInfoGetAll gets all the tranlation informations.
         /// </summary>
         [Test]

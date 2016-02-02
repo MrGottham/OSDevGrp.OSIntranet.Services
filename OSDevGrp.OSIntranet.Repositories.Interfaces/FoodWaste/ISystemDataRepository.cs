@@ -89,6 +89,12 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
         IEnumerable<IDataProvider> DataProviderGetAll();
 
         /// <summary>
+        /// Gets all the data providers who handles payments.
+        /// </summary>
+        /// <returns>All the data providers who handles payments.</returns>
+        IEnumerable<IDataProvider> DataProviderWhoHandlesPaymentsGetAll();
+
+        /// <summary>
         /// Gets all the translations for a given domain object.
         /// </summary>
         /// <param name="identifiableDomainObject">The identifiable domain object on which all the translations should be returned.</param>

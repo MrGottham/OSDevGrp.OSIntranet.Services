@@ -105,6 +105,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         StaticTextView PrivacyPolicyGet(PrivacyPolicyGetQuery query);
 
         /// <summary>
+        /// Gets all the data providers who handles payments.
+        /// </summary>
+        /// <param name="query">Query for getting a collection of data providers who handles payments.</param>
+        /// <returns>Collection of all the data providers who handles payments.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<DataProviderView> DataProviderWhoHandlesPaymentsCollectionGet(DataProviderWhoHandlesPaymentsCollectionGetQuery query);
+
+        /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>

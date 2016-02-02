@@ -342,6 +342,26 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Gets all the data providers who handles payments.
+        /// </summary>
+        /// <returns>All the data providers who handles payments.</returns>
+        public virtual IEnumerable<IDataProvider> DataProviderWhoHandlesPaymentsGetAll()
+        {
+            try
+            {
+                return DataProvider.GetCollection<DataProviderProxy>("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Gets all the translations for a given domain object.
         /// </summary>
         /// <param name="identifiableDomainObject">The identifiable domain object on which all the translations should be returned.</param>

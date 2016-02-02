@@ -345,6 +345,36 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that DataProviderWhoHandlesPaymentsCollectionGet gets all the data providers who handles payments.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderWhoHandlesPaymentsCollectionGetGetsDataProviderWhoHandlesPaymentsCollecti()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                foreach (var translationInfo in translationInfoCollection)
+                {
+                    var dataProviderWhoHandlesPaymentsCollectionGetQuery = new DataProviderWhoHandlesPaymentsCollectionGetQuery
+                    {
+                        TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                    };
+                    var dataProviderWhoHandlesPaymentsCollection = client.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery);
+                    Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Null);
+                    Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Empty);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that TranslationInfoGetAll gets all the tranlation informations.
         /// </summary>
         [Test]

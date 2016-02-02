@@ -528,6 +528,18 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that DataProviderWhoHandlesPaymentsGetAll returns all the data providers who handles payments.
+        /// </summary>
+        [Test]
+        public void TestThatDataProviderWhoHandlesPaymentsGetAllReturnsDataProvidersWhoHandlesPayments()
+        {
+            var dataProviders = _systemDataRepository.DataProviderWhoHandlesPaymentsGetAll();
+            Assert.That(dataProviders, Is.Not.Null);
+            Assert.That(dataProviders, Is.Not.Empty);
+            Assert.That(dataProviders.Count(), Is.EqualTo(1));
+        }
+
+        /// <summary>
         /// Tests that TranslationsForDomainObjectGet gets translations for a given identifiable domain object.
         /// </summary>
         [Test]

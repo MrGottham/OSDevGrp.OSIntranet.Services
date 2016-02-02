@@ -262,6 +262,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Gets all the data providers who handles payments.
+        /// </summary>
+        /// <param name="query">Query for getting a collection of data providers who handles payments.</param>
+        /// <returns>Collection of all the data providers who handles payments.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public IEnumerable<DataProviderView> DataProviderWhoHandlesPaymentsCollectionGet(DataProviderWhoHandlesPaymentsCollectionGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<DataProviderWhoHandlesPaymentsCollectionGetQuery, IEnumerable<DataProviderView>>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>
