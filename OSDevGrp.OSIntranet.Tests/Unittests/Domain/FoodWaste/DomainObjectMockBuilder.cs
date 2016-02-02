@@ -130,6 +130,53 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Build a mockup for a payment made by a stakeholder.
+        /// </summary>
+        /// <returns>Mockup for a payment made by a stakeholder</returns>
+        public static IPayment BuildPaymentMock(IStakeholder stakeholder = null, bool hasPaymentReceipt = true)
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var paymentMock = MockRepository.GenerateMock<IPayment>();
+            paymentMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            paymentMock.Stub(m => m.Stakeholder)
+                .Return(stakeholder ?? BuildStakeholderMock())
+                .Repeat.Any();
+            paymentMock.Stub(m => m.DataProvider)
+                .Return(BuildDataProviderMock(true))
+                .Repeat.Any();
+            paymentMock.Stub(m => m.PaymentTime)
+                .Return(DateTime.Now.AddDays(random.Next(1, 365)*-1).AddMinutes(random.Next(120, 240)))
+                .Repeat.Any();
+            paymentMock.Stub(m => m.PaymentReference)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+            paymentMock.Stub(m => m.PaymentReceipt)
+                .Return(hasPaymentReceipt ? fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray() : null)
+                .Repeat.Any();
+            paymentMock.Stub(m => m.CreationTime)
+                .Return(DateTime.Now)
+                .Repeat.Any();
+            return paymentMock;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some payments made by a stakeholder.
+        /// </summary>
+        /// <returns>Collection of mockups for some payments made by a stakeholder.</returns>
+        public static IEnumerable<IPayment> BuildPaymentMockCollection(IStakeholder stakeholder = null, bool hasPaymentReceipt = true)
+        {
+            return new List<IPayment>
+            {
+                BuildPaymentMock(stakeholder, hasPaymentReceipt),
+                BuildPaymentMock(stakeholder, hasPaymentReceipt),
+                BuildPaymentMock(stakeholder, hasPaymentReceipt)
+            };
+        }
+
+        /// <summary>
         /// Build a mockup for an internal or external stakeholder.
         /// </summary>
         /// <returns>Mockup for an internal or external stakeholder.</returns>
