@@ -1003,9 +1003,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map maps DataProvider to DataProviderSystemView.
         /// </summary>
         [Test]
-        public void TestThatMapMapsDataProviderToDataProviderSystemView()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapMapsDataProviderToDataProviderSystemView(bool handlesPayments)
         {
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(handlesPayments);
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
@@ -1016,6 +1018,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(dataProviderSystemView.Name, Is.Not.Null);
             Assert.That(dataProviderSystemView.Name, Is.Not.Empty);
             Assert.That(dataProviderSystemView.Name, Is.EqualTo(dataProviderMock.Name));
+            Assert.That(dataProviderSystemView.HandlesPayments, Is.EqualTo(handlesPayments));
             Assert.That(dataProviderSystemView.DataSourceStatementIdentifier, Is.EqualTo(dataProviderMock.DataSourceStatementIdentifier));
             Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Empty);
@@ -1031,9 +1034,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map maps DataProvider to DataProviderProxy.
         /// </summary>
         [Test]
-        public void TestThatMapMapsDataProviderToDataProviderProxy()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapMapsDataProviderToDataProviderProxy(bool handlesPayments)
         {
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(handlesPayments);
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
@@ -1053,6 +1058,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(dataProviderProxy.Name, Is.Not.Null);
             Assert.That(dataProviderProxy.Name, Is.Not.Empty);
             Assert.That(dataProviderProxy.Name, Is.EqualTo(dataProviderMock.Name));
+            Assert.That(dataProviderProxy.HandlesPayments, Is.EqualTo(handlesPayments));
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(dataProviderMock.DataSourceStatementIdentifier));
             Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);

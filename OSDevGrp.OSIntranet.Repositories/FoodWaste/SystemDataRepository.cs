@@ -329,7 +329,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<DataProviderProxy>("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name");
+                return DataProvider.GetCollection<DataProviderProxy>("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name");
             }
             catch (IntranetRepositoryException)
             {

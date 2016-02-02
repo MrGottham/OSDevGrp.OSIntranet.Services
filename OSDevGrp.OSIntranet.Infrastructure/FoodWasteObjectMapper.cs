@@ -341,6 +341,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IDataProvider, DataProviderSystemView>()
                     .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
+                    .ForMember(m => m.HandlesPayments, opt => opt.MapFrom(s => s.HandlesPayments))
                     .ForMember(m => m.DataSourceStatementIdentifier, opt => opt.MapFrom(s => s.DataSourceStatementIdentifier))
                     .ForMember(m => m.DataSourceStatements, opt => opt.MapFrom(s => s.DataSourceStatements));
 
@@ -351,7 +352,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         {
                             return (IDataProviderProxy) m;
                         }
-                        var dataProviderProxy = new DataProviderProxy(m.Name, m.DataSourceStatementIdentifier)
+                        var dataProviderProxy = new DataProviderProxy(m.Name, m.HandlesPayments, m.DataSourceStatementIdentifier)
                         {
                             Identifier = m.Identifier
                         };

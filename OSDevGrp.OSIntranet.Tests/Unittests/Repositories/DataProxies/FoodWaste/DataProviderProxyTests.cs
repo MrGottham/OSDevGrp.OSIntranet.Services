@@ -33,6 +33,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(dataProviderProxy.Translations, Is.Not.Null);
             Assert.That(dataProviderProxy.Translations, Is.Empty);
             Assert.That(dataProviderProxy.Name, Is.Null);
+            Assert.That(dataProviderProxy.HandlesPayments, Is.False);
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(Guid.Empty));
             Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
@@ -137,7 +138,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlQueryForId, Is.Not.Null);
             Assert.That(sqlQueryForId, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProviderMock.Identifier.Value.ToString("D").ToUpper())));
+            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProviderMock.Identifier.Value.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -145,11 +146,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a given data provider.
         /// </summary>
         [Test]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(bool handlesPayments)
         {
             var fixture = new Fixture();
 
-            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), Guid.NewGuid())
+            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), handlesPayments, Guid.NewGuid())
             {
                 Identifier = Guid.NewGuid()
             };
@@ -158,7 +161,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('{0}','{1}','{2}')", dataProviderProxy.UniqueId, dataProviderProxy.Name, dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES('{0}','{1}',{2},'{3}')", dataProviderProxy.UniqueId, dataProviderProxy.Name, Convert.ToInt32(handlesPayments), dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -166,11 +169,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a given data provider.
         /// </summary>
         [Test]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(bool handlesPayments)
         {
             var fixture = new Fixture();
 
-            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), Guid.NewGuid())
+            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), handlesPayments, Guid.NewGuid())
             {
                 Identifier = Guid.NewGuid()
             };
@@ -179,7 +184,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE DataProviders SET Name='{1}',DataSourceStatementIdentifier='{2}' WHERE DataProviderIdentifier='{0}'", dataProviderProxy.UniqueId, dataProviderProxy.Name, dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE DataProviders SET Name='{1}',HandlesPayments={2},DataSourceStatementIdentifier='{3}' WHERE DataProviderIdentifier='{0}'", dataProviderProxy.UniqueId, dataProviderProxy.Name, Convert.ToInt32(handlesPayments), dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -191,7 +196,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             var fixture = new Fixture();
 
-            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), Guid.NewGuid())
+            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), fixture.Create<bool>(), Guid.NewGuid())
             {
                 Identifier = Guid.NewGuid()
             };
@@ -268,7 +273,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(bool handlesPayments)
         {
             var fixture = new Fixture();
             fixture.Customize<TranslationProxy>(e => e.FromFactory(() => new TranslationProxy(new Guid("1AFF5DC2-26B4-4E0B-ACFF-71E669B5CDCB"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>())));
@@ -289,6 +296,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("Name")))
                 .Return(fixture.Create<string>())
                 .Repeat.Any();
+            dataReader.Stub(m => m.GetInt32(Arg<string>.Is.Equal("HandlesPayments")))
+                .Return(Convert.ToInt32(handlesPayments))
+                .Repeat.Any();
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("DataSourceStatementIdentifier")))
                 .Return("1AFF5DC2-26B4-4E0B-ACFF-71E669B5CDCB")
                 .Repeat.Any();
@@ -301,6 +311,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(dataProviderProxy.Translations, Is.Not.Null);
             Assert.That(dataProviderProxy.Translations, Is.Empty);
             Assert.That(dataProviderProxy.Name, Is.Null);
+            Assert.That(dataProviderProxy.HandlesPayments, Is.False);
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(Guid.Empty));
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Empty);
@@ -319,6 +330,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(dataProviderProxy.Name, Is.Not.Null);
             Assert.That(dataProviderProxy.Name, Is.Not.Empty);
             Assert.That(dataProviderProxy.Name, Is.EqualTo(dataReader.GetString("Name")));
+            Assert.That(dataProviderProxy.HandlesPayments, Is.EqualTo(handlesPayments));
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.Not.EqualTo(Guid.Empty));
             Assert.That(dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("DataSourceStatementIdentifier")));
             Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);

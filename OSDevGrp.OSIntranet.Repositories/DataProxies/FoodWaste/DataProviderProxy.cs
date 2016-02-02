@@ -28,9 +28,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Creates a data proxy to a given data provider.
         /// </summary>
         /// <param name="name">Name for the data provider.</param>
+        /// <param name="handlesPayments">Indication of whether the data provider handles payments.</param>
         /// <param name="dataSourceStatementIdentifier">Identifier for the data source statement.</param>
-        public DataProviderProxy(string name, Guid dataSourceStatementIdentifier)
-            : base(name, false, dataSourceStatementIdentifier)
+        public DataProviderProxy(string name, bool handlesPayments, Guid dataSourceStatementIdentifier)
+            : base(name, handlesPayments, dataSourceStatementIdentifier)
         {
         }
 
@@ -66,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             if (dataProvider.Identifier.HasValue)
             {
-                return string.Format("SELECT DataProviderIdentifier,Name,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProvider.Identifier.Value.ToString("D").ToUpper());
+                return string.Format("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProvider.Identifier.Value.ToString("D").ToUpper());
             }
             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
         }
@@ -77,7 +78,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this data provider.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            return string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,DataSourceStatementIdentifier) VALUES('{0}','{1}','{2}')", UniqueId, Name, DataSourceStatementIdentifier.ToString("D").ToUpper());
+            return string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES('{0}','{1}',{2},'{3}')", UniqueId, Name, Convert.ToInt32(HandlesPayments), DataSourceStatementIdentifier.ToString("D").ToUpper());
         }
 
         /// <summary>
@@ -86,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this data provider,</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            return string.Format("UPDATE DataProviders SET Name='{1}',DataSourceStatementIdentifier='{2}' WHERE DataProviderIdentifier='{0}'", UniqueId, Name, DataSourceStatementIdentifier.ToString("D").ToUpper());
+            return string.Format("UPDATE DataProviders SET Name='{1}',HandlesPayments={2},DataSourceStatementIdentifier='{3}' WHERE DataProviderIdentifier='{0}'", UniqueId, Name, Convert.ToInt32(HandlesPayments), DataSourceStatementIdentifier.ToString("D").ToUpper());
         }
 
         /// <summary>
@@ -126,6 +127,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             Identifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
             Name = mySqlDataReader.GetString("Name");
+            HandlesPayments = Convert.ToBoolean(mySqlDataReader.GetInt32("HandlesPayments"));
             DataSourceStatementIdentifier = new Guid(mySqlDataReader.GetString("DataSourceStatementIdentifier"));
         }
 

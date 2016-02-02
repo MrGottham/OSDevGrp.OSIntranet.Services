@@ -24,6 +24,12 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         public string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets whether the data provider handles payments.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public bool HandlesPayments { get; set; }
+
+        /// <summary>
         /// Gets or sets the identifier for translations of the data providers data source statement.
         /// </summary>
         [DataMember(IsRequired = true)]

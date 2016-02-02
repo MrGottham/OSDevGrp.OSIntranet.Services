@@ -524,7 +524,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
             var dataProviders = _systemDataRepository.DataProviderGetAll();
             Assert.That(dataProviders, Is.Not.Null);
             Assert.That(dataProviders, Is.Not.Empty);
-            Assert.That(dataProviders.Count(), Is.EqualTo(1));
+            Assert.That(dataProviders.Count(), Is.EqualTo(2));
         }
 
         /// <summary>
