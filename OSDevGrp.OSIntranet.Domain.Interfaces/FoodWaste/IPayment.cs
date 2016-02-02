@@ -37,5 +37,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// Creation date and time.
         /// </summary>
         DateTime CreationTime { get; }
+
+        // TODO: Translation (generic interface?)
     }
 }

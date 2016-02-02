@@ -99,6 +99,7 @@
     <Compile Include="DataProxies\FoodWaste\FoodItemProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ForeignKeyProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\HouseholdMemberProxy.cs" />
+    <Compile Include="DataProxies\FoodWaste\PaymentProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\StaticTextProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\TranslationInfoProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\TranslationProxy.cs" />

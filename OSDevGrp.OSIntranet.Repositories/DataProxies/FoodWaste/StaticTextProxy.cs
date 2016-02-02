@@ -59,7 +59,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <summary>
         /// Gets the SQL statement for selecting a given static text.
         /// </summary>
-        /// <param name="staticText">Data provider for which to get the SQL statement for selecting.</param>
+        /// <param name="staticText">Static text for which to get the SQL statement for selecting.</param>
         /// <returns>SQL statement for selecting a given static text.</returns>
         public virtual string GetSqlQueryForId(IStaticText staticText)
         {

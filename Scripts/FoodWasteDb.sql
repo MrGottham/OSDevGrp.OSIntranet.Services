@@ -366,6 +366,32 @@ DELIMITER ;
 CALL GrantRightsForFoodItemGroups(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForFoodItemGroups;
 
+CREATE TABLE IF NOT EXISTS Payments (
+	PaymentIdentifier CHAR(36) NOT NULL,
+	StakeholderIdentifier CHAR(36) NOT NULL,
+	StakeholderType TINYINT NOT NULL,
+	DataProviderIdentifier CHAR(36) NOT NULL,
+	PaymentTime DATETIME NOT NULL,
+	PaymentReference NVARCHAR(128) NOT NULL,
+	PaymentReceipt LONGTEXT NULL,
+	CreationTime DATETIME NOT NULL,
+	PRIMARY KEY (PaymentIdentifier),
+	UNIQUE INDEX IX_Payments_DataProvider_PaymentReference (DataProviderIdentifier,PaymentReference),
+	FOREIGN KEY FK_Payments_DataProviderIdentifier (DataProviderIdentifier) REFERENCES DataProviders (DataProviderIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForPayments;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForPayments(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Payments TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForPayments(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForPayments;
+
 CREATE TABLE IF NOT EXISTS HouseholdMembers (
 	HouseholdMemberIdentifier CHAR(36) NOT NULL,
 	MailAddress NVARCHAR(128) NOT NULL,

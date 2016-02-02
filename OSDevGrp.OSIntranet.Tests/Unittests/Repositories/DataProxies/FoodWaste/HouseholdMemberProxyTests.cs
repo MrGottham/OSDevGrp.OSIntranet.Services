@@ -72,7 +72,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that getter for UniqueId gets the unique identifier for the household member.
         /// </summary>
         [Test]
-        public void TestThatUniqueIdGetterGetsUniqueIdentificationForFoodItemProxy()
+        public void TestThatUniqueIdGetterGetsUniqueIdentificationForHouseholdMemberProxy()
         {
             var householdMemberProxy = new HouseholdMemberProxy
             {
