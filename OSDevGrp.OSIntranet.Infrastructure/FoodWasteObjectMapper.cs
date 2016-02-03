@@ -22,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
     {
         #region Private variables
 
-        private static readonly IMapper Mapper = null;
+        private static readonly IMapper Mapper;
 
         #endregion
 
@@ -73,6 +73,33 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             // TODO: Convert household to proxy and add (modify the test).
                         }
                         return householdMemberProxy;
+                    });
+
+                config.CreateMap<IPayment, IPaymentProxy>()
+                    .ConstructUsing(m =>
+                    {
+                        if (m as IPaymentProxy != null)
+                        {
+                            return (IPaymentProxy) m;
+                        }
+                        IStakeholder stakeholderProxy = null;
+                        if (m.Stakeholder as IHouseholdMember != null)
+                        {
+                            stakeholderProxy = m.Stakeholder as IHouseholdMemberProxy;
+                            if (stakeholderProxy == null && Mapper != null)
+                            {
+                                stakeholderProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>((IHouseholdMember) m.Stakeholder);
+                            }
+                        }
+                        var dataProviderProxy = m.DataProvider as IDataProviderProxy;
+                        if (dataProviderProxy == null && Mapper != null)
+                        {
+                            dataProviderProxy = Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
+                        }
+                        return new PaymentProxy(stakeholderProxy, dataProviderProxy, m.PaymentTime, m.PaymentReference, m.PaymentReceipt, m.CreationTime)
+                        {
+                            Identifier = m.Identifier
+                        };
                     });
 
                 config.CreateMap<IFoodItemCollection, FoodItemCollectionView>()

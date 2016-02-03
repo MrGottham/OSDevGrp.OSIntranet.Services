@@ -80,6 +80,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 return (TIdentifiable) Get<IHouseholdMember, HouseholdMemberProxy>(identifier);
             }
+            if (typeof (TIdentifiable) == typeof (IPayment))
+            {
+                return (TIdentifiable) Get<IPayment, PaymentProxy>(identifier);
+            }
             if (typeof (TIdentifiable) == typeof (IFoodItem))
             {
                 return (TIdentifiable) Get<IFoodItem, FoodItemProxy>(identifier);
@@ -126,6 +130,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (identifiable is IHouseholdMember)
             {
                 return (TIdentifiable) Insert<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
+            }
+            if (identifiable is IPayment)
+            {
+                return (TIdentifiable) Insert<IPayment, IPaymentProxy>(identifiable as IPayment);
             }
             if (identifiable is IFoodItem)
             {
@@ -174,6 +182,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 return (TIdentifiable) Update<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
             }
+            if (identifiable is IPayment)
+            {
+                return (TIdentifiable) Update<IPayment, IPaymentProxy>(identifiable as IPayment);
+            }
             if (identifiable is IFoodItem)
             {
                 return (TIdentifiable) Update<IFoodItem, IFoodItemProxy>(identifiable as IFoodItem);
@@ -219,6 +231,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (identifiable is IHouseholdMember)
             {
                 Delete<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
+                return;
+            }
+            if (identifiable is IPayment)
+            {
+                Delete<IPayment, IPaymentProxy>(identifiable as IPayment);
                 return;
             }
             if (identifiable is IFoodItem)

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using Ploeh.AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
@@ -430,6 +432,48 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             payment.CreationTime = newCreationTime;
             Assert.That(payment.CreationTime, Is.EqualTo(newCreationTime));
+        }
+
+        /// <summary>
+        /// Tests that Translate throws an ArgumentNullException when the culture information which are used for translation is null.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateThrowsArgumentNullExceptionWhenTranslationCultureIsNull()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var payment = new MyPayment(DomainObjectMockBuilder.BuildStakeholderMock(), DomainObjectMockBuilder.BuildDataProviderMock(true), DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)), fixture.Create<string>());
+            Assert.That(payment, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => payment.Translate(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("translationCulture"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Translate calls Translate on the data provider who has handled the payment.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateCallsTranslateOnDataProvider()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(true);
+
+            var payment = new MyPayment(DomainObjectMockBuilder.BuildStakeholderMock(), dataProviderMock, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)), fixture.Create<string>());
+            Assert.That(payment, Is.Not.Null);
+            Assert.That(payment.DataProvider, Is.Not.Null);
+            Assert.That(payment.DataProvider, Is.EqualTo(dataProviderMock));
+
+            var translationCulture = CultureInfo.CurrentCulture;
+
+            payment.Translate(translationCulture);
+
+            dataProviderMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture)));
         }
     }
 }

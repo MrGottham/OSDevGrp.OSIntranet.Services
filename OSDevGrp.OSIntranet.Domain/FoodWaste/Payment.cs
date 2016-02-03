@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 
@@ -169,6 +170,23 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             get { return _creationTime; }
             protected set { _creationTime = value; }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Make translation for the payment made by a stakeholder.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        public virtual void Translate(CultureInfo translationCulture)
+        {
+            if (translationCulture == null)
+            {
+                throw new ArgumentNullException("translationCulture");
+            }
+            DataProvider.Translate(translationCulture);
         }
 
         #endregion

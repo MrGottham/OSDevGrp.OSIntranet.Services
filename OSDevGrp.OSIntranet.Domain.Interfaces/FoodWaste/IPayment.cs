@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
 {
@@ -38,6 +39,10 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// </summary>
         DateTime CreationTime { get; }
 
-        // TODO: Translation (generic interface?)
+        /// <summary>
+        /// Make translation for the payment made by a stakeholder.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        void Translate(CultureInfo translationCulture);
     }
 }

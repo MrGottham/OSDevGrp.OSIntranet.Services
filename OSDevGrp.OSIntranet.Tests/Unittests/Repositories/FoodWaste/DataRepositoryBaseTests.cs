@@ -24,9 +24,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
     [TestFixture]
     public class DataRepositoryBaseTests
     {
-        private readonly static IList<Tuple<Type, Type, Type>> TypesToTest = new List<Tuple<Type, Type, Type>>
+        private static readonly IList<Tuple<Type, Type, Type>> TypesToTest = new List<Tuple<Type, Type, Type>>
         {
             new Tuple<Type, Type, Type>(typeof (IHouseholdMember), typeof (IHouseholdMemberProxy), typeof (HouseholdMemberProxy)),
+            new Tuple<Type, Type, Type>(typeof (IPayment), typeof (IPaymentProxy), typeof (PaymentProxy)),
             new Tuple<Type, Type, Type>(typeof (IFoodItem), typeof (IFoodItemProxy), typeof (FoodItemProxy)),
             new Tuple<Type, Type, Type>(typeof (IFoodGroup), typeof (IFoodGroupProxy), typeof (FoodGroupProxy)),
             new Tuple<Type, Type, Type>(typeof (IForeignKey), typeof (IForeignKeyProxy), typeof (ForeignKeyProxy)),

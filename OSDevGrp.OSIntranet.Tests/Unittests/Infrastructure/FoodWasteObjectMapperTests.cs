@@ -374,6 +374,56 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps Payment to PaymentProxy.
+        /// </summary>
+        [Test]
+        [TestCase(1, true)]
+        [TestCase(1, false)]
+        public void TestThatMapMapsPaymentToPaymentProxy(int stakeholderType, bool hasPaymentReceipt)
+        {
+            IStakeholder stakeholder;
+            switch (stakeholderType)
+            {
+                case 1:
+                    stakeholder = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported."));
+            }
+            
+            var paymentMock = DomainObjectMockBuilder.BuildPaymentMock(stakeholder, hasPaymentReceipt);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var paymentProxy = foodWasteObjectMapper.Map<IPayment, IPaymentProxy>(paymentMock);
+            Assert.That(paymentProxy, Is.Not.Null);
+            Assert.That(paymentProxy.Identifier, Is.Not.Null);
+            Assert.That(paymentProxy.Identifier, Is.EqualTo(paymentMock.Identifier));
+            Assert.That(paymentProxy.Stakeholder, Is.Not.Null);
+            Assert.That(paymentProxy.Stakeholder, Is.TypeOf<HouseholdMemberProxy>());
+            Assert.That(paymentProxy.StakeholderType, Is.EqualTo(stakeholderType));
+            Assert.That(paymentProxy.DataProvider, Is.Not.Null);
+            Assert.That(paymentProxy.DataProvider, Is.TypeOf<DataProviderProxy>());
+            Assert.That(paymentProxy.PaymentTime, Is.EqualTo(paymentMock.PaymentTime));
+            Assert.That(paymentProxy.PaymentReference, Is.Not.Null);
+            Assert.That(paymentProxy.PaymentReference, Is.Not.Empty);
+            Assert.That(paymentProxy.PaymentReference, Is.EqualTo(paymentMock.PaymentReference));
+            if (hasPaymentReceipt)
+            {
+                Assert.That(paymentProxy.PaymentReceipt, Is.Not.Null);
+                Assert.That(paymentProxy.PaymentReceipt, Is.Not.Empty);
+                Assert.That(paymentProxy.PaymentReceipt, Is.EqualTo(paymentMock.PaymentReceipt));
+            }
+            else
+            {
+                Assert.That(paymentProxy.PaymentReceipt, Is.Null);
+            }
+            Assert.That(paymentProxy.CreationTime, Is.EqualTo(paymentMock.CreationTime));
+        }
+
+        /// <summary>
         /// Tests that Map maps FoodItemCollection to FoodItemCollectionView.
         /// </summary>
         [Test]
