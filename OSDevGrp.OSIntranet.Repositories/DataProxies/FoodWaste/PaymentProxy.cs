@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -39,6 +41,29 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Gets the type value for the stakeholde.
+        /// </summary>
+        public virtual int? StakeholderType
+        {
+            get
+            {
+                if (Stakeholder == null)
+                {
+                    return null;
+                }
+                if (Stakeholder is IHouseholdMember)
+                {
+                    return 1;
+                }
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, Stakeholder.GetType().Name, "Stakeholder", MethodBase.GetCurrentMethod()));
+            }
+        }
+
+        #endregion
+
         #region IMySqlDataProxy<IPayment>
 
         /// <summary>
@@ -63,7 +88,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for selecting a given payment from a stakeholder.</returns>
         public virtual string GetSqlQueryForId(IPayment payment)
         {
-            throw new NotImplementedException();
+            if (payment == null)
+            {
+                throw new ArgumentNullException("payment");
+            }
+            if (payment.Identifier.HasValue)
+            {
+                return string.Format("SELECT PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime FROM Payments WHERE PaymentIdentifier='{0}'", payment.Identifier.Value.ToString("D").ToUpper());
+            }
+            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, payment.Identifier, "Identifier"));
         }
 
         /// <summary>
@@ -72,6 +105,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this payment from a stakeholder.</returns>
         public virtual string GetSqlCommandForInsert()
         {
+            var stakeholderIdentifierSqlValue = Stakeholder.Identifier.HasValue ? Stakeholder.Identifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
+            var dataProviderIdentifierSqlValue = DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
+            var paymentReceiptSqlValue = PaymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(PaymentReceipt.ToArray()));
+
             throw new NotImplementedException();
         }
 
@@ -81,6 +118,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this payment from a stakeholder.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
+            var stakeholderIdentifierSqlValue = Stakeholder.Identifier.HasValue ? Stakeholder.Identifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
+            var dataProviderIdentifierSqlValue = DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
+            var paymentReceiptSqlValue = PaymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(PaymentReceipt.ToArray()));
+
             throw new NotImplementedException();
         }
 
@@ -90,7 +131,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to delete this payment from a stakeholder.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new NotImplementedException();
+            return string.Format("DELETE FROM Payments WHERE PaymentIdentifier='{0}'", UniqueId);
         }
 
         #endregion
