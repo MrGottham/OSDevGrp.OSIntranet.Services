@@ -114,6 +114,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 set { base.Households = value; }
             }
 
+            /// <summary>
+            /// Payments made by the household member.
+            /// </summary>
+            public new IEnumerable<IPayment> Payments
+            {
+                get { return base.Payments; }
+                set { base.Payments = value; }
+            }
+
             #endregion
         }
 
@@ -147,6 +156,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
             Assert.That(householdMember.Households, Is.Not.Null);
             Assert.That(householdMember.Households, Is.Empty);
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Empty);
         }
 
         /// <summary>
@@ -936,6 +947,58 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that the setter for Payments throws ArgumentNullException when value is null.
+        /// </summary>
+        [Test]
+        public void TestThatPaymentsSetterThrowsArgumentNullExceptionWhenValueIsNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMember.Payments = null);
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("value"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the setter for Payments sets the payments made by the household member.
+        /// </summary>
+        [Test]
+        public void TestThatPaymentsSetterSetsPayments()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Empty);
+
+            var paymentMockCollection = new List<IPayment>
+            {
+                MockRepository.GenerateMock<IPayment>(),
+                MockRepository.GenerateMock<IPayment>(),
+                MockRepository.GenerateMock<IPayment>()
+            };
+            householdMember.Payments = paymentMockCollection;
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Empty);
+            Assert.That(householdMember.Payments, Is.EqualTo(paymentMockCollection));
+        }
+
+        /// <summary>
         /// Tests that HasRequiredMembership calls HasRequiredMembership on the common validations used by domain objects in the food waste domain.
         /// </summary>
         [Test]
@@ -1175,6 +1238,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.Households, Is.Not.Empty);
             Assert.That(householdMember.Households.Count(), Is.EqualTo(1));
             Assert.That(householdMember.Households.Contains(householdMock), Is.EqualTo(true));
+        }
+
+        /// <summary>
+        /// Tests that PaymentAdd throws ArgumentNullException when the payment made by the household member is null.
+        /// </summary>
+        [Test]
+        public void TestThatPaymentAddThrowsArgumentNullExceptionWhenPaymentIsNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMember.PaymentAdd(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("payment"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that PaymentAdd adds a payment made by the household member to the household member.
+        /// </summary>
+        [Test]
+        public void TestThatPaymentAddAddsPayment()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Empty);
+
+            var paymentMock = MockRepository.GenerateMock<IPayment>();
+            householdMember.PaymentAdd(paymentMock);
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Empty);
+            Assert.That(householdMember.Payments.Count(), Is.EqualTo(1));
+            Assert.That(householdMember.Payments.Contains(paymentMock), Is.EqualTo(true));
         }
     }
 }

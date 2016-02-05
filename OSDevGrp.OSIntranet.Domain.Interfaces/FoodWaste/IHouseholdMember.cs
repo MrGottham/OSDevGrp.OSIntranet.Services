@@ -55,6 +55,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         IEnumerable<IHousehold> Households { get; }
 
         /// <summary>
+        /// Payments made by the household member.
+        /// </summary>
+        IEnumerable<IPayment> Payments { get; }
+
+        /// <summary>
         /// Validates whether the household members current membership matches the required membership.
         /// </summary>
         /// <param name="requiredMembership">Required membership.</param>
@@ -72,5 +77,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// </summary>
         /// <param name="household">Household on which the household member has a membership.</param>
         void HouseholdAdd(IHousehold household);
+
+        /// <summary>
+        /// Adds a payment made by the household member.
+        /// </summary>
+        /// <param name="payment">Payment made by the household member.</param>
+        void PaymentAdd(IPayment payment);
     }
 }

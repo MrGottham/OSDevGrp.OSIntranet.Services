@@ -45,6 +45,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Empty);
+            Assert.That(householdMemberProxy.Payments, Is.Not.Null);
+            Assert.That(householdMemberProxy.Payments, Is.Empty);
         }
 
         /// <summary>
@@ -385,6 +387,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Empty);
+            Assert.That(householdMemberProxy.Payments, Is.Not.Null);
+            Assert.That(householdMemberProxy.Payments, Is.Empty);
 
             householdMemberProxy.MapData(dataReader, dataProviderBaseMock);
             householdMemberProxy.MapRelations(dataProviderBaseMock);
@@ -443,6 +447,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Empty);
+            Assert.That(householdMemberProxy.Payments, Is.Not.Null);
+            Assert.That(householdMemberProxy.Payments, Is.Empty);
         }
 
         /// <summary>

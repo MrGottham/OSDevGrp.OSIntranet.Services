@@ -371,6 +371,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Empty); // TODO: Modify this when HouseholdProxy has been implemented.
+            Assert.That(householdMemberProxy.Payments, Is.Not.Null);
+            Assert.That(householdMemberProxy.Payments, Is.Not.Empty);
+            Assert.That(householdMemberProxy.Payments.Count(), Is.EqualTo(householdMemberMock.Payments.Count()));
         }
 
         /// <summary>

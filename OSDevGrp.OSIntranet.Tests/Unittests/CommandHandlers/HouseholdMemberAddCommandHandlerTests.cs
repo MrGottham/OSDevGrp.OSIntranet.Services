@@ -474,6 +474,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
                     Assert.That(householdMember.Households, Is.Not.Null);
                     Assert.That(householdMember.Households, Is.Empty);
+                    Assert.That(householdMember.Payments, Is.Not.Null);
+                    Assert.That(householdMember.Payments, Is.Empty);
                 })
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();

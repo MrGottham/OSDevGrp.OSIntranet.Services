@@ -72,6 +72,24 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         {
                             // TODO: Convert household to proxy and add (modify the test).
                         }
+                        foreach (var payment in m.Payments)
+                        {
+                            if (payment as IPaymentProxy != null)
+                            {
+                                householdMemberProxy.PaymentAdd(payment);
+                                continue;
+                            }
+                            var dataProviderProxy = payment.DataProvider as IDataProviderProxy;
+                            if (dataProviderProxy == null && Mapper != null)
+                            {
+                                dataProviderProxy = Mapper.Map<IDataProvider, IDataProviderProxy>(payment.DataProvider);
+                            }
+                            var paymentProxy = new PaymentProxy(householdMemberProxy, dataProviderProxy, payment.PaymentTime, payment.PaymentReference, payment.PaymentReceipt, payment.CreationTime)
+                            {
+                                Identifier = payment.Identifier
+                            };
+                            householdMemberProxy.PaymentAdd(paymentProxy);
+                        }
                         return householdMemberProxy;
                     });
 

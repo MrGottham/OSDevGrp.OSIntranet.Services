@@ -24,6 +24,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         private string _activationCode;
         private DateTime _creationTime;
         private IList<IHousehold> _households = new List<IHousehold>(0);
+        private IList<IPayment>  _payments = new List<IPayment>(0);
         private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
@@ -231,6 +232,25 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             }
         }
 
+        /// <summary>
+        /// Payments made by the household member.
+        /// </summary>
+        public virtual IEnumerable<IPayment> Payments
+        {
+            get
+            {
+                return _payments;
+            }
+            protected set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+                _payments = value.ToList();
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -284,6 +304,19 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached));
             }
             _households.Add(household);
+        }
+
+        /// <summary>
+        /// Adds a payment made by the household member.
+        /// </summary>
+        /// <param name="payment">Payment made by the household member.</param>
+        public virtual void PaymentAdd(IPayment payment)
+        {
+            if (payment == null)
+            {
+                throw new ArgumentNullException("payment");
+            }
+            _payments.Add(payment);
         }
 
         /// <summary>

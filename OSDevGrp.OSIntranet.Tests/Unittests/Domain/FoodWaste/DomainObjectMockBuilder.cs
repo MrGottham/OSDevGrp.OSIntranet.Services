@@ -110,6 +110,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMemberMock.Stub(m => m.Households)
                 .Return(BuildHouseholdMockCollection(membership))
                 .Repeat.Any();
+            householdMemberMock.Stub(m => m.Payments)
+                .Return(BuildPaymentMockCollection(householdMemberMock))
+                .Repeat.Any();
             return householdMemberMock;
         }
 
