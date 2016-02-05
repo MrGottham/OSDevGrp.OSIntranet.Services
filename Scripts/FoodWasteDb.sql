@@ -377,8 +377,21 @@ CREATE TABLE IF NOT EXISTS Payments (
 	CreationTime DATETIME NOT NULL,
 	PRIMARY KEY (PaymentIdentifier),
 	UNIQUE INDEX IX_Payments_DataProvider_PaymentReference (DataProviderIdentifier,PaymentReference),
+	INDEX IX_StakeholderIdentifier_PaymentTime (StakeholderIdentifier,PaymentTime),
 	FOREIGN KEY FK_Payments_DataProviderIdentifier (DataProviderIdentifier) REFERENCES DataProviders (DataProviderIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP PROCEDURE IF EXISTS AlterPayments;
+DELIMITER $$
+CREATE PROCEDURE AlterPayments()
+BEGIN
+	IF((SELECT COUNT(*) FROM information_schema.Statistics WHERE Table_Schema=DATABASE() AND Table_Name='Payments' AND Index_Name='IX_StakeholderIdentifier_PaymentTime') = 0) THEN
+		CREATE INDEX IX_StakeholderIdentifier_PaymentTime ON Payments (StakeholderIdentifier,PaymentTime);
+	END IF;
+END $$
+DELIMITER ;
+CALL AlterPayments();
+DROP PROCEDURE AlterPayments;
 
 DROP PROCEDURE IF EXISTS GrantRightsForPayments;
 DELIMITER $$

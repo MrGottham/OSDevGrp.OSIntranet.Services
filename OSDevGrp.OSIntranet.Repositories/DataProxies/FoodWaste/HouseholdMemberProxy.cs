@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -16,6 +18,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class HouseholdMemberProxy : HouseholdMember, IHouseholdMemberProxy
     {
+        #region Private variables
+
+        private bool _paymentsIsLoaded;
+        private IDataProviderBase _dataProvider;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -45,6 +54,27 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public HouseholdMemberProxy(string mailAddress, Membership membership, DateTime? membershipExpireTime, string activationCode, DateTime creationTime)
             : base(mailAddress, membership, membershipExpireTime, activationCode, creationTime)
         {
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Payments made by the household member.
+        /// </summary>
+        public override IEnumerable<IPayment> Payments
+        {
+            get
+            {
+                if (_paymentsIsLoaded || _dataProvider == null || Identifier.HasValue == false)
+                {
+                    return base.Payments;
+                }
+                base.Payments = PaymentProxy.GetPayments(_dataProvider, Identifier.Value).ToList();
+                _paymentsIsLoaded = true;
+                return base.Payments;
+            }
         }
 
         #endregion
@@ -157,6 +187,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 PrivacyPolicyAcceptedTime = mySqlDataReader.GetDateTime(privacyPolicyAcceptedTimeColumnNo).ToLocalTime();
             }
             CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -186,6 +221,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -202,6 +242,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
+
+            PaymentProxy.DeletePayments(_dataProvider, Identifier.Value);
         }
 
         #endregion

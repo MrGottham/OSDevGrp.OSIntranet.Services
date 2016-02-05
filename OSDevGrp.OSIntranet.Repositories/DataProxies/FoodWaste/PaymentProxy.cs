@@ -305,6 +305,44 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
+        /// <summary>
+        /// Gets all the payments made by a given stakeholder.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="stakeholderIdentifier">Identifier for the stakeholder on which to get payments.</param>
+        /// <returns>All the payments made by the given stakeholder.</returns>
+        internal static IEnumerable<PaymentProxy> GetPayments(IDataProviderBase dataProvider, Guid stakeholderIdentifier)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                return subDataProvider.GetCollection<PaymentProxy>(string.Format("SELECT PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime FROM Payments WHERE StakeholderIdentifier='{0}' ORDER BY PaymentTime DESC", stakeholderIdentifier.ToString("D").ToUpper()));
+            }
+        }
+
+        /// <summary>
+        /// Delete all the payments made by a given stakeholder.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="stakeholderIdentifier">Identifier for the stakeholder on which to delete payments.</param>
+        internal static void DeletePayments(IDataProviderBase dataProvider, Guid stakeholderIdentifier)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            foreach (var paymentProxy in GetPayments(dataProvider, stakeholderIdentifier))
+            {
+                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(paymentProxy);
+                }
+            }
+        }
+
         #endregion
     }
 }
