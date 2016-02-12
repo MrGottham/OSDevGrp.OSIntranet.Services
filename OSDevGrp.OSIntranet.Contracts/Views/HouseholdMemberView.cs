@@ -55,6 +55,13 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         /// <summary>
         /// Gets or sets the households on which the household member has a membership.
         /// </summary>
+        [DataMember(IsRequired = true)]
         public IEnumerable<HouseholdIdentificationView> Households { get; set; }
+
+        /// <summary>
+        /// Gets or sets the payments made by the household member.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public IEnumerable<PaymentView> Payments { get; set; }
     }
 }

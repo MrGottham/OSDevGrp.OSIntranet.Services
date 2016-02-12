@@ -69,6 +69,7 @@
     <Compile Include="Commands\TranslationModifyCommand.cs" />
     <Compile Include="Faults\FoodWasteFault.cs" />
     <Compile Include="Faults\FoodWasteFaultType.cs" />
+    <Compile Include="Commands\HouseholdMemberUpgradeMembershipCommand.cs" />
     <Compile Include="Queries\AdressegrupperGetQuery.cs" />
     <Compile Include="Queries\BetalingsbetingelserGetQuery.cs" />
     <Compile Include="Faults\IntranetBusinessFault.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="Views\KreditorlisteView.cs" />
     <Compile Include="Views\KreditorView.cs" />
     <Compile Include="Views\MånedsoplysningerView.cs" />
+    <Compile Include="Views\PaymentView.cs" />
     <Compile Include="Views\PersonView.cs" />
     <Compile Include="Views\PostnummerView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />

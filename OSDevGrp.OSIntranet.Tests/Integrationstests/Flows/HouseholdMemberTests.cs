@@ -87,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.True);
 
-                    var householdMemberDataGetQuery = new HouseholdMemberDataGetQuery()
+                    var householdMemberDataGetQuery = new HouseholdMemberDataGetQuery
                     {
                         TranslationInfoIdentifier = translationInfoIdentifier
                     };
@@ -117,6 +117,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.CreationTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
                     Assert.That(householdMemberData.Households, Is.Not.Null);
                     Assert.That(householdMemberData.Households, Is.Empty);
+                    Assert.That(householdMemberData.Payments, Is.Not.Null);
+                    Assert.That(householdMemberData.Payments, Is.Empty);
                 }
                 finally
                 {

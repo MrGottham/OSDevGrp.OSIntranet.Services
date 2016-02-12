@@ -336,6 +336,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberView.Households, Is.Not.Empty);
             Assert.That(householdMemberView.Households, Is.TypeOf<List<HouseholdIdentificationView>>());
             Assert.That(householdMemberView.Households.Count(), Is.EqualTo(householdMemberMock.Households.Count()));
+            Assert.That(householdMemberView.Payments, Is.Not.Null);
+            Assert.That(householdMemberView.Payments, Is.Not.Empty);
+            Assert.That(householdMemberView.Payments, Is.TypeOf<List<PaymentView>>());
+            Assert.That(householdMemberView.Payments.Count(), Is.EqualTo(householdMemberMock.Payments.Count()));
         }
 
         /// <summary>
@@ -374,6 +378,45 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.Payments, Is.Not.Null);
             Assert.That(householdMemberProxy.Payments, Is.Not.Empty);
             Assert.That(householdMemberProxy.Payments.Count(), Is.EqualTo(householdMemberMock.Payments.Count()));
+        }
+
+        /// <summary>
+        /// Tests that Map maps Payment to PaymentView.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapMapsPaymentToPaymentView(bool hasPaymentReceipt)
+        {
+            var paymentMock = DomainObjectMockBuilder.BuildPaymentMock(hasPaymentReceipt: hasPaymentReceipt);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var paymentView = foodWasteObjectMapper.Map<IPayment, PaymentView>(paymentMock);
+            Assert.That(paymentView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(paymentView.PaymentIdentifier, Is.EqualTo(paymentMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(paymentView.Stakeholder, Is.Not.Null);
+            Assert.That(paymentView.Stakeholder, Is.TypeOf<StakeholderView>());
+            Assert.That(paymentView.DataProvider, Is.Not.Null);
+            Assert.That(paymentView.DataProvider, Is.TypeOf<DataProviderView>());
+            Assert.That(paymentView.PaymentTime, Is.EqualTo(paymentMock.PaymentTime));
+            Assert.That(paymentView.PaymentReference, Is.Not.Null);
+            Assert.That(paymentView.PaymentReference, Is.Not.Empty);
+            Assert.That(paymentView.PaymentReference, Is.EqualTo(paymentMock.PaymentReference));
+            if (hasPaymentReceipt)
+            {
+                Assert.That(paymentView.PaymentReceipt, Is.Not.Null);
+                Assert.That(paymentView.PaymentReceipt, Is.Not.Empty);
+                Assert.That(paymentView.PaymentReceipt, Is.EqualTo(Convert.ToBase64String(paymentMock.PaymentReceipt.ToArray())));
+            }
+            else
+            {
+                Assert.That(paymentView.PaymentReceipt, Is.Null);
+            }
+            Assert.That(paymentView.CreationTime, Is.EqualTo(paymentMock.CreationTime));
         }
 
         /// <summary>

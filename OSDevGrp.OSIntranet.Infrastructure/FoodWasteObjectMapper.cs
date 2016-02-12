@@ -54,7 +54,8 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.PrivacyPolicyAcceptedTime, opt => opt.MapFrom(s => s.PrivacyPolicyAcceptedTime))
                     .ForMember(m => m.IsPrivacyPolictyAccepted, opt => opt.MapFrom(s => s.IsPrivacyPolictyAccepted))
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
-                    .ForMember(m => m.Households, opt => opt.MapFrom(s => s.Households));
+                    .ForMember(m => m.Households, opt => opt.MapFrom(s => s.Households))
+                    .ForMember(m => m.Payments, opt => opt.MapFrom(s => s.Payments));
 
                 config.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
                     .ConstructUsing(m =>
@@ -93,6 +94,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         }
                         return householdMemberProxy;
                     });
+
+                config.CreateMap<IPayment, PaymentView>()
+                    .ForMember(m => m.PaymentIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Stakeholder, opt => opt.MapFrom(s => s.Stakeholder))
+                    .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider))
+                    .ForMember(m => m.PaymentTime, opt => opt.MapFrom(s => s.PaymentTime))
+                    .ForMember(m => m.PaymentReference, opt => opt.MapFrom(s => s.PaymentReference))
+                    .ForMember(m => m.PaymentReceipt, opt => opt.MapFrom(s => s.PaymentReceipt == null ? null : Convert.ToBase64String(s.PaymentReceipt.ToArray())))
+                    .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime));
 
                 config.CreateMap<IPayment, IPaymentProxy>()
                     .ConstructUsing(m =>
