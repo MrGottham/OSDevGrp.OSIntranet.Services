@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -85,6 +86,14 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Type of the internal or external stakeholder.
+        /// </summary>
+        public virtual StakeholderType StakeholderType
+        {
+            get { return StakeholderType.HouseholdMember; }
+        }
 
         /// <summary>
         /// Mail address for the household member.
@@ -317,6 +326,35 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 throw new ArgumentNullException("payment");
             }
             _payments.Add(payment);
+        }
+
+        /// <summary>
+        /// Make translation for the household member.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        /// <param name="translateHouseholds">Indicates whether to make translation for all the households on which the household member has a membership.</param>
+        /// <param name="translatePayments">Indicates whether to make translation for all payments made by the household member.</param>
+        public void Translate(CultureInfo translationCulture, bool translateHouseholds, bool translatePayments = true)
+        {
+            if (translationCulture == null)
+            {
+                throw new ArgumentNullException("translationCulture");
+            }
+            if (translateHouseholds)
+            {
+                foreach (var household in Households)
+                {
+                    household.Translate(translationCulture);
+                }
+            }
+            if (translatePayments == false)
+            {
+                return;
+            }
+            foreach (var payment in Payments)
+            {
+                payment.Translate(translationCulture);
+            }
         }
 
         /// <summary>

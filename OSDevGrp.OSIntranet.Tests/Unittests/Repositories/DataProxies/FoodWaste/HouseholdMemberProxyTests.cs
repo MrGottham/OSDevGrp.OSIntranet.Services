@@ -33,6 +33,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy, Is.Not.Null);
             Assert.That(householdMemberProxy.Identifier, Is.Null);
             Assert.That(householdMemberProxy.Identifier.HasValue, Is.False);
+            Assert.That(householdMemberProxy.StakeholderType, Is.EqualTo(StakeholderType.HouseholdMember));
             Assert.That(householdMemberProxy.MailAddress, Is.Null);
             Assert.That(householdMemberProxy.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(householdMemberProxy.MembershipExpireTime, Is.Null);
@@ -386,6 +387,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdMemberProxy, Is.Not.Null);
             Assert.That(householdMemberProxy.Identifier, Is.Null);
             Assert.That(householdMemberProxy.Identifier.HasValue, Is.False);
+            Assert.That(householdMemberProxy.StakeholderType, Is.EqualTo(StakeholderType.HouseholdMember));
             Assert.That(householdMemberProxy.MailAddress, Is.Null);
             Assert.That(householdMemberProxy.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(householdMemberProxy.MembershipExpireTime, Is.Null);
@@ -409,6 +411,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMemberProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("HouseholdMemberIdentifier")));
             // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMemberProxy.StakeholderType, Is.EqualTo(StakeholderType.HouseholdMember));
             Assert.That(householdMemberProxy.MailAddress, Is.Not.Null);
             Assert.That(householdMemberProxy.MailAddress, Is.Not.Empty);
             Assert.That(householdMemberProxy.MailAddress, Is.EqualTo(dataReader.GetString("MailAddress")));

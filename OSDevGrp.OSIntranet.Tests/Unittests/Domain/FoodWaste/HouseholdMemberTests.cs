@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
@@ -139,6 +140,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.Identifier, Is.Null);
             Assert.That(householdMember.Identifier.HasValue, Is.False);
+            Assert.That(householdMember.StakeholderType, Is.EqualTo(StakeholderType.HouseholdMember));
             Assert.That(householdMember.MailAddress, Is.Not.Null);
             Assert.That(householdMember.MailAddress, Is.Not.Empty);
             Assert.That(householdMember.MailAddress, Is.EqualTo(validMailAddress));
@@ -1286,6 +1288,184 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.Payments, Is.Not.Empty);
             Assert.That(householdMember.Payments.Count(), Is.EqualTo(1));
             Assert.That(householdMember.Payments.Contains(paymentMock), Is.EqualTo(true));
+        }
+
+        /// <summary>
+        /// Tests that Translate throws ArgumentNullException when the culture information which are used for translation is null.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateThrowsArgumentNullExceptionWhenTranslationCultureIsNull()
+        {
+            var fixture = new Fixture();
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMember.Translate(null, fixture.Create<bool>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("translationCulture"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that Translate calls Translate for each household on which the household member has a membership when those should be translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateCallsTranslateOnEachHouseholdWhenTranslateHouseholdsIsTrue()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            var numberOfHouseholds = random.Next(1, 5);
+            while (householdMember.Households.Count() < numberOfHouseholds)
+            {
+                householdMember.HouseholdAdd(MockRepository.GenerateMock<IHousehold>());
+            }
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(numberOfHouseholds));
+
+            var translationCulture = CultureInfo.CurrentCulture;
+
+            householdMember.Translate(translationCulture, true, fixture.Create<bool>());
+
+            foreach (var householdMock in householdMember.Households)
+            {
+                householdMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture)));
+            }
+        }
+
+        /// <summary>
+        /// Tests that Translate does not call Translate on any household on which the household member has a membership when those should not be translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateDoesNotCallTranslateOnAnyHouseholdWhenTranslateHouseholdsIsFalse()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            var numberOfHouseholds = random.Next(1, 5);
+            while (householdMember.Households.Count() < numberOfHouseholds)
+            {
+                householdMember.HouseholdAdd(MockRepository.GenerateMock<IHousehold>());
+            }
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(numberOfHouseholds));
+
+            householdMember.Translate(CultureInfo.CurrentCulture, false, fixture.Create<bool>());
+
+            foreach (var householdMock in householdMember.Households)
+            {
+                householdMock.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything));
+            }
+        }
+
+        /// <summary>
+        /// Tests that Translate calls Translate for each payment made by the household member when those should be translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateCallsTranslateOnEachPaymentWhenTranslatePaymentsIsTrue()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Empty);
+
+            var numberOfPayments = random.Next(1, 5);
+            while (householdMember.Payments.Count() < numberOfPayments)
+            {
+                householdMember.PaymentAdd(MockRepository.GenerateMock<IPayment>());
+            }
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Empty);
+            Assert.That(householdMember.Payments.Count(), Is.EqualTo(numberOfPayments));
+
+            var translationCulture = CultureInfo.CurrentCulture;
+
+            householdMember.Translate(translationCulture, fixture.Create<bool>());
+
+            foreach (var paymentMock in householdMember.Payments)
+            {
+                paymentMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture)));
+            }
+        }
+
+        /// <summary>
+        /// Tests that Translate does not call Translate on any payment made by the household member when those should not be translated.
+        /// </summary>
+        [Test]
+        public void TestThatTranslateDoesNotCallTranslateOnAnyPaymentWhenTranslatePaymentsIsFalse()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Empty);
+
+            var numberOfPayments = random.Next(1, 5);
+            while (householdMember.Payments.Count() < numberOfPayments)
+            {
+                householdMember.PaymentAdd(MockRepository.GenerateMock<IPayment>());
+            }
+            Assert.That(householdMember.Payments, Is.Not.Null);
+            Assert.That(householdMember.Payments, Is.Not.Empty);
+            Assert.That(householdMember.Payments.Count(), Is.EqualTo(numberOfPayments));
+
+            householdMember.Translate(CultureInfo.CurrentCulture, fixture.Create<bool>(), false);
+
+            foreach (var paymentMock in householdMember.Payments)
+            {
+                paymentMock.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything));
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ using AutoMapper;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
@@ -101,12 +102,20 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             return (IPaymentProxy) m;
                         }
                         IStakeholder stakeholderProxy = null;
-                        if (m.Stakeholder as IHouseholdMember != null)
+                        if (m.Stakeholder != null)
                         {
-                            stakeholderProxy = m.Stakeholder as IHouseholdMemberProxy;
-                            if (stakeholderProxy == null && Mapper != null)
+                            switch (m.Stakeholder.StakeholderType)
                             {
-                                stakeholderProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>((IHouseholdMember) m.Stakeholder);
+                                case StakeholderType.HouseholdMember:
+                                    if (m.Stakeholder as IHouseholdMember != null)
+                                    {
+                                        stakeholderProxy = m.Stakeholder as IHouseholdMemberProxy;
+                                        if (stakeholderProxy == null && Mapper != null)
+                                        {
+                                            stakeholderProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>((IHouseholdMember) m.Stakeholder);
+                                        }
+                                    }
+                                    break;
                             }
                         }
                         var dataProviderProxy = m.DataProvider as IDataProviderProxy;
@@ -119,6 +128,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             Identifier = m.Identifier
                         };
                     });
+
+                config.CreateMap<IStakeholder, StakeholderView>()
+                    .ForMember(m => m.StakeholderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress));
 
                 config.CreateMap<IFoodItemCollection, FoodItemCollectionView>()
                     .ForMember(m => m.FoodItems, opt => opt.MapFrom<IEnumerable<IFoodItem>>(s => s))

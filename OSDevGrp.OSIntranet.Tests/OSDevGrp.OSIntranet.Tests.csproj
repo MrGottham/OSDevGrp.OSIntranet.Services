@@ -269,6 +269,7 @@
     <Compile Include="Unittests\Contracts\Views\PersonViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\PostnummerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\StakeholderViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\SystemViewTests.cs" />

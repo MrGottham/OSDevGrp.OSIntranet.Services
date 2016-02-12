@@ -5,6 +5,7 @@ using System.Linq;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
@@ -33,8 +34,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(paymentProxy.Identifier, Is.Null);
             Assert.That(paymentProxy.Identifier.HasValue, Is.False);
             Assert.That(paymentProxy.Stakeholder, Is.Null);
-            Assert.That(paymentProxy.StakeholderType, Is.Null);
-            Assert.That(paymentProxy.StakeholderType.HasValue, Is.False);
             Assert.That(paymentProxy.DataProvider, Is.Null);
             Assert.That(paymentProxy.PaymentTime, Is.EqualTo(default(DateTime)));
             Assert.That(paymentProxy.PaymentReference, Is.Null);
@@ -148,23 +147,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a payment from a stakeholder.
         /// </summary>
         [Test]
-        [TestCase(typeof (IHouseholdMember), true)]
-        [TestCase(typeof (IHouseholdMember), false)]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(Type stakeholderType, bool hasPaymentReceipt)
+        [TestCase(StakeholderType.HouseholdMember, true)]
+        [TestCase(StakeholderType.HouseholdMember, false)]
+        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(StakeholderType stakeholderType, bool hasPaymentReceipt)
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
 
-            IStakeholder stakeholderMock = null;
-            if (stakeholderType == typeof (IHouseholdMember))
-            {
-                stakeholderMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
-            }
-            if (stakeholderMock == null)
-            {
-                throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported.", stakeholderType.Name));
-            }
-
+            var stakeholderMock = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(true);
             var paymentTime = DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
             var paymentReference = fixture.Create<string>();
@@ -178,7 +168,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             // ReSharper disable PossibleInvalidOperationException
             var stakeholderIdentifierSqlvalue = stakeholderMock.Identifier.Value.ToString("D").ToUpper();
-            var stakeholderTypeSqlValue = paymentProxy.StakeholderType.Value;
             var dataProviderIdentifierSqlValue = dataProviderMock.Identifier.Value.ToString("D").ToUpper();
             // ReSharper restore PossibleInvalidOperationException
             var paymentReceiptSqlValue = paymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(paymentReceipt));
@@ -186,30 +175,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var sqlCommand = paymentProxy.GetSqlCommandForInsert();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Payments (PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime) VALUES('{0}','{1}',{2},'{3}',{4},'{5}',{6},{7})", paymentProxy.UniqueId, stakeholderIdentifierSqlvalue, stakeholderTypeSqlValue, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(paymentTime), paymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Payments (PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime) VALUES('{0}','{1}',{2},'{3}',{4},'{5}',{6},{7})", paymentProxy.UniqueId, stakeholderIdentifierSqlvalue, (int) stakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(paymentTime), paymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
         }
 
         /// <summary>
         /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a payment from a stakeholder.
         /// </summary>
         [Test]
-        [TestCase(typeof (IHouseholdMember), true)]
-        [TestCase(typeof (IHouseholdMember), false)]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(Type stakeholderType, bool hasPaymentReceipt)
+        [TestCase(StakeholderType.HouseholdMember, true)]
+        [TestCase(StakeholderType.HouseholdMember, false)]
+        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(StakeholderType stakeholderType, bool hasPaymentReceipt)
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
 
-            IStakeholder stakeholderMock = null;
-            if (stakeholderType == typeof (IHouseholdMember))
-            {
-                stakeholderMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
-            }
-            if (stakeholderMock == null)
-            {
-                throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported.", stakeholderType.Name));
-            }
-
+            var stakeholderMock = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
             var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(true);
             var paymentTime = DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
             var paymentReference = fixture.Create<string>();
@@ -223,7 +203,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             // ReSharper disable PossibleInvalidOperationException
             var stakeholderIdentifierSqlvalue = stakeholderMock.Identifier.Value.ToString("D").ToUpper();
-            var stakeholderTypeSqlValue = paymentProxy.StakeholderType.Value;
             var dataProviderIdentifierSqlValue = dataProviderMock.Identifier.Value.ToString("D").ToUpper();
             // ReSharper restore PossibleInvalidOperationException
             var paymentReceiptSqlValue = paymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(paymentReceipt));
@@ -231,7 +210,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var sqlCommand = paymentProxy.GetSqlCommandForUpdate();
             Assert.That(sqlCommand, Is.Not.Null);
             Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Payments SET StakeholderIdentifier='{1}',StakeholderType={2},DataProviderIdentifier='{3}',PaymentTime={4},PaymentReference='{5}',PaymentReceipt={6},CreationTime={7} WHERE PaymentIdentifier='{0}'", paymentProxy.UniqueId, stakeholderIdentifierSqlvalue, stakeholderTypeSqlValue, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(paymentTime), paymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
+            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Payments SET StakeholderIdentifier='{1}',StakeholderType={2},DataProviderIdentifier='{3}',PaymentTime={4},PaymentReference='{5}',PaymentReceipt={6},CreationTime={7} WHERE PaymentIdentifier='{0}'", paymentProxy.UniqueId, stakeholderIdentifierSqlvalue, (int) stakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(paymentTime), paymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
         }
 
         /// <summary>
@@ -308,9 +287,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that the constructor initialize a data proxy to a payment from a stakeholder.
         /// </summary>
         [Test]
-        [TestCase(1, true)]
-        [TestCase(1, false)]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(int stakeholderType, bool hasPaymentReceipt)
+        [TestCase(StakeholderType.HouseholdMember, true)]
+        [TestCase(StakeholderType.HouseholdMember, false)]
+        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(StakeholderType stakeholderType, bool hasPaymentReceipt)
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
@@ -358,7 +337,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Return("61AAB0D8-314F-4C46-B604-3FF443CA183A")
                 .Repeat.Any();
             dataReader.Stub(m => m.GetInt32(Arg<string>.Is.Equal("StakeholderType")))
-                .Return(stakeholderType)
+                .Return((int) stakeholderType)
                 .Repeat.Any();
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
                 .Return("9D8B58A7-B8FE-4392-8A60-F3722A2F3C45")
@@ -387,8 +366,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(paymentProxy.Identifier, Is.Null);
             Assert.That(paymentProxy.Identifier.HasValue, Is.False);
             Assert.That(paymentProxy.Stakeholder, Is.Null);
-            Assert.That(paymentProxy.StakeholderType, Is.Null);
-            Assert.That(paymentProxy.StakeholderType.HasValue, Is.False);
             Assert.That(paymentProxy.DataProvider, Is.Null);
             Assert.That(paymentProxy.PaymentTime, Is.EqualTo(default(DateTime)));
             Assert.That(paymentProxy.PaymentReference, Is.Null);
@@ -404,11 +381,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(paymentProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("PaymentIdentifier")));
             // ReSharper restore PossibleInvalidOperationException
             Assert.That(paymentProxy.Stakeholder, Is.Not.Null);
-            Assert.That(paymentProxy.StakeholderType, Is.Not.Null);
-            Assert.That(paymentProxy.StakeholderType.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(paymentProxy.StakeholderType.Value, Is.EqualTo(stakeholderType));
-            // ReSharper restore PossibleInvalidOperationException
             Assert.That(paymentProxy.DataProvider, Is.Not.Null);
             Assert.That(paymentProxy.PaymentTime, Is.EqualTo(paymentTime));
             Assert.That(paymentProxy.PaymentReference, Is.Not.Null);
@@ -429,7 +401,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
             switch (stakeholderType)
             {
-                case 1:
+                case StakeholderType.HouseholdMember:
                     dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<HouseholdMemberProxy>.Is.NotNull));
                     break;
 

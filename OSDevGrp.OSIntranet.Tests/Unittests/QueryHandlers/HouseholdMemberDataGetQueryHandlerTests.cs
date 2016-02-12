@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
@@ -75,6 +76,50 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("query"));
             Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that GetData throws ArgumentNullException when the translation informations which can be used for translation is null.
+        /// </summary>
+        [Test]
+        public void TestThatGetDataThrowsArgumentNullExceptionWhenTranslationInfoIsNull()
+        {
+            var fixture = new Fixture();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdMemberDataGetQueryHandler = new HouseholdMemberDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandler, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMemberDataGetQueryHandler.GetData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), fixture.Create<HouseholdMemberDataGetQuery>(), null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("translationInfo"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that GetData Calls X on the household member.
+        /// </summary>
+        [Test]
+        public void TestThatGetDataCallsTranslateOnHouseholdMember()
+        {
+            var fixture = new Fixture();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+
+            var householdMemberDataGetQueryHandler = new HouseholdMemberDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
+            Assert.That(householdMemberDataGetQueryHandler, Is.Not.Null);
+
+            householdMemberDataGetQueryHandler.GetData(householdMemberMock, fixture.Create<HouseholdMemberDataGetQuery>(), translationInfoMock);
+
+            householdMemberMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationInfoMock.CultureInfo), Arg<bool>.Is.Equal(false), Arg<bool>.Is.Equal(true)));
         }
 
         /// <summary>

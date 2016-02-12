@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
@@ -83,5 +84,13 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// </summary>
         /// <param name="payment">Payment made by the household member.</param>
         void PaymentAdd(IPayment payment);
+
+        /// <summary>
+        /// Make translation for the household member.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        /// <param name="translateHouseholds">Indicates whether to make translation for all the households on which the household member has a membership.</param>
+        /// <param name="translatePayments">Indicates whether to make translation for all payments made by the household member.</param>
+        void Translate(CultureInfo translationCulture, bool translateHouseholds, bool translatePayments = true);
     }
 }

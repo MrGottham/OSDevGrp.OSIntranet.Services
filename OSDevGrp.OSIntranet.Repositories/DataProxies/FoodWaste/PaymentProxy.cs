@@ -5,6 +5,7 @@ using System.Reflection;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
@@ -21,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Private variables
 
         private Guid? _stakeholderIdentifier;
-        private int? _stakeholderType;
+        private StakeholderType? _stakeholderType;
         private Guid? _dataProviderIdentifier;
         private IDataProviderBase _dataProvider;
 
@@ -69,7 +70,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     switch (_stakeholderType.Value)
                     {
-                        case 1:
+                        case StakeholderType.HouseholdMember:
                             var householdMemberProxy = new HouseholdMemberProxy
                             {
                                 Identifier = _stakeholderIdentifier.Value
@@ -105,25 +106,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                     base.DataProvider = subDataProvider.Get(dataProviderProxy);
                 }
                 return base.DataProvider;
-            }
-        }
-
-        /// <summary>
-        /// Gets the type value for the stakeholde.
-        /// </summary>
-        public virtual int? StakeholderType
-        {
-            get
-            {
-                if (Stakeholder == null)
-                {
-                    return null;
-                }
-                if (Stakeholder is IHouseholdMember)
-                {
-                    return 1;
-                }
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, Stakeholder.GetType().Name, "Stakeholder", MethodBase.GetCurrentMethod()));
             }
         }
 
@@ -174,7 +156,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var dataProviderIdentifierSqlValue = DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
             var paymentReceiptSqlValue = PaymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(PaymentReceipt.ToArray()));
 
-            return string.Format("INSERT INTO Payments (PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime) VALUES('{0}','{1}',{2},'{3}',{4},'{5}',{6},{7})", UniqueId, stakeholderIdentifierSqlValue, StakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(PaymentTime), PaymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
+            return string.Format("INSERT INTO Payments (PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime) VALUES('{0}','{1}',{2},'{3}',{4},'{5}',{6},{7})", UniqueId, stakeholderIdentifierSqlValue, (int) Stakeholder.StakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(PaymentTime), PaymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
         }
 
         /// <summary>
@@ -187,7 +169,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var dataProviderIdentifierSqlValue = DataProvider.Identifier.HasValue ? DataProvider.Identifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
             var paymentReceiptSqlValue = PaymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(PaymentReceipt.ToArray()));
 
-            return string.Format("UPDATE Payments SET StakeholderIdentifier='{1}',StakeholderType={2},DataProviderIdentifier='{3}',PaymentTime={4},PaymentReference='{5}',PaymentReceipt={6},CreationTime={7} WHERE PaymentIdentifier='{0}'", UniqueId, stakeholderIdentifierSqlValue, StakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(PaymentTime), PaymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
+            return string.Format("UPDATE Payments SET StakeholderIdentifier='{1}',StakeholderType={2},DataProviderIdentifier='{3}',PaymentTime={4},PaymentReference='{5}',PaymentReceipt={6},CreationTime={7} WHERE PaymentIdentifier='{0}'", UniqueId, stakeholderIdentifierSqlValue, (int) Stakeholder.StakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(PaymentTime), PaymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
         }
 
         /// <summary>
@@ -241,7 +223,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
 
             _stakeholderIdentifier = Guid.Parse(mySqlDataReader.GetString("StakeholderIdentifier"));
-            _stakeholderType = mySqlDataReader.GetInt32("StakeholderType");
+            switch (mySqlDataReader.GetInt32("StakeholderType"))
+            {
+                case (int) StakeholderType.HouseholdMember:
+                    _stakeholderType = StakeholderType.HouseholdMember;
+                    break;
+
+                default:
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, mySqlDataReader.GetInt32("StakeholderType"), "StakeholderType", MethodBase.GetCurrentMethod()));
+            }
             _dataProviderIdentifier = Guid.Parse(mySqlDataReader.GetString("DataProviderIdentifier"));
 
             if (_dataProvider == null)

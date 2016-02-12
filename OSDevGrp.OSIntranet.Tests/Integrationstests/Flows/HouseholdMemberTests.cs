@@ -87,7 +87,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.True);
 
-                    var householdMemberData = _householdDataService.HouseholdMemberDataGet(new HouseholdMemberDataGetQuery());
+                    var householdMemberDataGetQuery = new HouseholdMemberDataGetQuery()
+                    {
+                        TranslationInfoIdentifier = translationInfoIdentifier
+                    };
+                    var householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
                     Assert.That(householdMemberData, Is.Not.Null);
                     Assert.That(householdMemberData.HouseholdMemberIdentifier, Is.Not.EqualTo(default(Guid)));
                     Assert.That(householdMemberData.MailAddress, Is.Not.Null);

@@ -61,6 +61,7 @@
     <Compile Include="Finansstyring\IKontogruppelisteHelper.cs" />
     <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />
     <Compile Include="FoodWaste\Enums\Membership.cs" />
+    <Compile Include="FoodWaste\Enums\StakeholderType.cs" />
     <Compile Include="FoodWaste\Enums\StaticTextType.cs" />
     <Compile Include="FoodWaste\IDomainObjectValidations.cs" />
     <Compile Include="FoodWaste\IDataProvider.cs" />

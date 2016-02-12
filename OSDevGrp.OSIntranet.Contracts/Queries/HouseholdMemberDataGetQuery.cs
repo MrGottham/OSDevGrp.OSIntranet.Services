@@ -6,7 +6,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Queries
     /// Query for getting household member data for the current user.
     /// </summary>
     [DataContract(Name = "HouseholdMemberDataGetQuery", Namespace = SoapNamespaces.FoodWasteNamespace)]
-    public class HouseholdMemberDataGetQuery : HouseholdMemberDataGetQueryBase
+    public class HouseholdMemberDataGetQuery : HouseholdMemberTranslatableDataGetQueryBase
     {
     }
 }

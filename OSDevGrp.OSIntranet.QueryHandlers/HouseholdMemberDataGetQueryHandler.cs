@@ -47,6 +47,13 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("query");
             }
+            if (translationInfo == null)
+            {
+                throw new ArgumentNullException("translationInfo");
+            }
+
+            householdMember.Translate(translationInfo.CultureInfo, false);
+
             return householdMember;
         }
 

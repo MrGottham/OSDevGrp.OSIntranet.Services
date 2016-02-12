@@ -380,22 +380,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map maps Payment to PaymentProxy.
         /// </summary>
         [Test]
-        [TestCase(1, true)]
-        [TestCase(1, false)]
-        public void TestThatMapMapsPaymentToPaymentProxy(int stakeholderType, bool hasPaymentReceipt)
+        [TestCase(StakeholderType.HouseholdMember, true)]
+        [TestCase(StakeholderType.HouseholdMember, false)]
+        public void TestThatMapMapsPaymentToPaymentProxy(StakeholderType stakeholderType, bool hasPaymentReceipt)
         {
-            IStakeholder stakeholder;
+            IStakeholder stakeholderMock;
             switch (stakeholderType)
             {
-                case 1:
-                    stakeholder = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+                case StakeholderType.HouseholdMember:
+                    stakeholderMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported."));
+                    throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported.", stakeholderType));
             }
-            
-            var paymentMock = DomainObjectMockBuilder.BuildPaymentMock(stakeholder, hasPaymentReceipt);
+            var paymentMock = DomainObjectMockBuilder.BuildPaymentMock(stakeholderMock, hasPaymentReceipt);
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
@@ -405,8 +404,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(paymentProxy.Identifier, Is.Not.Null);
             Assert.That(paymentProxy.Identifier, Is.EqualTo(paymentMock.Identifier));
             Assert.That(paymentProxy.Stakeholder, Is.Not.Null);
-            Assert.That(paymentProxy.Stakeholder, Is.TypeOf<HouseholdMemberProxy>());
-            Assert.That(paymentProxy.StakeholderType, Is.EqualTo(stakeholderType));
+            switch (stakeholderType)
+            {
+                case StakeholderType.HouseholdMember:
+                    Assert.That(paymentProxy.Stakeholder, Is.TypeOf<HouseholdMemberProxy>());
+                    break;
+
+                default:
+                    throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported.", stakeholderType));
+            }
             Assert.That(paymentProxy.DataProvider, Is.Not.Null);
             Assert.That(paymentProxy.DataProvider, Is.TypeOf<DataProviderProxy>());
             Assert.That(paymentProxy.PaymentTime, Is.EqualTo(paymentMock.PaymentTime));
@@ -424,6 +430,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                 Assert.That(paymentProxy.PaymentReceipt, Is.Null);
             }
             Assert.That(paymentProxy.CreationTime, Is.EqualTo(paymentMock.CreationTime));
+        }
+
+        /// <summary>
+        /// Tests that Map maps Stakeholder to StakeholderView.
+        /// </summary>
+        [Test]
+        [TestCase(StakeholderType.HouseholdMember)]
+        public void TestThatMapMapsStakeholderToStakeholderView(StakeholderType stakeholderType)
+        {
+            var stakeholderMock = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var stakeholderView = foodWasteObjectMapper.Map<IStakeholder, StakeholderView>(stakeholderMock);
+            Assert.That(stakeholderView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(stakeholderView.StakeholderIdentifier, Is.EqualTo(stakeholderMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(stakeholderView.StakeholderType, Is.Not.Null);
+            Assert.That(stakeholderView.StakeholderType, Is.Not.Empty);
+            Assert.That(stakeholderView.StakeholderType, Is.EqualTo(stakeholderType.ToString()));
+            Assert.That(stakeholderView.MailAddress, Is.Not.Null);
+            Assert.That(stakeholderView.MailAddress, Is.Not.Empty);
+            Assert.That(stakeholderView.MailAddress, Is.EqualTo(stakeholderMock.MailAddress));
         }
 
         /// <summary>

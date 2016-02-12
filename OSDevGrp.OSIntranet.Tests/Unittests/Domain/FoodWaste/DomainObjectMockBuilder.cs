@@ -80,6 +80,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMemberMock.Stub(m => m.Identifier)
                 .Return(identfier)
                 .Repeat.Any();
+            householdMemberMock.Stub(m => m.StakeholderType)
+                .Return(StakeholderType.HouseholdMember)
+                .Repeat.Any();
             householdMemberMock.Stub(m => m.MailAddress)
                 .Return(mailAddress)
                 .Repeat.Any();
@@ -183,13 +186,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for an internal or external stakeholder.
         /// </summary>
         /// <returns>Mockup for an internal or external stakeholder.</returns>
-        public static IStakeholder BuildStakeholderMock()
+        public static IStakeholder BuildStakeholderMock(StakeholderType stakeholderType = StakeholderType.HouseholdMember)
         {
             var identfier = Guid.NewGuid();
             var mailAddress = string.Format("test.{0}@osdevgrp.dk", identfier.ToString("D").ToLower());
             var stakeholderMock = MockRepository.GenerateMock<IStakeholder>();
             stakeholderMock.Stub(m => m.Identifier)
                 .Return(identfier)
+                .Repeat.Any();
+            stakeholderMock.Stub(m => m.StakeholderType)
+                .Return(stakeholderType)
                 .Repeat.Any();
             stakeholderMock.Stub(m => m.MailAddress)
                 .Return(mailAddress)
@@ -201,13 +207,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a collection of mockups for some internal or external stakeholders.
         /// </summary>
         /// <returns>Collection of mockups for some internal or external stakeholders.</returns>
-        public static IEnumerable<IStakeholder> BuildStakeholderMockCollection()
+        public static IEnumerable<IStakeholder> BuildStakeholderMockCollection(StakeholderType stakeholderType = StakeholderType.HouseholdMember)
         {
             return new List<IStakeholder>
             {
-                BuildStakeholderMock(),
-                BuildStakeholderMock(),
-                BuildStakeholderMock()
+                BuildStakeholderMock(stakeholderType),
+                BuildStakeholderMock(stakeholderType),
+                BuildStakeholderMock(stakeholderType)
             };
         }
 
