@@ -33,13 +33,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
             Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
             Assert.That(householdMemberUpgradeMembershipCommandHandler.ShouldBeActivated, Is.True);
             Assert.That(householdMemberUpgradeMembershipCommandHandler.ShouldHaveAcceptedPrivacyPolicy, Is.True);
             Assert.That(householdMemberUpgradeMembershipCommandHandler.RequiredMembership, Is.EqualTo(Membership.Basic));
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the common validations used by domain objects in the food waste domain is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenDomainObjectValidationsIsNull()
+        {
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, null, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("domainObjectValidations"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -54,9 +76,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
             Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdMemberUpgradeMembershipCommandHandler.AddValidationRules(null, fixture.Create<HouseholdMemberUpgradeMembershipCommand>(), specificationMock));
@@ -64,6 +87,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -77,9 +101,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
             Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), null, specificationMock));
@@ -87,6 +112,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("command"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -101,9 +127,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
             Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), fixture.Create<HouseholdMemberUpgradeMembershipCommand>(), null));
@@ -111,6 +138,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("specification"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -125,9 +153,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
             Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdMemberUpgradeMembershipCommandHandler.ModifyData(null, fixture.Create<HouseholdMemberUpgradeMembershipCommand>()));
@@ -135,6 +164,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -143,15 +173,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         [Test]
         public void TestThatModifyDataThrowsArgumentNullExceptionWhenCommandrIsNull()
         {
-            var fixture = new Fixture();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
             Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdMemberUpgradeMembershipCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), null));
@@ -159,6 +189,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("command"));
+            Assert.That(exception.InnerException, Is.Null);
         }
     }
 }

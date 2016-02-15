@@ -14,6 +14,12 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
     /// </summary>
     public class HouseholdMemberUpgradeMembershipCommandHandler : HouseholdMemberDataModificationCommandHandlerBase<HouseholdMemberUpgradeMembershipCommand>
     {
+        #region Private variables
+
+        private readonly IDomainObjectValidations _domainObjectValidations;
+
+        #endregion
+
         #region Constructor
 
         /// <summary>
@@ -24,10 +30,16 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="foodWasteObjectMapper">Implementation of an object mapper which can map objects in the food waste domain.</param>
         /// <param name="specification">Implementation of a specification which encapsulates validation rules.</param>
         /// <param name="commonValidations">Implementation of a common validations.</param>
+        /// <param name="domainObjectValidations">Implementaion of a common validations used by domain objects in the food waste domain.</param>
         /// <param name="exceptionBuilder">Implementation of a builder which can build exceptions.</param>
-        public HouseholdMemberUpgradeMembershipCommandHandler(IHouseholdDataRepository householdDataRepository, IClaimValueProvider claimValueProvider, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IExceptionBuilder exceptionBuilder)
+        public HouseholdMemberUpgradeMembershipCommandHandler(IHouseholdDataRepository householdDataRepository, IClaimValueProvider claimValueProvider, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IDomainObjectValidations domainObjectValidations, IExceptionBuilder exceptionBuilder)
             : base(householdDataRepository, claimValueProvider, foodWasteObjectMapper, specification, commonValidations, exceptionBuilder)
         {
+            if (domainObjectValidations == null)
+            {
+                throw new ArgumentNullException("domainObjectValidations");
+            }
+            _domainObjectValidations = domainObjectValidations;
         }
 
         #endregion
