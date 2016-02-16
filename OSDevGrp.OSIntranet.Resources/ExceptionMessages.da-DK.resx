@@ -244,4 +244,8 @@
   <data name="WrongActivationCodeForHouseholdMember" xml:space="preserve">
     <value>Den angivne aktiveringskode er invalid for dit husstandsmedlemsskab.</value>
   </data>
+  <data name="GenericTypeHasInvalidType" xml:space="preserve">
+    <value>Den generiske type med navnet '{0}' har en invalid type: {1}</value>
+    <comment>{0} = Navn på den generiske type, {1} = Navn på den invalide type.</comment>
+  </data>
 </root>

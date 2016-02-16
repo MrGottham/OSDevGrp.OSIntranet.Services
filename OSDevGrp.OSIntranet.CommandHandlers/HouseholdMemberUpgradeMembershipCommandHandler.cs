@@ -4,8 +4,10 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.CommandHandlers
 {
@@ -66,6 +68,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 throw new ArgumentNullException("specification");
             }
+            specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.Membership),
+                new IntranetBusinessException(Resource.GetExceptionMessage(
+                    ExceptionMessage.ValueMustBeGivenForProperty, "Membership")));
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
 {
@@ -43,5 +44,22 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
         /// <param name="comparisonType">Comparison type.</param>
         /// <returns>True when the two string are equal otherwise false.</returns>
         bool Equals(string xValue, string yValue, StringComparison comparisonType = StringComparison.Ordinal);
+
+        /// <summary>
+        /// Checks whether a given string value are a legal enum value.
+        /// </summary>
+        /// <typeparam name="TEnum">Type of the enum.</typeparam>
+        /// <param name="value">String value which should be checked.</param>
+        /// <param name="legalValues">Legal enum values.</param>
+        /// <returns>True when the given string value are a legal enum value otherwise false.</returns>
+        bool IsLegalEnumValue<TEnum>(string value, IEnumerable<TEnum> legalValues) where TEnum : struct, IConvertible;
+
+        /// <summary>
+        /// Checks whether a given string value are a legal enum value.
+        /// </summary>
+        /// <typeparam name="TEnum">Type of the enum.</typeparam>
+        /// <param name="value">String value which should be checked.</param>
+        /// <returns>True when the given string value are a legal enum value otherwise false.</returns>
+        bool IsLegalEnumValue<TEnum>(string value) where TEnum : struct, IConvertible;
     }
 }

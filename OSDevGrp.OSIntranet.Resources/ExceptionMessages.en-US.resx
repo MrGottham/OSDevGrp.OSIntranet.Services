@@ -244,4 +244,8 @@
   <data name="WrongActivationCodeForHouseholdMember" xml:space="preserve">
     <value>The submitted activation code is illegal for your household member account.</value>
   </data>
+  <data name="GenericTypeHasInvalidType" xml:space="preserve">
+    <value>The generic type named '{0}' has an invalid type: {1}</value>
+    <comment>{0} = Name of the generic type, {1} = Name of the invalid type.</comment>
+  </data>
 </root>

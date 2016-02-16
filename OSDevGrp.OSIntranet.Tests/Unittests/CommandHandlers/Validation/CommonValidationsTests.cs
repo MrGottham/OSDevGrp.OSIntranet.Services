@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
@@ -176,6 +180,107 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
             Assert.That(commonValidations, Is.Not.Null);
 
             var result = commonValidations.Equals(xValue, yValue, comparisonType);
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        /// <summary>
+        /// Tests that IsLegalEnumValue when calling with legal values throws an ArgumentNullException when the legal values is null.
+        /// </summary>
+        [Test]
+        public void TestThatIsLegalEnumValueWithLegalValuesThrowsArgumentNullExceptionWhenLegalValuesIsNull()
+        {
+            var fixture = new Fixture();
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var excpetion = Assert.Throws<ArgumentNullException>(() => commonValidations.IsLegalEnumValue<Membership>(fixture.Create<string>(), null));
+            Assert.That(excpetion, Is.Not.Null);
+            Assert.That(excpetion.ParamName, Is.Not.Null);
+            Assert.That(excpetion.ParamName, Is.Not.Empty);
+            Assert.That(excpetion.ParamName, Is.EqualTo("legalValues"));
+            Assert.That(excpetion.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that IsLegalEnumValue when calling with legal values throws an IntranetSystemException when the type of enum is not an enum type.
+        /// </summary>
+        [Test]
+        public void TestThatIsLegalEnumValueWithLegalValuesThrowsIntranetSystemExceptionWhenEnumTypeIsNotEnum()
+        {
+            var fixture = new Fixture();
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var excpetion = Assert.Throws<IntranetSystemException>(() => commonValidations.IsLegalEnumValue(fixture.Create<string>(), new List<int> {0, 1}));
+            Assert.That(excpetion, Is.Not.Null);
+            Assert.That(excpetion.Message, Is.Not.Null);
+            Assert.That(excpetion.Message, Is.Not.Empty);
+            Assert.That(excpetion.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType, "TEnum", typeof (int).Name)));
+            Assert.That(excpetion.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that IsLegalEnumValue when calling with legal values returns whether the given string value are a legal enum value.
+        /// </summary>
+        [Test]
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase(" ", false)]
+        [TestCase("  ", false)]
+        [TestCase("   ", false)]
+        [TestCase("XYZ", false)]
+        [TestCase("Basic", false)]
+        [TestCase("Deluxe", true)]
+        [TestCase("Premium", true)]
+        public void TestThatIsLegalEnumValueWithLegalValuesReturnsWhetherValueIsLegalEnumValue(string value, bool expectedResult)
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.IsLegalEnumValue(value, new List<Membership> {Membership.Deluxe, Membership.Premium});
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        /// <summary>
+        /// Tests that IsLegalEnumValue when calling without legal values throws an IntranetSystemException when the type of enum is not an enum type.
+        /// </summary>
+        [Test]
+        public void TestThatIsLegalEnumValueWithoutLegalValuesThrowsIntranetSystemExceptionWhenEnumTypeIsNotEnum()
+        {
+            var fixture = new Fixture();
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var excpetion = Assert.Throws<IntranetSystemException>(() => commonValidations.IsLegalEnumValue<int>(fixture.Create<string>()));
+            Assert.That(excpetion, Is.Not.Null);
+            Assert.That(excpetion.Message, Is.Not.Null);
+            Assert.That(excpetion.Message, Is.Not.Empty);
+            Assert.That(excpetion.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType, "TEnum", typeof(int).Name)));
+            Assert.That(excpetion.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that IsLegalEnumValue when calling without legal values returns whether the given string value are a legal enum value.
+        /// </summary>
+        [Test]
+        [TestCase(null, false)]
+        [TestCase("", false)]
+        [TestCase(" ", false)]
+        [TestCase("  ", false)]
+        [TestCase("   ", false)]
+        [TestCase("XYZ", false)]
+        [TestCase("Basic", true)]
+        [TestCase("Deluxe", true)]
+        [TestCase("Premium", true)]
+        public void TestThatIsLegalEnumValueWithoutLegalValuesReturnsWhetherValueIsLegalEnumValue(string value, bool expectedResult)
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.IsLegalEnumValue<Membership>(value);
             Assert.That(result, Is.EqualTo(expectedResult));
         }
     }
