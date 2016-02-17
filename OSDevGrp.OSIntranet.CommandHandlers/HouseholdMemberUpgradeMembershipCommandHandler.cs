@@ -79,7 +79,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                             new List<Membership> {Membership.Deluxe, Membership.Premium}),
                     new IntranetBusinessException(
                         Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid, command.Membership,
-                            "Membership")));
+                            "Membership")))
+                .IsSatisfiedBy(
+                    () =>
+                        _domainObjectValidations.CanUpgradeMembership(householdMember.Membership,
+                            (Membership) Enum.Parse(typeof (Membership), command.Membership)),
+                    new IntranetBusinessException(
+                        Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade)));
         }
 
         /// <summary>

@@ -91,7 +91,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <returns>True if the current membership can be upgraded to the other membership otherwise false.</returns>
         public virtual bool CanUpgradeMembership(Membership currentMembership, Membership upgradeToMembership)
         {
-            throw new NotImplementedException();
+            return (int) currentMembership <= (int) upgradeToMembership;
         }
 
         /// <summary>

@@ -280,6 +280,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="membership">Membership which should be applied to the household member.</param>
         public virtual void MembershipApply(Membership membership)
         {
+            if (_domainObjectValidations.CanUpgradeMembership(Membership, membership) == false)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade));
+            }
             switch (membership)
             {
                 case Membership.Basic:

@@ -252,4 +252,7 @@
     <value>Værdien '{0}' i egenskaben med navnet '{1}'  er ugyldig.</value>
     <comment>{0} = Værdi, {1} = Navn på egenskab.</comment>
   </data>
+  <data name="MembershipCannotDowngrade" xml:space="preserve">
+    <value>Medlemsskabet på et husstandsmedlemsskab kan ikke nedgraderes.</value>
+  </data>
 </root>

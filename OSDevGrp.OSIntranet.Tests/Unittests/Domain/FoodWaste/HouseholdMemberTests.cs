@@ -1059,6 +1059,65 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that HouseholdApply calls CanUpgradeMembership on the common validations used by domain objects in the food waste domain.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic, Membership.Basic)]
+        [TestCase(Membership.Basic, Membership.Deluxe)]
+        [TestCase(Membership.Basic, Membership.Premium)]
+        [TestCase(Membership.Deluxe, Membership.Basic)]
+        [TestCase(Membership.Deluxe, Membership.Deluxe)]
+        [TestCase(Membership.Deluxe, Membership.Premium)]
+        [TestCase(Membership.Premium, Membership.Basic)]
+        [TestCase(Membership.Premium, Membership.Deluxe)]
+        [TestCase(Membership.Premium, Membership.Premium)]
+        public void TestThatHouseholdApplyCallsCanUpgradeMembershipOnDomainObjectValidations(Membership currentMembership, Membership upgradeToMembership)
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.CanUpgradeMembership(Arg<Membership>.Is.Anything, Arg<Membership>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), currentMembership, currentMembership == Membership.Basic ? null : (DateTime?) DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(currentMembership));
+
+            householdMember.MembershipApply(upgradeToMembership);
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.CanUpgradeMembership(Arg<Membership>.Is.Equal(currentMembership), Arg<Membership>.Is.Equal(upgradeToMembership)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdApply throws an IntranetBusinessException when CanUpgradeMembership on the common validations used by domain objects in the food waste domain returns false.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdApplyThrowsIntranetBusinessExceptionWhenCanUpgradeMembershipOnDomainObjectValidationsReturnsFalse()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.CanUpgradeMembership(Arg<Membership>.Is.Anything, Arg<Membership>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<IntranetBusinessException>(() => householdMember.MembershipApply(fixture.Create<Membership>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade)));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
         /// Tests that HouseholdApply applies the basic membership.
         /// </summary>
         [Test]
@@ -1067,6 +1126,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var fixture = new Fixture();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.CanUpgradeMembership(Arg<Membership>.Is.Anything, Arg<Membership>.Is.Anything))
                 .Return(true)
                 .Repeat.Any();
 
@@ -1097,6 +1159,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
                 .Return(true)
                 .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.CanUpgradeMembership(Arg<Membership>.Is.Anything, Arg<Membership>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
 
             var householdMember = new MyHouseholdMember(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
@@ -1123,6 +1188,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var fixture = new Fixture();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.CanUpgradeMembership(Arg<Membership>.Is.Anything, Arg<Membership>.Is.Anything))
                 .Return(true)
                 .Repeat.Any();
 

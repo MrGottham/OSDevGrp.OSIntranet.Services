@@ -252,4 +252,7 @@
     <value>The value '{0}' for the property named '{1}'  is invalid.</value>
     <comment>{0} = Value, {1} = Name of property.</comment>
   </data>
+  <data name="MembershipCannotDowngrade" xml:space="preserve">
+    <value>The membership on a household member account cannot downgrade.</value>
+  </data>
 </root>

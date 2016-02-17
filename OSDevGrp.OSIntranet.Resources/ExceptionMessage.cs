@@ -43,6 +43,7 @@
         HouseholdMemberHasNotRequiredMembership,
         WrongActivationCodeForHouseholdMember,
         GenericTypeHasInvalidType,
-        ValueForPropertyIsInvalid
+        ValueForPropertyIsInvalid,
+        MembershipCannotDowngrade
     }
 }
