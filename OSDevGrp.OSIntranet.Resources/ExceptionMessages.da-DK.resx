@@ -248,4 +248,8 @@
     <value>Den generiske type med navnet '{0}' har en invalid type: {1}</value>
     <comment>{0} = Navn på den generiske type, {1} = Navn på den invalide type.</comment>
   </data>
+  <data name="ValueForPropertyIsInvalid" xml:space="preserve">
+    <value>Værdien '{0}' i egenskaben med navnet '{1}'  er ugyldig.</value>
+    <comment>{0} = Værdi, {1} = Navn på egenskab.</comment>
+  </data>
 </root>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers;
@@ -141,10 +142,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that AddValidationRules calls HasValue with the membership which the household member should be upgraded to on the common validations..
+        /// Tests that AddValidationRules calls HasValue with the membership which the household member should be upgraded to on the common validations.
         /// </summary>
         [Test]
-        public void TestThatAddValidationRulesCallsHasValueWithMembershipOnCommonValidations()
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatAddValidationRulesCallsHasValueWithMembershipOnCommonValidations(Membership upgradeToMembership)
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
@@ -168,9 +172,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
             Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
 
-            var upgradeToMembership = fixture.Create<Membership>().ToString();
+            var upgradeToMembershipAsString = upgradeToMembership.ToString();
             var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
-                .With(m => m.Membership, upgradeToMembership)
+                .With(m => m.Membership, upgradeToMembershipAsString)
                 .With(m => m.DataProviderIdentifier, Guid.NewGuid())
                 .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
                 .With(m => m.PaymentReference, fixture.Create<string>())
@@ -179,7 +183,52 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand, specificationMock);
 
-            commonValidationsMock.AssertWasCalled(m => m.HasValue(Arg<string>.Is.Equal(upgradeToMembership)));
+            commonValidationsMock.AssertWasCalled(m => m.HasValue(Arg<string>.Is.Equal(upgradeToMembershipAsString)));
+        }
+
+        /// <summary>
+        /// Tests that AddValidationRules calls IsLegalEnumValue with the membership which the household member should be upgraded to on the common validations.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatAddValidationRulesCallsIsLegalEnumValueWithMembershipOnCommonValidations(Membership upgradeToMembership)
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .WhenCalled(e =>
+                {
+                    var func = (Func<bool>) e.Arguments.ElementAt(0);
+                    func.Invoke();
+                })
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var upgradeToMembershipAsString = upgradeToMembership.ToString();
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, upgradeToMembershipAsString)
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand, specificationMock);
+
+            commonValidationsMock.AssertWasCalled(m => m.IsLegalEnumValue(Arg<string>.Is.Equal(upgradeToMembershipAsString), Arg<IEnumerable<Membership>>.Is.Equal(new List<Membership> {Membership.Deluxe, Membership.Premium})));
         }
 
         /// <summary>

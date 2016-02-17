@@ -36,5 +36,13 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// <param name="requiredMembership">Required membership.</param>
         /// <returns>True if the given membership matches the required membership otherwise false.</returns>
         bool HasRequiredMembership(Membership membership, Membership requiredMembership);
+
+        /// <summary>
+        /// Validates whether the current membership can be upgraded to another membership.
+        /// </summary>
+        /// <param name="currentMembership">Current membership.</param>
+        /// <param name="upgradeToMembership">Memvership which should be upgraded to.</param>
+        /// <returns>True if the current membership can be upgraded to the other membership otherwise false.</returns>
+        bool CanUpgradeMembership(Membership currentMembership, Membership upgradeToMembership);
     }
 }

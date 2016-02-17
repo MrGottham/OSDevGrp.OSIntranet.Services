@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
@@ -70,7 +72,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             }
             specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.Membership),
                 new IntranetBusinessException(Resource.GetExceptionMessage(
-                    ExceptionMessage.ValueMustBeGivenForProperty, "Membership")));
+                    ExceptionMessage.ValueMustBeGivenForProperty, "Membership")))
+                .IsSatisfiedBy(
+                    () =>
+                        CommonValidations.IsLegalEnumValue(command.Membership,
+                            new List<Membership> {Membership.Deluxe, Membership.Premium}),
+                    new IntranetBusinessException(
+                        Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid, command.Membership,
+                            "Membership")));
         }
 
         /// <summary>

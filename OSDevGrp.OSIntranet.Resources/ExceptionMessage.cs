@@ -42,6 +42,7 @@
         HouseholdMemberHasNotAcceptedPrivacyPolicy,
         HouseholdMemberHasNotRequiredMembership,
         WrongActivationCodeForHouseholdMember,
-        GenericTypeHasInvalidType
+        GenericTypeHasInvalidType,
+        ValueForPropertyIsInvalid
     }
 }

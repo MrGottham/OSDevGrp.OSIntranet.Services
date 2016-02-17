@@ -147,12 +147,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium, Membership.Basic, true)]
         [TestCase(Membership.Premium, Membership.Deluxe, true)]
         [TestCase(Membership.Premium, Membership.Premium, true)]
-        public void TestThatHasRequiredMembershipValidatedsWhetherMembershipMatchesRequiredMembership(Membership membership, Membership requiredMembership, bool expectedResult)
+        public void TestThatHasRequiredMembershipValidatesWhetherMembershipMatchesRequiredMembership(Membership membership, Membership requiredMembership, bool expectedResult)
         {
             var domainObjectValidations = new DomainObjectValidations();
             Assert.That(domainObjectValidations, Is.Not.Null);
 
             var result = domainObjectValidations.HasRequiredMembership(membership, requiredMembership);
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        /// <summary>
+        /// Tests that CanUpgradeMembership validates whether a given membership can be upgraded to another membership.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic, Membership.Basic, true)]
+        [TestCase(Membership.Basic, Membership.Deluxe, true)]
+        [TestCase(Membership.Basic, Membership.Premium, true)]
+        [TestCase(Membership.Deluxe, Membership.Basic, false)]
+        [TestCase(Membership.Deluxe, Membership.Deluxe, true)]
+        [TestCase(Membership.Deluxe, Membership.Premium, true)]
+        [TestCase(Membership.Premium, Membership.Basic, false)]
+        [TestCase(Membership.Premium, Membership.Deluxe, false)]
+        [TestCase(Membership.Premium, Membership.Premium, true)]
+        public void TestThatCanUpgradeMembershipValidatesWhetherMembershipCanBeUpgraded(Membership currentMembership, Membership upgradeToMembership, bool expectedResult)
+        {
+            var domainObjectValidations = new DomainObjectValidations();
+            Assert.That(domainObjectValidations, Is.Not.Null);
+
+            var result = domainObjectValidations.CanUpgradeMembership(currentMembership, upgradeToMembership);
             Assert.That(result, Is.EqualTo(expectedResult));
         }
 

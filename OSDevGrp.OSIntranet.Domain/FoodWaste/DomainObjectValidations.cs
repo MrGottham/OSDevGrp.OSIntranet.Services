@@ -84,6 +84,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Validates whether the current membership can be upgraded to another membership.
+        /// </summary>
+        /// <param name="currentMembership">Current membership.</param>
+        /// <param name="upgradeToMembership">Memvership which should be upgraded to.</param>
+        /// <returns>True if the current membership can be upgraded to the other membership otherwise false.</returns>
+        public virtual bool CanUpgradeMembership(Membership currentMembership, Membership upgradeToMembership)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Creates a instance of common validations used by domain objects in the food waste domain.
         /// </summary>
         /// <returns>Instance of common validations used by domain objects in the food waste domain.</returns>

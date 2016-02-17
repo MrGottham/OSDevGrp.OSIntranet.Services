@@ -248,4 +248,8 @@
     <value>The generic type named '{0}' has an invalid type: {1}</value>
     <comment>{0} = Name of the generic type, {1} = Name of the invalid type.</comment>
   </data>
+  <data name="ValueForPropertyIsInvalid" xml:space="preserve">
+    <value>The value '{0}' for the property named '{1}'  is invalid.</value>
+    <comment>{0} = Value, {1} = Name of property.</comment>
+  </data>
 </root>
