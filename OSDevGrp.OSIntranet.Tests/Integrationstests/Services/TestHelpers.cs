@@ -421,6 +421,23 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
         }
 
         /// <summary>
+        /// Gets byte collection containing a test document.
+        /// </summary>
+        /// <returns>Byte collection containing a test document.</returns>
+        public static IEnumerable<byte> GetTestDocument()
+        {
+            using (var resourceStream = GetEmbeddedResourceStream("Integrationstests.Testdata.TestDocument.pdf"))
+            {
+                var testDocument = new byte[resourceStream.Length];
+
+                resourceStream.Read(testDocument, 0, testDocument.Length);
+                resourceStream.Close();
+
+                return testDocument;
+            }
+        }
+
+        /// <summary>
         /// Loads the specified manifest resource stream from this assembly.
         /// </summary>
         /// <param name="name">The case-sensitive name of the manifest resource being requested.</param>

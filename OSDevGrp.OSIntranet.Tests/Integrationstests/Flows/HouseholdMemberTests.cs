@@ -52,6 +52,17 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
                 var translationInfoIdentifier = translationInfoCollection.Take(1).First().TranslationInfoIdentifier;
+
+                var dataProviderWhoHandlesPaymentsCollectionGetQuery = new DataProviderWhoHandlesPaymentsCollectionGetQuery
+                {
+                    TranslationInfoIdentifier = translationInfoIdentifier
+                };
+                var dataProviderWhoHandlesPaymentsCollection = _householdDataService.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery);
+                Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Null);
+                Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Empty);
+
+                var dataProviderWhoHandlesPaymentsIdentifier = dataProviderWhoHandlesPaymentsCollection.Take(1).First().DataProviderIdentifier;
+
                 var householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(executor.MailAddress, translationInfoIdentifier);
                 try
                 {
@@ -93,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     };
                     var householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
                     Assert.That(householdMemberData, Is.Not.Null);
-                    Assert.That(householdMemberData.HouseholdMemberIdentifier, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(householdMemberData.HouseholdMemberIdentifier, Is.EqualTo(householdMemberIdentifier));
                     Assert.That(householdMemberData.MailAddress, Is.Not.Null);
                     Assert.That(householdMemberData.MailAddress, Is.Not.Empty);
                     Assert.That(householdMemberData.MailAddress, Is.EqualTo(executor.MailAddress));
@@ -119,6 +130,74 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Households, Is.Empty);
                     Assert.That(householdMemberData.Payments, Is.Not.Null);
                     Assert.That(householdMemberData.Payments, Is.Empty);
+
+                    var householdMemberUpgradeMembershipToDeluxePaymentReference = Guid.NewGuid().ToString("D").ToUpper();
+                    var householdMemberUpgradeMembershipToDeluxeCommand = new HouseholdMemberUpgradeMembershipCommand
+                    {
+                        Membership = Membership.Deluxe.ToString(),
+                        DataProviderIdentifier = dataProviderWhoHandlesPaymentsIdentifier,
+                        PaymentTime = DateTime.Now,
+                        PaymentReference = householdMemberUpgradeMembershipToDeluxePaymentReference,
+                        PaymentReceipt = null
+                    };
+                    var householdMemberUpgradeMembershipToDeluxe = _householdDataService.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipToDeluxeCommand);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxe, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxe.Identifier, Is.EqualTo(householdMemberIdentifier));
+
+                    householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
+                    Assert.That(householdMemberData, Is.Not.Null);
+                    Assert.That(householdMemberData.Membership, Is.Not.Null);
+                    Assert.That(householdMemberData.Membership, Is.Not.Empty);
+                    Assert.That(householdMemberData.Membership, Is.EqualTo(Convert.ToString(Membership.Deluxe)));
+                    Assert.That(householdMemberData.MembershipExpireTime, Is.Not.Null);
+                    Assert.That(householdMemberData.MembershipExpireTime.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(householdMemberData.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(5).Seconds);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(householdMemberData.Payments, Is.Not.Null);
+                    Assert.That(householdMemberData.Payments, Is.Not.Empty);
+
+                    var householdMemberUpgradeMembershipToDeluxePayment = householdMemberData.Payments.SingleOrDefault(m => string.Compare(m.PaymentReference, householdMemberUpgradeMembershipToDeluxePaymentReference, StringComparison.Ordinal) == 0);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentIdentifier, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.Stakeholder, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.Stakeholder.StakeholderIdentifier, Is.EqualTo(householdMemberIdentifier));
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.DataProvider, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.DataProvider.DataProviderIdentifier, Is.EqualTo(dataProviderWhoHandlesPaymentsIdentifier));
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentReference, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentReference, Is.Not.Empty);
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentReference, Is.EqualTo(householdMemberUpgradeMembershipToDeluxePaymentReference));
+                    Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentReceipt, Is.Null);
+
+                    var householdMemberUpgradeMembershipToPremiumPaymentReference = Guid.NewGuid().ToString("D").ToUpper();
+                    var householdMemberUpgradeMembershipToPremiumPaymentReceipt = Convert.ToBase64String(Services.TestHelpers.GetTestDocument().ToArray());
+                    var householdMemberUpgradeMembershipToPremiumCommand = new HouseholdMemberUpgradeMembershipCommand
+                    {
+                        Membership = Membership.Premium.ToString(),
+                        DataProviderIdentifier = dataProviderWhoHandlesPaymentsIdentifier,
+                        PaymentTime = DateTime.Now,
+                        PaymentReference = householdMemberUpgradeMembershipToPremiumPaymentReference,
+                        PaymentReceipt = householdMemberUpgradeMembershipToPremiumPaymentReceipt
+                    };
+                    var householdMemberUpgradeMembershipToPremium = _householdDataService.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipToPremiumCommand);
+                    Assert.That(householdMemberUpgradeMembershipToPremium, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToPremium.Identifier, Is.EqualTo(householdMemberIdentifier));
+
+                    householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
+                    Assert.That(householdMemberData, Is.Not.Null);
+                    Assert.That(householdMemberData.Membership, Is.Not.Null);
+                    Assert.That(householdMemberData.Membership, Is.Not.Empty);
+                    Assert.That(householdMemberData.Membership, Is.EqualTo(Convert.ToString(Membership.Premium)));
+                    Assert.That(householdMemberData.MembershipExpireTime, Is.Not.Null);
+                    Assert.That(householdMemberData.MembershipExpireTime.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(householdMemberData.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(5).Seconds);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(householdMemberData.Payments, Is.Not.Null);
+                    Assert.That(householdMemberData.Payments, Is.Not.Empty);
+
+                    // TODO: Check payment.
                 }
                 finally
                 {

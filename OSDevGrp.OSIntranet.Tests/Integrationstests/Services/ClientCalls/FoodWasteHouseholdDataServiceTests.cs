@@ -238,6 +238,68 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberUpgradeMembership throws an FaultException when the household member has not been created.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatHouseholdMemberUpgradeMembershipThrowsFaultExceptionWhenHouseholdMemberHasNotBeenCreated(Membership upgradeToMembership)
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                using (new ClaimsPrincipalTestExecutor())
+                {
+                    var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                    Assert.That(translationInfoCollection, Is.Not.Null);
+                    Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                    foreach (var translationInfo in translationInfoCollection)
+                    {
+                        var dataProviderWhoHandlesPaymentsCollectionGetQuery = new DataProviderWhoHandlesPaymentsCollectionGetQuery
+                        {
+                            TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                        };
+                        var dataProviderCollection = client.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery);
+                        Assert.That(dataProviderCollection, Is.Not.Null);
+                        Assert.That(dataProviderCollection, Is.Not.Empty);
+
+                        foreach (var dataProvider in dataProviderCollection)
+                        {
+                            var householdMemberUpgradeMembershipCommand = new HouseholdMemberUpgradeMembershipCommand
+                            {
+                                Membership = upgradeToMembership.ToString(),
+                                DataProviderIdentifier = dataProvider.DataProviderIdentifier,
+                                PaymentTime = DateTime.Now,
+                                PaymentReference = Guid.NewGuid().ToString("D").ToUpper(),
+                                PaymentReceipt = null
+                            };
+                            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipCommand));
+                            Assert.That(faultException, Is.Not.Null);
+                            Assert.That(faultException.Detail, Is.Not.Null);
+                            Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
+                            Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+                            Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+                            Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
+                            Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+                            Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+                            Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
+                            Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+                            Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+                            Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberUpgradeMembership"));
+                            Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+                            Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that FoodItemCollectionGet gets the collection of food items.
         /// </summary>
         [Test]

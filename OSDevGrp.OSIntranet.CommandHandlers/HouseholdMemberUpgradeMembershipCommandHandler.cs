@@ -110,14 +110,16 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             var insertedPayment = HouseholdDataRepository.Insert<IPayment>(new Payment(householdMember, dataProvider, command.PaymentTime, command.PaymentReference, paymentReceipt));
             try
             {
+                householdMember.PaymentAdd(insertedPayment);
+                householdMember.MembershipApply((Membership) Enum.Parse(typeof (Membership), command.Membership));
 
+                return HouseholdDataRepository.Update(householdMember);
             }
             catch
             {
+                HouseholdDataRepository.Delete(insertedPayment);
                 throw;
             }
-
-            return null;
         }
 
         #endregion

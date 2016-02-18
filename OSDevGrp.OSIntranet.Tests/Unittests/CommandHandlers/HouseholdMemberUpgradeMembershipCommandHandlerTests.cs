@@ -519,6 +519,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildPaymentMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
@@ -563,6 +566,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -613,6 +619,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildPaymentMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
@@ -661,6 +670,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildPaymentMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
@@ -703,6 +715,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -767,6 +782,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     Assert.That(payment.PaymentReference, Is.Not.Null);
                     Assert.That(payment.PaymentReference, Is.Not.Empty);
                     Assert.That(payment.PaymentReference, Is.EqualTo(paymentReference));
+                    Assert.That(payment.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
                     if (hasPaymentReceipt == false || paymentReceipt == null)
                     {
                         Assert.That(payment.PaymentReceipt, Is.Null);
@@ -781,6 +797,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     }
                 })
                 .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -802,6 +821,352 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdMemberUpgradeMembershipCommandHandler.ModifyData(householdMemberMock, householdMemberUpgradeMembershipCommand);
 
             householdDataRepositoryMock.AssertWasCalled(m => m.Insert(Arg<IPayment>.Is.NotNull));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls PaymentAdd with the inserted payment for the upgrade on the household member.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsPaymentAddWithInsertedPaymentOnHouseholdMember()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var insertedPayment = DomainObjectMockBuilder.BuildPaymentMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(insertedPayment)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            householdMemberUpgradeMembershipCommandHandler.ModifyData(householdMemberMock, householdMemberUpgradeMembershipCommand);
+
+            householdMemberMock.AssertWasCalled(m => m.PaymentAdd(Arg<IPayment>.Is.Equal(insertedPayment)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls Delete with the inserted payment for the upgrade on the repository which can access household data for the food waste domain when PaymentAdd throws an exception.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsDeleteWithInsertedPaymentOnHouseholdDataRepositoryWhenPaymentAddThrowsException()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var insertedPayment = DomainObjectMockBuilder.BuildPaymentMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(insertedPayment)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            householdMemberMock.Stub(m => m.PaymentAdd(Arg<IPayment>.Is.Anything))
+                .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            Assert.Throws<Exception>(() => householdMemberUpgradeMembershipCommandHandler.ModifyData(householdMemberMock, householdMemberUpgradeMembershipCommand));
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Delete(Arg<IPayment>.Is.Equal(insertedPayment)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls MembershipApply with the membership which the household member account should be upgrade to on the household member.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatModifyDataCallsMembershipApplyWithMembershipOnHouseholdMember(Membership upgradeToMembership)
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, upgradeToMembership.ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            householdMemberUpgradeMembershipCommandHandler.ModifyData(householdMemberMock, householdMemberUpgradeMembershipCommand);
+
+            householdMemberMock.AssertWasCalled(m => m.MembershipApply(Arg<Membership>.Is.Equal(upgradeToMembership)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls Delete with the inserted payment for the upgrade on the repository which can access household data for the food waste domain when MembershipApply throws an exception.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsDeleteWithInsertedPaymentOnHouseholdDataRepositoryWhenMembershipApplyThrowsException()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var insertedPayment = DomainObjectMockBuilder.BuildPaymentMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(insertedPayment)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            householdMemberMock.Stub(m => m.MembershipApply(Arg<Membership>.Is.Anything))
+                .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            Assert.Throws<Exception>(() => householdMemberUpgradeMembershipCommandHandler.ModifyData(householdMemberMock, householdMemberUpgradeMembershipCommand));
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Delete(Arg<IPayment>.Is.Equal(insertedPayment)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls Update with the membership which the upgraded household member on the repository which can access household data for the food waste domain..
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsUpdateWithUpgradedHouseholdMemberOnHouseholdDataRepository()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            householdMemberUpgradeMembershipCommandHandler.ModifyData(householdMemberMock, householdMemberUpgradeMembershipCommand);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<IHouseholdMember>.Is.Equal(householdMemberMock)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls Delete with the inserted payment for the upgrade on the repository which can access household data for the food waste domain when Update for the upgraded household member throws an exception.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsDeleteWithInsertedPaymentOnHouseholdDataRepositoryWhenUpdateForUpgradedHouseholdMemberThrowsException()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var insertedPayment = DomainObjectMockBuilder.BuildPaymentMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(insertedPayment)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            Assert.Throws<Exception>(() =>householdMemberUpgradeMembershipCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand));
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Delete(Arg<IPayment>.Is.Equal(insertedPayment)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData return the household member who's membership has been upgraded.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataReturnsUpgradedHouseholdMember()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var upgradedHouseholdMember = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHouseholdMember>.Is.Anything))
+                .Return(upgradedHouseholdMember)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, fixture.Create<string>())
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            var result = householdMemberUpgradeMembershipCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(upgradedHouseholdMember));
         }
     }
 }

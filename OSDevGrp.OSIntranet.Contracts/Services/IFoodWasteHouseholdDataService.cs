@@ -75,6 +75,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         ServiceReceiptResponse HouseholdMemberAcceptPrivacyPolicy(HouseholdMemberAcceptPrivacyPolicyCommand command);
 
         /// <summary>
+        /// Upgrades the membership for the current caller.
+        /// </summary>
+        /// <param name="command">Command for upgrading the membership on the current callers household member account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse HouseholdMemberUpgradeMembership(HouseholdMemberUpgradeMembershipCommand command);
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>

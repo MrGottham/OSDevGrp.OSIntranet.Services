@@ -435,6 +435,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Integrationstests\Testdata\TestDocument.pdf" />
     <None Include="OSDevGrp.OSIntranet.snk" />
     <None Include="packages.config" />
   </ItemGroup>
