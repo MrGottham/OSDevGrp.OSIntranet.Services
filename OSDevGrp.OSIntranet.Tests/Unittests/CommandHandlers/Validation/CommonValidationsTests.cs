@@ -283,5 +283,153 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
             var result = commonValidations.IsLegalEnumValue<Membership>(value);
             Assert.That(result, Is.EqualTo(expectedResult));
         }
+
+        /// <summary>
+        /// Tests that IsDateTimeInInterval returns false when the given date and time value is lower than the start date and time for the interval.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInIntervalReturnsFalseWhenDateTimeValueIsLowerThanStartDateTime()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var currentTime = DateTime.Now;
+
+            var result = commonValidations.IsDateTimeInInterval(currentTime.AddMilliseconds(random.Next(1, 100)*-1), currentTime, DateTime.MaxValue);
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInInterval returns true when the given date and time value is equal to the start date and time for the interval.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInIntervalReturnsTrueWhenDateTimeValueIsEqualToStartDateTime()
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var currentTime = DateTime.Now;
+
+            var result = commonValidations.IsDateTimeInInterval(currentTime, currentTime, DateTime.MaxValue);
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInInterval returns true when the given date and time value is greater than the start date and time for the interval and lower than the end date and time for the interval.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInIntervalReturnsTrueWhenDateTimeValueIsGreaterThanStartDateTimeAndIsLowerThanEndDateTime()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var currentTime = DateTime.Now;
+
+            var result = commonValidations.IsDateTimeInInterval(currentTime.AddMilliseconds(random.Next(1, 100)), currentTime, currentTime.AddSeconds(1));
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInInterval returns true when the given date and time value equal to the end date and time for the interval.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInIntervalReturnsTrueWhenDateTimeValueIsEqualToThanEndDateTime()
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var currentTime = DateTime.Now;
+
+            var result = commonValidations.IsDateTimeInInterval(currentTime, DateTime.MinValue, currentTime);
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInInterval returns false when the given date and time value greater than the end date and time for the interval.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInIntervalReturnsFalseWhenDateTimeValueIsGreaterThanEndDateTime()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var currentTime = DateTime.Now;
+
+            var result = commonValidations.IsDateTimeInInterval(currentTime.AddMilliseconds(random.Next(1, 100)), DateTime.MinValue, currentTime);
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInPast returns true when the given date and time value is in the past.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInPastReturnsTrueWhenDateTimeValueIsInPast()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.IsDateTimeInPast(DateTime.Now.AddSeconds(random.Next(3, 10)*-1));
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInPast returns false when the given date and time value is in the future.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInPastReturnsFalseWhenDateTimeValueIsInFuture()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.IsDateTimeInPast(DateTime.Now.AddSeconds(random.Next(3, 10)));
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInFuture returns true when the given date and time value is in the future.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInFutureReturnsTrueWhenDateTimeValueIsInFuture()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.IsDateTimeInFuture(DateTime.Now.AddSeconds(random.Next(3, 10)));
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that IsDateTimeInFuture returns false when the given date and time value is in the past.
+        /// </summary>
+        [Test]
+        public void TestThatIsDateTimeInFutureReturnsFalseWhenDateTimeValueIsInPast()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.IsDateTimeInFuture(DateTime.Now.AddSeconds(random.Next(3, 10)*-1));
+            Assert.That(result, Is.False);
+        }
     }
 }

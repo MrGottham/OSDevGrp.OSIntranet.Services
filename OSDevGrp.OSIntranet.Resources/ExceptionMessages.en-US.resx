@@ -255,4 +255,16 @@
   <data name="MembershipCannotDowngrade" xml:space="preserve">
     <value>The membership on a household member account cannot downgrade.</value>
   </data>
+  <data name="DateTimeValueForPropertyIsNotInFuture" xml:space="preserve">
+    <value>The value for the property named '{0}' is not in the future.</value>
+    <comment>{0} = Name of property.</comment>
+  </data>
+  <data name="DateTimeValueForPropertyIsNotInPast" xml:space="preserve">
+    <value>The value for the property named '{0}' is not in the past.</value>
+    <comment>{0} = Name of property.</comment>
+  </data>
+  <data name="DataProviderDoesNotHandlesPayments" xml:space="preserve">
+    <value>The data provider with the name '{0}' does not handles payments.</value>
+    <comment>{0} = Name of data provider.</comment>
+  </data>
 </root>

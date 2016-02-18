@@ -44,6 +44,9 @@
         WrongActivationCodeForHouseholdMember,
         GenericTypeHasInvalidType,
         ValueForPropertyIsInvalid,
-        MembershipCannotDowngrade
+        MembershipCannotDowngrade,
+        DateTimeValueForPropertyIsNotInPast,
+        DateTimeValueForPropertyIsNotInFuture,
+        DataProviderDoesNotHandlesPayments
     }
 }

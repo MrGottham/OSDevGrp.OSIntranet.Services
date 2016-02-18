@@ -119,6 +119,41 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
             return IsLegalEnumValue(value, Enum.GetValues(typeof (TEnum)).Cast<TEnum>().ToArray());
         }
 
+        /// <summary>
+        /// Checks whether a given date and time value is in a given date and time interval.
+        /// </summary>
+        /// <param name="value">Date and time value which should be in the interval.</param>
+        /// <param name="minTime">Start date and time for the interval.</param>
+        /// <param name="maxTime">End date and time for the interval.</param>
+        /// <returns>True when the given date and time is in the given date and time interval otherwise false.</returns>
+        public virtual bool IsDateTimeInInterval(DateTime value, DateTime minTime, DateTime maxTime)
+        {
+            var minTimeUtc = minTime.ToUniversalTime();
+            var maxTimeUtc = maxTime.ToUniversalTime();
+
+            return (minTimeUtc.CompareTo(value.ToUniversalTime()) <= 0) && (maxTimeUtc.CompareTo(value.ToUniversalTime()) >= 0);
+        }
+
+        /// <summary>
+        /// Checks whether a given date and time value is in the past.
+        /// </summary>
+        /// <param name="value">Date and time value which should be in the past.</param>
+        /// <returns>True when the given date and time is in the past otherwise false.</returns>
+        public virtual bool IsDateTimeInPast(DateTime value)
+        {
+            return IsDateTimeInInterval(value, DateTime.MinValue, DateTime.Now);
+        }
+
+        /// <summary>
+        /// Checks whether a given date and time value is in the future.
+        /// </summary>
+        /// <param name="value">Date and time value which should be in the future.</param>
+        /// <returns>True when the given date and time is in the future otherwise false.</returns>
+        public virtual bool IsDateTimeInFuture(DateTime value)
+        {
+            return IsDateTimeInInterval(value, DateTime.Now, DateTime.MaxValue);
+        }
+
         #endregion
     }
 }

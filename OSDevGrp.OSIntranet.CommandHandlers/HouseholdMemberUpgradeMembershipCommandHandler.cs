@@ -70,22 +70,15 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 throw new ArgumentNullException("specification");
             }
-            specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.Membership),
-                new IntranetBusinessException(Resource.GetExceptionMessage(
-                    ExceptionMessage.ValueMustBeGivenForProperty, "Membership")))
-                .IsSatisfiedBy(
-                    () =>
-                        CommonValidations.IsLegalEnumValue(command.Membership,
-                            new List<Membership> {Membership.Deluxe, Membership.Premium}),
-                    new IntranetBusinessException(
-                        Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid, command.Membership,
-                            "Membership")))
-                .IsSatisfiedBy(
-                    () =>
-                        _domainObjectValidations.CanUpgradeMembership(householdMember.Membership,
-                            (Membership) Enum.Parse(typeof (Membership), command.Membership)),
-                    new IntranetBusinessException(
-                        Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade)));
+
+            var currentMembership = householdMember.Membership;
+
+            specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.Membership), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Membership")))
+                .IsSatisfiedBy(() => CommonValidations.IsLegalEnumValue(command.Membership, new List<Membership> {Membership.Deluxe, Membership.Premium}), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid, command.Membership, "Membership")))
+                .IsSatisfiedBy(() => _domainObjectValidations.CanUpgradeMembership(currentMembership, (Membership)Enum.Parse(typeof(Membership), command.Membership)), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade)))
+                .IsSatisfiedBy(() => CommonValidations.IsDateTimeInPast(command.PaymentTime), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast, "PaymentTime")))
+                .IsSatisfiedBy(() => CommonValidations.HasValue(command.PaymentReference), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "PaymentReference")))
+                .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.PaymentReference) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "PaymentReference")));
         }
 
         /// <summary>
@@ -104,6 +97,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             {
                 throw new ArgumentNullException("command");
             }
+
+            var dataProvider = HouseholdDataRepository.Get<IDataProvider>(command.DataProviderIdentifier);
+            var handlesPayments = dataProvider != null && dataProvider.HandlesPayments;
+
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(dataProvider), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.DataProviderIdentifier)))
+                .IsSatisfiedBy(() => handlesPayments, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments, dataProvider != null ? dataProvider.Name : null)))
+                .Evaluate();
+
             return null;
         }
 

@@ -257,7 +257,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that AddValidationRules alls IsSatisfiedBy on the specification which encapsulates validation rules 3 times.
+        /// Tests that AddValidationRules calls IsSatisfiedBy on the specification which encapsulates validation rules 3 times.
         /// </summary>
         [Test]
         public void TestThatAddValidationRulesCallsIsSatisfiedByOnSpecification3Times()

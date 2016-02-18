@@ -583,6 +583,57 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for DateTimeValueForPropertyIsNotInPast hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForDateTimeValueForPropertyIsNotInPastHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for DateTimeValueForPropertyIsNotInFuture hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForDateTimeValueForPropertyIsNotInFutureHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInFuture);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInFuture, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for DataProviderDoesNotHandlesPayments hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForDataProviderDoesNotHandlesPaymentsHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]

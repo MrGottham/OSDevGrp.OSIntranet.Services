@@ -61,5 +61,28 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
         /// <param name="value">String value which should be checked.</param>
         /// <returns>True when the given string value are a legal enum value otherwise false.</returns>
         bool IsLegalEnumValue<TEnum>(string value) where TEnum : struct, IConvertible;
+
+        /// <summary>
+        /// Checks whether a given date and time value is in a given date and time interval.
+        /// </summary>
+        /// <param name="value">Date and time value which should be in the interval.</param>
+        /// <param name="minTime">Start date and time for the interval.</param>
+        /// <param name="maxTime">End date and time for the interval.</param>
+        /// <returns>True when the given date and time is in the given date and time interval otherwise false.</returns>
+        bool IsDateTimeInInterval(DateTime value, DateTime minTime, DateTime maxTime);
+
+        /// <summary>
+        /// Checks whether a given date and time value is in the past.
+        /// </summary>
+        /// <param name="value">Date and time value which should be in the past.</param>
+        /// <returns>True when the given date and time is in the past otherwise false.</returns>
+        bool IsDateTimeInPast(DateTime value);
+
+        /// <summary>
+        /// Checks whether a given date and time value is in the future.
+        /// </summary>
+        /// <param name="value">Date and time value which should be in the future.</param>
+        /// <returns>True when the given date and time is in the future otherwise false.</returns>
+        bool IsDateTimeInFuture(DateTime value);
     }
 }
