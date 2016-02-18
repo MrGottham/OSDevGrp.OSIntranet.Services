@@ -415,7 +415,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that AddValidationRules calls IsSatisfiedBy on the specification which encapsulates validation rules 6 times.
         /// </summary>
         [Test]
-        public void TestThatAddValidationRulesCallsCallsIsSatisfiedByOnSpecification6Times()
+        public void TestThatAddValidationRulesCallsIsSatisfiedByOnSpecification6Times()
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
@@ -516,6 +516,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
@@ -557,6 +560,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
                 .Return(dataProviderMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -604,6 +610,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
                 .Return(dataProviderMock)
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
@@ -635,7 +644,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that ModifyData calls IsSatisfiedBy on the specification which encapsulates validation rules 2 times.
         /// </summary>
         [Test]
-        public void TestThatModifyDataCallsCallsIsSatisfiedByOnSpecification2Times()
+        public void TestThatModifyDataCallsIsSatisfiedByOnSpecification2Times()
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
@@ -648,6 +657,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -675,7 +687,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that ModifyData calls Evaluate on the specification which encapsulates validation rules.
         /// </summary>
         [Test]
-        public void TestThatModifyDataCallsCallsEvaluateOnSpecification()
+        public void TestThatModifyDataCallsEvaluateOnSpecification()
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
@@ -688,6 +700,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildDataProviderMock(true))
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -709,6 +724,84 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdMemberUpgradeMembershipCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand);
 
             specificationMock.AssertWasCalled(m => m.Evaluate());
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls Insert with a payment for the upgrade of the membership on the repository which can access household data for the food waste domain.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatModifyDataCallsInsertWithPaymentOnHouseholdDataRepository(bool hasPaymentReceipt)
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(true);
+            var paymentTime = DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
+            var paymentReference = fixture.Create<string>();
+            var paymentReceipt = hasPaymentReceipt ? fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray() : null;
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<IDataProvider>(Arg<Guid>.Is.Anything))
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IPayment>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var payment = (IPayment) e.Arguments.ElementAt(0);
+                    Assert.That(payment, Is.Not.Null);
+                    Assert.That(payment.Identifier, Is.Null);
+                    Assert.That(payment.Identifier.HasValue, Is.False);
+                    Assert.That(payment.Stakeholder, Is.Not.Null);
+                    Assert.That(payment.Stakeholder, Is.EqualTo(householdMemberMock));
+                    Assert.That(payment.DataProvider, Is.Not.Null);
+                    Assert.That(payment.DataProvider, Is.EqualTo(dataProviderMock));
+                    Assert.That(payment.PaymentTime, Is.EqualTo(paymentTime));
+                    Assert.That(payment.PaymentReference, Is.Not.Null);
+                    Assert.That(payment.PaymentReference, Is.Not.Empty);
+                    Assert.That(payment.PaymentReference, Is.EqualTo(paymentReference));
+                    if (hasPaymentReceipt == false || paymentReceipt == null)
+                    {
+                        Assert.That(payment.PaymentReceipt, Is.Null);
+                        return;
+                    }
+                    Assert.That(payment.PaymentReceipt, Is.Not.Null);
+                    Assert.That(payment.PaymentReceipt, Is.Not.Empty);
+                    Assert.That(payment.PaymentReceipt.Count(), Is.EqualTo(paymentReceipt.Length));
+                    for (var byteNo = 0; byteNo < paymentReceipt.Length; byteNo++)
+                    {
+                        Assert.That(payment.PaymentReceipt.ElementAt(byteNo), Is.EqualTo(paymentReceipt.ElementAt(byteNo)));
+                    }
+                })
+                .Return(DomainObjectMockBuilder.BuildPaymentMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, paymentTime)
+                .With(m => m.PaymentReference, paymentReference)
+                .With(m => m.PaymentReceipt, hasPaymentReceipt && paymentReceipt != null ? Convert.ToBase64String(paymentReceipt) : null)
+                .Create();
+
+            householdMemberUpgradeMembershipCommandHandler.ModifyData(householdMemberMock, householdMemberUpgradeMembershipCommand);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Insert(Arg<IPayment>.Is.NotNull));
         }
     }
 }

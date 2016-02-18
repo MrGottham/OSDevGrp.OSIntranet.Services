@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
@@ -104,6 +105,17 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(dataProvider), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.DataProviderIdentifier)))
                 .IsSatisfiedBy(() => handlesPayments, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments, dataProvider != null ? dataProvider.Name : null)))
                 .Evaluate();
+
+            var paymentReceipt = string.IsNullOrWhiteSpace(command.PaymentReceipt) ? null : Convert.FromBase64String(command.PaymentReceipt);
+            var insertedPayment = HouseholdDataRepository.Insert<IPayment>(new Payment(householdMember, dataProvider, command.PaymentTime, command.PaymentReference, paymentReceipt));
+            try
+            {
+
+            }
+            catch
+            {
+                throw;
+            }
 
             return null;
         }
