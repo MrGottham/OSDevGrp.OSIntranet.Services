@@ -22,15 +22,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a household.
         /// </summary>
         /// <returns>Mockup for a household.</returns>
-        public static IHousehold BuildHouseholdMock()
+        public static IHousehold BuildHouseholdMock(IHouseholdMember householdMember = null)
         {
             var fixture = new Fixture();
             var householdMock = MockRepository.GenerateMock<IHousehold>();
             householdMock.Stub(m => m.Identifier)
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
+            householdMock.Stub(m => m.Name)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
             householdMock.Stub(m => m.Description)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+            householdMock.Stub(m => m.CreationTime)
+                .Return(DateTime.Today)
+                .Repeat.Any();
+            householdMock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember> {householdMember ?? BuildHouseholdMemberMock()})
                 .Repeat.Any();
             return householdMock;
         }
@@ -39,7 +48,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a collection of mockups for some households.
         /// </summary>
         /// <returns>Collection of mockups for some households.</returns>
-        public static IEnumerable<IHousehold> BuildHouseholdMockCollection(Membership membership = Membership.Basic)
+        public static IEnumerable<IHousehold> BuildHouseholdMockCollection(Membership membership = Membership.Basic, IHouseholdMember householdMember = null)
         {
             int numberOfHouseholds;
             switch (membership)
@@ -62,7 +71,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var householdCollection = new List<IHousehold>(numberOfHouseholds);
             while (householdCollection.Count < numberOfHouseholds)
             {
-                householdCollection.Add(BuildHouseholdMock());
+                householdCollection.Add(BuildHouseholdMock(householdMember));
             }
             return householdCollection;
         }
@@ -111,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(DateTime.Today)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.Households)
-                .Return(BuildHouseholdMockCollection(membership))
+                .Return(BuildHouseholdMockCollection(membership, householdMemberMock))
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.Payments)
                 .Return(BuildPaymentMockCollection(householdMemberMock))

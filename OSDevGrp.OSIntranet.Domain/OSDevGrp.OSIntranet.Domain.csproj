@@ -72,6 +72,7 @@
     <Compile Include="FoodWaste\FoodItem.cs" />
     <Compile Include="FoodWaste\FoodItemCollection.cs" />
     <Compile Include="FoodWaste\ForeignKey.cs" />
+    <Compile Include="FoodWaste\Household.cs" />
     <Compile Include="FoodWaste\HouseholdMember.cs" />
     <Compile Include="FoodWaste\IdentifiableBase.cs" />
     <Compile Include="FoodWaste\Payment.cs" />

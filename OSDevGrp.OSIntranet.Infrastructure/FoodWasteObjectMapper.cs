@@ -23,7 +23,9 @@ namespace OSDevGrp.OSIntranet.Infrastructure
     {
         #region Private variables
 
+        private static IHouseholdMemberProxy _mappingHouseholdMember;
         private static readonly IMapper Mapper;
+        private static readonly object SyncRoot = new object();
 
         #endregion
 
@@ -70,27 +72,32 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             ActivationTime = m.ActivationTime,
                             PrivacyPolicyAcceptedTime = m.PrivacyPolicyAcceptedTime
                         };
-                        foreach (var household in m.Households)
+                        lock (SyncRoot)
                         {
-                            // TODO: Convert household to proxy and add (modify the test).
-                        }
-                        foreach (var payment in m.Payments)
-                        {
-                            if (payment as IPaymentProxy != null)
+                            _mappingHouseholdMember = householdMemberProxy;
+                            try
                             {
-                                householdMemberProxy.PaymentAdd(payment);
-                                continue;
+                                foreach (var household in m.Households)
+                                {
+                                    // TODO: Convert household to proxy and add (modify the test).
+                                }
+                                foreach (var payment in m.Payments)
+                                {
+                                    if (payment as IPaymentProxy != null)
+                                    {
+                                        householdMemberProxy.PaymentAdd(payment);
+                                        continue;
+                                    }
+                                    if (Mapper != null)
+                                    {
+                                        householdMemberProxy.PaymentAdd(Mapper.Map<IPayment, IPaymentProxy>(payment));
+                                    }
+                                }
                             }
-                            var dataProviderProxy = payment.DataProvider as IDataProviderProxy;
-                            if (dataProviderProxy == null && Mapper != null)
+                            finally
                             {
-                                dataProviderProxy = Mapper.Map<IDataProvider, IDataProviderProxy>(payment.DataProvider);
+                                _mappingHouseholdMember = null;
                             }
-                            var paymentProxy = new PaymentProxy(householdMemberProxy, dataProviderProxy, payment.PaymentTime, payment.PaymentReference, payment.PaymentReceipt, payment.CreationTime)
-                            {
-                                Identifier = payment.Identifier
-                            };
-                            householdMemberProxy.PaymentAdd(paymentProxy);
                         }
                         return householdMemberProxy;
                     });
@@ -117,12 +124,19 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             switch (m.Stakeholder.StakeholderType)
                             {
                                 case StakeholderType.HouseholdMember:
-                                    if (m.Stakeholder as IHouseholdMember != null)
+                                    lock (SyncRoot)
                                     {
-                                        stakeholderProxy = m.Stakeholder as IHouseholdMemberProxy;
-                                        if (stakeholderProxy == null && Mapper != null)
+                                        if (_mappingHouseholdMember != null)
                                         {
-                                            stakeholderProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>((IHouseholdMember) m.Stakeholder);
+                                            stakeholderProxy = _mappingHouseholdMember;
+                                        }
+                                        else if (m.Stakeholder as IHouseholdMember != null)
+                                        {
+                                            stakeholderProxy = m.Stakeholder as IHouseholdMemberProxy;
+                                            if (stakeholderProxy == null && Mapper != null)
+                                            {
+                                                stakeholderProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>((IHouseholdMember) m.Stakeholder);
+                                            }
                                         }
                                     }
                                     break;
