@@ -30,6 +30,12 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         IEnumerable<IHouseholdMember> HouseholdMembers { get; }
 
         /// <summary>
+        /// Adds a household memeber to this household.
+        /// </summary>
+        /// <param name="household">Household member which should be member on this household.</param>
+        void HouseholdMemberAdd(IHousehold household);
+
+        /// <summary>
         /// Make translation for the household.
         /// </summary>
         /// <param name="translationCulture">Culture information which are used for translation.</param>

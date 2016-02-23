@@ -77,6 +77,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Adds a household memeber to this household.
+        /// </summary>
+        /// <param name="household">Household member which should be member on this household.</param>
+        public virtual void HouseholdMemberAdd(IHousehold household)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Make translation for the household.
         /// </summary>
         /// <param name="translationCulture">Culture information which are used for translation.</param>
