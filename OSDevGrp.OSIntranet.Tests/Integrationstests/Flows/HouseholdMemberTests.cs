@@ -197,7 +197,20 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Payments, Is.Not.Null);
                     Assert.That(householdMemberData.Payments, Is.Not.Empty);
 
-                    // TODO: Check payment.
+                    var householdMemberUpgradeMembershipToPremiumPayment = householdMemberData.Payments.SingleOrDefault(m => string.Compare(m.PaymentReference, householdMemberUpgradeMembershipToPremiumPaymentReference, StringComparison.Ordinal) == 0);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentIdentifier, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.Stakeholder, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.Stakeholder.StakeholderIdentifier, Is.EqualTo(householdMemberIdentifier));
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.DataProvider, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.DataProvider.DataProviderIdentifier, Is.EqualTo(dataProviderWhoHandlesPaymentsIdentifier));
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReference, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReference, Is.Not.Empty);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReference, Is.EqualTo(householdMemberUpgradeMembershipToPremiumPaymentReference));
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReceipt, Is.Not.Null);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReceipt, Is.Not.Empty);
+                    Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReceipt, Is.EqualTo(householdMemberUpgradeMembershipToPremiumPaymentReceipt));
                 }
                 finally
                 {
