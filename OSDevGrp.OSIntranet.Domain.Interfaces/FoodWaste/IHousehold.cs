@@ -32,13 +32,14 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// <summary>
         /// Adds a household memeber to this household.
         /// </summary>
-        /// <param name="household">Household member which should be member on this household.</param>
-        void HouseholdMemberAdd(IHousehold household);
+        /// <param name="householdMember">Household member which should be member on this household.</param>
+        void HouseholdMemberAdd(IHouseholdMember householdMember);
 
         /// <summary>
         /// Make translation for the household.
         /// </summary>
         /// <param name="translationCulture">Culture information which are used for translation.</param>
-        void Translate(CultureInfo translationCulture);
+        /// <param name="translateHouseholdMembers">Indicates whether to make translation for all the household members who has a membership on this household.</param>
+        void Translate(CultureInfo translationCulture, bool translateHouseholdMembers);
     }
 }

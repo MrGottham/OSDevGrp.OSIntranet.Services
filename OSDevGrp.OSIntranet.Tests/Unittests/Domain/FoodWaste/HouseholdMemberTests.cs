@@ -1251,7 +1251,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
 
-            householdMember.HouseholdAdd(MockRepository.GenerateMock<IHousehold>());
+            var householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            householdMember.HouseholdAdd(householdMock);
 
             domainObjectValidationsMock.AssertWasCalled(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Equal(householdMember.Membership), Arg<int>.Is.Equal(householdMember.Households.Count() - 1)));
         }
@@ -1303,11 +1308,99 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.Households, Is.Empty);
 
             var householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
             householdMember.HouseholdAdd(householdMock);
             Assert.That(householdMember.Households, Is.Not.Null);
             Assert.That(householdMember.Households, Is.Not.Empty);
             Assert.That(householdMember.Households.Count(), Is.EqualTo(1));
             Assert.That(householdMember.Households.Contains(householdMock), Is.EqualTo(true));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdAdd calls HouseholdMembers on the household which should be added to the household member.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddCallsHouseholdMembersOnHousehold()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            householdMember.HouseholdAdd(householdMock);
+
+            householdMock.AssertWasCalled(m => m.HouseholdMembers);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdAdd calls HouseholdMemberAdd on the household which should be added to the household member when the household member is not a member of the household.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddCallsHouseholdMemberAddOnHouseholdWhenHouseholdMemberIsNotMemberOfHousehold()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            householdMember.HouseholdAdd(householdMock);
+
+            householdMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<IHouseholdMember>.Is.Equal(householdMember)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdAdd does not call HouseholdMemberAdd on the household which should be added to the household member when the household member is a member of the household.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddDoesNotCallHouseholdMemberAddOnHouseholdWhenHouseholdMemberIsMemberOfHousehold()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember> {householdMember})
+                .Repeat.Any();
+
+            householdMember.HouseholdAdd(householdMock);
+
+            householdMock.AssertWasNotCalled(m => m.HouseholdMemberAdd(Arg<IHouseholdMember>.Is.Anything));
         }
 
         /// <summary>
@@ -1359,7 +1452,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that Translate throws ArgumentNullException when the culture information which are used for translation is null.
+        /// Tests that Translate throws an ArgumentNullException when the culture information which are used for translation is null.
         /// </summary>
         [Test]
         public void TestThatTranslateThrowsArgumentNullExceptionWhenTranslationCultureIsNull()
@@ -1407,7 +1500,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var numberOfHouseholds = random.Next(1, 5);
             while (householdMember.Households.Count() < numberOfHouseholds)
             {
-                householdMember.HouseholdAdd(MockRepository.GenerateMock<IHousehold>());
+                var householdMock = MockRepository.GenerateMock<IHousehold>();
+                householdMock.Stub(m => m.HouseholdMembers)
+                    .Return(new List<IHouseholdMember>(0))
+                    .Repeat.Any();
+                householdMember.HouseholdAdd(householdMock);
             }
             Assert.That(householdMember.Households, Is.Not.Null);
             Assert.That(householdMember.Households, Is.Not.Empty);
@@ -1419,7 +1516,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             foreach (var householdMock in householdMember.Households)
             {
-                householdMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture)));
+                householdMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture), Arg<bool>.Is.Equal(false)));
             }
         }
 
@@ -1448,7 +1545,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var numberOfHouseholds = random.Next(1, 5);
             while (householdMember.Households.Count() < numberOfHouseholds)
             {
-                householdMember.HouseholdAdd(MockRepository.GenerateMock<IHousehold>());
+                var householdMock = MockRepository.GenerateMock<IHousehold>();
+                householdMock.Stub(m => m.HouseholdMembers)
+                    .Return(new List<IHouseholdMember>(0))
+                    .Repeat.Any();
+                householdMember.HouseholdAdd(householdMock);
             }
             Assert.That(householdMember.Households, Is.Not.Null);
             Assert.That(householdMember.Households, Is.Not.Empty);
@@ -1458,7 +1559,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             foreach (var householdMock in householdMember.Households)
             {
-                householdMock.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything));
+                householdMock.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything, Arg<bool>.Is.Anything));
             }
         }
 

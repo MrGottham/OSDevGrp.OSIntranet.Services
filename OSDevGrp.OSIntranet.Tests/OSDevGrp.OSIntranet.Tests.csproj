@@ -301,6 +301,7 @@
     <Compile Include="Unittests\Domain\FoodWaste\FoodItemTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\ForeignKeyTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\HouseholdMemberTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\HouseholdTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\PaymentTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\StaticTextTests.cs" />

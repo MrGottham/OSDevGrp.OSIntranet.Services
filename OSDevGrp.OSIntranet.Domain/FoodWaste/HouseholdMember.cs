@@ -317,6 +317,11 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached));
             }
             _households.Add(household);
+            if (household.HouseholdMembers.Contains(this))
+            {
+                return;
+            }
+            household.HouseholdMemberAdd(this);
         }
 
         /// <summary>
@@ -348,7 +353,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             {
                 foreach (var household in Households)
                 {
-                    household.Translate(translationCulture);
+                    household.Translate(translationCulture, false);
                 }
             }
             if (translatePayments == false)
