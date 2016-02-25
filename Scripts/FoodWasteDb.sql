@@ -458,3 +458,24 @@ END $$
 DELIMITER ;
 CALL GrantRightsForHouseholdMembers(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForHouseholdMembers;
+
+CREATE TABLE IF NOT EXISTS Households (
+	HouseholdIdentifier CHAR(36) NOT NULL,
+	Name NVARCHAR(64) NOT NULL,
+	Descr NVARCHAR(2048) NULL,
+	CreationTime DATETIME NOT NULL,
+	PRIMARY KEY (HouseholdIdentifier),
+	INDEX IX_Households_Name_CreationTime (Name,CreationTime)
+);
+
+DROP PROCEDURE IF EXISTS GrantRightsForHouseholds;
+DELIMITER $$
+CREATE PROCEDURE GrantRightsForHouseholds(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Households TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantRightsForHouseholds(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantRightsForHouseholds;
