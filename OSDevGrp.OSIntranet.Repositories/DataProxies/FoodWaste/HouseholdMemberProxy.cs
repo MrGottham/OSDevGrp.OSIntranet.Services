@@ -20,6 +20,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     {
         #region Private variables
 
+        private bool _householdsIsLoaded;
         private bool _paymentsIsLoaded;
         private IDataProviderBase _dataProvider;
 
@@ -59,6 +60,28 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Households on which the household member has a membership.
+        /// </summary>
+        public override IEnumerable<IHousehold> Households
+        {
+            get
+            {
+                if (_householdsIsLoaded || _dataProvider == null || Identifier.HasValue == false)
+                {
+                    return base.Households;
+                }
+                base.Households = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this)
+                    .Where(m => m.Household != null)
+                    .OrderByDescending(m => m.CreationTime)
+                    .Take(Validator.GetHouseholdLimit(Membership))
+                    .Select(m => m.Household)
+                    .ToList();
+                _householdsIsLoaded = true;
+                return base.Households;
+            }
+        }
 
         /// <summary>
         /// Payments made by the household member.
@@ -248,7 +271,37 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 _dataProvider = dataProvider;
             }
 
+            foreach (var affectedHousehold in MemberOfHouseholdProxy.DeleteMemberOfHouseholds(_dataProvider, this))
+            {
+                HandleAffectedHousehold(_dataProvider, affectedHousehold);
+            }
+
             PaymentProxy.DeletePayments(_dataProvider, Identifier.Value);
+        }
+
+        /// <summary>
+        /// Handles an affected household.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="affectedHousehold">Implementation of a data proxy to the affected household.</param>
+        private static void HandleAffectedHousehold(IDataProviderBase dataProvider, IHouseholdProxy affectedHousehold)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (affectedHousehold == null)
+            {
+                throw new ArgumentNullException("affectedHousehold");
+            }
+            if (affectedHousehold.HouseholdMembers.Any())
+            {
+                return;
+            }
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                subDataProvider.Delete(affectedHousehold);
+            }
         }
 
         #endregion

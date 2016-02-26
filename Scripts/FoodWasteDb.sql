@@ -479,3 +479,27 @@ END $$
 DELIMITER ;
 CALL GrantRightsForHouseholds(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantRightsForHouseholds;
+
+CREATE TABLE IF NOT EXISTS MemberOfHouseholds (
+	MemberOfHouseholdIdentifier CHAR(36) NOT NULL,
+	HouseholdMemberIdentifier CHAR(36) NOT NULL,
+	HouseholdIdentifier CHAR(36) NOT NULL,
+	CreationTime DATETIME NOT NULL,
+	PRIMARY KEY (MemberOfHouseholdIdentifier),
+	UNIQUE INDEX IX_MemberOfHouseholds_HouseholdMemberIdentifier (HouseholdMemberIdentifier,HouseholdIdentifier),
+	UNIQUE INDEX IX_MemberOfHouseholds_HouseholdIdentifier (HouseholdIdentifier,HouseholdMemberIdentifier),
+	FOREIGN KEY FK_MemberOfHouseholds_HouseholdMemberIdentifier (HouseholdMemberIdentifier) REFERENCES HouseholdMembers (HouseholdMemberIdentifier) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY FK_MemberOfHouseholds_HouseholdIdentifier (HouseholdIdentifier) REFERENCES Households (HouseholdIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DROP PROCEDURE IF EXISTS GrantMemberOfHouseholds;
+DELIMITER $$
+CREATE PROCEDURE GrantMemberOfHouseholds(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.MemberOfHouseholds TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantMemberOfHouseholds(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantMemberOfHouseholds;

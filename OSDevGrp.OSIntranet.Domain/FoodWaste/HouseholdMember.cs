@@ -260,6 +260,14 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             }
         }
 
+        /// <summary>
+        /// Common validations used by domain objects in the food waste domain.
+        /// </summary>
+        protected virtual IDomainObjectValidations Validator
+        {
+            get { return _domainObjectValidations; }
+        }
+
         #endregion
 
         #region Methods

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
@@ -15,6 +18,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class HouseholdProxy : Household, IHouseholdProxy
     {
+        #region Private variables
+
+        private bool _householdMembersIsLoaded;
+        private IDataProviderBase _dataProvider;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -43,6 +53,31 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public HouseholdProxy(string name, string description, DateTime creationTime)
             : base(name, description, creationTime)
         {
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Household members who is member of this household.
+        /// </summary>
+        public override IEnumerable<IHouseholdMember> HouseholdMembers
+        {
+            get
+            {
+                if (_householdMembersIsLoaded || _dataProvider == null)
+                {
+                    return base.HouseholdMembers;
+                }
+                base.HouseholdMembers = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this)
+                    .Where(m => m.HouseholdMember != null)
+                    .OrderBy(m => m.CreationTime)
+                    .Select(m => m.HouseholdMember)
+                    .ToList();
+                _householdMembersIsLoaded = true;
+                return base.HouseholdMembers;
+            }
         }
 
         #endregion
@@ -145,6 +180,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 Description = mySqlDataReader.GetString(descriptionColumnNo);
             }
             CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -174,6 +214,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -189,6 +234,45 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             if (Identifier.HasValue == false)
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
+
+            foreach (var affectedHouseholdMember in MemberOfHouseholdProxy.DeleteMemberOfHouseholds(_dataProvider, this))
+            {
+                HandleAffectedHouseholdMember(_dataProvider, affectedHouseholdMember);
+            }
+        }
+
+        /// <summary>
+        /// Handles an affected household member
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="affectedHouseholdMember">Implementation of a data proxy to the affected household member.</param>
+        private static void HandleAffectedHouseholdMember(IDataProviderBase dataProvider, IHouseholdMemberProxy affectedHouseholdMember)
+        {
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException("dataProvider");
+            }
+            if (affectedHouseholdMember == null)
+            {
+                throw new ArgumentNullException("affectedHouseholdMember");
+            }
+            if (affectedHouseholdMember.Membership != Membership.Basic)
+            {
+                return;
+            }
+            if (affectedHouseholdMember.Households.Any())
+            {
+                return;
+            }
+            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            {
+                subDataProvider.Delete(affectedHouseholdMember);
             }
         }
 
