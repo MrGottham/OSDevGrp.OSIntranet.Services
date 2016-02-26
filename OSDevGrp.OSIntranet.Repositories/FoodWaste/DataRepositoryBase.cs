@@ -76,7 +76,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>The identifiable domain object.</returns>
         public virtual TIdentifiable Get<TIdentifiable>(Guid identifier) where TIdentifiable : IIdentifiable
         {
-            if (typeof (TIdentifiable) == typeof (IHouseholdMember))
+            if (typeof (TIdentifiable) == typeof (IHousehold))
+            {
+                return (TIdentifiable) Get<IHousehold, HouseholdProxy>(identifier);
+            }
+            if (typeof(TIdentifiable) == typeof(IHouseholdMember))
             {
                 return (TIdentifiable) Get<IHouseholdMember, HouseholdMemberProxy>(identifier);
             }
@@ -126,6 +130,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IHousehold)
+            {
+                return (TIdentifiable) Insert<IHousehold, IHouseholdProxy>(identifiable as IHousehold);
             }
             if (identifiable is IHouseholdMember)
             {
@@ -178,6 +186,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 throw new ArgumentNullException("identifiable");
             }
+            if (identifiable is IHousehold)
+            {
+                return (TIdentifiable) Update<IHousehold, IHouseholdProxy>(identifiable as IHousehold);
+            }
             if (identifiable is IHouseholdMember)
             {
                 return (TIdentifiable) Update<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
@@ -227,6 +239,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (Equals(identifiable, null))
             {
                 throw new ArgumentNullException("identifiable");
+            }
+            if (identifiable is IHousehold)
+            {
+                Delete<IHousehold, IHouseholdProxy>(identifiable as IHousehold);
+                return;
             }
             if (identifiable is IHouseholdMember)
             {

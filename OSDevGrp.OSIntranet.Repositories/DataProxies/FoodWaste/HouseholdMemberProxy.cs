@@ -79,7 +79,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy<IFoodItem>
+        #region IMySqlDataProxy<IHouseholdMember>
 
         /// <summary>
         /// Gets the unique identification for the household member.

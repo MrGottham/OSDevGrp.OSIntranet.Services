@@ -4,6 +4,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
 {
@@ -28,6 +29,61 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         {
             var container = ContainerFactory.Create();
             _householdDataRepository = container.Resolve<IHouseholdDataRepository>();
+        }
+
+        /// <summary>
+        /// Tests that Get gets a given household.
+        /// </summary>
+        [Test]
+        public void TestThatGetGetsHousehold()
+        {
+            var fixture = new Fixture();
+            var household = _householdDataRepository.Insert(new Household(fixture.Create<string>()));
+            try
+            {
+                // ReSharper disable PossibleInvalidOperationException
+                var result = _householdDataRepository.Get<IHousehold>(household.Identifier.Value);
+                // ReSharper restore PossibleInvalidOperationException
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Identifier, Is.Not.Null);
+                Assert.That(result.Identifier.HasValue, Is.True);
+                // ReSharper disable PossibleInvalidOperationException
+                Assert.That(result.Identifier.Value, Is.EqualTo(household.Identifier.Value));
+                // ReSharper restore PossibleInvalidOperationException
+            }
+            finally
+            {
+                _householdDataRepository.Delete(household);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Update updates a given household.
+        /// </summary>
+        [Test]
+        public void TestThatUpdateUpdatesHousehold()
+        {
+            var fixture = new Fixture();
+            var household = _householdDataRepository.Insert(new Household(fixture.Create<string>()));
+            try
+            {
+                Assert.That(household.Description, Is.Null);
+
+                household.Description = fixture.Create<string>();
+                _householdDataRepository.Update(household);
+
+                // ReSharper disable PossibleInvalidOperationException
+                var result = _householdDataRepository.Get<IHousehold>(household.Identifier.Value);
+                // ReSharper restore PossibleInvalidOperationException
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Description, Is.Not.Null);
+                Assert.That(result.Description, Is.Not.Empty);
+                Assert.That(result.Description, Is.EqualTo(household.Description));
+            }
+            finally
+            {
+                _householdDataRepository.Delete(household);
+            }
         }
 
         /// <summary>

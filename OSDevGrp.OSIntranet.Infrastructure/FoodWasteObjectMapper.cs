@@ -23,6 +23,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
     {
         #region Private variables
 
+        private static IHouseholdProxy _mappingHousehold;
         private static IHouseholdMemberProxy _mappingHouseholdMember;
         private static readonly IMapper Mapper;
         private static readonly object SyncRoot = new object();
@@ -41,6 +42,59 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IHousehold, HouseholdIdentificationView>()
                     .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                     .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description));
+
+                config.CreateMap<IHousehold, IHouseholdProxy>()
+                    .ConstructUsing(m =>
+                    {
+                        if (m as IHouseholdProxy != null)
+                        {
+                            return (IHouseholdProxy) m;
+                        }
+                        var householdProxy = new HouseholdProxy(m.Name, m.Description, m.CreationTime)
+                        {
+                            Identifier = m.Identifier
+                        };
+                        lock (SyncRoot)
+                        {
+                            _mappingHousehold = householdProxy;
+                            try
+                            {
+                                if (_mappingHouseholdMember == null)
+                                {
+                                    foreach (var householdMember in m.HouseholdMembers)
+                                    {
+                                        if (householdMember as IHouseholdMemberProxy != null)
+                                        {
+                                            if (householdProxy.HouseholdMembers.Contains(householdMember))
+                                            {
+                                                continue;
+                                            }
+                                            householdProxy.HouseholdMemberAdd(householdMember);
+                                            continue;
+                                        }
+                                        if (Mapper != null)
+                                        {
+                                            var householdMemberProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>(householdMember);
+                                            if (householdProxy.HouseholdMembers.Contains(householdMemberProxy))
+                                            {
+                                                continue;
+                                            }
+                                            householdProxy.HouseholdMemberAdd(householdMemberProxy);
+                                        }
+                                    }
+                                }
+                                else if (householdProxy.HouseholdMembers.Contains(_mappingHouseholdMember) == false)
+                                {
+                                    householdProxy.HouseholdMemberAdd(_mappingHouseholdMember);
+                                }
+                            }
+                            finally
+                            {
+                                _mappingHousehold = null;
+                            }
+                        }
+                        return householdProxy;
+                    });
 
                 config.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
                     .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
@@ -77,9 +131,33 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             _mappingHouseholdMember = householdMemberProxy;
                             try
                             {
-                                foreach (var household in m.Households)
+                                if (_mappingHousehold == null)
                                 {
-                                    // TODO: Convert household to proxy and add (modify the test).
+                                    foreach (var household in m.Households)
+                                    {
+                                        if (household as IHouseholdProxy != null)
+                                        {
+                                            if (householdMemberProxy.Households.Contains(household))
+                                            {
+                                                continue;
+                                            }
+                                            householdMemberProxy.HouseholdAdd(household);
+                                            continue;
+                                        }
+                                        if (Mapper != null)
+                                        {
+                                            var householdProxy = Mapper.Map<IHousehold, IHouseholdProxy>(household);
+                                            if (householdMemberProxy.Households.Contains(householdProxy))
+                                            {
+                                                continue;
+                                            }
+                                            householdMemberProxy.HouseholdAdd(householdProxy);
+                                        }
+                                    }
+                                }
+                                else if (householdMemberProxy.Households.Contains(_mappingHousehold) == false)
+                                {
+                                    householdMemberProxy.HouseholdAdd(_mappingHousehold);
                                 }
                                 foreach (var payment in m.Payments)
                                 {

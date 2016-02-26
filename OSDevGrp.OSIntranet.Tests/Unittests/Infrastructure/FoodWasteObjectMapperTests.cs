@@ -263,7 +263,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map maps Household to HouseholdIdentificationView.
         /// </summary>
         [Test]
-        public void TestThatMapMapsHouseholdMemberToHouseholdIdentificationView()
+        public void TestThatMapMapsHouseholdToHouseholdIdentificationView()
         {
             var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
 
@@ -278,6 +278,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdIdentificationView.Description, Is.Not.Null);
             Assert.That(householdIdentificationView.Description, Is.Not.Empty);
             Assert.That(householdIdentificationView.Description, Is.EqualTo(householdMock.Description));
+        }
+
+        /// <summary>
+        /// Tests that Map maps Household to HouseholdProxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsHouseholdToHouseholdProxy()
+        {
+            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var householdProxy = foodWasteObjectMapper.Map<IHousehold, IHouseholdProxy>(householdMock);
+            Assert.That(householdProxy, Is.Not.Null);
+            Assert.That(householdProxy.Identifier, Is.Not.Null);
+            Assert.That(householdProxy.Identifier, Is.EqualTo(householdMock.Identifier));
+            Assert.That(householdProxy.Name, Is.Not.Null);
+            Assert.That(householdProxy.Name, Is.Not.Empty);
+            Assert.That(householdProxy.Name, Is.EqualTo(householdMock.Name));
+            Assert.That(householdProxy.Description, Is.Not.Null);
+            Assert.That(householdProxy.Description, Is.Not.Empty);
+            Assert.That(householdProxy.Description, Is.EqualTo(householdMock.Description));
+            Assert.That(householdProxy.CreationTime, Is.EqualTo(householdMock.CreationTime));
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Empty);
+            Assert.That(householdProxy.HouseholdMembers.Count(), Is.EqualTo(householdMock.HouseholdMembers.Count()));
+            foreach (var householdMember in householdProxy.HouseholdMembers)
+            {
+                Assert.That(householdMember, Is.Not.Null);
+                Assert.That(householdMember, Is.TypeOf<HouseholdMemberProxy>());
+            }
         }
 
         /// <summary>
@@ -374,10 +406,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.IsPrivacyPolictyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolictyAccepted));
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
-            Assert.That(householdMemberProxy.Households, Is.Empty); // TODO: Modify this when HouseholdProxy has been implemented.
+            Assert.That(householdMemberProxy.Households, Is.Not.Empty);
+            Assert.That(householdMemberProxy.Households.Count(), Is.EqualTo(householdMemberMock.Households.Count()));
+            foreach (var household in householdMemberProxy.Households)
+            {
+                Assert.That(household, Is.Not.Null);
+                Assert.That(household, Is.TypeOf<HouseholdProxy>());
+            }
             Assert.That(householdMemberProxy.Payments, Is.Not.Null);
             Assert.That(householdMemberProxy.Payments, Is.Not.Empty);
             Assert.That(householdMemberProxy.Payments.Count(), Is.EqualTo(householdMemberMock.Payments.Count()));
+            foreach (var payment in householdMemberProxy.Payments)
+            {
+                Assert.That(payment, Is.Not.Null);
+                Assert.That(payment, Is.TypeOf<PaymentProxy>());
+            }
         }
 
         /// <summary>
