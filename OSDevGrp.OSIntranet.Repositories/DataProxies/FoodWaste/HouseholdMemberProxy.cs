@@ -249,6 +249,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 _dataProvider = dataProvider;
             }
+
+            var unsavedHouseholds = base.Households.ToArray(); // This will not force the proxy to reload the households.
+            var unsavedHouseholdWithoutIdentifier = unsavedHouseholds.FirstOrDefault(unsavedHousehold => unsavedHousehold.Identifier.HasValue == false);
+            if (unsavedHouseholdWithoutIdentifier != null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, unsavedHouseholdWithoutIdentifier.Identifier, "Identifier"));
+            }
         }
 
         /// <summary>

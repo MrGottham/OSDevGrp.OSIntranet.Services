@@ -416,6 +416,81 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that SaveRelations throws an IntranetRepositoryException when one of the household members has an identifier equal to null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenOneHouseholdMemberIdentifierIsNull()
+        {
+            var fixture = new Fixture();
+
+            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMemberMock.Stub(m => m.Identifier)
+                .Return(null)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.Households)
+                .Return(new List<IHousehold>(0))
+                .Repeat.Any();
+
+            var householdProxy = new HouseholdProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(householdProxy, Is.Not.Null);
+            Assert.That(householdProxy.Identifier, Is.Not.Null);
+            Assert.That(householdProxy.Identifier.HasValue, Is.True);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdProxy.HouseholdMembers, Is.Empty);
+
+            householdProxy.HouseholdMemberAdd(householdMemberMock);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Empty);
+            Assert.That(householdProxy.HouseholdMembers.Count(), Is.EqualTo(1));
+            Assert.That(householdProxy.HouseholdMembers.Contains(householdMemberMock), Is.True);
+
+            var exception = Assert.Throws<IntranetRepositoryException>(() => householdProxy.SaveRelations(MockRepository.GenerateStub<IDataProviderBase>(), fixture.Create<bool>()));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, householdMemberMock.Identifier, "Identifier")));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations inserts the missing bindings between the given household and who is member of the household.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsInsertsMissingMemberOfHouseholds()
+        {
+            var fixture = new Fixture();
+
+            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMemberMock.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.Households)
+                .Return(new List<IHousehold>(0))
+                .Repeat.Any();
+
+            var householdProxy = new HouseholdProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(householdProxy, Is.Not.Null);
+            Assert.That(householdProxy.Identifier, Is.Not.Null);
+            Assert.That(householdProxy.Identifier.HasValue, Is.True);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdProxy.HouseholdMembers, Is.Empty);
+
+            householdProxy.HouseholdMemberAdd(householdMemberMock);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Empty);
+            Assert.That(householdProxy.HouseholdMembers.Count(), Is.EqualTo(1));
+            Assert.That(householdProxy.HouseholdMembers.Contains(householdMemberMock), Is.True);
+
+            householdProxy.SaveRelations(MockRepository.GenerateStub<IDataProviderBase>(), fixture.Create<bool>());
+        }
+
+        /// <summary>
         /// Tests that DeleteRelations throws an ArgumentNullException if the data provider is null.
         /// </summary>
         [Test]
