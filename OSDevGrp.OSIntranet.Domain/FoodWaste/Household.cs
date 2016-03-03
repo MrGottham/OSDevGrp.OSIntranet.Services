@@ -155,7 +155,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         /// <param name="householdMember">Household member which should be removed as a member of this household.</param>
         /// <returns>Household member who has been removed af member of this household.</returns>
-        public IHouseholdMember HouseholdMemberRemove(IHouseholdMember householdMember)
+        public virtual IHouseholdMember HouseholdMemberRemove(IHouseholdMember householdMember)
         {
             if (householdMember == null)
             {

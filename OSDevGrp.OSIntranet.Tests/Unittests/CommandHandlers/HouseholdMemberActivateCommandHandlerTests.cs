@@ -150,6 +150,42 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Tests that AddValidationRules calls IsLengthValid with the activation code from the command on the common validations.
+        /// </summary>
+        [Test]
+        public void TestThatAddValidationRulesCallsIsLengthValidWithActivationCodeOnCommonValidations()
+        {
+            var fixture = new Fixture();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .WhenCalled(e =>
+                {
+                    var func = (Func<bool>) e.Arguments.ElementAt(0);
+                    func.Invoke();
+                })
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberActivateCommandHandler = new HouseholdMemberActivateCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberActivateCommandHandler, Is.Not.Null);
+
+            var activationCode = fixture.Create<string>();
+            var householdMemberActivateCommand = fixture.Build<HouseholdMemberActivateCommand>()
+                .With(m => m.ActivationCode, activationCode)
+                .Create();
+
+            householdMemberActivateCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberActivateCommand, specificationMock);
+
+            commonValidationsMock.AssertWasCalled(m => m.IsLengthValid(Arg<string>.Is.Equal(activationCode), Arg<int>.Is.Equal(1), Arg<int>.Is.Equal(64)));
+        }
+
+        /// <summary>
         /// Tests that AddValidationRules calls ContainsIllegalChar with the activation code from the command on the common validations.
         /// </summary>
         [Test]
@@ -257,10 +293,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that AddValidationRules calls IsSatisfiedBy on the specification which encapsulates validation rules 3 times.
+        /// Tests that AddValidationRules calls IsSatisfiedBy on the specification which encapsulates validation rules 4 times.
         /// </summary>
         [Test]
-        public void TestThatAddValidationRulesCallsIsSatisfiedByOnSpecification3Times()
+        public void TestThatAddValidationRulesCallsIsSatisfiedByOnSpecification4Times()
         {
             var fixture = new Fixture();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
@@ -286,7 +322,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdMemberActivateCommandHandler.AddValidationRules(householdMemberMock, householdMemberActivateCommand, specificationMock);
 
-            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(3));
+            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(4));
         }
 
         /// <summary>

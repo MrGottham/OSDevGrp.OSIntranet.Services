@@ -84,5 +84,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
         /// <param name="value">Date and time value which should be in the future.</param>
         /// <returns>True when the given date and time is in the future otherwise false.</returns>
         bool IsDateTimeInFuture(DateTime value);
+
+        /// <summary>
+        /// Checks whether a given string value has a valid length.
+        /// </summary>
+        /// <param name="value">String value on which to check the length.</param>
+        /// <param name="minLength">Min length for the string value.</param>
+        /// <param name="maxLength">Max length for the string value.</param>
+        /// <returns>True when the string value has a valid length otherwise false.</returns>
+        bool IsLengthValid(string value, int minLength, int maxLength);
     }
 }

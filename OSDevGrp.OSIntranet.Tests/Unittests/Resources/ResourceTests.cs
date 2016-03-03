@@ -575,8 +575,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForMembershipCannotDowngradeHentes()
         {
-            var fixture = new Fixture();
-
             var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
@@ -629,6 +627,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for LengthForPropertyIsInvalid hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForLengthForPropertyIsInvalidHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, fixture.Create<string>(), fixture.Create<int>(), fixture.Create<int>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }

@@ -154,6 +154,22 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
             return IsDateTimeInInterval(value, DateTime.Now, DateTime.MaxValue);
         }
 
+        /// <summary>
+        /// Checks whether a given string value has a valid length.
+        /// </summary>
+        /// <param name="value">String value on which to check the length.</param>
+        /// <param name="minLength">Min length for the string value.</param>
+        /// <param name="maxLength">Max length for the string value.</param>
+        /// <returns>True when the string value has a valid length otherwise false.</returns>
+        public virtual bool IsLengthValid(string value, int minLength, int maxLength)
+        {
+            if (value == null)
+            {
+                return false;
+            }
+            return (value.Length >= minLength) && (value.Length <= maxLength);
+        }
+        
         #endregion
     }
 }

@@ -377,7 +377,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="translationCulture">Culture information which are used for translation.</param>
         /// <param name="translateHouseholds">Indicates whether to make translation for all the households on which the household member has a membership.</param>
         /// <param name="translatePayments">Indicates whether to make translation for all payments made by the household member.</param>
-        public void Translate(CultureInfo translationCulture, bool translateHouseholds, bool translatePayments = true)
+        public virtual void Translate(CultureInfo translationCulture, bool translateHouseholds, bool translatePayments = true)
         {
             if (translationCulture == null)
             {

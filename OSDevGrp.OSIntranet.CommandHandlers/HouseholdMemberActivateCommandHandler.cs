@@ -77,6 +77,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 throw new ArgumentNullException("specification");
             }
             specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.ActivationCode), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "ActivationCode")))
+                .IsSatisfiedBy(() => CommonValidations.IsLengthValid(command.ActivationCode, 1, 64), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, "ActivationCode", 1, 64)))
                 .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.ActivationCode) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "ActivationCode")))
                 .IsSatisfiedBy(() => CommonValidations.Equals(command.ActivationCode, householdMember.ActivationCode), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.WrongActivationCodeForHouseholdMember)));
         }

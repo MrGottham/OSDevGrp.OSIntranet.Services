@@ -23,6 +23,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         private bool _householdsIsLoaded;
         private bool _paymentsIsLoaded;
         private IDataProviderBase _dataProvider;
+        private readonly IList<IHousehold> _removedHouseholds = new List<IHousehold>(0);
 
         #endregion
 
@@ -98,6 +99,25 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 _paymentsIsLoaded = true;
                 return base.Payments;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Removes a household from the household member.
+        /// </summary>
+        /// <param name="household">Household where the membership for the household member should be removed.</param>
+        /// <returns>Household where the membership for the household member has been removed.</returns>
+        public override IHousehold HouseholdRemove(IHousehold household)
+        {
+            var householdToRemove = base.HouseholdRemove(household);
+            if (householdToRemove != null)
+            {
+                _removedHouseholds.Add(householdToRemove);
+            }
+            return householdToRemove;
         }
 
         #endregion
@@ -257,7 +277,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, unsavedHouseholdWithoutIdentifier.Identifier, "Identifier"));
             }
 
-            var existingMemberOfHouseholds = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this).ToArray();
+            var existingMemberOfHouseholds = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this).ToList();
             foreach (var unsavedHousehold in unsavedHouseholds.Where(m => m.Identifier.HasValue))
             {
                 var household = unsavedHousehold;
@@ -267,8 +287,44 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 }
                 using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
                 {
-                    subDataProvider.Add(new MemberOfHouseholdProxy(this, household));
+                    var memberOfHouseholdProxy = new MemberOfHouseholdProxy(this, household)
+                    {
+                        Identifier = Guid.NewGuid()
+                    };
+                    existingMemberOfHouseholds.Add(subDataProvider.Add(memberOfHouseholdProxy));
                 }
+            }
+            while (_removedHouseholds.Count > 0)
+            {
+                var householdToRemove = _removedHouseholds.First();
+                if (householdToRemove.Identifier.HasValue == false)
+                {
+                    _removedHouseholds.Remove(householdToRemove);
+                    continue;
+                }
+
+                var memberOfHouseholdToRemove = existingMemberOfHouseholds.SingleOrDefault(existingMemberOfHousehold => existingMemberOfHousehold.HouseholdIdentifier == householdToRemove.Identifier);
+                if (memberOfHouseholdToRemove == null)
+                {
+                    _removedHouseholds.Remove(householdToRemove);
+                    continue;
+                }
+
+                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                {
+                    subDataProvider.Delete(memberOfHouseholdToRemove);
+                }
+                var householdProxy = memberOfHouseholdToRemove.Household as IHouseholdProxy;
+                if (householdProxy == null)
+                {
+                    using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                    {
+                        householdProxy = subDataProvider.Get(new HouseholdProxy {Identifier = memberOfHouseholdToRemove.HouseholdIdentifier});
+                    }
+                }
+                HandleAffectedHousehold(_dataProvider, householdProxy);
+
+                _removedHouseholds.Remove(householdToRemove);
             }
         }
 

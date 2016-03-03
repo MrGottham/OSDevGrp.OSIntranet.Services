@@ -47,6 +47,7 @@
         MembershipCannotDowngrade,
         DateTimeValueForPropertyIsNotInPast,
         DateTimeValueForPropertyIsNotInFuture,
-        DataProviderDoesNotHandlesPayments
+        DataProviderDoesNotHandlesPayments,
+        LengthForPropertyIsInvalid
     }
 }

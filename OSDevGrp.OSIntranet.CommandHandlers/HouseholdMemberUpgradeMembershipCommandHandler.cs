@@ -79,6 +79,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .IsSatisfiedBy(() => _domainObjectValidations.CanUpgradeMembership(currentMembership, (Membership)Enum.Parse(typeof(Membership), command.Membership)), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade)))
                 .IsSatisfiedBy(() => CommonValidations.IsDateTimeInPast(command.PaymentTime), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast, "PaymentTime")))
                 .IsSatisfiedBy(() => CommonValidations.HasValue(command.PaymentReference), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "PaymentReference")))
+                .IsSatisfiedBy(() => CommonValidations.IsLengthValid(command.PaymentReference, 1, 128), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, "PaymentReference", 1, 128)))
                 .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.PaymentReference) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "PaymentReference")));
         }
 

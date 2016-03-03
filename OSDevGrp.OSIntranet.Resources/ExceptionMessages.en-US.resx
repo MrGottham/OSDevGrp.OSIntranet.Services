@@ -267,4 +267,8 @@
     <value>The data provider with the name '{0}' does not handles payments.</value>
     <comment>{0} = Name of data provider.</comment>
   </data>
+  <data name="LengthForPropertyIsInvalid" xml:space="preserve">
+    <value>The length for the value given in the property named '{0}' is invalid (length should be  between {1} and {2} characters).</value>
+    <comment>{0} = Name of property, {1} = Min. length, {2} = Max. length.</comment>
+  </data>
 </root>

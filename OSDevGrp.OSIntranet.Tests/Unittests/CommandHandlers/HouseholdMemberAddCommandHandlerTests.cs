@@ -252,6 +252,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
+        /// Tests that Execute calls IsLengthValid with the mail address on the common validations.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteIsLengthValidWithMailAddressOnCommonValidations()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var welcomeLetterDispatcherMock = MockRepository.GenerateMock<IWelcomeLetterDispatcher>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHouseholdMember>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .WhenCalled(e =>
+                {
+                    var func = (Func<bool>) e.Arguments.ElementAt(0);
+                    func.Invoke();
+                })
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var householdMemberAddCommandHandler = new HouseholdMemberAddCommandHandler(householdDataRepositoryMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, welcomeLetterDispatcherMock, exceptionBuilderMock);
+            Assert.That(householdMemberAddCommandHandler, Is.Not.Null);
+
+            var householdMemberAddCommand = fixture.Build<HouseholdMemberAddCommand>()
+                .With(m => m.MailAddress, string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D")).ToLower())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdMemberAddCommandHandler.Execute(householdMemberAddCommand);
+
+            commonValidationsMock.AssertWasCalled(m => m.IsLengthValid(Arg<string>.Is.Equal(householdMemberAddCommand.MailAddress), Arg<int>.Is.Equal(1), Arg<int>.Is.Equal(128)));
+        }
+
+        /// <summary>
         /// Tests that Execute calls ContainsIllegalChar with the mail address on the common validations.
         /// </summary>
         [Test]
@@ -348,10 +396,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that Execute calls IsSatisfiedBy on the specification which encapsulates validation rules 4 times.
+        /// Tests that Execute calls IsSatisfiedBy on the specification which encapsulates validation rules 5 times.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsIsSatisfiedByOnSpecification4Times()
+        public void TestThatExecuteCallsIsSatisfiedByOnSpecification5Times()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -387,7 +435,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdMemberAddCommandHandler.Execute(householdMemberAddCommand);
 
-            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(4));
+            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(5));
         }
 
         /// <summary>

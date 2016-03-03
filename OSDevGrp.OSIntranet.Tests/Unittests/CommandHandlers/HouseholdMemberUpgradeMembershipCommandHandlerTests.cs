@@ -366,7 +366,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand, specificationMock);
 
-            commonValidationsMock.AssertWasCalled(m => m.HasValue(paymentReference));
+            commonValidationsMock.AssertWasCalled(m => m.HasValue(Arg<string>.Is.Equal(paymentReference)));
+        }
+
+        /// <summary>
+        /// Tests that AddValidationRules calls IsLengthValid with the payment reference from the data provider who handled the payment for the upgrade on the common validations.
+        /// </summary>
+        [Test]
+        public void TestThatAddValidationRulesCallsIsLengthValidWithPaymentReferenceOnCommonValidations()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .WhenCalled(e =>
+                {
+                    var func = (Func<bool>) e.Arguments.ElementAt(0);
+                    func.Invoke();
+                })
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdMemberUpgradeMembershipCommandHandler = new HouseholdMemberUpgradeMembershipCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            Assert.That(householdMemberUpgradeMembershipCommandHandler, Is.Not.Null);
+
+            var paymentReference = fixture.Create<string>();
+            var householdMemberUpgradeMembershipCommand = fixture.Build<HouseholdMemberUpgradeMembershipCommand>()
+                .With(m => m.Membership, fixture.Create<Membership>().ToString())
+                .With(m => m.DataProviderIdentifier, Guid.NewGuid())
+                .With(m => m.PaymentTime, DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240)))
+                .With(m => m.PaymentReference, paymentReference)
+                .With(m => m.PaymentReceipt, Convert.ToBase64String(fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray()))
+                .Create();
+
+            householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand, specificationMock);
+
+            commonValidationsMock.AssertWasCalled(m => m.IsLengthValid(Arg<string>.Is.Equal(paymentReference), Arg<int>.Is.Equal(1), Arg<int>.Is.Equal(128)));
         }
 
         /// <summary>
@@ -408,14 +450,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand, specificationMock);
 
-            commonValidationsMock.AssertWasCalled(m => m.ContainsIllegalChar(paymentReference));
+            commonValidationsMock.AssertWasCalled(m => m.ContainsIllegalChar(Arg<string>.Is.Equal(paymentReference)));
         }
 
         /// <summary>
-        /// Tests that AddValidationRules calls IsSatisfiedBy on the specification which encapsulates validation rules 6 times.
+        /// Tests that AddValidationRules calls IsSatisfiedBy on the specification which encapsulates validation rules 7 times.
         /// </summary>
         [Test]
-        public void TestThatAddValidationRulesCallsIsSatisfiedByOnSpecification6Times()
+        public void TestThatAddValidationRulesCallsIsSatisfiedByOnSpecification7Times()
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
@@ -444,7 +486,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdMemberUpgradeMembershipCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMemberMock(), householdMemberUpgradeMembershipCommand, specificationMock);
 
-            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(6));
+            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(7));
         }
 
         /// <summary>

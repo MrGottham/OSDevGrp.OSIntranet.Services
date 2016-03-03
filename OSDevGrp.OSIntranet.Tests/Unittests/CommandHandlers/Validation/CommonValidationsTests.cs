@@ -431,5 +431,51 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
             var result = commonValidations.IsDateTimeInFuture(DateTime.Now.AddSeconds(random.Next(3, 10)*-1));
             Assert.That(result, Is.False);
         }
+
+        /// <summary>
+        /// Tests that IsLengthValid returns whether the length of the string value is valid.
+        /// </summary>
+        [Test]
+        [TestCase(null, 0, 256, false)]
+        [TestCase("", 0, 256, true)]
+        [TestCase("", 1, 256, false)]
+        [TestCase("X", 0, 256, true)]
+        [TestCase("X", 1, 256, true)]
+        [TestCase("X", 2, 256, false)]
+        [TestCase("X", 3, 256, false)]
+        [TestCase("X", 4, 256, false)]
+        [TestCase("XY", 0, 256, true)]
+        [TestCase("XY", 1, 256, true)]
+        [TestCase("XY", 2, 256, true)]
+        [TestCase("XY", 3, 256, false)]
+        [TestCase("XY", 4, 256, false)]
+        [TestCase("XY", 0, 256, true)]
+        [TestCase("XYZ", 1, 256, true)]
+        [TestCase("XYZ", 2, 256, true)]
+        [TestCase("XYZ", 3, 256, true)]
+        [TestCase("XYZ", 4, 256, false)]
+        [TestCase("X", 0, 0, false)]
+        [TestCase("X", 0, 1, true)]
+        [TestCase("X", 0, 2, true)]
+        [TestCase("X", 0, 3, true)]
+        [TestCase("X", 0, 4, true)]
+        [TestCase("XY", 0, 0, false)]
+        [TestCase("XY", 0, 1, false)]
+        [TestCase("XY", 0, 2, true)]
+        [TestCase("XY", 0, 3, true)]
+        [TestCase("XY", 0, 4, true)]
+        [TestCase("XYZ", 0, 0, false)]
+        [TestCase("XYZ", 0, 1, false)]
+        [TestCase("XYZ", 0, 2, false)]
+        [TestCase("XYZ", 0, 3, true)]
+        [TestCase("XYZ", 0, 4, true)]
+        public void TestThatIsLengthValidReturnsWhetherLengthIsValid(string value, int minLength, int maxLength, bool expectedResult)
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            var result = commonValidations.IsLengthValid(value, minLength, maxLength);
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         private bool _householdMembersIsLoaded;
         private IDataProviderBase _dataProvider;
+        private readonly IList<IHouseholdMember> _removedHouseholdMembers = new List<IHouseholdMember>(0);
 
         #endregion
 
@@ -78,6 +79,25 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 _householdMembersIsLoaded = true;
                 return base.HouseholdMembers;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Removes a household member from this household.
+        /// </summary>
+        /// <param name="householdMember">Household member which should be removed as a member of this household.</param>
+        /// <returns>Household member who has been removed af member of this household.</returns>
+        public override IHouseholdMember HouseholdMemberRemove(IHouseholdMember householdMember)
+        {
+            var householdMemberToRemove = base.HouseholdMemberRemove(householdMember);
+            if (householdMemberToRemove != null)
+            {
+                _removedHouseholdMembers.Add(householdMemberToRemove);
+            }
+            return householdMemberToRemove;
         }
 
         #endregion
@@ -227,7 +247,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, unsavedHouseholdMemberWithoutIdentifier.Identifier, "Identifier"));
             }
 
-            var existingMemberOfHouseholds = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this).ToArray();
+            var existingMemberOfHouseholds = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this).ToList();
             foreach (var unsavedHouseholdMember in unsavedHouseholdMembers.Where(m => m.Identifier.HasValue))
             {
                 var householdMember = unsavedHouseholdMember;
@@ -237,8 +257,44 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 }
                 using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
                 {
-                    subDataProvider.Add(new MemberOfHouseholdProxy(householdMember, this));
+                    var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMember, this)
+                    {
+                        Identifier = Guid.NewGuid()
+                    };
+                    existingMemberOfHouseholds.Add(subDataProvider.Add(memberOfHouseholdProxy));
                 }
+            }
+            while (_removedHouseholdMembers.Count > 0)
+            {
+                var householdMemberToRemove = _removedHouseholdMembers.First();
+                if (householdMemberToRemove.Identifier.HasValue == false)
+                {
+                    _removedHouseholdMembers.Remove(householdMemberToRemove);
+                    continue;
+                }
+
+                var memberOfHouseholdToRemove = existingMemberOfHouseholds.SingleOrDefault(existingMemberOfHousehold => existingMemberOfHousehold.HouseholdMemberIdentifier == householdMemberToRemove.Identifier);
+                if (memberOfHouseholdToRemove == null)
+                {
+                    _removedHouseholdMembers.Remove(householdMemberToRemove);
+                    continue;
+                }
+
+                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                {
+                    subDataProvider.Delete(memberOfHouseholdToRemove);
+                }
+                var householdMemberProxy = memberOfHouseholdToRemove.HouseholdMember as IHouseholdMemberProxy;
+                if (householdMemberProxy == null)
+                {
+                    using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                    {
+                        householdMemberProxy = subDataProvider.Get(new HouseholdMemberProxy {Identifier = memberOfHouseholdToRemove.HouseholdMemberIdentifier});
+                    }
+                }
+                HandleAffectedHouseholdMember(_dataProvider, householdMemberProxy);
+
+                _removedHouseholdMembers.Remove(householdMemberToRemove);
             }
         }
 
