@@ -256,6 +256,20 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, unsavedHouseholdWithoutIdentifier.Identifier, "Identifier"));
             }
+
+            var existingMemberOfHouseholds = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this).ToArray();
+            foreach (var unsavedHousehold in unsavedHouseholds.Where(m => m.Identifier.HasValue))
+            {
+                var household = unsavedHousehold;
+                if (existingMemberOfHouseholds.Any(existingMemberOfHousehold => existingMemberOfHousehold.HouseholdIdentifier == household.Identifier))
+                {
+                    continue;
+                }
+                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                {
+                    subDataProvider.Add(new MemberOfHouseholdProxy(this, household));
+                }
+            }
         }
 
         /// <summary>

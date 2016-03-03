@@ -448,7 +448,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdProxy.HouseholdMembers.Count(), Is.EqualTo(1));
             Assert.That(householdProxy.HouseholdMembers.Contains(householdMemberMock), Is.True);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => householdProxy.SaveRelations(MockRepository.GenerateStub<IDataProviderBase>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => householdProxy.SaveRelations(dataProviderBaseMock, fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -467,17 +467,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             var fixture = new Fixture();
 
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
-            dataProviderBaseMock.Stub(m => m.Clone())
-                .Return(dataProviderBaseMock)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Anything))
-                .Return(new List<MemberOfHouseholdProxy>(0))
-                .Repeat.Any();
-
+            var householdMemberIdentifier = Guid.NewGuid();
             var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMemberMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
+                .Return(householdMemberIdentifier)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.Households)
                 .Return(new List<IHousehold>(0))
@@ -493,16 +486,100 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
             Assert.That(householdProxy.HouseholdMembers, Is.Empty);
 
+            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProviderBaseMock.Stub(m => m.Clone())
+                .Return(dataProviderBaseMock)
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Anything))
+                .Return(new List<MemberOfHouseholdProxy>(0))
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.Add(Arg<MemberOfHouseholdProxy>.Is.NotNull))
+                .WhenCalled(e =>
+                {
+                    var memberOfHouseholdProxy = (MemberOfHouseholdProxy)e.Arguments.ElementAt(0);
+                    Assert.That(memberOfHouseholdProxy, Is.Not.Null);
+                    Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Not.Null);
+                    Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.EqualTo(householdMemberMock));
+                    Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Not.Null);
+                    Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.Value, Is.EqualTo(householdMemberMock.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(memberOfHouseholdProxy.Household, Is.Not.Null);
+                    Assert.That(memberOfHouseholdProxy.Household, Is.EqualTo(householdProxy));
+                    Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Not.Null);
+                    Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.Value, Is.EqualTo(householdProxy.Identifier.Value));
+                    // ReSharper restore PossibleInvalidOperationException
+                })
+                .Return(fixture.Create<MemberOfHouseholdProxy>())
+                .Repeat.Any();
+
             householdProxy.HouseholdMemberAdd(householdMemberMock);
             Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
             Assert.That(householdProxy.HouseholdMembers, Is.Not.Empty);
             Assert.That(householdProxy.HouseholdMembers.Count(), Is.EqualTo(1));
             Assert.That(householdProxy.HouseholdMembers.Contains(householdMemberMock), Is.True);
 
-            householdProxy.SaveRelations(MockRepository.GenerateStub<IDataProviderBase>(), fixture.Create<bool>());
+            householdProxy.SaveRelations(dataProviderBaseMock, fixture.Create<bool>());
+
+            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Equal(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdIdentifier='{0}' ORDER BY CreationTime DESC", householdProxy.UniqueId))), opt => opt.Repeat.Times(1));
+            dataProviderBaseMock.AssertWasCalled(m => m.Add(Arg<MemberOfHouseholdProxy>.Is.NotNull), opt => opt.Repeat.Times(1));
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations does not inserts the existing bindings between the given household and who is member of the household.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsDoesNotInsertsExistingMemberOfHouseholds()
+        {
+            var fixture = new Fixture();
+
+            var householdMemberIdentifier = Guid.NewGuid();
+            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMemberMock.Stub(m => m.Identifier)
+                .Return(householdMemberIdentifier)
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.Households)
+                .Return(new List<IHousehold>(0))
+                .Repeat.Any();
+
+            var householdProxy = new HouseholdProxy
+            {
+                Identifier = Guid.NewGuid()
+            };
+            Assert.That(householdProxy, Is.Not.Null);
+            Assert.That(householdProxy.Identifier, Is.Not.Null);
+            Assert.That(householdProxy.Identifier.HasValue, Is.True);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdProxy.HouseholdMembers, Is.Empty);
+
+            var memberOfHouseholdProxy = fixture.Build<MemberOfHouseholdProxy>()
+                .With(m => m.HouseholdMemberIdentifier, householdMemberIdentifier)
+                .With(m => m.HouseholdIdentifier, householdProxy.Identifier)
+                .Create();
+
+            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProviderBaseMock.Stub(m => m.Clone())
+                .Return(dataProviderBaseMock)
+                .Repeat.Any();
+            dataProviderBaseMock.Stub(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Anything))
+                .Return(new List<MemberOfHouseholdProxy> {memberOfHouseholdProxy})
+                .Repeat.Any();
+
+            householdProxy.HouseholdMemberAdd(householdMemberMock);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdProxy.HouseholdMembers, Is.Not.Empty);
+            Assert.That(householdProxy.HouseholdMembers.Count(), Is.EqualTo(1));
+            Assert.That(householdProxy.HouseholdMembers.Contains(householdMemberMock), Is.True);
+
+            householdProxy.SaveRelations(dataProviderBaseMock, fixture.Create<bool>());
 
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
             dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Equal(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdIdentifier='{0}' ORDER BY CreationTime DESC", householdProxy.UniqueId))), opt => opt.Repeat.Times(1));
+            dataProviderBaseMock.AssertWasNotCalled(m => m.Add(Arg<MemberOfHouseholdProxy>.Is.Anything));
         }
 
         /// <summary>
