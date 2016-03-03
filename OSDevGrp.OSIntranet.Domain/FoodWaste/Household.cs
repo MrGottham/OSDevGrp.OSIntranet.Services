@@ -133,7 +133,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Methods
 
         /// <summary>
-        /// Adds a household memeber to this household.
+        /// Adds a household member to this household.
         /// </summary>
         /// <param name="householdMember">Household member which should be member on this household.</param>
         public virtual void HouseholdMemberAdd(IHouseholdMember householdMember)
@@ -148,6 +148,32 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 return;
             }
             householdMember.HouseholdAdd(this);
+        }
+
+        /// <summary>
+        /// Removes a household member from this household.
+        /// </summary>
+        /// <param name="householdMember">Household member which should be removed as a member of this household.</param>
+        /// <returns>Household member who has been removed af member of this household.</returns>
+        public IHouseholdMember HouseholdMemberRemove(IHouseholdMember householdMember)
+        {
+            if (householdMember == null)
+            {
+                throw new ArgumentNullException("householdMember");
+            }
+
+            var householdMemberToRemove = HouseholdMembers.SingleOrDefault(householdMember.Equals);
+            if (householdMemberToRemove == null)
+            {
+                return null;
+            }
+
+            _householdMembers.Remove(householdMemberToRemove);
+            if (householdMemberToRemove.Households.Contains(this))
+            {
+                householdMemberToRemove.HouseholdRemove(this);
+            }
+            return householdMemberToRemove;
         }
 
         /// <summary>

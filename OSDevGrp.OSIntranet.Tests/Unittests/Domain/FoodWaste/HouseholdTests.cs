@@ -388,6 +388,286 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that HouseholdMemberRemove throws an ArgumentNullException when the household member which should be removed as a member of this household is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberRemoveThrowsArgumentNullExceptionWhenHouseholdMemberIsNull()
+        {
+            var fixture = new Fixture();
+
+            var household = new Household(fixture.Create<string>());
+            Assert.That(household, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => household.HouseholdMemberRemove(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberRemove returns null when the household member which should be removed as a member of this household does not exists on the household.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberRemoveReturnsNullWhenHouseholdMemberDoesNotExistOnHousehold()
+        {
+            var fixture = new Fixture();
+
+            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember1Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember2Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember3Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var household = new Household(fixture.Create<string>());
+            Assert.That(household, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Empty);
+
+            household.HouseholdMemberAdd(householdMember1Mock);
+            household.HouseholdMemberAdd(householdMember2Mock);
+            household.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Empty);
+            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+
+            var result = household.HouseholdMemberRemove(MockRepository.GenerateMock<IHouseholdMember>());
+            Assert.That(result, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberRemove removes the household member which should be removed as a member of this household.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberRemoveRemovesHouseholdMember()
+        {
+            var fixture = new Fixture();
+
+            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember1Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember2Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember3Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var household = new Household(fixture.Create<string>());
+            Assert.That(household, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Empty);
+
+            household.HouseholdMemberAdd(householdMember1Mock);
+            household.HouseholdMemberAdd(householdMember2Mock);
+            household.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Empty);
+            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+
+            household.HouseholdMemberRemove(householdMember2Mock);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Empty);
+            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(2));
+            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.False);
+            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberRemove calls Households on the household member which should be removed as a member of this household.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberRemoveCallsHouseholdsOnHouseholdMember()
+        {
+            var fixture = new Fixture();
+
+            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember1Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember2Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember3Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var household = new Household(fixture.Create<string>());
+            Assert.That(household, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Empty);
+
+            household.HouseholdMemberAdd(householdMember1Mock);
+            household.HouseholdMemberAdd(householdMember2Mock);
+            household.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Empty);
+            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+
+            household.HouseholdMemberRemove(householdMember2Mock);
+
+            householdMember2Mock.AssertWasCalled(m => m.Households, opt => opt.Repeat.Times(2));  // One time when added and one time when removed.
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberRemove calls HouseholdRemove on the household member which should be removed as a member of this household when the household has the household member as a member.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberRemoveCallsHouseholdRemoveOnHouseholdMemberWhenHouseholdExistsOnHouseholdMember()
+        {
+            var fixture = new Fixture();
+
+            var household = new Household(fixture.Create<string>());
+            Assert.That(household, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Empty);
+
+            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember1Mock.Stub(m => m.Households)
+                .Return(new List<Household> {household})
+                .Repeat.Any();
+
+            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember2Mock.Stub(m => m.Households)
+                .Return(new List<Household> {household})
+                .Repeat.Any();
+
+            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember3Mock.Stub(m => m.Households)
+                .Return(new List<Household> {household})
+                .Repeat.Any();
+
+            household.HouseholdMemberAdd(householdMember1Mock);
+            household.HouseholdMemberAdd(householdMember2Mock);
+            household.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Empty);
+            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+
+            household.HouseholdMemberRemove(householdMember2Mock);
+
+            householdMember2Mock.AssertWasCalled(m => m.HouseholdRemove(Arg<IHousehold>.Is.Equal(household)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberRemove does not call HouseholdRemove on the household member which should be removed as a member of this household when the household does not have the household member as a member.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberRemoveDoesNotCallHouseholdRemoveOnHouseholdMemberWhenHouseholdDoesNotExistOnHouseholdMember()
+        {
+            var fixture = new Fixture();
+
+            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember1Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember2Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember3Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var household = new Household(fixture.Create<string>());
+            Assert.That(household, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Empty);
+
+            household.HouseholdMemberAdd(householdMember1Mock);
+            household.HouseholdMemberAdd(householdMember2Mock);
+            household.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Empty);
+            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+
+            household.HouseholdMemberRemove(householdMember2Mock);
+
+            householdMember2Mock.AssertWasNotCalled(m => m.HouseholdRemove(Arg<IHousehold>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdMemberRemove returns null the household member which has been removed as a member of the household.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdMemberRemoveReturnsRemovedHouseholdMember()
+        {
+            var fixture = new Fixture();
+
+            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember1Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember2Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            householdMember3Mock.Stub(m => m.Households)
+                .Return(new List<Household>(0))
+                .Repeat.Any();
+
+            var household = new Household(fixture.Create<string>());
+            Assert.That(household, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Empty);
+
+            household.HouseholdMemberAdd(householdMember1Mock);
+            household.HouseholdMemberAdd(householdMember2Mock);
+            household.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(household.HouseholdMembers, Is.Not.Null);
+            Assert.That(household.HouseholdMembers, Is.Not.Empty);
+            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+
+            var result = household.HouseholdMemberRemove(householdMember2Mock);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(householdMember2Mock));
+        }
+
+        /// <summary>
         /// Tests that Translate throws an ArgumentNullException when the culture information which are used for translation is null.
         /// </summary>
         [Test]

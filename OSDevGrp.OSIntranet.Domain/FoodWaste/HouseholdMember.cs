@@ -333,6 +333,32 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Removes a household from the household member.
+        /// </summary>
+        /// <param name="household">Household where the membership for the household member should be removed.</param>
+        /// <returns>Household where the membership for the household member has been removed.</returns>
+        public virtual IHousehold HouseholdRemove(IHousehold household)
+        {
+            if (household == null)
+            {
+                throw new ArgumentNullException("household");
+            }
+            
+            var householdToRemove = Households.SingleOrDefault(household.Equals);
+            if (householdToRemove == null)
+            {
+                return null;
+            }
+            
+            _households.Remove(householdToRemove);
+            if (householdToRemove.HouseholdMembers.Contains(this))
+            {
+                householdToRemove.HouseholdMemberRemove(this);
+            }
+            return householdToRemove;
+        }
+
+        /// <summary>
         /// Adds a payment made by the household member.
         /// </summary>
         /// <param name="payment">Payment made by the household member.</param>

@@ -1262,7 +1262,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that HouseholdAdd  throws an IntranetBusinessException when the limit of households has been reached.
+        /// Tests that HouseholdAdd throws an IntranetBusinessException when the limit of households has been reached.
         /// </summary>
         [Test]
         public void TestThatHouseholdAddThrowsIntranetBusinessExceptionWhenHouseholdLimitHasBeenReached()
@@ -1401,6 +1401,332 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMember.HouseholdAdd(householdMock);
 
             householdMock.AssertWasNotCalled(m => m.HouseholdMemberAdd(Arg<IHouseholdMember>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdRemove throws ArgumentNullException when the household where the membership for the household member should be removed is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdRemoveThrowsArgumentNullExceptionWhenHouseholdIsNull()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => householdMember.HouseholdRemove(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("household"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdRemove returns null when the household where the membership for the household member should be removed does not exist on the household member.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdRemoveReturnsNullWhenHouseholdMemberDoesNotExistOnHouseholdMember()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var household1Mock = MockRepository.GenerateMock<IHousehold>();
+            household1Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household2Mock = MockRepository.GenerateMock<IHousehold>();
+            household2Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household3Mock = MockRepository.GenerateMock<IHousehold>();
+            household3Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            householdMember.HouseholdAdd(household1Mock);
+            householdMember.HouseholdAdd(household2Mock);
+            householdMember.HouseholdAdd(household3Mock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(3));
+            Assert.That(householdMember.Households.Contains(household1Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household2Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household3Mock), Is.True);
+
+            var result = householdMember.HouseholdRemove(MockRepository.GenerateMock<IHousehold>());
+            Assert.That(result, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdRemove removes the household where the membership for the household member should be removed.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdRemoveRemovesHouseholdMember()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var household1Mock = MockRepository.GenerateMock<IHousehold>();
+            household1Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household2Mock = MockRepository.GenerateMock<IHousehold>();
+            household2Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household3Mock = MockRepository.GenerateMock<IHousehold>();
+            household3Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            householdMember.HouseholdAdd(household1Mock);
+            householdMember.HouseholdAdd(household2Mock);
+            householdMember.HouseholdAdd(household3Mock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(3));
+            Assert.That(householdMember.Households.Contains(household1Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household2Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household3Mock), Is.True);
+
+            householdMember.HouseholdRemove(household2Mock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(2));
+            Assert.That(householdMember.Households.Contains(household1Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household2Mock), Is.False);
+            Assert.That(householdMember.Households.Contains(household3Mock), Is.True);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdRemove calls HouseholdMembers on the household where the membership for the household member should be removed.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdRemoveCallsHouseholdMembersOnHouseholdMember()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var household1Mock = MockRepository.GenerateMock<IHousehold>();
+            household1Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household2Mock = MockRepository.GenerateMock<IHousehold>();
+            household2Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household3Mock = MockRepository.GenerateMock<IHousehold>();
+            household3Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            householdMember.HouseholdAdd(household1Mock);
+            householdMember.HouseholdAdd(household2Mock);
+            householdMember.HouseholdAdd(household3Mock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(3));
+            Assert.That(householdMember.Households.Contains(household1Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household2Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household3Mock), Is.True);
+
+            householdMember.HouseholdRemove(household2Mock);
+
+            household2Mock.AssertWasCalled(m => m.HouseholdMembers, opt => opt.Repeat.Times(2)); // One time when added and one time when removed.
+        }
+
+        /// <summary>
+        /// Tests that HouseholdRemove calls HouseholdMemberRemove on the household where the membership for the household member should be removed when the household member is member of the household where the membership for the household member should be removed.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdRemoveCallsHouseholdMemberRemoveOnHouseholdMemberWhenHouseholdMemberExistsOnHousehold()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            var household1Mock = MockRepository.GenerateMock<IHousehold>();
+            household1Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember> {householdMember})
+                .Repeat.Any();
+
+            var household2Mock = MockRepository.GenerateMock<IHousehold>();
+            household2Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember> {householdMember})
+                .Repeat.Any();
+
+            var household3Mock = MockRepository.GenerateMock<IHousehold>();
+            household3Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember> {householdMember})
+                .Repeat.Any();
+
+            householdMember.HouseholdAdd(household1Mock);
+            householdMember.HouseholdAdd(household2Mock);
+            householdMember.HouseholdAdd(household3Mock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(3));
+            Assert.That(householdMember.Households.Contains(household1Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household2Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household3Mock), Is.True);
+
+            householdMember.HouseholdRemove(household2Mock);
+
+            household2Mock.AssertWasCalled(m => m.HouseholdMemberRemove(Arg<IHouseholdMember>.Is.Equal(householdMember)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdRemove does not call HouseholdMemberRemove on the household where the membership for the household member should be removed when the household member is not a member of the household where the membership for the household member should be removed.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdRemoveDoesNotCallHouseholdMemberRemoveOnHouseholdMemberWhenHouseholdMemberDoesNotExistOnHousehold()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var household1Mock = MockRepository.GenerateMock<IHousehold>();
+            household1Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household2Mock = MockRepository.GenerateMock<IHousehold>();
+            household2Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household3Mock = MockRepository.GenerateMock<IHousehold>();
+            household3Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            householdMember.HouseholdAdd(household1Mock);
+            householdMember.HouseholdAdd(household2Mock);
+            householdMember.HouseholdAdd(household3Mock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(3));
+            Assert.That(householdMember.Households.Contains(household1Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household2Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household3Mock), Is.True);
+
+            householdMember.HouseholdRemove(household2Mock);
+
+            household2Mock.AssertWasNotCalled(m => m.HouseholdMemberRemove(Arg<IHouseholdMember>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdRemove returns the household where the membership for the household member has been removed.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdRemoveReturnsRemovedHousehold()
+        {
+            var fixture = new Fixture();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(false)
+                .Repeat.Any();
+
+            var household1Mock = MockRepository.GenerateMock<IHousehold>();
+            household1Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household2Mock = MockRepository.GenerateMock<IHousehold>();
+            household2Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var household3Mock = MockRepository.GenerateMock<IHousehold>();
+            household3Mock.Stub(m => m.HouseholdMembers)
+                .Return(new List<IHouseholdMember>(0))
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Empty);
+
+            householdMember.HouseholdAdd(household1Mock);
+            householdMember.HouseholdAdd(household2Mock);
+            householdMember.HouseholdAdd(household3Mock);
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households.Count(), Is.EqualTo(3));
+            Assert.That(householdMember.Households.Contains(household1Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household2Mock), Is.True);
+            Assert.That(householdMember.Households.Contains(household3Mock), Is.True);
+
+            var result = householdMember.HouseholdRemove(household2Mock);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(household2Mock));
         }
 
         /// <summary>

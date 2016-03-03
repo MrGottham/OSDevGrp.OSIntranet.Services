@@ -80,6 +80,13 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         void HouseholdAdd(IHousehold household);
 
         /// <summary>
+        /// Removes a household from the household member.
+        /// </summary>
+        /// <param name="household">Household where the membership for the household member should be removed.</param>
+        /// <returns>Household where the membership for the household member has been removed.</returns>
+        IHousehold HouseholdRemove(IHousehold household);
+
+        /// <summary>
         /// Adds a payment made by the household member.
         /// </summary>
         /// <param name="payment">Payment made by the household member.</param>
