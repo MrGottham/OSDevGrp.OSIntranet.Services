@@ -115,7 +115,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls Get with the identifier of translation informations on the repository which can access household data for the food waste domain.
         /// </summary>
         [Test]
-        public void TestThatExecuteGetForTranslationInfoIdentifierOnHouseholdDataRepository()
+        public void TestThatExecuteCallsGetForTranslationInfoIdentifierOnHouseholdDataRepository()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -158,7 +158,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls IsNotNull with the translation informations on the common validations.
         /// </summary>
         [Test]
-        public void TestThatExecuteIsNotNullWithTranslationInfoOnCommonValidations()
+        public void TestThatExecuteCallsIsNotNullWithTranslationInfoOnCommonValidations()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -207,7 +207,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls HasValue with the mail address on the common validations.
         /// </summary>
         [Test]
-        public void TestThatExecuteHasValueWithMailAddressOnCommonValidations()
+        public void TestThatExecuteCallsHasValueWithMailAddressOnCommonValidations()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -255,7 +255,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls IsLengthValid with the mail address on the common validations.
         /// </summary>
         [Test]
-        public void TestThatExecuteIsLengthValidWithMailAddressOnCommonValidations()
+        public void TestThatExecuteCallsIsLengthValidWithMailAddressOnCommonValidations()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -303,7 +303,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls ContainsIllegalChar with the mail address on the common validations.
         /// </summary>
         [Test]
-        public void TestThatExecuteContainsIllegalCharWithMailAddressOnCommonValidations()
+        public void TestThatExecuteCallsContainsIllegalCharWithMailAddressOnCommonValidations()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -351,7 +351,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls IsMailAddress with the mail address on the common validations used by domain objects in the food waste domain.
         /// </summary>
         [Test]
-        public void TestThatExecuteIsMailAddressWithMailAddressOnDomainObjectValidations()
+        public void TestThatExecuteCallsIsMailAddressWithMailAddressOnDomainObjectValidations()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
