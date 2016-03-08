@@ -5,6 +5,8 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Responses;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
@@ -76,6 +78,16 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .IsSatisfiedBy(() => command.Description == null || CommonValidations.ContainsIllegalChar(command.Description) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Description")))
                 .Evaluate();
 
+            var household = HouseholdDataRepository.Insert<IHousehold>(new Household(command.Name, command.Description));
+            try
+            {
+                var householdMember = HouseholdMemberGetCurrent(command.TranslationInfoIdentifier);
+            }
+            catch
+            {
+                HouseholdDataRepository.Delete(household);
+                throw;
+            }
             return null;
         }
 
@@ -87,6 +99,23 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         public virtual void HandleException(HouseholdAddCommand command, Exception exception)
         {
             throw ExceptionBuilder.Build(exception, MethodBase.GetCurrentMethod());
+        }
+
+        /// <summary>
+        /// Gets the current users household member account.
+        /// </summary>
+        /// <param name="translationInfoIdentifier">Identifier of the translation informations which should be used in the translation.</param>
+        /// <returns>Current users household member account.</returns>
+        private IHouseholdMember HouseholdMemberGetCurrent(Guid translationInfoIdentifier)
+        {
+            var mailAddress = _claimValueProvider.MailAddress;
+            var householdMember = HouseholdDataRepository.HouseholdMemberGetByMailAddress(mailAddress);
+            if (householdMember != null)
+            {
+                return householdMember;
+            }
+            var householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(mailAddress, translationInfoIdentifier);
+            return null;
         }
 
         #endregion
