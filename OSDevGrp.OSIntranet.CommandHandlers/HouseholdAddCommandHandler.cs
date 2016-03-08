@@ -82,6 +82,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             try
             {
                 var householdMember = HouseholdMemberGetCurrent(command.TranslationInfoIdentifier);
+                household.HouseholdMemberAdd(householdMember);
             }
             catch
             {
@@ -115,7 +116,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 return householdMember;
             }
             var householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(mailAddress, translationInfoIdentifier);
-            return null;
+            return HouseholdDataRepository.Get<IHouseholdMember>(householdMemberIdentifier);
         }
 
         #endregion
