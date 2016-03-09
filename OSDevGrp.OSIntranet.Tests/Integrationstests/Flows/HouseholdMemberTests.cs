@@ -218,12 +218,12 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                         Description = null,
                         TranslationInfoIdentifier = translationInfoIdentifier
                     };
-                    var householdAddServiceReceipt = _householdDataService.HouseholdAdd(householdAddCommand);
-                    Assert.That(householdAddServiceReceipt, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt.Identifier, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt.Identifier.HasValue, Is.True);
+                    var householdAddServiceReceipt1 = _householdDataService.HouseholdAdd(householdAddCommand);
+                    Assert.That(householdAddServiceReceipt1, Is.Not.Null);
+                    Assert.That(householdAddServiceReceipt1.Identifier, Is.Not.Null);
+                    Assert.That(householdAddServiceReceipt1.Identifier.HasValue, Is.True);
                     // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdAddServiceReceipt.Identifier.Value, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(householdAddServiceReceipt1.Identifier.Value, Is.Not.EqualTo(default(Guid)));
                     // ReSharper restore PossibleInvalidOperationException
 
                     householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
@@ -231,7 +231,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Households, Is.Not.Null);
                     Assert.That(householdMemberData.Households, Is.Not.Empty);
                     Assert.That(householdMemberData.Households.Count(), Is.EqualTo(1));
-                    Assert.That(householdMemberData.Households.SingleOrDefault(household => household.HouseholdIdentifier == householdAddServiceReceipt.Identifier.Value), Is.Not.Null);
+                    Assert.That(householdMemberData.Households.SingleOrDefault(household => household.HouseholdIdentifier == householdAddServiceReceipt1.Identifier.Value), Is.Not.Null);
 
                     householdAddCommand = new HouseholdAddCommand
                     {
@@ -239,12 +239,12 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                         Description = Guid.NewGuid().ToString("N"),
                         TranslationInfoIdentifier = translationInfoIdentifier
                     };
-                    householdAddServiceReceipt = _householdDataService.HouseholdAdd(householdAddCommand);
-                    Assert.That(householdAddServiceReceipt, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt.Identifier, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt.Identifier.HasValue, Is.True);
+                    var householdAddServiceReceipt2 = _householdDataService.HouseholdAdd(householdAddCommand);
+                    Assert.That(householdAddServiceReceipt2, Is.Not.Null);
+                    Assert.That(householdAddServiceReceipt2.Identifier, Is.Not.Null);
+                    Assert.That(householdAddServiceReceipt2.Identifier.HasValue, Is.True);
                     // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdAddServiceReceipt.Identifier.Value, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(householdAddServiceReceipt2.Identifier.Value, Is.Not.EqualTo(default(Guid)));
                     // ReSharper restore PossibleInvalidOperationException
 
                     householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
@@ -252,7 +252,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Households, Is.Not.Null);
                     Assert.That(householdMemberData.Households, Is.Not.Empty);
                     Assert.That(householdMemberData.Households.Count(), Is.EqualTo(2));
-                    Assert.That(householdMemberData.Households.SingleOrDefault(household => household.HouseholdIdentifier == householdAddServiceReceipt.Identifier.Value), Is.Not.Null);
+                    Assert.That(householdMemberData.Households.SingleOrDefault(household => household.HouseholdIdentifier == householdAddServiceReceipt2.Identifier.Value), Is.Not.Null);
 
                 }
                 finally
