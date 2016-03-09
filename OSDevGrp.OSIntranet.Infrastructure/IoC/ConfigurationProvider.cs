@@ -62,14 +62,14 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<IMySqlDataProvider>().Instance(new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName])).LifeStyle.Transient);
             container.Register(Component.For<IFoodWasteDataProvider>().Instance(new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteProviderConnectionStringSettingsName])).LifeStyle.Transient);
 
-            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)).LifestyleTransient());
 
-            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers").BasedOn(typeof (IDispatcher<>)).WithService.FromInterface(typeof (IDispatcher<>)));
-            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers").BasedOn(typeof (ICommandHandler)).WithService.FromInterface(typeof (ICommandHandler)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers").BasedOn(typeof (IDispatcher<>)).WithService.FromInterface(typeof (IDispatcher<>)).LifestyleTransient());
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.CommandHandlers").BasedOn(typeof (ICommandHandler)).WithService.FromInterface(typeof (ICommandHandler)).LifestyleTransient());
 
-            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.QueryHandlers").BasedOn(typeof (IQueryHandler)).WithService.FromInterface(typeof (IQueryHandler)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.QueryHandlers").BasedOn(typeof (IQueryHandler)).WithService.FromInterface(typeof (IQueryHandler)).LifestyleTransient());
 
-            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Services").BasedOn(typeof (IIntranetService)).WithService.FromInterface(typeof (IIntranetService)));
+            container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Services").BasedOn(typeof (IIntranetService)).WithService.FromInterface(typeof (IIntranetService)).LifestyleTransient());
         }
 
         #endregion

@@ -64,6 +64,29 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Adds a new household to the current caller. If the current caller is not created as a household
+        /// member account this account would be created.
+        /// </summary>
+        /// <param name="command">Command for adding a household to the current users household account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse HouseholdAdd(HouseholdAddCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<HouseholdAddCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets whether the current caller has been created as a household member.
         /// </summary>
         /// <param name="query">Query which can check whether the current caller has been created as a household member.</param>

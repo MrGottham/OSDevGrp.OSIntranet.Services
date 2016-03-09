@@ -38,6 +38,45 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tests that HouseholdAdd throws an FaultException when the household could not be created.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdAddThrowsFaultExceptionWhenHouseholdCouldNotBeCreated()
+        {
+            using (new ClaimsPrincipalTestExecutor())
+            {
+                var translationInfoCollection = _foodWasteHouseholdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                foreach (var translationInfo in translationInfoCollection)
+                {
+                    var householdAddCommand = new HouseholdAddCommand
+                    {
+                        Name = null,
+                        Description = null,
+                        TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                    };
+                    var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdAdd(householdAddCommand));
+                    Assert.That(faultException, Is.Not.Null);
+                    Assert.That(faultException.Detail, Is.Not.Null);
+                    Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
+                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+                    Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")));
+                    Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+                    Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+                    Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
+                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+                    Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdAdd"));
+                    Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+                    Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                }
+            }
+        }
+
+        /// <summary>
         /// Tests that HouseholdMemberIsCreated returns boolean result where the result is false.
         /// </summary>
         [Test]

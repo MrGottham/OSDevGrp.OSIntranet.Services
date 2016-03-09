@@ -15,6 +15,17 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteHouseholdDataService : IIntranetService
     {
         /// <summary>
+        /// Adds a new household to the current caller. If the current caller is not created as a household
+        /// member account this account would be created.
+        /// </summary>
+        /// <param name="command">Command for adding a household to the current users household account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse HouseholdAdd(HouseholdAddCommand command);
+
+        /// <summary>
         /// Gets whether the current caller has been created as a household member.
         /// </summary>
         /// <param name="query">Query which can check whether the current caller has been created as a household member.</param>
