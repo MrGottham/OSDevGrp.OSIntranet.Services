@@ -597,7 +597,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that Execute calls Map with the inserted household member on the object mapper which can map objects in the food waste domain..
+        /// Tests that Execute calls Map with the inserted household member on the object mapper which can map objects in the food waste domain.
         /// </summary>
         [Test]
         public void TestThatExecuteCallsMapWithInsertedHouseholdMemberOnFoodWasteObjectMapper()
@@ -642,7 +642,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that Execute returns the results from Map on the object mapper which can map objects in the food waste domain..
+        /// Tests that Execute returns the results from Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
         [Test]
         public void TestThatExecuteReturnsResultFromMapOnFoodWasteObjectMapper()

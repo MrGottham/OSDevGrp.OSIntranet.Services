@@ -70,7 +70,10 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 throw new ArgumentNullException("command");
             }
 
-            Specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.Name), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")))
+            var translationInfo = HouseholdDataRepository.Get<ITranslationInfo>(command.TranslationInfoIdentifier);
+
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(translationInfo), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.TranslationInfoIdentifier)))
+                .IsSatisfiedBy(() => CommonValidations.HasValue(command.Name), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")))
                 .IsSatisfiedBy(() => CommonValidations.IsLengthValid(command.Name, 1, 64), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, "Name", 1, 64)))
                 .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.Name) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Name")))
                 .IsSatisfiedBy(() => command.Description == null || CommonValidations.HasValue(command.Description), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Description")))
@@ -81,15 +84,18 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             var household = HouseholdDataRepository.Insert<IHousehold>(new Household(command.Name, command.Description));
             try
             {
-                var householdMember = HouseholdMemberGetCurrent(command.TranslationInfoIdentifier);
+                var householdMember = HouseholdMemberGetCurrent(translationInfo.Identifier.HasValue ? translationInfo.Identifier.Value : default(Guid));
                 household.HouseholdMemberAdd(householdMember);
+
+                var updatedHousehold = HouseholdDataRepository.Update(household);
+
+                return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(updatedHousehold, translationInfo.CultureInfo);
             }
             catch
             {
                 HouseholdDataRepository.Delete(household);
                 throw;
             }
-            return null;
         }
 
         /// <summary>

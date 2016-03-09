@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -6,6 +7,7 @@ using OSDevGrp.OSIntranet.CommandHandlers;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -109,28 +111,155 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that Execute calls HasValue with the name for the household on the common validations.
+        /// Tests that Execute calls Get with the identifier of the translation informations which should be used in the translation on the repository which can access household data for the food waste domain.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsHasValueWithNameOnCommonValidations()
+        public void TestThatExecuteCallsGetWithTranslationInfoIdentifierOnHouseholdDataRepository()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.NotNull))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddCommandHandler, Is.Not.Null);
+
+            var translationInfoIdentifier = Guid.NewGuid();
+            var householdAddCommand = fixture.Build<HouseholdAddCommand>()
+                .With(m => m.Name, fixture.Create<string>())
+                .With(m => m.Description, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, translationInfoIdentifier)
+                .Create();
+
+            householdAddCommandHandler.Execute(householdAddCommand);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Equal(translationInfoIdentifier)));
+        }
+
+
+        /// <summary>
+        /// Tests that Execute calls IsNotNull with the translation informations which should be used in the translation on the common validations.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsIsNotNullWithTranslationInfoOnCommonValidations()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<Exception>.Is.Anything))
+                .WhenCalled(e =>
+                {
+                    var func = (Func<bool>) e.Arguments.ElementAt(0);
+                    func.Invoke();
+                })
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddCommandHandler, Is.Not.Null);
+
+            var name = fixture.Create<string>();
+            var householdAddCommand = fixture.Build<HouseholdAddCommand>()
+                .With(m => m.Name, name)
+                .With(m => m.Description, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddCommandHandler.Execute(householdAddCommand);
+
+            commonValidationsMock.AssertWasCalled(m => m.IsNotNull(Arg<ITranslationInfo>.Is.Equal(translationInfoMock)));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls HasValue with the name for the household on the common validations.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsHasValueWithNameOnCommonValidations()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -165,22 +294,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsLengthValidWithNameOnCommonValidations()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -215,22 +354,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsContainsIllegalCharWithNameOnCommonValidations()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -265,22 +414,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHasValueWithDescriptionOnCommonValidationsWhenDescriptionIsNotNull()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -317,22 +476,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsIsLengthValidWithDescriptionOnCommonValidationsWhenDescriptionIsNotNull()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -369,22 +538,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsContainsIllegalCharWithDescriptionOnCommonValidationsWhenDescriptionIsNotNull()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -421,22 +600,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteDoesNotCallHasValueWithDescriptionOnCommonValidationsWhenDescriptionIsNull()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -473,22 +662,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteDoesNotCallIsLengthValidWithDescriptionOnCommonValidationsWhenDescriptionIsNull()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -525,22 +724,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteDoesNotCallContainsIllegalCharWithDescriptionOnCommonValidationsWhenDescriptionIsNull()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -571,28 +780,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         }
 
         /// <summary>
-        /// Tests that Execute calls IsSatisfiedBy on the specification which encapsulates validation rules 6 times.
+        /// Tests that Execute calls IsSatisfiedBy on the specification which encapsulates validation rules 7 times.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsIsSatisfiedByOnSpecification6Times()
+        public void TestThatExecuteCallsIsSatisfiedByOnSpecification7Times()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -611,7 +830,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdAddCommandHandler.Execute(householdAddCommand);
 
-            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(6));
+            specificationMock.AssertWasCalled(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.NotNull, Arg<IntranetBusinessException>.Is.TypeOf), opt => opt.Repeat.Times(7));
         }
 
         /// <summary>
@@ -621,22 +840,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsEvaluateOnSpecification()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -667,7 +896,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsInsertWithNewHouseholdOnHouseholdDataRepository(bool hasDescription)
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
@@ -675,6 +903,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var name = fixture.Create<string>();
             var description = hasDescription ? fixture.Create<string>() : null;
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.NotNull))
                 .WhenCalled(e =>
                 {
@@ -704,10 +935,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -736,22 +975,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsMailAddressOnClaimValueProvider()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -781,23 +1030,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenMailAddressOnClaimValueProviderThrowsException()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(insertedHouseholdMock)
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -827,23 +1086,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHouseholdMemberGetByMailAddressOnHouseholdDataRepository()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var mailAddress = fixture.Create<string>();
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(mailAddress)
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -873,24 +1142,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenHouseholdMemberGetByMailAddressOnHouseholdDataRepositoryThrowsException()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(insertedHouseholdMock)
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Throw(fixture.Create<Exception>())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var mailAddress = fixture.Create<string>();
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(mailAddress)
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -920,11 +1199,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHouseholdMemberAddOnLogicExecutorWhenHouseholdMemberGetByMailAddressOnHouseholdDataRepositoryDoesNotReturnHouseholdMember()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
@@ -934,11 +1216,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var mailAddress = fixture.Create<string>();
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(mailAddress)
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -954,16 +1244,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddCommandHandler, Is.Not.Null);
 
-            var translationInfoIdentifier = Guid.NewGuid();
             var householdAddCommand = fixture.Build<HouseholdAddCommand>()
                 .With(m => m.Name, fixture.Create<string>())
                 .With(m => m.Description, fixture.Create<string>())
-                .With(m => m.TranslationInfoIdentifier, translationInfoIdentifier)
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
                 .Create();
 
             householdAddCommandHandler.Execute(householdAddCommand);
 
-            logicExecutorMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<string>.Is.Equal(mailAddress), Arg<Guid>.Is.Equal(translationInfoIdentifier)));
+            logicExecutorMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<string>.Is.Equal(mailAddress), Arg<Guid>.Is.Equal(translationInfoMock.Identifier)));
             householdDataRepositoryMock.AssertWasNotCalled(m => m.Delete(Arg<IHousehold>.Is.Anything));
         }
 
@@ -974,12 +1263,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenHouseholdMemberAddOnLogicExecutorThrowsException()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(insertedHouseholdMock)
                 .Repeat.Any();
@@ -989,11 +1281,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var mailAddress = fixture.Create<string>();
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(mailAddress)
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1009,16 +1309,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddCommandHandler, Is.Not.Null);
 
-            var translationInfoIdentifier = Guid.NewGuid();
             var householdAddCommand = fixture.Build<HouseholdAddCommand>()
                 .With(m => m.Name, fixture.Create<string>())
                 .With(m => m.Description, fixture.Create<string>())
-                .With(m => m.TranslationInfoIdentifier, translationInfoIdentifier)
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
                 .Create();
 
             Assert.Throws<Exception>(() => householdAddCommandHandler.Execute(householdAddCommand));
 
-            logicExecutorMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<string>.Is.Equal(mailAddress), Arg<Guid>.Is.Equal(translationInfoIdentifier)));
+            logicExecutorMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<string>.Is.Equal(mailAddress), Arg<Guid>.Is.Equal(translationInfoMock.Identifier)));
             householdDataRepositoryMock.AssertWasCalled(m => m.Delete(Arg<IHousehold>.Is.Equal(insertedHouseholdMock)));
         }
 
@@ -1029,22 +1328,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteDoesNotCallHouseholdMemberAddOnLogicExecutorWhenHouseholdMemberGetByMailAddressOnHouseholdDataRepositoryDoesReturnHouseholdMember()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1074,11 +1383,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsGetWithHouseholdMemberIdentifierForNewlyCreatedHouseholdMemberOnHouseholdDataRepositoryWhenHouseholdMemberGetByMailAddressOnHouseholdDataRepositoryDoesNotReturnHouseholdMember()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
@@ -1088,10 +1399,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1124,15 +1443,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls Delete with the inserted household on the repository which can access household data for the food waste domain when Get with the identifier for the newly created household member on the repository which can access household data for the food waste domain throws an exception.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenWhenGetWithHouseholdMemberIdentifierForNewlyCreatedHouseholdMemberOnHouseholdDataRepositoryThrowsException()
+        public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenGetWithHouseholdMemberIdentifierForNewlyCreatedHouseholdMemberOnHouseholdDataRepositoryThrowsException()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(insertedHouseholdMock)
                 .Repeat.Any();
@@ -1142,10 +1463,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything))
                 .Throw(fixture.Create<Exception>())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1181,22 +1510,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteDoesNotCallGetForHouseholdMemberOnHouseholdDataRepositoryWhenHouseholdMemberGetByMailAddressOnHouseholdDataRepositoryDoesReturnHouseholdMember()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1226,7 +1565,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHouseholdMemberAddWithExistingHouseholdMemberOnInsertedHouseholdWhenHouseholdMemberGetByMailAddressOnHouseholdDataRepositoryDoesReturnHouseholdMember()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
@@ -1234,16 +1572,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             var existingHouseholdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(insertedHouseholdMock)
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(existingHouseholdMemberMock)
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1273,13 +1622,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatExecuteCallsHouseholdMemberAddWithInsertedHouseholdMemberOnInsertedHouseholdWhenHouseholdMemberGetByMailAddressOnHouseholdDataRepositoryDoesNotReturnHouseholdMember()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             var insertedHouseholdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(insertedHouseholdMock)
                 .Repeat.Any();
@@ -1289,10 +1640,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdDataRepositoryMock.Stub(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything))
                 .Return(insertedHouseholdMemberMock)
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1324,10 +1683,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         /// Tests that Execute calls Delete with the inserted household on the repository which can access household data for the food waste domain when HouseholdMemberAdd on the inserted household throws an exception.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenWhenHouseholdMemberAddOnInsertedHouseholdThrowsException()
+        public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenHouseholdMemberAddOnInsertedHouseholdThrowsException()
         {
             var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
@@ -1339,16 +1697,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             var existingHouseholdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
                 .Return(insertedHouseholdMock)
                 .Repeat.Any();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(existingHouseholdMemberMock)
                 .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             claimValueProviderMock.Stub(m => m.MailAddress)
                 .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -1369,6 +1738,288 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             insertedHouseholdMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<IHouseholdMember>.Is.Equal(existingHouseholdMemberMock)));
             householdDataRepositoryMock.AssertWasCalled(m => m.Delete(Arg<IHousehold>.Is.Equal(insertedHouseholdMock)));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Update with the inserted household on the repository which can access household data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsUpdateWithInsertedHouseholdOnHouseholdDataRepository()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
+                .Return(insertedHouseholdMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddCommandHandler, Is.Not.Null);
+
+            var householdAddCommand = fixture.Build<HouseholdAddCommand>()
+                .With(m => m.Name, fixture.Create<string>())
+                .With(m => m.Description, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddCommandHandler.Execute(householdAddCommand);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<IHousehold>.Is.Equal(insertedHouseholdMock)));
+            householdDataRepositoryMock.AssertWasNotCalled(m => m.Delete(Arg<IHousehold>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Delete with the inserted household on the repository which can access household data for the food waste domain when Update on the repository which can access household data for the food waste domain throws an exception.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenUpdateForInsertedHouseholdMemberOnHouseholdDataRepositoryThrowsException()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
+                .Return(insertedHouseholdMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddCommandHandler, Is.Not.Null);
+
+            var householdAddCommand = fixture.Build<HouseholdAddCommand>()
+                .With(m => m.Name, fixture.Create<string>())
+                .With(m => m.Description, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            Assert.Throws<Exception>(() => householdAddCommandHandler.Execute(householdAddCommand));
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<IHousehold>.Is.Equal(insertedHouseholdMock)));
+            householdDataRepositoryMock.AssertWasCalled(m => m.Delete(Arg<IHousehold>.Is.Equal(insertedHouseholdMock)));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Map with the updated household on the object mapper which can map objects in the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsMapWithUpdatedHouseholdOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var updatedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(updatedHouseholdMock)
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddCommandHandler, Is.Not.Null);
+
+            var householdAddCommand = fixture.Build<HouseholdAddCommand>()
+                .With(m => m.Name, fixture.Create<string>())
+                .With(m => m.Description, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddCommandHandler.Execute(householdAddCommand);
+
+            objectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(updatedHouseholdMock), Arg<CultureInfo>.Is.Equal(translationInfoMock.CultureInfo)));
+            householdDataRepositoryMock.AssertWasNotCalled(m => m.Delete(Arg<IHousehold>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that Execute calls Delete with the inserted household on the repository which can access household data for the food waste domain when Map on the object mapper which can map objects in the food waste domain throws an exception.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteCallsDeleteWithInsertedHouseholdWhenMapForUpdatedHouseholdOnFoodWasteObjectMapperThrowsException()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var insertedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            var updatedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
+                .Return(insertedHouseholdMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(updatedHouseholdMock)
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Throw(fixture.Create<Exception>())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddCommandHandler, Is.Not.Null);
+
+            var householdAddCommand = fixture.Build<HouseholdAddCommand>()
+                .With(m => m.Name, fixture.Create<string>())
+                .With(m => m.Description, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            Assert.Throws<Exception>(() => householdAddCommandHandler.Execute(householdAddCommand));
+
+            objectMapperMock.AssertWasCalled(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Equal(updatedHouseholdMock), Arg<CultureInfo>.Is.Equal(translationInfoMock.CultureInfo)));
+            householdDataRepositoryMock.AssertWasCalled(m => m.Delete(Arg<IHousehold>.Is.Equal(insertedHouseholdMock)));
+        }
+
+        /// <summary>
+        /// Tests that Execute returns the results from Map on the object mapper which can map objects in the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatExecuteReturnsResultFromMapOnFoodWasteObjectMapper()
+        {
+            var fixture = new Fixture();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Insert(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            claimValueProviderMock.Stub(m => m.MailAddress)
+                .Return(fixture.Create<string>())
+                .Repeat.Any();
+
+            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            objectMapperMock.Stub(m => m.Map<IIdentifiable, ServiceReceiptResponse>(Arg<IIdentifiable>.Is.Anything, Arg<CultureInfo>.Is.Anything))
+                .Return(serviceReceipt)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddCommandHandler = new HouseholdAddCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddCommandHandler, Is.Not.Null);
+
+            var householdAddCommand = fixture.Build<HouseholdAddCommand>()
+                .With(m => m.Name, fixture.Create<string>())
+                .With(m => m.Description, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            var result = householdAddCommandHandler.Execute(householdAddCommand);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(serviceReceipt));
         }
 
         /// <summary>
