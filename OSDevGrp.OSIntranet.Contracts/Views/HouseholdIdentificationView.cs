@@ -17,9 +17,9 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         public Guid HouseholdIdentifier { get; set; }
 
         /// <summary>
-        /// Gets or sets the description for the household.
+        /// Gets or sets the name for the household.
         /// </summary>
         [DataMember(IsRequired = true)]
-        public string Description { get; set; }
+        public string Name { get; set; }
     }
 }

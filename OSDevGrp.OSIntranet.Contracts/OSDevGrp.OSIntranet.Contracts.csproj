@@ -93,6 +93,7 @@
     <Compile Include="Queries\FirmalisteGetQuery.cs" />
     <Compile Include="Queries\FoodGroupTreeGetQuery.cs" />
     <Compile Include="Queries\FoodItemCollectionGetQuery.cs" />
+    <Compile Include="Queries\HouseholdDataGetQuery.cs" />
     <Compile Include="Queries\HouseholdMemberDataGetQuery.cs" />
     <Compile Include="Queries\HouseholdMemberDataGetQueryBase.cs" />
     <Compile Include="Queries\HouseholdMemberHasAcceptedPrivacyPolicyQuery.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Views\HouseholdIdentificationView.cs" />
     <Compile Include="Views\HouseholdMemberIdentificationView.cs" />
     <Compile Include="Views\HouseholdMemberView.cs" />
+    <Compile Include="Views\HouseholdView.cs" />
     <Compile Include="Views\KalenderbrugerAftaleView.cs" />
     <Compile Include="Views\KalenderbrugerView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />

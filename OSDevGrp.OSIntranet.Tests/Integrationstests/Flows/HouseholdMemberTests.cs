@@ -253,7 +253,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Households, Is.Not.Empty);
                     Assert.That(householdMemberData.Households.Count(), Is.EqualTo(2));
                     Assert.That(householdMemberData.Households.SingleOrDefault(household => household.HouseholdIdentifier == householdAddServiceReceipt2.Identifier.Value), Is.Not.Null);
-
                 }
                 finally
                 {

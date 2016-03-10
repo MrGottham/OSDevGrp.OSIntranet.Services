@@ -121,6 +121,7 @@
     <Compile Include="Integrationstests\ClaimsPrincipalTestExecutor.cs" />
     <Compile Include="Integrationstests\Flows\ClaimValueProviderTests.cs" />
     <Compile Include="Integrationstests\Flows\HouseholdMemberTests.cs" />
+    <Compile Include="Integrationstests\Flows\HouseholdTests.cs" />
     <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\CommunicationRepositoryTests.cs" />
@@ -206,6 +207,7 @@
     <Compile Include="Unittests\Contracts\Queries\FirmalisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodGroupTreeGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodItemCollectionGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\HouseholdDataGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdMemberDataGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdMemberHasAcceptedPrivacyPolicyQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdMemberIsActivatedQueryTests.cs" />
@@ -262,6 +264,7 @@
     <Compile Include="Unittests\Contracts\Views\HouseholdIdentificationViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\HouseholdMemberIdentificationViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\HouseholdMemberViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\HouseholdViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerAftaleViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />

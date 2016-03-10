@@ -41,7 +41,14 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             {
                 config.CreateMap<IHousehold, HouseholdIdentificationView>()
                     .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
-                    .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description));
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name));
+
+                config.CreateMap<IHousehold, HouseholdView>()
+                    .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
+                    .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description))
+                    .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
+                    .ForMember(m => m.HouseholdMembers, opt => opt.MapFrom(s => s.HouseholdMembers));
 
                 config.CreateMap<IHousehold, IHouseholdProxy>()
                     .ConstructUsing(m =>

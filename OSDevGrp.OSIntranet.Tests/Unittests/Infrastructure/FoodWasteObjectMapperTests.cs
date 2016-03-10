@@ -275,9 +275,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdIdentificationView.HouseholdIdentifier, Is.EqualTo(householdMock.Identifier.Value));
             // ReSharper restore PossibleInvalidOperationException
-            Assert.That(householdIdentificationView.Description, Is.Not.Null);
-            Assert.That(householdIdentificationView.Description, Is.Not.Empty);
-            Assert.That(householdIdentificationView.Description, Is.EqualTo(householdMock.Description));
+            Assert.That(householdIdentificationView.Name, Is.Not.Null);
+            Assert.That(householdIdentificationView.Name, Is.Not.Empty);
+            Assert.That(householdIdentificationView.Name, Is.EqualTo(householdMock.Name));
+        }
+
+        /// <summary>
+        /// Tests that Map maps Household to HouseholdView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsHouseholdToHouseholdView()
+        {
+            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            var householdView = foodWasteObjectMapper.Map<IHousehold, HouseholdView>(householdMock);
+            Assert.That(householdView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(householdView.HouseholdIdentifier, Is.EqualTo(householdMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdView.Name, Is.Not.Null);
+            Assert.That(householdView.Name, Is.Not.Empty);
+            Assert.That(householdView.Name, Is.EqualTo(householdMock.Name));
+            Assert.That(householdView.Description, Is.Not.Null);
+            Assert.That(householdView.Description, Is.Not.Empty);
+            Assert.That(householdView.Description, Is.EqualTo(householdMock.Description));
+            Assert.That(householdView.CreationTime, Is.EqualTo(householdMock.CreationTime));
+            Assert.That(householdView.HouseholdMembers, Is.Not.Null);
+            Assert.That(householdView.HouseholdMembers, Is.Not.Empty);
+            Assert.That(householdView.HouseholdMembers, Is.TypeOf<List<HouseholdMemberIdentificationView>>());
+            Assert.That(householdView.HouseholdMembers.Count(), Is.EqualTo(householdMock.HouseholdMembers.Count()));
         }
 
         /// <summary>

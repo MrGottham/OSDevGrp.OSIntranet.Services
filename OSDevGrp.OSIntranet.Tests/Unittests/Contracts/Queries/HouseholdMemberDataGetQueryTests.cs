@@ -5,16 +5,16 @@ using Ploeh.AutoFixture;
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
 {
     /// <summary>
-    /// Tests the for getting household member data for the current user
+    /// Tests the query for getting household member data for the current user.
     /// </summary>
     [TestFixture]
     public class HouseholdMemberDataGetQueryTests
     {
         /// <summary>
-        /// Tests that for getting household member data for the current user can be initialized.
+        /// Tests that the query for getting household member data for the current user can be initialized.
         /// </summary>
         [Test]
-        public void TestThatHouseholdMemberHasAcceptedPrivacyPolicyQueryCanBeInitialized()
+        public void TestThatHouseholdMemberDataGetQueryCanBeInitialized()
         {
             var fixture = new Fixture();
             var householdMemberDataGetQuery = fixture.Create<HouseholdMemberDataGetQuery>();
@@ -22,10 +22,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Queries
         }
 
         /// <summary>
-        /// Tests that for getting household member data for the current user can be serialized.
+        /// Tests that the query for getting household member data for the current user can be serialized.
         /// </summary>
         [Test]
-        public void TestThatHouseholdMemberHasAcceptedPrivacyPolicyQueryCanBeSerialized()
+        public void TestThatHouseholdMemberDataGetQueryCanBeSerialized()
         {
             var fixture = new Fixture();
             var householdMemberDataGetQuery = fixture.Create<HouseholdMemberDataGetQuery>();
