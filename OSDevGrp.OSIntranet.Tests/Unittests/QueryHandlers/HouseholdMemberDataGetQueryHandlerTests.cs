@@ -101,7 +101,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         }
 
         /// <summary>
-        /// Tests that GetData Calls X on the household member.
+        /// Tests that GetData calls Translate on the household member.
         /// </summary>
         [Test]
         public void TestThatGetDataCallsTranslateOnHouseholdMember()

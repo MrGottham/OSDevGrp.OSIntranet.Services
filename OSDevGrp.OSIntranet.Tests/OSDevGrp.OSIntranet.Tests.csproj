@@ -360,6 +360,7 @@
     <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerForSystemViewTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerTest.cs" />
+    <Compile Include="Unittests\QueryHandlers\HouseholdDataGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\HouseholdMemberDataGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\HouseholdMemberHasAcceptedPrivacyPolicyQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\HouseholdMemberIsActivatedQueryHandlerTests.cs" />

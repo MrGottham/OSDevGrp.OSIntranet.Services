@@ -8,7 +8,6 @@ using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using Ploeh.AutoFixture;
-using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
 {
@@ -70,6 +69,42 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     var householdIdentifier = householdAddServiceReceipt.Identifier.Value;
                     // ReSharper restore PossibleInvalidOperationException
                     Assert.That(householdAddServiceReceipt.Identifier.Value, Is.Not.EqualTo(default(Guid)));
+
+                    var householdMemberIsCreatedBooleanResponse = _householdDataService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                    Assert.That(householdMemberIsCreatedBooleanResponse, Is.Not.Null);
+                    Assert.That(householdMemberIsCreatedBooleanResponse.Result, Is.True);
+
+                    var householdMemberIsActivatedBooleanResponse = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    Assert.That(householdMemberIsActivatedBooleanResponse, Is.Not.Null);
+                    Assert.That(householdMemberIsActivatedBooleanResponse.Result, Is.False);
+
+                    var householdMemberActivateCommand = new HouseholdMemberActivateCommand
+                    {
+                        ActivationCode = _householdDataRepository.HouseholdMemberGetByMailAddress(executor.MailAddress).ActivationCode
+                    };
+                    var householdMemberActivateServiceReceipt = _householdDataService.HouseholdMemberActivate(householdMemberActivateCommand);
+                    Assert.That(householdMemberActivateServiceReceipt, Is.Not.Null);
+                    Assert.That(householdMemberActivateServiceReceipt.Identifier, Is.Not.Null);
+                    Assert.That(householdMemberActivateServiceReceipt.Identifier.HasValue, Is.True);
+                    Assert.That(householdMemberActivateServiceReceipt.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+
+                    householdMemberIsActivatedBooleanResponse = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    Assert.That(householdMemberIsActivatedBooleanResponse, Is.Not.Null);
+                    Assert.That(householdMemberIsActivatedBooleanResponse.Result, Is.True);
+
+                    var householdMemberHasAcceptedPrivacyPolicyBooleanResponse = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse, Is.Not.Null);
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse.Result, Is.False);
+
+                    var householdMemberAcceptPrivacyPolicyServiceReceipt = _householdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand());
+                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt, Is.Not.Null);
+                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt.Identifier, Is.Not.Null);
+                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt.Identifier.HasValue, Is.True);
+                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+
+                    householdMemberHasAcceptedPrivacyPolicyBooleanResponse = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse, Is.Not.Null);
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse.Result, Is.True);
                 }
                 finally
                 {
