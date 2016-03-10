@@ -57,60 +57,79 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Description = fixture.Create<string>(),
                     TranslationInfoIdentifier = translationInfoIdentifier
                 };
-                var householdAddServiceReceipt = _householdDataService.HouseholdAdd(householdAddCommand);
+                var householdAdd = _householdDataService.HouseholdAdd(householdAddCommand);
                 try
                 {
-                    Assert.That(householdAddServiceReceipt, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt.Identifier, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt.Identifier.HasValue, Is.True);
-                    Assert.That(householdAddServiceReceipt.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    Assert.That(householdAdd, Is.Not.Null);
+                    Assert.That(householdAdd.Identifier, Is.Not.Null);
+                    Assert.That(householdAdd.Identifier.HasValue, Is.True);
 
                     // ReSharper disable PossibleInvalidOperationException
-                    var householdIdentifier = householdAddServiceReceipt.Identifier.Value;
+                    var householdIdentifier = householdAdd.Identifier.Value;
                     // ReSharper restore PossibleInvalidOperationException
-                    Assert.That(householdAddServiceReceipt.Identifier.Value, Is.Not.EqualTo(default(Guid)));
+                    Assert.That(householdIdentifier, Is.Not.EqualTo(default(Guid)));
 
-                    var householdMemberIsCreatedBooleanResponse = _householdDataService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
-                    Assert.That(householdMemberIsCreatedBooleanResponse, Is.Not.Null);
-                    Assert.That(householdMemberIsCreatedBooleanResponse.Result, Is.True);
+                    var householdMemberIsCreated = _householdDataService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                    Assert.That(householdMemberIsCreated, Is.Not.Null);
+                    Assert.That(householdMemberIsCreated.Result, Is.True);
 
-                    var householdMemberIsActivatedBooleanResponse = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
-                    Assert.That(householdMemberIsActivatedBooleanResponse, Is.Not.Null);
-                    Assert.That(householdMemberIsActivatedBooleanResponse.Result, Is.False);
+                    var householdMemberIsActivated = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    Assert.That(householdMemberIsActivated, Is.Not.Null);
+                    Assert.That(householdMemberIsActivated.Result, Is.False);
 
+                    var currentMailAddress = executor.MailAddress;
                     var householdMemberActivateCommand = new HouseholdMemberActivateCommand
                     {
-                        ActivationCode = _householdDataRepository.HouseholdMemberGetByMailAddress(executor.MailAddress).ActivationCode
+                        ActivationCode = _householdDataRepository.HouseholdMemberGetByMailAddress(currentMailAddress).ActivationCode
                     };
-                    var householdMemberActivateServiceReceipt = _householdDataService.HouseholdMemberActivate(householdMemberActivateCommand);
-                    Assert.That(householdMemberActivateServiceReceipt, Is.Not.Null);
-                    Assert.That(householdMemberActivateServiceReceipt.Identifier, Is.Not.Null);
-                    Assert.That(householdMemberActivateServiceReceipt.Identifier.HasValue, Is.True);
-                    Assert.That(householdMemberActivateServiceReceipt.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    var householdMemberActivate = _householdDataService.HouseholdMemberActivate(householdMemberActivateCommand);
+                    Assert.That(householdMemberActivate, Is.Not.Null);
+                    Assert.That(householdMemberActivate.Identifier, Is.Not.Null);
+                    Assert.That(householdMemberActivate.Identifier.HasValue, Is.True);
 
-                    householdMemberIsActivatedBooleanResponse = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
-                    Assert.That(householdMemberIsActivatedBooleanResponse, Is.Not.Null);
-                    Assert.That(householdMemberIsActivatedBooleanResponse.Result, Is.True);
+                    householdMemberIsActivated = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    Assert.That(householdMemberIsActivated, Is.Not.Null);
+                    Assert.That(householdMemberIsActivated.Result, Is.True);
 
-                    var householdMemberHasAcceptedPrivacyPolicyBooleanResponse = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
-                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse, Is.Not.Null);
-                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse.Result, Is.False);
+                    var householdMemberHasAcceptedPrivacyPolicy = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.False);
 
-                    var householdMemberAcceptPrivacyPolicyServiceReceipt = _householdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand());
-                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt, Is.Not.Null);
-                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt.Identifier, Is.Not.Null);
-                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt.Identifier.HasValue, Is.True);
-                    Assert.That(householdMemberAcceptPrivacyPolicyServiceReceipt.EventDate, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    var householdMemberAcceptPrivacyPolicy = _householdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand());
+                    Assert.That(householdMemberAcceptPrivacyPolicy, Is.Not.Null);
+                    Assert.That(householdMemberAcceptPrivacyPolicy.Identifier, Is.Not.Null);
+                    Assert.That(householdMemberAcceptPrivacyPolicy.Identifier.HasValue, Is.True);
 
-                    householdMemberHasAcceptedPrivacyPolicyBooleanResponse = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
-                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse, Is.Not.Null);
-                    Assert.That(householdMemberHasAcceptedPrivacyPolicyBooleanResponse.Result, Is.True);
+                    householdMemberHasAcceptedPrivacyPolicy = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
+                    Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.True);
+
+                    var householdDataGetQuery = new HouseholdDataGetQuery
+                    {
+                        HouseholdIdentifier = householdIdentifier,
+                        TranslationInfoIdentifier = translationInfoIdentifier
+                    };
+                    var householdData = _householdDataService.HouseholdDataGet(householdDataGetQuery);
+                    Assert.That(householdData, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.EqualTo(householdIdentifier));
+                    Assert.That(householdData.Name, Is.Not.Null);
+                    Assert.That(householdData.Name, Is.Not.Empty);
+                    Assert.That(householdData.Name, Is.EqualTo(householdAddCommand.Name));
+                    Assert.That(householdData.Name, Is.Not.Null);
+                    Assert.That(householdData.Name, Is.Not.Empty);
+                    Assert.That(householdData.Name, Is.EqualTo(householdAddCommand.Name));
+                    Assert.That(householdData.CreationTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    Assert.That(householdData.HouseholdMembers, Is.Not.Null);
+                    Assert.That(householdData.HouseholdMembers, Is.Not.Empty);
+                    Assert.That(householdData.HouseholdMembers.Count(), Is.EqualTo(1));
+                    Assert.That(householdData.HouseholdMembers.SingleOrDefault(householdMember => string.Compare(householdMember.MailAddress, currentMailAddress, StringComparison.Ordinal) == 0), Is.Not.Null);
                 }
                 finally
                 {
-                    if (householdAddServiceReceipt != null && householdAddServiceReceipt.Identifier.HasValue)
+                    if (householdAdd != null && householdAdd.Identifier.HasValue)
                     {
-                        _householdDataRepository.Delete(_householdDataRepository.Get<IHousehold>(householdAddServiceReceipt.Identifier.Value));
+                        _householdDataRepository.Delete(_householdDataRepository.Get<IHousehold>(householdAdd.Identifier.Value));
                     }
                 }
             }

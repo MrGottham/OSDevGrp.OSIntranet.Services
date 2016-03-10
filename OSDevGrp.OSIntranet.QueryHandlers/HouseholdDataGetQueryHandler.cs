@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Linq;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.QueryHandlers
 {
@@ -51,7 +54,16 @@ namespace OSDevGrp.OSIntranet.QueryHandlers
             {
                 throw new ArgumentNullException("translationInfo");
             }
-            throw new NotImplementedException();
+
+            var household = householdMember.Households.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == query.HouseholdIdentifier);
+            if (household == null)
+            {
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, query.HouseholdIdentifier));
+            }
+
+            household.Translate(translationInfo.CultureInfo, false);
+
+            return household;
         }
 
         #endregion

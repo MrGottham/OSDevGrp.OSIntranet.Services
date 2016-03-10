@@ -64,6 +64,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Gets household data for one of the current callers households.
+        /// </summary>
+        /// <param name="query">Query for getting household data for one of the current callers households.</param>
+        /// <returns>Household data.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual HouseholdView HouseholdDataGet(HouseholdDataGetQuery query)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException("query");
+            }
+            try
+            {
+                return _queryBus.Query<HouseholdDataGetQuery, HouseholdView>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Adds a new household to the current caller. If the current caller is not created as a household
         /// member account this account would be created.
         /// </summary>

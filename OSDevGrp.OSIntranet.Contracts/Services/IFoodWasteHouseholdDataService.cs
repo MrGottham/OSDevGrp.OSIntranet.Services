@@ -15,6 +15,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteHouseholdDataService : IIntranetService
     {
         /// <summary>
+        /// Gets household data for one of the current callers households.
+        /// </summary>
+        /// <param name="query">Query for getting household data for one of the current callers households.</param>
+        /// <returns>Household data.</returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        HouseholdView HouseholdDataGet(HouseholdDataGetQuery query);
+
+        /// <summary>
         /// Adds a new household to the current caller. If the current caller is not created as a household
         /// member account this account would be created.
         /// </summary>
