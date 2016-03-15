@@ -53,6 +53,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             #endregion
 
+            #region Properties
+
+            /// <summary>
+            /// Indicates whether AddValidationRules is called.
+            /// </summary>
+            public bool AddValidationRulesIsCalled { get; private set; }
+
+            /// <summary>
+            /// Gets the household which has been handled.
+            /// </summary>
+            public IHousehold HandledHousehold { get; private set; }
+
+            #endregion
+
             #region Methods
 
             /// <summary>
@@ -101,6 +115,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             public IExceptionBuilder GetExceptionBuilder()
             {
                 return base.ExceptionBuilder;
+            }
+
+            /// <summary>
+            /// Adds validation rules to the specification which encapsulates validation rules.
+            /// </summary>
+            /// <param name="household">Household on which to modify data.</param>
+            /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
+            /// <param name="specification">Specification which encapsulates validation rules.</param>
+            public override void AddValidationRules(IHousehold household, TCommand command, ISpecification specification)
+            {
+                throw new NotImplementedException();
             }
 
             #endregion
@@ -275,7 +300,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             var householdDataModificationCommandHandlerBase = new MyHouseholdDataModificationCommandHandler<MyHouseholdDataModificationCommand>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
             Assert.That(householdDataModificationCommandHandlerBase, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => householdDataModificationCommandHandlerBase.AddValidationRules(null, fixture.Create<MyHouseholdDataModificationCommand>(), specificationMock));
+            var exception = Assert.Throws<ArgumentNullException>(() => householdDataModificationCommandHandlerBase.AddValidationRules((IHouseholdMember) null, fixture.Create<MyHouseholdDataModificationCommand>(), specificationMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -284,7 +309,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Tests that AddValidationRules throws an ArgumentNullException when the command for modifying some data on a household member is null.
+        /// Tests that AddValidationRules throws an ArgumentNullException when the command for modifying some data on a given household on the current household member is null.
         /// </summary>
         [Test]
         public void TestThatAddValidationRulesThrowsArgumentNullExceptionWhenCommandIsNull()
@@ -489,6 +514,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
+        /// Tests that AddValidationRules calls AddValidationRules with the household on which to modify data.
+        /// </summary>
+        [Test]
+        public void TestThatAddValidationRulesCallsAddValidationRulesWithHousehold()
+        {
+            var fixture = new Fixture();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdDataModificationCommandHandlerBase = new MyHouseholdDataModificationCommandHandler<MyHouseholdDataModificationCommand>(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, exceptionBuilderMock);
+            Assert.That(householdDataModificationCommandHandlerBase, Is.Not.Null);
+            Assert.That(householdDataModificationCommandHandlerBase.AddValidationRulesIsCalled, Is.False);
+            Assert.That(householdDataModificationCommandHandlerBase.HandledHousehold, Is.Null);
+
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            Assert.That(householdMemberMock, Is.Not.Null);
+            Assert.That(householdMemberMock.Households, Is.Not.Null);
+            Assert.That(householdMemberMock.Households, Is.Not.Empty);
+
+            var householdMock = householdMemberMock.Households.FirstOrDefault();
+            Assert.That(householdMock, Is.Not.Null);
+
+            var householdDataModificationCommandBase = fixture.Build<MyHouseholdDataModificationCommand>()
+                // ReSharper disable PossibleInvalidOperationException
+                .With(m => m.HouseholdIdentifier, householdMock.Identifier.Value)
+                // ReSharper restore PossibleInvalidOperationException
+                .Create();
+
+            householdDataModificationCommandHandlerBase.AddValidationRules(householdMemberMock, householdDataModificationCommandBase, specificationMock);
+            Assert.That(householdDataModificationCommandHandlerBase.AddValidationRulesIsCalled, Is.True);
+            Assert.That(householdDataModificationCommandHandlerBase.HandledHousehold, Is.Not.Null);
+            Assert.That(householdDataModificationCommandHandlerBase.HandledHousehold, Is.EqualTo(householdMock));
+        }
+
+        /// <summary>
         /// Tests that ModifyData throws an ArgumentNullException when the household member for which to modify data is null.
         /// </summary>
         [Test]
@@ -514,7 +582,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Tests that ModifyData throws an ArgumentNullException when the command for modifying some data on a household member is null.
+        /// Tests that ModifyData throws an ArgumentNullException when the command for modifying some data on a given household on the current household member is null.
         /// </summary>
         [Test]
         public void TestThatModifyDataThrowsArgumentNullExceptionWhenCommandIsNull()

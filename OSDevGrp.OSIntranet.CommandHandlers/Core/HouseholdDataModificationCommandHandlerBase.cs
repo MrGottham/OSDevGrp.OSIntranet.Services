@@ -41,7 +41,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// Adds validation rules to the specification which encapsulates validation rules.
         /// </summary>
         /// <param name="householdMember">Household member for which to modify data.</param>
-        /// <param name="command">Command for modifying some data on a household member.</param>
+        /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
         /// <param name="specification">Specification which encapsulates validation rules.</param>
         public override void AddValidationRules(IHouseholdMember householdMember, TCommand command, ISpecification specification)
         {
@@ -68,7 +68,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// Modifies the data.
         /// </summary>
         /// <param name="householdMember">Household member for which to modify data.</param>
-        /// <param name="command">Command for modifying some data on a household member.</param>
+        /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
         /// <returns>An identifiable domain object in the food waste domain.</returns>
         public override IIdentifiable ModifyData(IHouseholdMember householdMember, TCommand command)
         {
@@ -88,6 +88,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 
             return null;
         }
+
+        /// <summary>
+        /// Adds validation rules to the specification which encapsulates validation rules.
+        /// </summary>
+        /// <param name="household">Household on which to modify data.</param>
+        /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
+        /// <param name="specification">Specification which encapsulates validation rules.</param>
+        public abstract void AddValidationRules(IHousehold household, TCommand command, ISpecification specification);
 
         #endregion
     }
