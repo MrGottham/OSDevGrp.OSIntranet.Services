@@ -61,6 +61,7 @@
     <Compile Include="Commands\ForeignKeyModifyCommand.cs" />
     <Compile Include="Commands\FoodGroupImportFromDataProviderCommand.cs" />
     <Compile Include="Commands\HouseholdAddCommand.cs" />
+    <Compile Include="Commands\HouseholdDataModificationCommandBase.cs" />
     <Compile Include="Commands\HouseholdMemberAcceptPrivacyPolicyCommand.cs" />
     <Compile Include="Commands\HouseholdMemberActivateCommand.cs" />
     <Compile Include="Commands\HouseholdMemberAddCommand.cs" />
