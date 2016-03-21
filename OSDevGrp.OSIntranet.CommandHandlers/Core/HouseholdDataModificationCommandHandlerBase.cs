@@ -62,6 +62,8 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
 
             specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(household), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.HouseholdIdentifier)))
                 .Evaluate();
+
+            AddValidationRules(household, command, specification);
         }
 
         /// <summary>

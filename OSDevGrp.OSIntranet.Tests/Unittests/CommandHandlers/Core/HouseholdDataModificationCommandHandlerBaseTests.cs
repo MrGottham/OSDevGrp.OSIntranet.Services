@@ -65,6 +65,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             /// </summary>
             public IHousehold HandledHousehold { get; private set; }
 
+            /// <summary>
+            /// Gets the command which has been handled.
+            /// </summary>
+            public TCommand HandledCommand { get; private set; }
+
             #endregion
 
             #region Methods
@@ -125,7 +130,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             /// <param name="specification">Specification which encapsulates validation rules.</param>
             public override void AddValidationRules(IHousehold household, TCommand command, ISpecification specification)
             {
-                throw new NotImplementedException();
+                Assert.That(household, Is.Not.Null);
+                Assert.That(command, Is.Not.Null);
+                Assert.That(specification, Is.Not.Null);
+                Assert.That(specification, Is.EqualTo(base.Specification));
+                AddValidationRulesIsCalled = true;
+                HandledHousehold = household;
+                HandledCommand = command;
             }
 
             #endregion
@@ -535,6 +546,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.That(householdDataModificationCommandHandlerBase, Is.Not.Null);
             Assert.That(householdDataModificationCommandHandlerBase.AddValidationRulesIsCalled, Is.False);
             Assert.That(householdDataModificationCommandHandlerBase.HandledHousehold, Is.Null);
+            Assert.That(householdDataModificationCommandHandlerBase.HandledCommand, Is.Null);
 
             var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             Assert.That(householdMemberMock, Is.Not.Null);
@@ -554,6 +566,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.That(householdDataModificationCommandHandlerBase.AddValidationRulesIsCalled, Is.True);
             Assert.That(householdDataModificationCommandHandlerBase.HandledHousehold, Is.Not.Null);
             Assert.That(householdDataModificationCommandHandlerBase.HandledHousehold, Is.EqualTo(householdMock));
+            Assert.That(householdDataModificationCommandHandlerBase.HandledCommand, Is.Not.Null);
+            Assert.That(householdDataModificationCommandHandlerBase.HandledCommand, Is.EqualTo(householdDataModificationCommandBase));
         }
 
         /// <summary>
