@@ -88,7 +88,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(household), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.HouseholdIdentifier)))
                 .Evaluate();
 
-            return null;
+            return ModifyData(household, command);
         }
 
         /// <summary>
@@ -98,6 +98,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
         /// <param name="specification">Specification which encapsulates validation rules.</param>
         public abstract void AddValidationRules(IHousehold household, TCommand command, ISpecification specification);
+
+        /// <summary>
+        /// Modifies the data.
+        /// </summary>
+        /// <param name="household">Household on which to modify data.</param>
+        /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
+        /// <returns>An identifiable domain object in the food waste domain.</returns>
+        public abstract IIdentifiable ModifyData(IHousehold household, TCommand command);
 
         #endregion
     }
