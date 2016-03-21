@@ -63,6 +63,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -86,6 +87,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("command"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -110,6 +112,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("specification"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -134,6 +137,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>

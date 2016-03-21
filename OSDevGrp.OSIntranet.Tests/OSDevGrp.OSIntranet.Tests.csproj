@@ -168,6 +168,7 @@
     <Compile Include="Unittests\CommandHandlers\HouseholdMemberActivateCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\HouseholdMemberAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\HouseholdMemberUpgradeMembershipCommandHandlerTests.cs" />
+    <Compile Include="Unittests\CommandHandlers\HouseholdUpdateCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationAddCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationModifyCommandHandlerTests.cs" />
@@ -183,6 +184,7 @@
     <Compile Include="Unittests\Contracts\Commands\HouseholdMemberActivateCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\HouseholdMemberAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\HouseholdMemberUpgradeMembershipCommandTests.cs" />
+    <Compile Include="Unittests\Contracts\Commands\HouseholdUpdateCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationDeleteCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\TranslationModifyCommandTests.cs" />

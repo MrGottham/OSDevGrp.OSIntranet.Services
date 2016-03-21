@@ -14,7 +14,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Commands
         /// Tests that the command for adding a household to the current users household account can be initialized.
         /// </summary>
         [Test]
-        public void TestThaHouseholdAddCommandCanBeInitialized()
+        public void TestThatHouseholdAddCommandCanBeInitialized()
         {
             var fixture = new Fixture();
             var householdAddCommand = fixture.Create<HouseholdAddCommand>();

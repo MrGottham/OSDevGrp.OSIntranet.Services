@@ -66,6 +66,7 @@
     <Compile Include="Commands\HouseholdMemberActivateCommand.cs" />
     <Compile Include="Commands\HouseholdMemberAddCommand.cs" />
     <Compile Include="Commands\HouseholdMemberDataModificationCommandBase.cs" />
+    <Compile Include="Commands\HouseholdUpdateCommand.cs" />
     <Compile Include="Commands\TranslationAddCommand.cs" />
     <Compile Include="Commands\TranslationDeleteCommand.cs" />
     <Compile Include="Commands\TranslationModifyCommand.cs" />
