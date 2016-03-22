@@ -271,4 +271,11 @@
     <value>The length for the value given in the property named '{0}' is invalid (length should be  between {1} and {2} characters).</value>
     <comment>{0} = Name of property, {1} = Min. length, {2} = Max. length.</comment>
   </data>
+  <data name="CannotModifyHouseholdMembershipForYourself" xml:space="preserve">
+    <value>You cannot modify the membership on one or more households for your own mail address.</value>
+  </data>
+  <data name="HouseholdMemberAlreadyExistsOnHousehold" xml:space="preserve">
+    <value>A household member with the mail address '{0}' already exists on the household.</value>
+    <comment>{0} = Mail address.</comment>
+  </data>
 </root>

@@ -81,10 +81,12 @@
     <Compile Include="ForeignKeyModifyCommandHandler.cs" />
     <Compile Include="FoodGroupImportFromDataProviderCommandHandler.cs" />
     <Compile Include="HouseholdAddCommandHandler.cs" />
+    <Compile Include="HouseholdAddHouseholdMemberCommandHandler.cs" />
     <Compile Include="HouseholdMemberAcceptPrivacyPolicyCommandHandler.cs" />
     <Compile Include="HouseholdMemberActivateCommandHandler.cs" />
     <Compile Include="HouseholdMemberAddCommandHandler.cs" />
     <Compile Include="HouseholdMemberUpgradeMembershipCommandHandler.cs" />
+    <Compile Include="HouseholdRemoveHouseholdMemberCommandHandler.cs" />
     <Compile Include="HouseholdUpdateCommandHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TranslationAddCommandHandler.cs" />

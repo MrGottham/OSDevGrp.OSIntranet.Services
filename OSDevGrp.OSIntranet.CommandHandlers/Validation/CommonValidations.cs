@@ -54,6 +54,16 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Validation
         }
 
         /// <summary>
+        /// Checks whether an object is null.
+        /// </summary>
+        /// <param name="value">Object.</param>
+        /// <returns>True when the object is null otherwise false.</returns>
+        public virtual bool IsNull(object value)
+        {
+            return value == null;
+        }
+
+        /// <summary>
         /// Checks whether an object is not null.
         /// </summary>
         /// <param name="value">Object.</param>

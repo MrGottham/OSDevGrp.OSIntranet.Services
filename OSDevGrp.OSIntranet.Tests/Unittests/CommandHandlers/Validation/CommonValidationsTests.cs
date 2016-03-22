@@ -135,6 +135,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
         }
 
         /// <summary>
+        /// Tests that IsNull returns true when the object is null.
+        /// </summary>
+        [Test]
+        public void TestThatIsNullReturnsTrueWhenObjectIsNull()
+        {
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.IsNull(null), Is.True);
+        }
+
+        /// <summary>
+        /// Tests that IsNull returns false when the object is not null.
+        /// </summary>
+        [Test]
+        public void TestThatIsNullReturnsFalseWhenObjectIsNotNull()
+        {
+            var fixture = new Fixture();
+
+            var commonValidations = new CommonValidations();
+            Assert.That(commonValidations, Is.Not.Null);
+
+            Assert.That(commonValidations.IsNull(fixture.Create<object>()), Is.False);
+        }
+
+        /// <summary>
         /// Tests that IsNotNull returns true when the object is not null.
         /// </summary>
         [Test]

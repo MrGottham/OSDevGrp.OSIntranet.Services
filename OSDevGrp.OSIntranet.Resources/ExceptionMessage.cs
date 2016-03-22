@@ -48,6 +48,8 @@
         DateTimeValueForPropertyIsNotInPast,
         DateTimeValueForPropertyIsNotInFuture,
         DataProviderDoesNotHandlesPayments,
-        LengthForPropertyIsInvalid
+        LengthForPropertyIsInvalid,
+        CannotModifyHouseholdMembershipForYourself,
+        HouseholdMemberAlreadyExistsOnHousehold
     }
 }

@@ -649,6 +649,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
+        /// Tester, at ExceptionMessage for CannotModifyHouseholdMembershipForYourself hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForCannotModifyHouseholdMembershipForYourselffHentes()
+        {
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CannotModifyHouseholdMembershipForYourself);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for HouseholdMemberAlreadyExistsOnHousehold hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForHouseholdMemberAlreadyExistsOnHouseholdHentes()
+        {
+            var fixture = new Fixture();
+
+            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberAlreadyExistsOnHousehold);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberAlreadyExistsOnHousehold, fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
         /// Tester, at ResourceException kastes, hvis ExceptionMessage ikke findes.
         /// </summary>
         [Test]

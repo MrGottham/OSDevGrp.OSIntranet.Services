@@ -271,4 +271,11 @@
     <value>Længden på værdien i egenskaben med navnet '{0}' er ugyldig (længden skal være mellem {1} og {2} tegn).</value>
     <comment>{0} = Navn på egenskab, {1} = Min. længde, {2} = Max. længde.</comment>
   </data>
+  <data name="CannotModifyHouseholdMembershipForYourself" xml:space="preserve">
+    <value>Du kan ikke ændre medlemskabet på en eller flere husstande for din egen mailadresse.</value>
+  </data>
+  <data name="HouseholdMemberAlreadyExistsOnHousehold" xml:space="preserve">
+    <value>Der findes allerede et husstandsmedlem med mailadressen '{0}' på husstanden.</value>
+    <comment>{0} = Mailadresse.</comment>
+  </data>
 </root>
