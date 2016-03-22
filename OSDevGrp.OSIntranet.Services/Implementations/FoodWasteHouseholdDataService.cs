@@ -109,6 +109,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
+        /// Updates a given household on which the current caller has a membership.
+        /// </summary>
+        /// <param name="command">Command for updatering a household on the current callers household account.</param>
+        /// <returns></returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse HouseholdUpdate(HouseholdUpdateCommand command)
+        {
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<HouseholdUpdateCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        /// <summary>
         /// Gets whether the current caller has been created as a household member.
         /// </summary>
         /// <param name="query">Query which can check whether the current caller has been created as a household member.</param>

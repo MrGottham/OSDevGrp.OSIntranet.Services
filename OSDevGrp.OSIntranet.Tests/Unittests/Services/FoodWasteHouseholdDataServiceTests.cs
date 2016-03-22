@@ -299,6 +299,106 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
+        /// Tests that HouseholdUpdate throws an ArgumentNullException when the command for updatering a household on the current callers household account is null.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdUpdateThrowsArgumentNullExceptionIfHouseholdUpdateCommandIsNull()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var foodWasteHouseholdDataService = new FoodWasteHouseholdDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdDataService, Is.Not.Null);
+
+            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteHouseholdDataService.HouseholdUpdate(null));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("command"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that HouseholdUpdate calls Publish on the command bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdUpdateCallsPublishOnCommandBus()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var commandBus = MockRepository.GenerateMock<ICommandBus>();
+            commandBus.Stub(m => m.Publish<HouseholdUpdateCommand, ServiceReceiptResponse>(Arg<HouseholdUpdateCommand>.Is.NotNull))
+                .Return(fixture.Create<ServiceReceiptResponse>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdDataService = new FoodWasteHouseholdDataService(commandBus, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdDataService, Is.Not.Null);
+
+            var command = fixture.Create<HouseholdUpdateCommand>();
+            foodWasteHouseholdDataService.HouseholdUpdate(command);
+
+            commandBus.AssertWasCalled(m => m.Publish<HouseholdUpdateCommand, ServiceReceiptResponse>(Arg<HouseholdUpdateCommand>.Is.Equal(command)));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdUpdate returns the result from the command bus.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdUpdateReturnsResultFromCommand()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+
+            var serviceReceiptResponse = fixture.Create<ServiceReceiptResponse>();
+            var commandBus = MockRepository.GenerateMock<ICommandBus>();
+            commandBus.Stub(m => m.Publish<HouseholdUpdateCommand, ServiceReceiptResponse>(Arg<HouseholdUpdateCommand>.Is.NotNull))
+                .Return(serviceReceiptResponse)
+                .Repeat.Any();
+
+            var foodWasteHouseholdDataService = new FoodWasteHouseholdDataService(commandBus, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
+            Assert.That(foodWasteHouseholdDataService, Is.Not.Null);
+
+            var result = foodWasteHouseholdDataService.HouseholdUpdate(fixture.Create<HouseholdUpdateCommand>());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(serviceReceiptResponse));
+        }
+
+        /// <summary>
+        /// Tests that HouseholdUpdate throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdUpdateThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            var fixture = new Fixture();
+            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+
+            var exception = fixture.Create<Exception>();
+            var commandBus = MockRepository.GenerateMock<ICommandBus>();
+            commandBus.Stub(m => m.Publish<HouseholdUpdateCommand, ServiceReceiptResponse>(Arg<HouseholdUpdateCommand>.Is.NotNull))
+                .Throw(exception)
+                .Repeat.Any();
+
+            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
+            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
+                .Return(fixture.Create<FaultException<FoodWasteFault>>())
+                .Repeat.Any();
+
+            var foodWasteHouseholdDataService = new FoodWasteHouseholdDataService(commandBus, fixture.Create<IQueryBus>(), foodWasteFaultExceptionBuilderMock);
+            Assert.That(foodWasteHouseholdDataService, Is.Not.Null);
+
+            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteHouseholdDataService.HouseholdUpdate(fixture.Create<HouseholdUpdateCommand>()));
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+
+            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName), Arg<MethodBase>.Is.NotNull));
+        }
+
+        /// <summary>
         /// Tests that HouseholdMemberIsCreated throws an ArgumentNullException when the query which can check whether the current caller has been created as a household member is null.
         /// </summary>
         [Test]

@@ -4,8 +4,10 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.CommandHandlers
 {
@@ -42,7 +44,25 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="specification">Specification which encapsulates validation rules.</param>
         public override void AddValidationRules(IHousehold household, HouseholdUpdateCommand command, ISpecification specification)
         {
-            throw new NotImplementedException();
+            if (household == null)
+            {
+                throw new ArgumentNullException("household");
+            }
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            if (specification == null)
+            {
+                throw new ArgumentNullException("specification");
+            }
+
+            specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.Name), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")))
+                .IsSatisfiedBy(() => CommonValidations.IsLengthValid(command.Name, 1, 64), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, "Name", 1, 64)))
+                .IsSatisfiedBy(() => CommonValidations.ContainsIllegalChar(command.Name) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Name")))
+                .IsSatisfiedBy(() => command.Description == null || CommonValidations.HasValue(command.Description), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Description")))
+                .IsSatisfiedBy(() => command.Description == null || CommonValidations.IsLengthValid(command.Description, 1, 2048), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, "Description", 1, 2048)))
+                .IsSatisfiedBy(() => command.Description == null || CommonValidations.ContainsIllegalChar(command.Description) == false, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, "Description")));
         }
 
         /// <summary>
@@ -53,7 +73,19 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <returns>The updated household.</returns>
         public override IIdentifiable ModifyData(IHousehold household, HouseholdUpdateCommand command)
         {
-            throw new NotImplementedException();
+            if (household == null)
+            {
+                throw new ArgumentNullException("household");
+            }
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+
+            household.Name = command.Name;
+            household.Description = command.Description;
+
+            return HouseholdDataRepository.Update(household);
         }
 
         #endregion

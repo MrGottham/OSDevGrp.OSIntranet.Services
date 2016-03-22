@@ -135,6 +135,43 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
+        /// Tests that HouseholdUpdate throws an FaultException when the household member has not been created.
+        /// </summary>
+        [Test]
+        public void TestThatHouseholdUpdateThrowsFaultExceptionWhenHouseholdMemberHasNotBeenCreated()
+        {
+            var client = _channelFactory.CreateChannel();
+            try
+            {
+                var householdUpdateCommand = new HouseholdUpdateCommand
+                {
+                    HouseholdIdentifier = Guid.NewGuid(),
+                    Name = Guid.NewGuid().ToString("D"),
+                    Description = null
+                };
+                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdUpdate(householdUpdateCommand));
+                Assert.That(faultException, Is.Not.Null);
+                Assert.That(faultException.Detail, Is.Not.Null);
+                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdUpdate"));
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
+        }
+
+        /// <summary>
         /// Tests that HouseholdMemberIsCreated returns boolean result where the result is false.
         /// </summary>
         [Test]

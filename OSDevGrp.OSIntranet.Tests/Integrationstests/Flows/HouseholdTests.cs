@@ -116,14 +116,62 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdData.Name, Is.Not.Null);
                     Assert.That(householdData.Name, Is.Not.Empty);
                     Assert.That(householdData.Name, Is.EqualTo(householdAddCommand.Name));
-                    Assert.That(householdData.Name, Is.Not.Null);
-                    Assert.That(householdData.Name, Is.Not.Empty);
-                    Assert.That(householdData.Name, Is.EqualTo(householdAddCommand.Name));
+                    Assert.That(householdData.Description, Is.Not.Null);
+                    Assert.That(householdData.Description, Is.Not.Empty);
+                    Assert.That(householdData.Description, Is.EqualTo(householdAddCommand.Description));
                     Assert.That(householdData.CreationTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
                     Assert.That(householdData.HouseholdMembers, Is.Not.Null);
                     Assert.That(householdData.HouseholdMembers, Is.Not.Empty);
                     Assert.That(householdData.HouseholdMembers.Count(), Is.EqualTo(1));
                     Assert.That(householdData.HouseholdMembers.SingleOrDefault(householdMember => string.Compare(householdMember.MailAddress, currentMailAddress, StringComparison.Ordinal) == 0), Is.Not.Null);
+
+                    var householdUpdateCommand = new HouseholdUpdateCommand
+                    {
+                        HouseholdIdentifier = householdIdentifier,
+                        Name = fixture.Create<string>(),
+                        Description = fixture.Create<string>()
+                    };
+                    var householdUpdate = _householdDataService.HouseholdUpdate(householdUpdateCommand);
+                    Assert.That(householdUpdate, Is.Not.Null);
+                    Assert.That(householdUpdate.Identifier, Is.Not.Null);
+                    Assert.That(householdUpdate.Identifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(householdUpdate.Identifier.Value, Is.EqualTo(householdIdentifier));
+                    // ReSharper restore PossibleInvalidOperationException
+
+                    householdData = _householdDataService.HouseholdDataGet(householdDataGetQuery);
+                    Assert.That(householdData, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.EqualTo(householdIdentifier));
+                    Assert.That(householdData.Name, Is.Not.Null);
+                    Assert.That(householdData.Name, Is.Not.Empty);
+                    Assert.That(householdData.Name, Is.EqualTo(householdUpdateCommand.Name));
+                    Assert.That(householdData.Description, Is.Not.Null);
+                    Assert.That(householdData.Description, Is.Not.Empty);
+                    Assert.That(householdData.Description, Is.EqualTo(householdUpdateCommand.Description));
+
+                    householdUpdateCommand = new HouseholdUpdateCommand
+                    {
+                        HouseholdIdentifier = householdIdentifier,
+                        Name = fixture.Create<string>(),
+                        Description = null
+                    };
+                    householdUpdate = _householdDataService.HouseholdUpdate(householdUpdateCommand);
+                    Assert.That(householdUpdate, Is.Not.Null);
+                    Assert.That(householdUpdate.Identifier, Is.Not.Null);
+                    Assert.That(householdUpdate.Identifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(householdUpdate.Identifier.Value, Is.EqualTo(householdIdentifier));
+                    // ReSharper restore PossibleInvalidOperationException
+
+                    householdData = _householdDataService.HouseholdDataGet(householdDataGetQuery);
+                    Assert.That(householdData, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.EqualTo(householdIdentifier));
+                    Assert.That(householdData.Name, Is.Not.Null);
+                    Assert.That(householdData.Name, Is.Not.Empty);
+                    Assert.That(householdData.Name, Is.EqualTo(householdUpdateCommand.Name));
+                    Assert.That(householdData.Description, Is.Null);
                 }
                 finally
                 {

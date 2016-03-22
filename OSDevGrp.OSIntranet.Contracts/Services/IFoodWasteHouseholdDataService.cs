@@ -36,6 +36,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         ServiceReceiptResponse HouseholdAdd(HouseholdAddCommand command);
 
         /// <summary>
+        /// Updates a given household on which the current caller has a membership.
+        /// </summary>
+        /// <param name="command">Command for updatering a household on the current callers household account.</param>
+        /// <returns></returns>
+        [OperationContract]
+        [FaultContract(typeof (FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        ServiceReceiptResponse HouseholdUpdate(HouseholdUpdateCommand command);
+
+        /// <summary>
         /// Gets whether the current caller has been created as a household member.
         /// </summary>
         /// <param name="query">Query which can check whether the current caller has been created as a household member.</param>
