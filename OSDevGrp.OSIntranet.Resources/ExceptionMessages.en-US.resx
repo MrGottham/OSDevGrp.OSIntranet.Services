@@ -278,4 +278,8 @@
     <value>A household member with the mail address '{0}' already exists on the household.</value>
     <comment>{0} = Mail address.</comment>
   </data>
+  <data name="HouseholdMemberDoesNotExistOnHousehold" xml:space="preserve">
+    <value>A household member with the mail address '{0}' does not exist on the household.</value>
+    <comment>{0} = Mail address.</comment>
+  </data>
 </root>

@@ -278,4 +278,8 @@
     <value>Der findes allerede et husstandsmedlem med mailadressen '{0}' på husstanden.</value>
     <comment>{0} = Mailadresse.</comment>
   </data>
+  <data name="HouseholdMemberDoesNotExistOnHousehold" xml:space="preserve">
+    <value>Der findes ikke et husstandsmedlem med mailadressen '{0}' på husstanden.</value>
+    <comment>{0} = Mailadresse.</comment>
+  </data>
 </root>

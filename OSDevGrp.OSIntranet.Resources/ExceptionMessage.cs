@@ -50,6 +50,7 @@
         DataProviderDoesNotHandlesPayments,
         LengthForPropertyIsInvalid,
         CannotModifyHouseholdMembershipForYourself,
-        HouseholdMemberAlreadyExistsOnHousehold
+        HouseholdMemberAlreadyExistsOnHousehold,
+        HouseholdMemberDoesNotExistOnHousehold
     }
 }

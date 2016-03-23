@@ -99,6 +99,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
 
             var householdMemberForMailAddress = household.HouseholdMembers.SingleOrDefault(householdMember => string.Compare(householdMember.MailAddress, command.MailAddress, StringComparison.OrdinalIgnoreCase) == 0);
 
+            Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(householdMemberForMailAddress), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberDoesNotExistOnHousehold, command.MailAddress)))
+                .Evaluate();
+
             return null;
         }
 
