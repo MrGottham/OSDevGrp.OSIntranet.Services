@@ -138,7 +138,18 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual ServiceReceiptResponse HouseholdAddHouseholdMember(HouseholdAddHouseholdMemberCommand command)
         {
-            throw new NotImplementedException();
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<HouseholdAddHouseholdMemberCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
         }
 
         /// <summary>
@@ -149,7 +160,18 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual ServiceReceiptResponse HouseholdRemoveHouseholdMember(HouseholdRemoveHouseholdMemberCommand command)
         {
-            throw new NotImplementedException();
+            if (command == null)
+            {
+                throw new ArgumentNullException("command");
+            }
+            try
+            {
+                return _commandBus.Publish<HouseholdRemoveHouseholdMemberCommand, ServiceReceiptResponse>(command);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
         }
 
         /// <summary>
