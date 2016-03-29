@@ -112,7 +112,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// Updates a given household on which the current caller has a membership.
         /// </summary>
         /// <param name="command">Command for updatering a household on the current callers household account.</param>
-        /// <returns></returns>
+        /// <returns>Service receipt.</returns>
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual ServiceReceiptResponse HouseholdUpdate(HouseholdUpdateCommand command)
         {
@@ -128,6 +128,28 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             {
                 throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
             }
+        }
+
+        /// <summary>
+        /// Adds a household member to a given household on the current callers household account.
+        /// </summary>
+        /// <param name="command">Command for adding a household member to a given household on the current callers household account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse HouseholdAddHouseholdMember(HouseholdAddHouseholdMemberCommand command)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Removes a household member from a given household on the current callers household account.
+        /// </summary>
+        /// <param name="command">Command for removing a household member from a given household on the current callers household account.</param>
+        /// <returns>Service receipt.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual ServiceReceiptResponse HouseholdRemoveHouseholdMember(HouseholdRemoveHouseholdMemberCommand command)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

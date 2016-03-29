@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers;
+using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -34,9 +35,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
             Assert.That(householdAddHouseholdMemberCommandHandler.ShouldBeActivated, Is.True);
             Assert.That(householdAddHouseholdMemberCommandHandler.ShouldHaveAcceptedPrivacyPolicy, Is.True);
@@ -54,13 +56,36 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, null, exceptionBuilderMock));
+            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, null, logicExecutorMock, exceptionBuilderMock));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("domainObjectValidations"));
+            Assert.That(exception.InnerException, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the logic executor which can execute basic logic is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenLogicExecutorIsNull()
+        {
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, null, exceptionBuilderMock));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Null);
+            Assert.That(exception.ParamName, Is.Not.Empty);
+            Assert.That(exception.ParamName, Is.EqualTo("logicExecutor"));
             Assert.That(exception.InnerException, Is.Null);
         }
 
@@ -77,9 +102,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdAddHouseholdMemberCommandHandler.AddValidationRules(null, fixture.Create<HouseholdAddHouseholdMemberCommand>(), specificationMock));
@@ -102,9 +128,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdAddHouseholdMemberCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMock(), null, specificationMock));
@@ -128,9 +155,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdAddHouseholdMemberCommandHandler.AddValidationRules(DomainObjectMockBuilder.BuildHouseholdMock(), fixture.Create<HouseholdAddHouseholdMemberCommand>(), null));
@@ -152,6 +180,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -164,7 +193,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
@@ -189,6 +218,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -206,7 +236,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var mailAddress = fixture.Create<string>();
@@ -232,6 +262,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -249,7 +280,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var mailAddress = fixture.Create<string>();
@@ -275,6 +306,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -292,7 +324,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var mailAddress = fixture.Create<string>();
@@ -318,6 +350,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -335,7 +368,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var mailAddress = fixture.Create<string>();
@@ -361,6 +394,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var currentUserMailAddress = fixture.Create<string>();
@@ -379,7 +413,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var mailAddress = fixture.Create<string>();
@@ -405,6 +439,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -417,7 +452,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
@@ -442,6 +477,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
@@ -454,7 +490,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
@@ -481,9 +517,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdAddHouseholdMemberCommandHandler.ModifyData(null, fixture.Create<HouseholdAddHouseholdMemberCommand>()));
@@ -506,9 +543,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var exception = Assert.Throws<ArgumentNullException>(() => householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), null));
@@ -530,11 +568,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -542,7 +587,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var translationInfoIdentifier = Guid.NewGuid();
@@ -568,11 +613,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -580,7 +632,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
@@ -607,12 +659,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(translationInfoMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -625,7 +684,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
@@ -650,12 +709,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(translationInfoMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -668,7 +734,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
@@ -697,16 +763,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
         public void TestThatModifyDataCallsIsNullWithHouseholdMemberOnCommonValidationsWhenHouseholdDoesHaveHouseholdMemberWithMailAddress()
         {
             var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(translationInfoMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -719,7 +793,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
@@ -727,7 +801,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             Assert.That(householdMock.HouseholdMembers, Is.Not.Null);
             Assert.That(householdMock.HouseholdMembers, Is.Not.Empty);
 
-            var mailAddress = householdMock.HouseholdMembers.First().MailAddress;
+            var householdMemberMock = householdMock.HouseholdMembers.ElementAt(random.Next(0, householdMock.HouseholdMembers.Count() - 1));
+            Assert.That(householdMemberMock, Is.Not.Null);
+            Assert.That(householdMemberMock.MailAddress, Is.Not.Null);
+            Assert.That(householdMemberMock.MailAddress, Is.Not.Empty);
+
+            var mailAddress = householdMemberMock.MailAddress;
             Assert.That(householdMock.HouseholdMembers.Any(householdMember => string.Compare(householdMember.MailAddress, mailAddress, StringComparison.OrdinalIgnoreCase) == 0), Is.True);
 
             var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
@@ -738,7 +817,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
 
             householdAddHouseholdMemberCommandHandler.ModifyData(householdMock, householdAddHouseholdMemberCommand);
 
-            commonValidationsMock.AssertWasCalled(m => m.IsNull(Arg<IHouseholdMember>.Is.Equal(householdMock.HouseholdMembers.First())));
+            commonValidationsMock.AssertWasCalled(m => m.IsNull(Arg<IHouseholdMember>.Is.Equal(householdMemberMock)));
         }
 
         /// <summary>
@@ -752,11 +831,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -764,7 +850,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
@@ -789,11 +875,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
             var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
             var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
 
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
                 .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
                 .Repeat.Any();
 
             var specificationMock = MockRepository.GenerateMock<ISpecification>();
@@ -801,7 +894,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                 .Return(specificationMock)
                 .Repeat.Any();
 
-            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, exceptionBuilderMock);
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
             Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
 
             var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
@@ -813,6 +906,435 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
             householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), householdAddHouseholdMemberCommand);
 
             specificationMock.AssertWasCalled(m => m.Evaluate());
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls HouseholdMemberGetByMailAddress on the repository which can access household data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsHouseholdMemberGetByMailAddressOnHouseholdDataRepository()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var mailAddress = fixture.Create<string>();
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, mailAddress)
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), householdAddHouseholdMemberCommand);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Equal(mailAddress)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls HouseholdMemberAdd on the logic executor which can execute basic logic when a household member with the mail address does not exists.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsHouseholdMemberAddOnLogicExecutorWhenHouseholdMemberForMailAddressDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(translationInfoMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(null)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.HouseholdMemberAdd(Arg<string>.Is.Anything, Arg<Guid>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var mailAddress = fixture.Create<string>();
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, mailAddress)
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), householdAddHouseholdMemberCommand);
+
+            // ReSharper disable PossibleInvalidOperationException
+            logicExecutorMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<string>.Is.Equal(mailAddress), Arg<Guid>.Is.Equal(translationInfoMock.Identifier.Value)));
+            // ReSharper restore PossibleInvalidOperationException
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls Get with the identifier for the created household member on the repository which can access household data for the food waste domain when a household member with the mail address does not exists.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsGetWithIdentifierForCreatedHouseholdMemberOnHouseholdDataRepositoryWhenHouseholdMemberForMailAddressDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(null)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var createdHouseholdMemberIdentifier = Guid.NewGuid();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.HouseholdMemberAdd(Arg<string>.Is.Anything, Arg<Guid>.Is.Anything))
+                .Return(createdHouseholdMemberIdentifier)
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), householdAddHouseholdMemberCommand);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Equal(createdHouseholdMemberIdentifier)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls HouseholdMemberAdd with the created household member on the household when a household member with the mail address does not exists.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsHouseholdMemberAddWithCreatedHouseholdMemberOnHouseholdWhenHouseholdMemberForMailAddressDoesNotExist()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var createdHouseholdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(null)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything))
+                .Return(createdHouseholdMemberMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            logicExecutorMock.Stub(m => m.HouseholdMemberAdd(Arg<string>.Is.Anything, Arg<Guid>.Is.Anything))
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(householdMock, householdAddHouseholdMemberCommand);
+
+            householdMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<IHouseholdMember>.Is.Equal(createdHouseholdMemberMock)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData does not call HouseholdMemberAdd on the logic executor which can execute basic logic when a household member with the mail address exists.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataDoesNotCallHouseholdMemberAddOnLogicExecutorWhenHouseholdMemberForMailAddressExists()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), householdAddHouseholdMemberCommand);
+
+            logicExecutorMock.AssertWasNotCalled(m => m.HouseholdMemberAdd(Arg<string>.Is.Anything, Arg<Guid>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData does not call Get for any household members on the repository which can access household data for the food waste domain when a household member with the mail address exists.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataDoesNotCallGetForAnyHouseholdMemberOnHouseholdDataRepositoryWhenHouseholdMemberForMailAddressExists()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), householdAddHouseholdMemberCommand);
+
+            householdDataRepositoryMock.AssertWasNotCalled(m => m.Get<IHouseholdMember>(Arg<Guid>.Is.Anything));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls HouseholdMemberAdd with the household member for the mail address on the household when a household member with the mail address exists.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsHouseholdMemberAddWithHouseholdMemberForMailAddressOnHouseholdWhenHouseholdMemberForMailAddressExists()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdMemberForMailAddressMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(householdMemberForMailAddressMock)
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(householdMock, householdAddHouseholdMemberCommand);
+
+            householdMock.AssertWasCalled(m => m.HouseholdMemberAdd(Arg<IHouseholdMember>.Is.Equal(householdMemberForMailAddressMock)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData calls Update with household on the repository which can access household data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataCallsUpdateWithHouseholdOnHouseholdDataRepository()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMock())
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            householdAddHouseholdMemberCommandHandler.ModifyData(householdMock, householdAddHouseholdMemberCommand);
+
+            householdDataRepositoryMock.AssertWasCalled(m => m.Update(Arg<IHousehold>.Is.Equal(householdMock)));
+        }
+
+        /// <summary>
+        /// Tests that ModifyData returns the result from Update called with household on the repository which can access household data for the food waste domain.
+        /// </summary>
+        [Test]
+        public void TestThatModifyDataReturnsResultFromUpdateCalledWithHouseholdOnHouseholdDataRepository()
+        {
+            var fixture = new Fixture();
+            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            var logicExecutorMock = MockRepository.GenerateMock<ILogicExecutor>();
+            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
+
+            var updatedHouseholdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            householdDataRepositoryMock.Stub(m => m.Get<ITranslationInfo>(Arg<Guid>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildTranslationInfoMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
+                .Return(DomainObjectMockBuilder.BuildHouseholdMemberMock())
+                .Repeat.Any();
+            householdDataRepositoryMock.Stub(m => m.Update(Arg<IHousehold>.Is.Anything))
+                .Return(updatedHouseholdMock)
+                .Repeat.Any();
+
+            var specificationMock = MockRepository.GenerateMock<ISpecification>();
+            specificationMock.Stub(m => m.IsSatisfiedBy(Arg<Func<bool>>.Is.Anything, Arg<Exception>.Is.Anything))
+                .Return(specificationMock)
+                .Repeat.Any();
+
+            var householdAddHouseholdMemberCommandHandler = new HouseholdAddHouseholdMemberCommandHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock, specificationMock, commonValidationsMock, domainObjectValidationsMock, logicExecutorMock, exceptionBuilderMock);
+            Assert.That(householdAddHouseholdMemberCommandHandler, Is.Not.Null);
+
+            var householdAddHouseholdMemberCommand = fixture.Build<HouseholdAddHouseholdMemberCommand>()
+                .With(m => m.HouseholdIdentifier, Guid.NewGuid())
+                .With(m => m.MailAddress, fixture.Create<string>())
+                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
+                .Create();
+
+            var result = householdAddHouseholdMemberCommandHandler.ModifyData(DomainObjectMockBuilder.BuildHouseholdMock(), householdAddHouseholdMemberCommand);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(updatedHouseholdMock));
         }
     }
 }

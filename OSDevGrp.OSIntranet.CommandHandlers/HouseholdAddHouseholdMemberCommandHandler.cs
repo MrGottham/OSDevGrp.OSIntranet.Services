@@ -20,6 +20,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         #region Private variables
 
         private readonly IDomainObjectValidations _domainObjectValidations;
+        private readonly ILogicExecutor _logicExecutor;
 
         #endregion
 
@@ -34,15 +35,21 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// <param name="specification">Implementation of a specification which encapsulates validation rules.</param>
         /// <param name="commonValidations">Implementation of common validations.</param>
         /// <param name="domainObjectValidations">Implemenation of common validations used by domain objects in the food waste domain.</param>
+        /// <param name="logicExecutor">Implementation of the logic executor which can execute basic logic.</param>
         /// <param name="exceptionBuilder">Implementation of a builder which can build exceptions.</param>
-        public HouseholdAddHouseholdMemberCommandHandler(IHouseholdDataRepository householdDataRepository, IClaimValueProvider claimValueProvider, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IDomainObjectValidations domainObjectValidations, IExceptionBuilder exceptionBuilder)
+        public HouseholdAddHouseholdMemberCommandHandler(IHouseholdDataRepository householdDataRepository, IClaimValueProvider claimValueProvider, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IDomainObjectValidations domainObjectValidations, ILogicExecutor logicExecutor, IExceptionBuilder exceptionBuilder)
             : base(householdDataRepository, claimValueProvider, foodWasteObjectMapper, specification, commonValidations, exceptionBuilder)
         {
             if (domainObjectValidations == null)
             {
                 throw new ArgumentNullException("domainObjectValidations");
             }
+            if (logicExecutor == null)
+            {
+                throw new ArgumentNullException("logicExecutor");
+            }
             _domainObjectValidations = domainObjectValidations;
+            _logicExecutor = logicExecutor;
         }
 
         #endregion
@@ -104,7 +111,16 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
                 .IsSatisfiedBy(() => CommonValidations.IsNull(householdMemberForMailAddress), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberAlreadyExistsOnHousehold, command.MailAddress)))
                 .Evaluate();
 
-            return null;
+            var householdMemberToAdd = HouseholdDataRepository.HouseholdMemberGetByMailAddress(command.MailAddress);
+            if (householdMemberToAdd == null)
+            {
+                var householdMemberToAddIdentifier = _logicExecutor.HouseholdMemberAdd(command.MailAddress, translationInfo.Identifier.HasValue ? translationInfo.Identifier.Value : default(Guid));
+                householdMemberToAdd = HouseholdDataRepository.Get<IHouseholdMember>(householdMemberToAddIdentifier);
+            }
+
+            household.HouseholdMemberAdd(householdMemberToAdd);
+
+            return HouseholdDataRepository.Update(household);
         }
 
         #endregion

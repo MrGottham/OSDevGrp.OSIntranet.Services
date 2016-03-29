@@ -102,7 +102,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
             Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(householdMemberForMailAddress), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberDoesNotExistOnHousehold, command.MailAddress)))
                 .Evaluate();
 
-            return null;
+            household.HouseholdMemberRemove(householdMemberForMailAddress);
+
+            return HouseholdDataRepository.Update(household);
         }
 
         #endregion
