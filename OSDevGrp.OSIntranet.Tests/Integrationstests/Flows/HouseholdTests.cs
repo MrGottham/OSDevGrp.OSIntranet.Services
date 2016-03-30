@@ -173,10 +173,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdData.Name, Is.EqualTo(householdUpdateCommand.Name));
                     Assert.That(householdData.Description, Is.Null);
 
+                    var secondaryMailAddress = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower());
                     var householdAddHouseholdMemberCommand = new HouseholdAddHouseholdMemberCommand
                     {
                         HouseholdIdentifier = householdIdentifier,
-                        MailAddress = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower()),
+                        MailAddress = secondaryMailAddress,
                         TranslationInfoIdentifier = translationInfoIdentifier
                     };
                     var householdAddHouseholdMember = _householdDataService.HouseholdAddHouseholdMember(householdAddHouseholdMemberCommand);
@@ -193,7 +194,28 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdData.HouseholdMembers, Is.Not.Null);
                     Assert.That(householdData.HouseholdMembers, Is.Not.Empty);
                     Assert.That(householdData.HouseholdMembers.Count(), Is.EqualTo(2));
-                    Assert.That(householdData.HouseholdMembers.SingleOrDefault(householdMember => string.Compare(householdMember.MailAddress, householdAddHouseholdMemberCommand.MailAddress, StringComparison.Ordinal) == 0), Is.Not.Null);
+                    Assert.That(householdData.HouseholdMembers.SingleOrDefault(householdMember => string.Compare(householdMember.MailAddress, secondaryMailAddress, StringComparison.Ordinal) == 0), Is.Not.Null);
+
+                    var householdRemoveHouseholdMemberCommand = new HouseholdRemoveHouseholdMemberCommand
+                    {
+                        HouseholdIdentifier = householdIdentifier,
+                        MailAddress = secondaryMailAddress
+                    };
+                    var householdRemoveHouseholdMember = _householdDataService.HouseholdRemoveHouseholdMember(householdRemoveHouseholdMemberCommand);
+                    Assert.That(householdRemoveHouseholdMember.Identifier, Is.Not.Null);
+                    Assert.That(householdRemoveHouseholdMember.Identifier.HasValue, Is.True);
+                    // ReSharper disable PossibleInvalidOperationException
+                    Assert.That(householdRemoveHouseholdMember.Identifier.Value, Is.EqualTo(householdIdentifier));
+                    // ReSharper restore PossibleInvalidOperationException
+
+                    householdData = _householdDataService.HouseholdDataGet(householdDataGetQuery);
+                    Assert.That(householdData, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.Not.Null);
+                    Assert.That(householdData.HouseholdIdentifier, Is.EqualTo(householdIdentifier));
+                    Assert.That(householdData.HouseholdMembers, Is.Not.Null);
+                    Assert.That(householdData.HouseholdMembers, Is.Not.Empty);
+                    Assert.That(householdData.HouseholdMembers.Count(), Is.EqualTo(1));
+                    Assert.That(householdData.HouseholdMembers.SingleOrDefault(householdMember => string.Compare(householdMember.MailAddress, secondaryMailAddress, StringComparison.Ordinal) == 0), Is.Null);
                 }
                 finally
                 {
