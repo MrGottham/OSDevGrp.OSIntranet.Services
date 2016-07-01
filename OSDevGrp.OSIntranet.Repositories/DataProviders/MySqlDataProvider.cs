@@ -100,6 +100,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     command.CommandText = query;
                     using (var reader = command.ExecuteReader())
                     {
+                        if (reader == null)
+                        {
+                            return collection;
+                        }
+                        if (reader.HasRows == false)
+                        {
+                            reader.Close();
+                            return collection;
+                        }
                         while (reader.Read())
                         {
                             var dataProxy = new TDataProxy();
@@ -142,6 +151,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     command.CommandText = sqlQuery;
                     using (var reader = command.ExecuteReader())
                     {
+                        if (reader == null)
+                        {
+                            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, queryForDataProxy.GetType().Name, ((IMySqlDataProxy<TDataProxy>)queryForDataProxy).UniqueId));
+                        }
                         if (!reader.HasRows)
                         {
                             reader.Close();

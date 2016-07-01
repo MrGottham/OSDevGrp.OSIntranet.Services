@@ -12,8 +12,8 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using AutoMapper;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 using ObjectMapper = OSDevGrp.OSIntranet.Infrastructure.ObjectMapper;
@@ -121,7 +121,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(telefonlisteView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, TelefonlisteView>(andenAdresse));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<AdresseBase, TelefonlisteView>(andenAdresse));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, andenAdresse.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -167,7 +172,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontolisteView.Saldo, Is.GreaterThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontolisteView>(andenAdresse));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<AdresseBase, AdressekontolisteView>(andenAdresse));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, andenAdresse.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -237,7 +247,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontoView.Saldo, Is.GreaterThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, AdressekontoView>(andenAdresse));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<AdresseBase, AdressekontoView>(andenAdresse));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, andenAdresse.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -283,7 +298,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorlisteView.Saldo, Is.GreaterThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, DebitorlisteView>(andenAdresse));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<AdresseBase, DebitorlisteView>(andenAdresse));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, andenAdresse.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -353,7 +373,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorView.Saldo, Is.GreaterThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, DebitorView>(andenAdresse));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<AdresseBase, DebitorView>(andenAdresse));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, andenAdresse.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -399,7 +424,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorlisteView.Saldo, Is.LessThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, KreditorlisteView>(andenAdresse));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<AdresseBase, KreditorlisteView>(andenAdresse));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, andenAdresse.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -470,7 +500,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorView.Saldo, Is.LessThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
-            Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<AdresseBase, KreditorView>(andenAdresse));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<AdresseBase, KreditorView>(andenAdresse));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, andenAdresse.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>
@@ -740,7 +775,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             kontoBase.SætBeskrivelse(fixture.Create<string>());
             kontoBase.SætNote(fixture.Create<string>());
 
-            Assert.That(Assert.Throws<AutoMapperMappingException>(() => objectMapper.Map<KontoBase, KontoBaseView>(kontoBase)).InnerException, Is.TypeOf(typeof (IntranetSystemException)));
+            var exception = Assert.Throws<IntranetSystemException>(() => objectMapper.Map<KontoBase, KontoBaseView>(kontoBase));
+            Assert.That(exception, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Null);
+            Assert.That(exception.Message, Is.Not.Empty);
+            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, kontoBase.GetType().Name)));
+            Assert.That(exception.InnerException, Is.Null);
         }
 
         /// <summary>

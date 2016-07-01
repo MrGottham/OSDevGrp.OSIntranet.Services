@@ -45,6 +45,9 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             var mapperConfiguration = new MapperConfiguration(config =>
             {
+                config.CreateMap<AdressereferenceView, AdresseBase>()
+                    .ConvertUsing(s => { throw new NotSupportedException(); });
+
                 config.CreateMap<PersonView, AdresseBase>()
                     .ConvertUsing(s =>
                     {
@@ -277,6 +280,9 @@ namespace OSDevGrp.OSIntranet.Repositories
                         return regnskab;
                     });
 
+                config.CreateMap<KontoListeView, Konto>()
+                    .ConvertUsing(s => { throw new NotSupportedException(); });
+
                 config.CreateMap<KontoView, Konto>()
                     .ConvertUsing(s =>
                     {
@@ -332,6 +338,9 @@ namespace OSDevGrp.OSIntranet.Repositories
 
                 config.CreateMap<KreditoplysningerView, Kreditoplysninger>()
                     .ConvertUsing(s => new Kreditoplysninger(s.År, s.Måned, s.Kredit));
+
+                config.CreateMap<BudgetkontoListeView, Budgetkonto>()
+                    .ConvertUsing(s => { throw new NotSupportedException(); });
 
                 config.CreateMap<BudgetkontoView, Budgetkonto>()
                     .ConvertUsing(s =>

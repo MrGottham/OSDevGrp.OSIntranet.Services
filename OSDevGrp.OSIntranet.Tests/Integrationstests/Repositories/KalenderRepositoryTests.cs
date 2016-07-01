@@ -22,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
         /// <summary>
         /// Opsætning af tests.
         /// </summary>
-        [TestFixtureSetUp]
+        [SetUp]
         public void TestSetUp()
         {
             var container = ContainerFactory.Create();

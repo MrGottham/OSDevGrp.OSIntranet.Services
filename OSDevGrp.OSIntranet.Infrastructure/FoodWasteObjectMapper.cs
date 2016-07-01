@@ -350,14 +350,22 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
                     .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
-                    .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent))
+                    .ForMember(m => m.Parent, opt =>
+                    {
+                        opt.Condition(s => s.Parent != null);
+                        opt.MapFrom(s => s.Parent);
+                    })
                     .ForMember(m => m.Children, opt => opt.MapFrom(s => s.Children));
 
                 config.CreateMap<IFoodGroup, FoodGroupSystemView>()
                     .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
                     .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
-                    .ForMember(m => m.Parent, opt => opt.MapFrom(s => s.Parent))
+                    .ForMember(m => m.Parent, opt =>
+                    {
+                        opt.Condition(s => s.Parent != null);
+                        opt.MapFrom(s => s.Parent);
+                    })
                     .ForMember(m => m.Translations, opt => opt.MapFrom(s => s.Translations))
                     .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => s.ForeignKeys))
                     .ForMember(m => m.Children, opt => opt.MapFrom(s => s.Children));

@@ -21,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         /// <summary>
         /// Opsætning af tests.
         /// </summary>
-        [TestFixtureSetUp]
+        [SetUp]
         public void TestSetUp()
         {
             var container = ContainerFactory.Create();
@@ -32,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         /// Tests that SendMail sends a mail message.
         /// </summary>
         [Test]
-        [Ignore]
+        [Ignore("We don't want to send mails anytime we tests.")]
         [TestCase("mrgottham@gmail.com")]
         public void TestThatSendMailSendsMailMessage(string toMailAddress)
         {

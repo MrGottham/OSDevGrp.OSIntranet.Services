@@ -33,7 +33,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         /// <summary>
         /// Opsætning af test.
         /// </summary>
-        [TestFixtureSetUp]
+        [SetUp]
         public void TestSetUp()
         {
             _channelFactory = new ChannelFactory<IFoodWasteSystemDataService>(ClientEndpointName);

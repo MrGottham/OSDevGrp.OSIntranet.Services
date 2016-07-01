@@ -35,7 +35,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// <summary>
         /// Konfigurering af test.
         /// </summary>
-        [TestFixtureSetUp]
+        [SetUp]
         public void SetUp()
         {
             _container = ContainerFactory.Create();
