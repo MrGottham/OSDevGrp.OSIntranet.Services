@@ -97,13 +97,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 var collection = new List<TDataProxy>();
                 using (var command = _mySqlConnection.CreateCommand())
                 {
+                    command.CommandType = CommandType.Text;
                     command.CommandText = query;
                     using (var reader = command.ExecuteReader())
                     {
-                        if (reader == null)
-                        {
-                            return collection;
-                        }
                         if (reader.HasRows == false)
                         {
                             reader.Close();
@@ -148,14 +145,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                     var dataHasBeenReaded = false;
                     var dataProxy = new TDataProxy();
                     // Execute the command and read the data.
+                    command.CommandType = CommandType.Text;
                     command.CommandText = sqlQuery;
                     using (var reader = command.ExecuteReader())
                     {
-                        if (reader == null)
-                        {
-                            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, queryForDataProxy.GetType().Name, ((IMySqlDataProxy<TDataProxy>)queryForDataProxy).UniqueId));
-                        }
-                        if (!reader.HasRows)
+                        if (reader.HasRows == false)
                         {
                             reader.Close();
                             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, queryForDataProxy.GetType().Name, ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).UniqueId));
@@ -199,6 +193,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForInsert();
                 using (var command = _mySqlConnection.CreateCommand())
                 {
+                    command.CommandType = CommandType.Text;
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
                 }
@@ -229,6 +224,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 var sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForUpdate();
                 using (var command = _mySqlConnection.CreateCommand())
                 {
+                    command.CommandType = CommandType.Text;
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
                 }
@@ -259,6 +255,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 var sqlCommand = ((IMySqlDataProxy<TDataProxy>)dataProxy).GetSqlCommandForDelete();
                 using (var command = _mySqlConnection.CreateCommand())
                 {
+                    command.CommandType = CommandType.Text;
                     command.CommandText = sqlCommand;
                     command.ExecuteNonQuery();
                 }
