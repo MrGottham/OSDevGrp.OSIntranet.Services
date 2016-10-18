@@ -151,6 +151,28 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Indicates whether the membership can be upgraded.
+        /// </summary>
+        public virtual bool CanUpgradeMembership
+        {
+            get
+            {
+                switch (Membership)
+                {
+                    case Membership.Basic:
+                        return _domainObjectValidations.CanUpgradeMembership(Membership, Membership.Deluxe);
+
+                    case Membership.Deluxe:
+                    case Membership.Premium:
+                        return _domainObjectValidations.CanUpgradeMembership(Membership, Membership.Premium);
+
+                    default:
+                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, Membership, "Membership", MethodBase.GetCurrentMethod().Name));
+                }
+            }
+        }
+
+        /// <summary>
         /// Activation code for the household member.
         /// </summary>
         public virtual string ActivationCode

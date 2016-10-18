@@ -21,6 +21,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         DateTime? MembershipExpireTime { get; }
 
         /// <summary>
+        /// Indicates whether the membership can be upgraded.
+        /// </summary>
+        bool CanUpgradeMembership { get; }
+
+        /// <summary>
         /// Activation code for the household member.
         /// </summary>
         string ActivationCode { get; }

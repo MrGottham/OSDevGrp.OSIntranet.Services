@@ -80,7 +80,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a household member.
         /// </summary>
         /// <returns>Mockup for a household member.</returns>
-        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolictyAccepted = true)
+        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolictyAccepted = true, bool canUpgradeMembership = true)
         {
             var fixture = new Fixture();
             var identfier = Guid.NewGuid();
@@ -100,6 +100,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.MembershipExpireTime)
                 .Return(membership == Membership.Basic ? null : (DateTime?) DateTime.Now.AddYears(1))
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.CanUpgradeMembership)
+                .Return(canUpgradeMembership)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.ActivationCode)
                 .Return(fixture.Create<string>())
