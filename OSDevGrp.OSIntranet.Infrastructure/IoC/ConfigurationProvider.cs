@@ -41,8 +41,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
         /// <param name="container">Container, hvortil der skal tilføjes konfiguration.</param>
         public void AddConfiguration(IWindsorContainer container)
         {
-            var konfigurationRepository = new KonfigurationRepository(ConfigurationManager.AppSettings);
-
             container.Register(Component.For<IDomainObjectBuilder>().ImplementedBy<DomainObjectBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<IFoodWasteObjectMapper>().ImplementedBy<FoodWasteObjectMapper>().LifeStyle.Singleton);
@@ -57,10 +55,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<ICommonValidations>().ImplementedBy<CommonValidations>().LifeStyle.Singleton);
             container.Register(Component.For<ILogicExecutor>().ImplementedBy<LogicExecutor>().LifeStyle.Transient);
             container.Register(Component.For<IStaticTextFieldMerge>().ImplementedBy<StaticTextFieldMerge>().LifeStyle.Transient);
-            container.Register(Component.For<IKonfigurationRepository>().Instance(konfigurationRepository).LifeStyle.Transient);
+            container.Register(Component.For<IKonfigurationRepository>().UsingFactoryMethod(() => new KonfigurationRepository(ConfigurationManager.AppSettings)).LifeStyle.Transient);
 
-            container.Register(Component.For<IMySqlDataProvider>().Instance(new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName])).LifeStyle.Transient);
-            container.Register(Component.For<IFoodWasteDataProvider>().Instance(new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteProviderConnectionStringSettingsName])).LifeStyle.Transient);
+            container.Register(Component.For<IMySqlDataProvider>().UsingFactoryMethod(() => new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName])).LifeStyle.Transient);
+            container.Register(Component.For<IFoodWasteDataProvider>().UsingFactoryMethod(() => new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteProviderConnectionStringSettingsName])).LifeStyle.Transient);
 
             container.Register(Classes.FromAssemblyNamed("OSDevGrp.OSIntranet.Repositories").BasedOn(typeof (IRepository)).WithService.FromInterface(typeof (IRepository)).LifestyleTransient());
 

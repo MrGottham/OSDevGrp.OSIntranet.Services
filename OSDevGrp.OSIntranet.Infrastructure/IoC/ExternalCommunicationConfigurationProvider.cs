@@ -20,9 +20,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
         /// <param name="container">IoC container.</param>
         public void AddConfiguration(IWindsorContainer container)
         {
-            var configurationRepository = new ConfigurationRepository(ConfigurationManager.AppSettings);
-
-            container.Register(Component.For<IConfigurationRepository>().Instance(configurationRepository).LifeStyle.Transient);
+            container.Register(Component.For<IConfigurationRepository>().UsingFactoryMethod(() => new ConfigurationRepository(ConfigurationManager.AppSettings)).LifeStyle.Transient);
             container.Register(Component.For<ICommunicationRepository>().ImplementedBy<CommunicationRepository>().LifeStyle.Transient);
         }
 
