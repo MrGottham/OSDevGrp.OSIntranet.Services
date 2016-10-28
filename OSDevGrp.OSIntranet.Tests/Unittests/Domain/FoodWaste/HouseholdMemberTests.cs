@@ -157,6 +157,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.False);
             Assert.That(householdMember.IsPrivacyPolictyAccepted, Is.False);
             Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(householdMember.HasReachedHouseholdLimit, Is.False);
             Assert.That(householdMember.Households, Is.Not.Null);
             Assert.That(householdMember.Households, Is.Empty);
             Assert.That(householdMember.Payments, Is.Not.Null);
@@ -1028,6 +1029,76 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var newCreationTime = DateTime.Today.AddDays(random.Next(1, 365)*-1);
             householdMember.CreationTime = newCreationTime;
             Assert.That(householdMember.CreationTime, Is.EqualTo(newCreationTime));
+        }
+
+        /// <summary>
+        /// Tests that the getter for HasReachedHouseholdLimit calls HasReachedHouseholdLimit on the common validations used by domain objects in the food waste domain.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatHasReachedHouseholdLimitGetterCallsHasReachedHouseholdLimitOnDomainObjectValidations(Membership membership)
+        {
+            var fixture = new Fixture();
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.GetHouseholdLimit(Arg<Membership>.Is.Anything))
+                .Return(int.MaxValue)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(fixture.Create<bool>())
+                .Repeat.Any();
+
+            var householdMockCollection = DomainObjectMockBuilder.BuildHouseholdMockCollection(membership).ToArray();
+            Assert.That(householdMockCollection, Is.Not.Null);
+            Assert.That(householdMockCollection, Is.Not.Empty);
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock)
+            {
+                Households = householdMockCollection
+            };
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(membership));
+            Assert.That(householdMember.Households, Is.Not.Null);
+            Assert.That(householdMember.Households, Is.Not.Empty);
+            Assert.That(householdMember.Households, Is.EqualTo(householdMockCollection));
+
+            var result = householdMember.HasReachedHouseholdLimit;
+            Assert.That(result, Is.TypeOf<bool>());
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Equal(membership), Arg<int>.Is.Equal(householdMockCollection.Length)));
+        }
+
+        /// <summary>
+        /// Tests that the getter for HasReachedHouseholdLimit returns the result from HasReachedHouseholdLimit on the common validations used by domain objects in the food waste domain.
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatHasReachedHouseholdLimitGetterReturnsResultFromHasReachedHouseholdLimitOnDomainObjectValidations(Membership membership)
+        {
+            var fixture = new Fixture();
+
+            var hasReachedHouseholdLimit = fixture.Create<bool>();
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+            domainObjectValidationsMock.Stub(m => m.HasReachedHouseholdLimit(Arg<Membership>.Is.Anything, Arg<int>.Is.Anything))
+                .Return(hasReachedHouseholdLimit)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.Membership, Is.EqualTo(membership));
+
+            var result = householdMember.HasReachedHouseholdLimit;
+            Assert.That(result, Is.EqualTo(hasReachedHouseholdLimit));
         }
 
         /// <summary>

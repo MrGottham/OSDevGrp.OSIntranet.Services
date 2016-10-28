@@ -56,6 +56,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         DateTime CreationTime { get; }
 
         /// <summary>
+        /// Indicates whether the household member has reached the household limit.
+        /// </summary>
+        bool HasReachedHouseholdLimit { get; }
+
+        /// <summary>
         /// Households on which the household member has a membership.
         /// </summary>
         IEnumerable<IHousehold> Households { get; }

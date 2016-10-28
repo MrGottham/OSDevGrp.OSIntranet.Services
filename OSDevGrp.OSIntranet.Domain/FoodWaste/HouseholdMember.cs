@@ -241,6 +241,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Indicates whether the household member has reached the household limit.
+        /// </summary>
+        public virtual bool HasReachedHouseholdLimit
+        {
+            get
+            {
+                return _domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count());
+            }
+        }
+
+        /// <summary>
         /// Households on which the household member has a membership.
         /// </summary>
         public virtual IEnumerable<IHousehold> Households
