@@ -21,6 +21,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         DateTime? MembershipExpireTime { get; }
 
         /// <summary>
+        /// Indicates whether the membership can be renewed.
+        /// </summary>
+        bool CanRenewMembership { get; }
+
+        /// <summary>
         /// Indicates whether the membership can be upgraded.
         /// </summary>
         bool CanUpgradeMembership { get; }
@@ -51,14 +56,19 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         bool IsPrivacyPolictyAccepted { get; }
 
         /// <summary>
+        /// Indicates whether the household member has reached the household limit.
+        /// </summary>
+        bool HasReachedHouseholdLimit { get; }
+
+        /// <summary>
         /// Date and time for when the household member was created.
         /// </summary>
         DateTime CreationTime { get; }
 
         /// <summary>
-        /// Indicates whether the household member has reached the household limit.
+        /// Memberships which the household member can upgrade to.
         /// </summary>
-        bool HasReachedHouseholdLimit { get; }
+        IEnumerable<Membership> UpgradeableMemberships { get; }
 
         /// <summary>
         /// Households on which the household member has a membership.

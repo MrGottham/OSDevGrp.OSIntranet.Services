@@ -151,6 +151,30 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Indicates whether the membership can be renewed.
+        /// </summary>
+        public virtual bool CanRenewMembership
+        {
+            get
+            {
+                switch (Membership)
+                {
+                    case Membership.Basic:
+                        return false;
+
+                    case Membership.Deluxe:
+                        return _domainObjectValidations.CanUpgradeMembership(Membership, Membership.Deluxe);
+
+                    case Membership.Premium:
+                        return _domainObjectValidations.CanUpgradeMembership(Membership, Membership.Premium);
+
+                    default:
+                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, Membership, "Membership", MethodBase.GetCurrentMethod().Name));
+                }
+            }
+        }
+
+        /// <summary>
         /// Indicates whether the membership can be upgraded.
         /// </summary>
         public virtual bool CanUpgradeMembership
@@ -160,11 +184,14 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 switch (Membership)
                 {
                     case Membership.Basic:
-                        return _domainObjectValidations.CanUpgradeMembership(Membership, Membership.Deluxe);
-
                     case Membership.Deluxe:
+                        return Enum.GetValues(typeof(Membership))
+                            .Cast<Membership>()
+                            .Where(membership => membership > Membership)
+                            .Any(higherMembership => _domainObjectValidations.CanUpgradeMembership(Membership, higherMembership));
+
                     case Membership.Premium:
-                        return _domainObjectValidations.CanUpgradeMembership(Membership, Membership.Premium);
+                        return false;
 
                     default:
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, Membership, "Membership", MethodBase.GetCurrentMethod().Name));
@@ -232,6 +259,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Indicates whether the household member has reached the household limit.
+        /// </summary>
+        public virtual bool HasReachedHouseholdLimit
+        {
+            get
+            {
+                return _domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count());
+            }
+        }
+
+        /// <summary>
         /// Date and time for when the household member was created.
         /// </summary>
         public virtual DateTime CreationTime
@@ -241,13 +279,16 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Indicates whether the household member has reached the household limit.
+        /// Memberships which the household member can upgrade to.
         /// </summary>
-        public virtual bool HasReachedHouseholdLimit
+        public virtual IEnumerable<Membership> UpgradeableMemberships
         {
             get
             {
-                return _domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count());
+                return Enum.GetValues(typeof(Membership))
+                    .Cast<Membership>()
+                    .Where(upgradeableMembership => upgradeableMembership > Membership && _domainObjectValidations.CanUpgradeMembership(Membership, upgradeableMembership))
+                    .ToList();
             }
         }
 

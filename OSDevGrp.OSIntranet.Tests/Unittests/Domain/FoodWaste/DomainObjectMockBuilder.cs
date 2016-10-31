@@ -80,7 +80,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a household member.
         /// </summary>
         /// <returns>Mockup for a household member.</returns>
-        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolictyAccepted = true, bool canUpgradeMembership = true, bool hasReachedHouseholdLimit = false)
+        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolictyAccepted = true, bool canRenewMembership = false, bool canUpgradeMembership = true, bool hasReachedHouseholdLimit = false, IEnumerable<Membership> upgradeableMemberships = null)
         {
             var fixture = new Fixture();
             var identfier = Guid.NewGuid();
@@ -101,6 +101,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMemberMock.Stub(m => m.MembershipExpireTime)
                 .Return(membership == Membership.Basic ? null : (DateTime?) DateTime.Now.AddYears(1))
                 .Repeat.Any();
+            householdMemberMock.Stub(m => m.CanRenewMembership)
+                .Return(canRenewMembership)
+                .Repeat.Any();
             householdMemberMock.Stub(m => m.CanUpgradeMembership)
                 .Return(canUpgradeMembership)
                 .Repeat.Any();
@@ -119,11 +122,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMemberMock.Stub(m => m.IsPrivacyPolictyAccepted)
                 .Return(isPrivacyPolictyAccepted)
                 .Repeat.Any();
+            householdMemberMock.Stub(m => m.HasReachedHouseholdLimit)
+                .Return(hasReachedHouseholdLimit)
+                .Repeat.Any();
             householdMemberMock.Stub(m => m.CreationTime)
                 .Return(DateTime.Today)
                 .Repeat.Any();
-            householdMemberMock.Stub(m => m.HasReachedHouseholdLimit)
-                .Return(hasReachedHouseholdLimit)
+            householdMemberMock.Stub(m => m.UpgradeableMemberships)
+                .Return(upgradeableMemberships ?? new List<Membership> {Membership.Deluxe, Membership.Deluxe})
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.Households)
                 .Return(BuildHouseholdMockCollection(membership, householdMemberMock))
