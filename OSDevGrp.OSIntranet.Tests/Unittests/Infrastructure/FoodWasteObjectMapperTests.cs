@@ -388,11 +388,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberView.Membership, Is.Not.Empty);
             Assert.That(householdMemberView.Membership, Is.EqualTo(householdMemberMock.Membership.ToString()));
             Assert.That(householdMemberView.MembershipExpireTime, Is.EqualTo(householdMemberMock.MembershipExpireTime));
+            Assert.That(householdMemberView.CanRenewMembership, Is.EqualTo(householdMemberMock.CanRenewMembership));
+            Assert.That(householdMemberView.CanUpgradeMembership, Is.EqualTo(householdMemberMock.CanUpgradeMembership));
             Assert.That(householdMemberView.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));
             Assert.That(householdMemberView.IsActivated, Is.EqualTo(householdMemberMock.IsActivated));
             Assert.That(householdMemberView.PrivacyPolicyAcceptedTime, Is.EqualTo(householdMemberMock.PrivacyPolicyAcceptedTime));
             Assert.That(householdMemberView.IsPrivacyPolictyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolictyAccepted));
+            Assert.That(householdMemberView.HasReachedHouseholdLimit, Is.EqualTo(householdMemberMock.HasReachedHouseholdLimit));
             Assert.That(householdMemberView.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
+            Assert.That(householdMemberView.UpgradeableMemberships, Is.Not.Null);
+            Assert.That(householdMemberView.UpgradeableMemberships, Is.Not.Empty);
+            Assert.That(householdMemberView.UpgradeableMemberships, Is.TypeOf<List<string>>());
+            Assert.That(householdMemberView.UpgradeableMemberships.Count(), Is.EqualTo(householdMemberMock.UpgradeableMemberships.Count()));
+            foreach (var upgradeableMembership in householdMemberMock.UpgradeableMemberships)
+            {
+                Assert.That(householdMemberView.UpgradeableMemberships.Contains(upgradeableMembership.ToString()), Is.True);
+            }
             Assert.That(householdMemberView.Households, Is.Not.Null);
             Assert.That(householdMemberView.Households, Is.Not.Empty);
             Assert.That(householdMemberView.Households, Is.TypeOf<List<HouseholdIdentificationView>>());

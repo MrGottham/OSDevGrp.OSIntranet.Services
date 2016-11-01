@@ -23,6 +23,18 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         public DateTime? MembershipExpireTime { get; set; }
 
         /// <summary>
+        /// Gets or sets the identification of whether the membership can be renewed.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public bool CanRenewMembership { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identification ofwhether the membership can be upgraded.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public bool CanUpgradeMembership { get; set; }
+
+        /// <summary>
         /// Gets or sets the date and time for when the household member was activated.
         /// </summary>
         [DataMember(IsRequired = false)]
@@ -47,10 +59,22 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         public bool IsPrivacyPolictyAccepted { get; set; }
 
         /// <summary>
+        /// Gets or sets the identification of whether the household member has reached the household limit.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public bool HasReachedHouseholdLimit { get; set; }
+
+        /// <summary>
         /// Gets or sets the date and time for when the household member was created.
         /// </summary>
         [DataMember(IsRequired = true)]
         public DateTime CreationTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets the memberships which the household member can upgrade to.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public IEnumerable<string> UpgradeableMemberships { get; set; }
 
         /// <summary>
         /// Gets or sets the households on which the household member has a membership.
