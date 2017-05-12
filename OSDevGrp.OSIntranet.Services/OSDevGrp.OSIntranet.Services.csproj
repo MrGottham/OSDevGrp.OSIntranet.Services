@@ -30,6 +30,7 @@
     <IISExpressUseClassicPipelineMode />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -126,7 +127,7 @@
   <ItemGroup>
     <None Include="OSDevGrp.OSIntranet.snk" />
     <Content Include="packages.config" />
-    <None Include="Properties\PublishProfiles\Publish to application server.pubxml" />
+    <None Include="Properties\PublishProfiles\Deploy to MOTHER.pubxml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OSDevGrp.OSIntranet.CommandHandlers\OSDevGrp.OSIntranet.CommandHandlers.csproj">
