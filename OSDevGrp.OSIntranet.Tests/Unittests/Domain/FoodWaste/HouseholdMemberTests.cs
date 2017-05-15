@@ -66,8 +66,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new string MailAddress
             {
-                get { return base.MailAddress; }
-                set { base.MailAddress = value; }
+                get => base.MailAddress;
+                set => base.MailAddress = value;
             }
 
             /// <summary>
@@ -75,8 +75,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new Membership Membership
             {
-                get { return base.Membership; }
-                set { base.Membership = value; }
+                get => base.Membership;
+                set => base.Membership = value;
             }
 
             /// <summary>
@@ -84,8 +84,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new DateTime? MembershipExpireTime
             {
-                get { return base.MembershipExpireTime; }
-                set { base.MembershipExpireTime = value; }
+                get => base.MembershipExpireTime;
+                set => base.MembershipExpireTime = value;
             }
 
             /// <summary>
@@ -93,8 +93,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new string ActivationCode
             {
-                get { return base.ActivationCode; }
-                set { base.ActivationCode = value; }
+                get => base.ActivationCode;
+                set => base.ActivationCode = value;
             }
 
             /// <summary>
@@ -102,8 +102,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new DateTime CreationTime
             {
-                get { return base.CreationTime; }
-                set { base.CreationTime = value; }
+                get => base.CreationTime;
+                set => base.CreationTime = value;
             }
 
             /// <summary>
@@ -111,8 +111,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new IEnumerable<IHousehold> Households
             {
-                get { return base.Households; }
-                set { base.Households = value; }
+                get => base.Households;
+                set => base.Households = value;
             }
 
             /// <summary>
@@ -120,8 +120,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new IEnumerable<IPayment> Payments
             {
-                get { return base.Payments; }
-                set { base.Payments = value; }
+                get => base.Payments;
+                set => base.Payments = value;
             }
 
             #endregion
@@ -179,7 +179,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase("")]
         public void TestThatConstructorThrowsArgumentNullExceptionWhenMailAddressIsNullOrEmpty(string invalidMailAddress)
         {
+            // ReSharper disable ObjectCreationAsStatement
             var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdMember(invalidMailAddress, MockRepository.GenerateMock<IDomainObjectValidations>()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -197,7 +199,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             var fixture = new Fixture();
 
+            // ReSharper disable ObjectCreationAsStatement
             var exception = Assert.Throws<ArgumentNullException>(() => new MyHouseholdMember(fixture.Create<string>(), fixture.Create<Membership>(), DateTime.Today.AddYears(1), invalidActivationCode, DateTime.Now, MockRepository.GenerateMock<IDomainObjectValidations>()));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -237,7 +241,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Repeat.Any();
 
             var invalidMailAddress = fixture.Create<string>();
+            // ReSharper disable ObjectCreationAsStatement
             var exception = Assert.Throws<IntranetSystemException>(() => new HouseholdMember(invalidMailAddress, domainObjectValidationsMock));
+            // ReSharper restore ObjectCreationAsStatement
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -388,7 +394,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
                 Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.LessThan(DateTime.Now));
                 // ReSharper restore PossibleInvalidOperationException
@@ -415,7 +423,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember.Membership, Is.EqualTo(membershipToTest));
                 Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.GreaterThan(DateTime.Now));
                 // ReSharper restore PossibleInvalidOperationException
@@ -442,7 +452,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
                 Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.GreaterThan(DateTime.Now));
                 // ReSharper restore PossibleInvalidOperationException
@@ -473,7 +485,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember.Membership, Is.EqualTo(membershipToTest));
                 Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
                 // ReSharper restore PossibleInvalidOperationException
@@ -533,7 +547,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var householdMember = new MyHouseholdMember(fixture.Create<string>(), fixture.Create<Membership>(), membershipExpireTime, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
             // ReSharper restore PossibleInvalidOperationException
@@ -1106,7 +1122,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             };
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.ActivationTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.ActivationTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             householdMember.ActivationTime = null;
             Assert.That(householdMember.ActivationTime, Is.Null);
@@ -1154,7 +1172,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             };
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.ActivationTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.ActivationTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.ActivationTime.Value, Is.GreaterThan(DateTime.Now));
             // ReSharper restore PossibleInvalidOperationException
@@ -1180,7 +1200,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             };
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.ActivationTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.ActivationTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.ActivationTime.Value, Is.LessThan(DateTime.Now));
             // ReSharper restore PossibleInvalidOperationException
@@ -1231,7 +1253,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             };
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             householdMember.PrivacyPolicyAcceptedTime = null;
             Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Null);
@@ -1279,7 +1303,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             };
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.PrivacyPolicyAcceptedTime.Value, Is.GreaterThan(DateTime.Now));
             // ReSharper restore PossibleInvalidOperationException
@@ -1305,7 +1331,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             };
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.PrivacyPolicyAcceptedTime.Value, Is.LessThan(DateTime.Now));
             // ReSharper restore PossibleInvalidOperationException
@@ -1923,7 +1951,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.Membership, Is.EqualTo(Membership.Deluxe));
             Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
             // ReSharper restore PossibleInvalidOperationException
@@ -1960,7 +1990,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.Membership, Is.EqualTo(Membership.Deluxe));
             Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
             // ReSharper restore PossibleInvalidOperationException
@@ -1991,7 +2023,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.Membership, Is.EqualTo(Membership.Premium));
             Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
             // ReSharper restore PossibleInvalidOperationException

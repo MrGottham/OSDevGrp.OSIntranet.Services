@@ -518,7 +518,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported.", stakeholderType));
+                    throw new NotSupportedException($"The stakeholderType '{stakeholderType}' is not supported.");
             }
             var paymentMock = DomainObjectMockBuilder.BuildPaymentMock(stakeholderMock, hasPaymentReceipt);
 
@@ -537,7 +537,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported.", stakeholderType));
+                    throw new NotSupportedException($"The stakeholderType '{stakeholderType}' is not supported.");
             }
             Assert.That(paymentProxy.DataProvider, Is.Not.Null);
             Assert.That(paymentProxy.DataProvider, Is.TypeOf<DataProviderProxy>());
@@ -1122,7 +1122,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             if (staticTextMock.BodyTranslationIdentifier.HasValue)
             {
                 Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.True);
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(staticTextProxy.BodyTranslationIdentifier.Value, Is.EqualTo(staticTextMock.BodyTranslationIdentifier.Value));
                 // ReSharper restore PossibleInvalidOperationException
@@ -1200,7 +1202,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var dataProviderView = foodWasteObjectMapper.Map<IDataProvider, DataProviderView>(dataProviderMock);
             Assert.That(dataProviderView.DataProviderIdentifier, Is.Not.Null);
-            Assert.That(dataProviderView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier.HasValue ? dataProviderMock.Identifier.Value : Guid.Empty));
+            Assert.That(dataProviderView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier ?? Guid.Empty));
             Assert.That(dataProviderView.Name, Is.Not.Null);
             Assert.That(dataProviderView.Name, Is.Not.Empty);
             Assert.That(dataProviderView.Name, Is.EqualTo(dataProviderMock.Name));
@@ -1224,7 +1226,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var dataProviderSystemView = foodWasteObjectMapper.Map<IDataProvider, DataProviderSystemView>(dataProviderMock);
             Assert.That(dataProviderSystemView.DataProviderIdentifier, Is.Not.Null);
-            Assert.That(dataProviderSystemView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier.HasValue ? dataProviderMock.Identifier.Value : Guid.Empty));
+            Assert.That(dataProviderSystemView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier ?? Guid.Empty));
             Assert.That(dataProviderSystemView.Name, Is.Not.Null);
             Assert.That(dataProviderSystemView.Name, Is.Not.Empty);
             Assert.That(dataProviderSystemView.Name, Is.EqualTo(dataProviderMock.Name));
@@ -1294,7 +1296,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var translationInfoSystemView = foodWasteObjectMapper.Map<ITranslation, TranslationSystemView>(translationMock);
             Assert.That(translationInfoSystemView.TranslationIdentifier, Is.Not.Null);
-            Assert.That(translationInfoSystemView.TranslationIdentifier, Is.EqualTo(translationMock.Identifier.HasValue ? translationMock.Identifier.Value : Guid.Empty));
+            Assert.That(translationInfoSystemView.TranslationIdentifier, Is.EqualTo(translationMock.Identifier ?? Guid.Empty));
             Assert.That(translationInfoSystemView.TranslationOfIdentifier, Is.EqualTo(translationMock.TranslationOfIdentifier));
             Assert.That(translationInfoSystemView.TranslationInfo, Is.Not.Null);
             Assert.That(translationInfoSystemView.TranslationInfo, Is.TypeOf<TranslationInfoSystemView>());
@@ -1340,7 +1342,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var translationInfoSystemView = foodWasteObjectMapper.Map<ITranslationInfo, TranslationInfoSystemView>(translationInfoMock);
             Assert.That(translationInfoSystemView.TranslationInfoIdentifier, Is.Not.Null);
-            Assert.That(translationInfoSystemView.TranslationInfoIdentifier, Is.EqualTo(translationInfoMock.Identifier.HasValue ? translationInfoMock.Identifier.Value : Guid.Empty));
+            Assert.That(translationInfoSystemView.TranslationInfoIdentifier, Is.EqualTo(translationInfoMock.Identifier ?? Guid.Empty));
             Assert.That(translationInfoSystemView.CultureName, Is.Not.Null);
             Assert.That(translationInfoSystemView.CultureName, Is.Not.Empty);
             Assert.That(translationInfoSystemView.CultureName, Is.EqualTo(cultureName));

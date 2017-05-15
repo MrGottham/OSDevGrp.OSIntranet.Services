@@ -63,11 +63,11 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (string.IsNullOrEmpty(mailAddress))
             {
-                throw new ArgumentNullException("mailAddress");
+                throw new ArgumentNullException(nameof(mailAddress));
             }
             if (string.IsNullOrEmpty(activationCode))
             {
-                throw new ArgumentNullException("activationCode");
+                throw new ArgumentNullException(nameof(activationCode));
             }
 
             _domainObjectValidations = domainObjectValidations ?? DomainObjectValidations.Create();
@@ -90,25 +90,19 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <summary>
         /// Type of the internal or external stakeholder.
         /// </summary>
-        public virtual StakeholderType StakeholderType
-        {
-            get { return StakeholderType.HouseholdMember; }
-        }
+        public virtual StakeholderType StakeholderType => StakeholderType.HouseholdMember;
 
         /// <summary>
         /// Mail address for the household member.
         /// </summary>
         public virtual string MailAddress
         {
-            get
-            {
-                return _mailAddress;
-            }
+            get => _mailAddress;
             protected set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 if (_domainObjectValidations.IsMailAddress(value) == false)
                 {
@@ -146,8 +140,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual DateTime? MembershipExpireTime
         {
-            get { return _membershipExpireTime; }
-            protected set { _membershipExpireTime = value; }
+            get => _membershipExpireTime;
+            protected set => _membershipExpireTime = value;
         }
 
         /// <summary>
@@ -204,15 +198,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual string ActivationCode
         {
-            get
-            {
-                return _activationCode;
-            }
+            get => _activationCode;
             protected set
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _activationCode = value;
             }
@@ -230,13 +221,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <summary>
         /// Indicates whether the household member is activated.
         /// </summary>
-        public virtual bool IsActivated
-        {
-            get
-            {
-                return ActivationTime.HasValue && ActivationTime.Value <= DateTime.Now;
-            }
-        }
+        public virtual bool IsActivated => ActivationTime.HasValue && ActivationTime.Value <= DateTime.Now;
 
         /// <summary>
         /// Date and time for when the household member has accepted our privacy policy.
@@ -250,32 +235,20 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <summary>
         /// Indicates whether the household member has accepted our privacy policy.
         /// </summary>
-        public virtual bool IsPrivacyPolictyAccepted
-        {
-            get
-            {
-                return PrivacyPolicyAcceptedTime.HasValue && PrivacyPolicyAcceptedTime.Value <= DateTime.Now;
-            }
-        }
+        public virtual bool IsPrivacyPolictyAccepted => PrivacyPolicyAcceptedTime.HasValue && PrivacyPolicyAcceptedTime.Value <= DateTime.Now;
 
         /// <summary>
         /// Indicates whether the household member has reached the household limit.
         /// </summary>
-        public virtual bool HasReachedHouseholdLimit
-        {
-            get
-            {
-                return _domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count());
-            }
-        }
+        public virtual bool HasReachedHouseholdLimit => _domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count());
 
         /// <summary>
         /// Date and time for when the household member was created.
         /// </summary>
         public virtual DateTime CreationTime
         {
-            get { return _creationTime; }
-            protected set { _creationTime = value; }
+            get => _creationTime;
+            protected set => _creationTime = value;
         }
 
         /// <summary>
@@ -297,15 +270,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual IEnumerable<IHousehold> Households
         {
-            get
-            {
-                return _households;
-            }
+            get => _households;
             protected set
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 if (value.Count() > _domainObjectValidations.GetHouseholdLimit(Membership))
                 {
@@ -320,15 +290,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual IEnumerable<IPayment> Payments
         {
-            get
-            {
-                return _payments;
-            }
+            get => _payments;
             protected set
             {
                 if (value == null)
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _payments = value.ToList();
             }
@@ -337,10 +304,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <summary>
         /// Common validations used by domain objects in the food waste domain.
         /// </summary>
-        protected virtual IDomainObjectValidations Validator
-        {
-            get { return _domainObjectValidations; }
-        }
+        protected virtual IDomainObjectValidations Validator => _domainObjectValidations;
 
         #endregion
 
@@ -392,7 +356,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (household == null)
             {
-                throw new ArgumentNullException("household");
+                throw new ArgumentNullException(nameof(household));
             }
             if (_domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count()))
             {
@@ -415,7 +379,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (household == null)
             {
-                throw new ArgumentNullException("household");
+                throw new ArgumentNullException(nameof(household));
             }
             
             var householdToRemove = Households.SingleOrDefault(household.Equals);
@@ -440,7 +404,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (payment == null)
             {
-                throw new ArgumentNullException("payment");
+                throw new ArgumentNullException(nameof(payment));
             }
             _payments.Add(payment);
         }
@@ -455,7 +419,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (translationCulture == null)
             {
-                throw new ArgumentNullException("translationCulture");
+                throw new ArgumentNullException(nameof(translationCulture));
             }
             if (translateHouseholds)
             {
@@ -487,7 +451,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 var activationCodeBuilder = new StringBuilder();
                 for (var i = 0; i < hash.Length; i++)
                 {
-                    activationCodeBuilder.Append(hash[i].ToString("X2"));
+                    activationCodeBuilder.Append(i.ToString("X2"));
                 }
                 return activationCodeBuilder.ToString();
             }

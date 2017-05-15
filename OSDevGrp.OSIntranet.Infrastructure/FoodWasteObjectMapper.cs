@@ -40,11 +40,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             var mapperConfiguration = new MapperConfiguration(config =>
             {
                 config.CreateMap<IHousehold, HouseholdIdentificationView>()
-                    .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name));
 
                 config.CreateMap<IHousehold, HouseholdView>()
-                    .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.HouseholdIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
                     .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description))
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
@@ -53,11 +53,12 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IHousehold, IHouseholdProxy>()
                     .ConstructUsing(m =>
                     {
-                        if (m as IHouseholdProxy != null)
+                        IHouseholdProxy householdProxy = m as IHouseholdProxy;
+                        if (householdProxy != null)
                         {
-                            return (IHouseholdProxy) m;
+                            return householdProxy;
                         }
-                        var householdProxy = new HouseholdProxy(m.Name, m.Description, m.CreationTime)
+                        householdProxy = new HouseholdProxy(m.Name, m.Description, m.CreationTime)
                         {
                             Identifier = m.Identifier
                         };
@@ -70,7 +71,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                 {
                                     foreach (var householdMember in m.HouseholdMembers)
                                     {
-                                        if (householdMember as IHouseholdMemberProxy != null)
+                                        if (householdMember is IHouseholdMemberProxy)
                                         {
                                             if (householdProxy.HouseholdMembers.Contains(householdMember))
                                             {
@@ -104,11 +105,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
-                    .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress));
 
                 config.CreateMap<IHouseholdMember, HouseholdMemberView>()
-                    .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress))
                     .ForMember(m => m.Membership, opt => opt.MapFrom(s => s.Membership))
                     .ForMember(m => m.MembershipExpireTime, opt => opt.MapFrom(s => s.MembershipExpireTime))
@@ -127,11 +128,12 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
                     .ConstructUsing(m =>
                     {
-                        if (m as IHouseholdMemberProxy != null)
+                        IHouseholdMemberProxy householdMemberProxy = m as IHouseholdMemberProxy;
+                        if (householdMemberProxy != null)
                         {
-                            return (IHouseholdMemberProxy) m;
+                            return householdMemberProxy;
                         }
-                        var householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.Membership, m.MembershipExpireTime, m.ActivationCode, m.CreationTime)
+                        householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.Membership, m.MembershipExpireTime, m.ActivationCode, m.CreationTime)
                         {
                             Identifier = m.Identifier,
                             ActivationTime = m.ActivationTime,
@@ -146,7 +148,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                 {
                                     foreach (var household in m.Households)
                                     {
-                                        if (household as IHouseholdProxy != null)
+                                        if (household is IHouseholdProxy)
                                         {
                                             if (householdMemberProxy.Households.Contains(household))
                                             {
@@ -172,7 +174,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                 }
                                 foreach (var payment in m.Payments)
                                 {
-                                    if (payment as IPaymentProxy != null)
+                                    if (payment is IPaymentProxy)
                                     {
                                         householdMemberProxy.PaymentAdd(payment);
                                         continue;
@@ -192,7 +194,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<IPayment, PaymentView>()
-                    .ForMember(m => m.PaymentIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.PaymentIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Stakeholder, opt => opt.MapFrom(s => s.Stakeholder))
                     .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider))
                     .ForMember(m => m.PaymentTime, opt => opt.MapFrom(s => s.PaymentTime))
@@ -203,9 +205,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IPayment, IPaymentProxy>()
                     .ConstructUsing(m =>
                     {
-                        if (m as IPaymentProxy != null)
+                        IPaymentProxy paymentProxy = m as IPaymentProxy;
+                        if (paymentProxy != null)
                         {
-                            return (IPaymentProxy) m;
+                            return paymentProxy;
                         }
                         IStakeholder stakeholderProxy = null;
                         if (m.Stakeholder != null)
@@ -219,7 +222,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                         {
                                             stakeholderProxy = _mappingHouseholdMember;
                                         }
-                                        else if (m.Stakeholder as IHouseholdMember != null)
+                                        else if (m.Stakeholder is IHouseholdMember)
                                         {
                                             stakeholderProxy = m.Stakeholder as IHouseholdMemberProxy;
                                             if (stakeholderProxy == null && Mapper != null)
@@ -243,7 +246,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<IStakeholder, StakeholderView>()
-                    .ForMember(m => m.StakeholderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.StakeholderIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress));
 
                 config.CreateMap<IFoodItemCollection, FoodItemCollectionView>()
@@ -255,18 +258,18 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider));
 
                 config.CreateMap<IFoodItem, FoodItemIdentificationView>()
-                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
 
                 config.CreateMap<IFoodItem, FoodItemView>()
-                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
                     .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => s.PrimaryFoodGroup))
                     .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
                     .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => s.FoodGroups));
 
                 config.CreateMap<IFoodItem, FoodItemSystemView>()
-                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.FoodItemIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
                     .ForMember(m => m.PrimaryFoodGroup, opt => opt.MapFrom(s => s.PrimaryFoodGroup))
                     .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
@@ -277,9 +280,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IFoodItem, IFoodItemProxy>()
                     .ConvertUsing(m =>
                     {
-                        if (m as IFoodItemProxy != null)
+                        IFoodItemProxy foodItemProxy = m as IFoodItemProxy;
+                        if (foodItemProxy != null)
                         {
-                            return (IFoodItemProxy) m;
+                            return foodItemProxy;
                         }
                         IFoodGroupProxy primaryFoodGroup = null;
                         if (m.PrimaryFoodGroup != null)
@@ -290,7 +294,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                 primaryFoodGroup = Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.PrimaryFoodGroup);
                             }
                         }
-                        var foodItemProxy = new FoodItemProxy(primaryFoodGroup)
+                        foodItemProxy = new FoodItemProxy(primaryFoodGroup)
                         {
                             Identifier = m.Identifier,
                             IsActive = m.IsActive
@@ -301,7 +305,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             {
                                 continue;
                             }
-                            if (foodGroup as IFoodGroupProxy != null)
+                            if (foodGroup is IFoodGroupProxy)
                             {
                                 foodItemProxy.FoodGroupAdd(foodGroup);
                                 continue;
@@ -313,7 +317,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         }
                         foreach (var translation in m.Translations)
                         {
-                            if (translation as ITranslationProxy != null)
+                            if (translation is ITranslationProxy)
                             {
                                 foodItemProxy.TranslationAdd(translation);
                                 continue;
@@ -325,7 +329,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         }
                         foreach (var foreignKey in m.ForeignKeys)
                         {
-                            if (foreignKey as IForeignKeyProxy != null)
+                            if (foreignKey is IForeignKeyProxy)
                             {
                                 foodItemProxy.ForeignKeyAdd(foreignKey);
                                 continue;
@@ -347,11 +351,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider));
 
                 config.CreateMap<IFoodGroup, FoodGroupIdentificationView>()
-                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
 
                 config.CreateMap<IFoodGroup, FoodGroupView>()
-                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
                     .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
                     .ForMember(m => m.Parent, opt =>
@@ -362,7 +366,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Children, opt => opt.MapFrom(s => s.Children));
 
                 config.CreateMap<IFoodGroup, FoodGroupSystemView>()
-                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.FoodGroupIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
                     .ForMember(m => m.IsActive, opt => opt.MapFrom(s => s.IsActive))
                     .ForMember(m => m.Parent, opt =>
@@ -377,7 +381,8 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IFoodGroup, IFoodGroupProxy>()
                     .ConvertUsing(m =>
                     {
-                        if (m as IFoodGroupProxy != null)
+                        IFoodGroupProxy foodGroupProxy = m as IFoodGroupProxy;
+                        if (foodGroupProxy != null)
                         {
                             return (IFoodGroupProxy) m;
                         }
@@ -393,12 +398,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         var childFoodGroupProxyCollection = new List<IFoodGroupProxy>();
                         foreach (var child in m.Children)
                         {
-                            if (child as IFoodGroupProxy != null)
+                            IFoodGroupProxy childFoodGroupProxy = child as IFoodGroupProxy;
+                            if (childFoodGroupProxy != null)
                             {
                                 childFoodGroupProxyCollection.Add((IFoodGroupProxy) child);
                                 continue;
                             }
-                            var childFoodGroupProxy = new FoodGroupProxy
+                            childFoodGroupProxy = new FoodGroupProxy
                             {
                                 Identifier = m.Identifier,
                                 Parent = parentFoodGroupProxy,
@@ -406,7 +412,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                             };
                             childFoodGroupProxyCollection.Add(childFoodGroupProxy);
                         }
-                        var foodGroupProxy = new FoodGroupProxy(childFoodGroupProxyCollection)
+                        foodGroupProxy = new FoodGroupProxy(childFoodGroupProxyCollection)
                         {
                             Identifier = m.Identifier,
                             Parent = parentFoodGroupProxy,
@@ -414,7 +420,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         };
                         foreach (var translation in m.Translations)
                         {
-                            if (translation as ITranslationProxy != null)
+                            if (translation is ITranslationProxy)
                             {
                                 foodGroupProxy.TranslationAdd(translation);
                                 continue;
@@ -426,7 +432,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         }
                         foreach (var foreignKey in m.ForeignKeys)
                         {
-                            if (foreignKey as IForeignKeyProxy != null)
+                            if (foreignKey is IForeignKeyProxy)
                             {
                                 foodGroupProxy.ForeignKeyAdd(foreignKey);
                                 continue;
@@ -440,13 +446,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<IForeignKey, ForeignKeyView>()
-                    .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider))
                     .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
                     .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
 
                 config.CreateMap<IForeignKey, ForeignKeySystemView>()
-                    .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.DataProvider, opt => opt.MapFrom(s => s.DataProvider))
                     .ForMember(m => m.ForeignKeyForIdentifier, opt => opt.MapFrom(s => s.ForeignKeyForIdentifier))
                     .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
@@ -454,16 +460,17 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IForeignKey, IForeignKeyProxy>()
                     .ConvertUsing(m =>
                     {
-                        if (m as IForeignKeyProxy != null)
+                        IForeignKeyProxy foreignKeyProxy = m as IForeignKeyProxy;
+                        if (foreignKeyProxy != null)
                         {
-                            return (IForeignKeyProxy) m;
+                            return foreignKeyProxy;
                         }
                         var dataProvider = m.DataProvider as IDataProviderProxy;
                         if (dataProvider == null && Mapper != null)
                         {
                             dataProvider = Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
                         }
-                        var foreignKeyProxy = new ForeignKeyProxy(dataProvider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
+                        foreignKeyProxy = new ForeignKeyProxy(dataProvider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
                         {
                             Identifier = m.Identifier
                         };
@@ -471,13 +478,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<IStaticText, StaticTextView>()
-                    .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
                     .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
                     .ForMember(m => m.BodyTranslation, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslation != null ? s.BodyTranslation.Value : string.Empty : null));
 
                 config.CreateMap<IStaticText, StaticTextSystemView>()
-                    .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.StaticTextType, opt => opt.MapFrom(s => (int) s.Type))
                     .ForMember(m => m.SubjectTranslationIdentifier, opt => opt.MapFrom(s => s.SubjectTranslationIdentifier))
                     .ForMember(m => m.SubjectTranslation, opt => opt.MapFrom(s => s.SubjectTranslation != null ? s.SubjectTranslation.Value : string.Empty))
@@ -489,17 +496,18 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IStaticText, IStaticTextProxy>()
                     .ConvertUsing(m =>
                     {
-                        if (m as IStaticTextProxy != null)
+                        IStaticTextProxy staticTextProxy = m as IStaticTextProxy;
+                        if (staticTextProxy != null)
                         {
-                            return (IStaticTextProxy) m;
+                            return staticTextProxy;
                         }
-                        var staticTextProxy = new StaticTextProxy(m.Type, m.SubjectTranslationIdentifier, m.BodyTranslationIdentifier)
+                        staticTextProxy = new StaticTextProxy(m.Type, m.SubjectTranslationIdentifier, m.BodyTranslationIdentifier)
                         {
                             Identifier = m.Identifier
                         };
                         foreach (var translation in m.Translations)
                         {
-                            if (translation as ITranslationProxy != null)
+                            if (translation is ITranslationProxy)
                             {
                                 staticTextProxy.TranslationAdd(translation);
                                 continue;
@@ -513,12 +521,12 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<IDataProvider, DataProviderView>()
-                    .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
                     .ForMember(m => m.DataSourceStatement, opt => opt.MapFrom(s => s.DataSourceStatement != null ? s.DataSourceStatement.Value : string.Empty));
 
                 config.CreateMap<IDataProvider, DataProviderSystemView>()
-                    .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
                     .ForMember(m => m.HandlesPayments, opt => opt.MapFrom(s => s.HandlesPayments))
                     .ForMember(m => m.DataSourceStatementIdentifier, opt => opt.MapFrom(s => s.DataSourceStatementIdentifier))
@@ -527,17 +535,18 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IDataProvider, IDataProviderProxy>()
                     .ConvertUsing(m =>
                     {
-                        if (m as IDataProviderProxy != null)
+                        IDataProviderProxy dataProviderProxy = m as IDataProviderProxy;
+                        if (dataProviderProxy != null)
                         {
-                            return (IDataProviderProxy) m;
+                            return dataProviderProxy;
                         }
-                        var dataProviderProxy = new DataProviderProxy(m.Name, m.HandlesPayments, m.DataSourceStatementIdentifier)
+                        dataProviderProxy = new DataProviderProxy(m.Name, m.HandlesPayments, m.DataSourceStatementIdentifier)
                         {
                             Identifier = m.Identifier
                         };
                         foreach (var translation in m.Translations)
                         {
-                            if (translation as ITranslationProxy != null)
+                            if (translation is ITranslationProxy)
                             {
                                 dataProviderProxy.TranslationAdd(translation);
                                 continue;
@@ -551,7 +560,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<ITranslation, TranslationSystemView>()
-                    .ForMember(m => m.TranslationIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.TranslationIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.TranslationOfIdentifier, opt => opt.MapFrom(s => s.TranslationOfIdentifier))
                     .ForMember(m => m.TranslationInfo, opt => opt.MapFrom(s => s.TranslationInfo))
                     .ForMember(m => m.Translation, opt => opt.MapFrom(s => s.Value));
@@ -559,9 +568,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<ITranslation, ITranslationProxy>()
                     .ConvertUsing(m =>
                     {
-                        if (m as ITranslationProxy != null)
+                        ITranslationProxy translationProxy = m as ITranslationProxy;
+                        if (translationProxy != null)
                         {
-                            return (ITranslationProxy) m;
+                            return translationProxy;
                         }
                         var translationInfoProxy = m.TranslationInfo as ITranslationInfoProxy;
                         if (translationInfoProxy == null && Mapper != null)
@@ -575,11 +585,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     });
 
                 config.CreateMap<ITranslationInfo, TranslationInfoSystemView>()
-                    .ForMember(m => m.TranslationInfoIdentifier, opt => opt.MapFrom(s => s.Identifier.HasValue ? s.Identifier.Value : Guid.Empty))
+                    .ForMember(m => m.TranslationInfoIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.CultureName, opt => opt.MapFrom(s => s.CultureName));
 
                 config.CreateMap<ITranslationInfo, ITranslationInfoProxy>()
-                    .ConvertUsing(m => (m as ITranslationInfoProxy) != null ? (ITranslationInfoProxy) m : new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier});
+                    .ConvertUsing(m =>
+                    {
+                        ITranslationInfoProxy translationInfoProxy = m as ITranslationInfoProxy;
+                        return translationInfoProxy ?? new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier};
+                    });
 
                 config.CreateMap<IIdentifiable, ServiceReceiptResponse>()
                     .ForMember(m => m.Identifier, opt => opt.MapFrom(s => s.Identifier))
@@ -611,7 +625,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         {
             if (Equals(source, null))
             {
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             }
             var identifiable = source as IIdentifiable;
             if (identifiable != null && identifiable.Identifier.HasValue == false)
