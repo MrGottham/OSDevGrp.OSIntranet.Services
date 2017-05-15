@@ -147,6 +147,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(householdMember.MembershipExpireTime, Is.Null);
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
             Assert.That(householdMember.CanRenewMembership, Is.False);
             Assert.That(householdMember.CanUpgradeMembership, Is.True);
             Assert.That(householdMember.ActivationCode, Is.Not.Null);
@@ -371,6 +372,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
                 Assert.That(householdMember.MembershipExpireTime, Is.Null);
                 Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+                Assert.That(householdMember.MembershipHasExpired, Is.True);
             }
         }
 
@@ -400,6 +402,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.LessThan(DateTime.Now));
                 // ReSharper restore PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipHasExpired, Is.True);
             }
         }
 
@@ -429,6 +432,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.GreaterThan(DateTime.Now));
                 // ReSharper restore PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipHasExpired, Is.False);
             }
         }
 
@@ -458,6 +462,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.GreaterThan(DateTime.Now));
                 // ReSharper restore PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipHasExpired, Is.False);
 
                 householdMember.Membership = membershipToTest;
                 Assert.That(householdMember.Membership, Is.EqualTo(membershipToTest));
@@ -491,6 +496,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 // ReSharper disable PossibleInvalidOperationException
                 Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
                 // ReSharper restore PossibleInvalidOperationException
+                Assert.That(householdMember.MembershipHasExpired, Is.False);
 
                 householdMember.Membership = Membership.Basic;
                 Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
@@ -498,14 +504,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
                 // ReSharper restore ConditionIsAlwaysTrueOrFalse
+                Assert.That(householdMember.MembershipHasExpired, Is.True);
             }
         }
 
         /// <summary>
-        /// Tests that the setter for MembershipExpireTime sets the membership expire date and time not equal to null.
+        /// Tests that the setter for MembershipExpireTime sets the membership expire date and time in the past.
         /// </summary>
         [Test]
-        public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeNotEqualToNull()
+        public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeInPast()
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
@@ -519,6 +526,37 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.MembershipExpireTime, Is.Null);
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
+
+            var membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365) * -1);
+            householdMember.MembershipExpireTime = membershipExpireTime;
+            Assert.That(householdMember.MembershipExpireTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that the setter for MembershipExpireTime sets the membership expire date and time in the future.
+        /// </summary>
+        [Test]
+        public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeInFuture()
+        {
+            var fixture = new Fixture();
+            var random = new Random(fixture.Create<int>());
+
+            var domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
+            domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Anything))
+                .Return(true)
+                .Repeat.Any();
+
+            var householdMember = new MyHouseholdMember(fixture.Create<string>(), fixture.Create<Membership>(), null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(householdMember, Is.Not.Null);
+            Assert.That(householdMember.MembershipExpireTime, Is.Null);
+            Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
 
             var membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365));
             householdMember.MembershipExpireTime = membershipExpireTime;
@@ -527,6 +565,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.True);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
+            Assert.That(householdMember.MembershipHasExpired, Is.False);
         }
 
         /// <summary>
@@ -553,10 +592,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(membershipExpireTime));
             // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipHasExpired, Is.False);
 
             householdMember.MembershipExpireTime = null;
             Assert.That(householdMember.MembershipExpireTime, Is.Null);
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
         }
 
         /// <summary>
@@ -1957,12 +1998,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
             // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipHasExpired, Is.False);
 
             householdMember.MembershipApply(Membership.Basic);
             Assert.That(householdMember, Is.Not.Null);
             Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(householdMember.MembershipExpireTime, Is.Null);
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
         }
 
         /// <summary>
@@ -1985,6 +2028,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(householdMember.MembershipExpireTime, Is.Null);
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
 
             householdMember.MembershipApply(Membership.Deluxe);
             Assert.That(householdMember, Is.Not.Null);
@@ -1996,6 +2040,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
             // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipHasExpired, Is.False);
         }
 
         /// <summary>
@@ -2018,6 +2063,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(householdMember.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(householdMember.MembershipExpireTime, Is.Null);
             Assert.That(householdMember.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(householdMember.MembershipHasExpired, Is.True);
 
             householdMember.MembershipApply(Membership.Premium);
             Assert.That(householdMember, Is.Not.Null);
@@ -2029,6 +2075,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMember.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(3).Seconds);
             // ReSharper restore PossibleInvalidOperationException
+            Assert.That(householdMember.MembershipHasExpired, Is.False);
         }
 
         /// <summary>

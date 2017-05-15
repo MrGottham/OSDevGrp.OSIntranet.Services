@@ -117,14 +117,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual Membership Membership
         {
-            get
-            {
-                if (MembershipExpireTime.HasValue == false || MembershipExpireTime.Value < DateTime.Now)
-                {
-                    return Membership.Basic;
-                }
-                return _membership;
-            }
+            get => MembershipHasExpired ? Membership.Basic : _membership;
             protected set
             {
                 _membership = value;
@@ -143,6 +136,11 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             get => _membershipExpireTime;
             protected set => _membershipExpireTime = value;
         }
+
+        /// <summary>
+        /// Indicates whether the membership has expired.
+        /// </summary>
+        public virtual bool MembershipHasExpired => MembershipExpireTime.HasValue == false || MembershipExpireTime.Value < DateTime.Now;
 
         /// <summary>
         /// Indicates whether the membership can be renewed.

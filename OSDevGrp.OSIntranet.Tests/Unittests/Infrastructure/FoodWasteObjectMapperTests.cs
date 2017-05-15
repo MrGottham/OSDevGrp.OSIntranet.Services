@@ -366,12 +366,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map maps HouseholdMember to HouseholdMemberView.
         /// </summary>
         [Test]
-        [TestCase(Membership.Basic)]
-        [TestCase(Membership.Deluxe)]
-        [TestCase(Membership.Premium)]
-        public void TestThatMapMapsHouseholdMemberToHouseholdMemberView(Membership membership)
+        [TestCase(Membership.Basic, true)]
+        [TestCase(Membership.Basic, false)]
+        [TestCase(Membership.Deluxe, true)]
+        [TestCase(Membership.Deluxe, false)]
+        [TestCase(Membership.Premium, true)]
+        [TestCase(Membership.Premium, false)]
+        public void TestThatMapMapsHouseholdMemberToHouseholdMemberView(Membership membership, bool membershipHasExpired)
         {
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership);
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership, membershipHasExpired: membershipHasExpired);
 
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
@@ -387,7 +390,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberView.Membership, Is.Not.Null);
             Assert.That(householdMemberView.Membership, Is.Not.Empty);
             Assert.That(householdMemberView.Membership, Is.EqualTo(householdMemberMock.Membership.ToString()));
-            Assert.That(householdMemberView.MembershipExpireTime, Is.EqualTo(householdMemberMock.MembershipExpireTime));
+            if (membershipHasExpired)
+            {
+                Assert.That(householdMemberView.MembershipExpireTime, Is.Null);
+                Assert.That(householdMemberView.MembershipExpireTime.HasValue, Is.False);
+            }
+            else
+            {
+                Assert.That(householdMemberView.MembershipExpireTime, Is.EqualTo(householdMemberMock.MembershipExpireTime));
+            }
             Assert.That(householdMemberView.CanRenewMembership, Is.EqualTo(householdMemberMock.CanRenewMembership));
             Assert.That(householdMemberView.CanUpgradeMembership, Is.EqualTo(householdMemberMock.CanUpgradeMembership));
             Assert.That(householdMemberView.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));

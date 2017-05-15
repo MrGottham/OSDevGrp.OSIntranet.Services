@@ -80,11 +80,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a household member.
         /// </summary>
         /// <returns>Mockup for a household member.</returns>
-        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolictyAccepted = true, bool canRenewMembership = false, bool canUpgradeMembership = true, bool hasReachedHouseholdLimit = false, IEnumerable<Membership> upgradeableMemberships = null)
+        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolictyAccepted = true, bool canRenewMembership = false, bool canUpgradeMembership = true, bool hasReachedHouseholdLimit = false, IEnumerable<Membership> upgradeableMemberships = null, bool membershipHasExpired = true)
         {
             var fixture = new Fixture();
             var identfier = Guid.NewGuid();
-            var mailAddress = string.Format("test.{0}@osdevgrp.dk", identfier.ToString("D").ToLower());
+            var mailAddress = $"test.{identfier.ToString("D").ToLower()}@osdevgrp.dk";
             var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMemberMock.Stub(m => m.Identifier)
                 .Return(identfier)
@@ -100,6 +100,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.MembershipExpireTime)
                 .Return(membership == Membership.Basic ? null : (DateTime?) DateTime.Now.AddYears(1))
+                .Repeat.Any();
+            householdMemberMock.Stub(m => m.MembershipHasExpired)
+                .Return(membershipHasExpired)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.CanRenewMembership)
                 .Return(canRenewMembership)
@@ -210,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         public static IStakeholder BuildStakeholderMock(StakeholderType stakeholderType = StakeholderType.HouseholdMember)
         {
             var identfier = Guid.NewGuid();
-            var mailAddress = string.Format("test.{0}@osdevgrp.dk", identfier.ToString("D").ToLower());
+            var mailAddress = $"test.{identfier.ToString("D").ToLower()}@osdevgrp.dk";
             var stakeholderMock = MockRepository.GenerateMock<IStakeholder>();
             stakeholderMock.Stub(m => m.Identifier)
                 .Return(identfier)
@@ -377,7 +380,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             if (foreignKeyForType == null)
             {
-                throw new ArgumentNullException("foreignKeyForType");
+                throw new ArgumentNullException(nameof(foreignKeyForType));
             }
             var fixture = new Fixture();
             var foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
@@ -574,7 +577,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             if (string.IsNullOrEmpty(cultureName))
             {
-                throw new ArgumentNullException("cultureName");
+                throw new ArgumentNullException(nameof(cultureName));
             }
             var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
             translationInfoMock.Stub(m => m.Identifier)

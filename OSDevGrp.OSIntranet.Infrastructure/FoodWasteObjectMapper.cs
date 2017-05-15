@@ -112,7 +112,11 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress))
                     .ForMember(m => m.Membership, opt => opt.MapFrom(s => s.Membership))
-                    .ForMember(m => m.MembershipExpireTime, opt => opt.MapFrom(s => s.MembershipExpireTime))
+                    .ForMember(m => m.MembershipExpireTime, opt =>
+                    {
+                        opt.Condition(s => s.MembershipHasExpired == false);
+                        opt.MapFrom(s => s.MembershipExpireTime);
+                    })
                     .ForMember(m => m.CanRenewMembership, opt => opt.MapFrom(s => s.CanRenewMembership))
                     .ForMember(m => m.CanUpgradeMembership, opt => opt.MapFrom(s => s.CanUpgradeMembership))
                     .ForMember(m => m.ActivationTime, opt => opt.MapFrom(s => s.ActivationTime))

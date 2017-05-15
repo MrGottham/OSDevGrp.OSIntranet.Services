@@ -21,6 +21,11 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         DateTime? MembershipExpireTime { get; }
 
         /// <summary>
+        /// Indicates whether the membership has expired.
+        /// </summary>
+        bool MembershipHasExpired { get; }
+
+        /// <summary>
         /// Indicates whether the membership can be renewed.
         /// </summary>
         bool CanRenewMembership { get; }
