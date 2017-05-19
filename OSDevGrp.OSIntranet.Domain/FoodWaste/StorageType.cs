@@ -86,6 +86,26 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             protected set => _deletable = value;
         }
 
+        /// <summary>
+        /// Gets the unique identifier for the freezer storage type.
+        /// </summary>
+        public static Guid IdentifierForFreezer => new Guid("959A0D7D-A034-405C-8F6E-EF49ED5E7553");
+
+        /// <summary>
+        /// Gets the unique identifier for the refrigerator storage type.
+        /// </summary>
+        public static Guid IdentifierForRefrigerator => new Guid("3CEA8A7D-01A4-40BF-AB96-F70354015352");
+
+        /// <summary>
+        /// Gets the unique identifier for the kitchen cabinets storage type.
+        /// </summary>
+        public static Guid IdentifierForKitchenCabinets => new Guid("0F78276B-87D1-4660-8708-A119C5DAA3A9");
+
+        /// <summary>
+        /// Gets the unique identifier for the shopping basket storage type.
+        /// </summary>
+        public static Guid IdentifierForShoppingBasket => new Guid("B5A0B40D-1709-48D9-83F2-E87D54ED80F5");
+
         #endregion
     }
 }

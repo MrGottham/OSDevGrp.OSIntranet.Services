@@ -503,3 +503,59 @@ END $$
 DELIMITER ;
 CALL GrantMemberOfHouseholds(@HostName, DATABASE(), @ServiceUserName);
 DROP PROCEDURE GrantMemberOfHouseholds;
+
+CREATE TABLE IF NOT EXISTS StorageTypes (
+	StorageTypeIdentifier CHAR(36) NOT NULL,
+	Temperature TINYINT NOT NULL,
+	TemperatureRangeStartValue TINYINT NOT NULL,
+	TemperatureRangeEndValue TINYINT NOT NULL,
+	Creatable BIT NOT NULL,
+	Editable BIT NOT NULL,
+	Deletable BIT NOT NULL,
+	PRIMARY KEY (StorageTypeIdentifier)
+);
+
+DROP PROCEDURE IF EXISTS InsertDataIntoStorageTypes;
+DELIMITER $$
+CREATE PROCEDURE InsertDataIntoStorageTypes()
+BEGIN
+	IF((SELECT COUNT(*) FROM StorageTypes WHERE StorageTypeIdentifier = '959A0D7D-A034-405C-8F6E-EF49ED5E7553') = 0) THEN
+		INSERT INTO StorageTypes (StorageTypeIdentifier,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('959A0D7D-A034-405C-8F6E-EF49ED5E7553',-10,-25,0,1,1,1);
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'FCAAD78E-31DD-4D6C-9DE3-B8261D251799') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('FCAAD78E-31DD-4D6C-9DE3-B8261D251799','959A0D7D-A034-405C-8F6E-EF49ED5E7553','807E904D-FDF9-418D-9745-B73821B8D07A','Freezer');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '1C1E756D-ADAF-4450-881C-5112ABE917FD') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('1C1E756D-ADAF-4450-881C-5112ABE917FD','959A0D7D-A034-405C-8F6E-EF49ED5E7553','978C7318-AD0A-459C-BEE0-1803A94F50D7','Fryser');
+	END IF;
+	IF((SELECT COUNT(*) FROM StorageTypes WHERE StorageTypeIdentifier = '3CEA8A7D-01A4-40BF-AB96-F70354015352') = 0) THEN
+		INSERT INTO StorageTypes (StorageTypeIdentifier,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('3CEA8A7D-01A4-40BF-AB96-F70354015352',5,-5,10,1,1,1);
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '00A98681-217A-45DD-8510-27BC359369A3') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('00A98681-217A-45DD-8510-27BC359369A3','3CEA8A7D-01A4-40BF-AB96-F70354015352','807E904D-FDF9-418D-9745-B73821B8D07A','Refrigerator');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'A29B688E-D620-4C58-96C6-4020AADFD840') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('A29B688E-D620-4C58-96C6-4020AADFD840','3CEA8A7D-01A4-40BF-AB96-F70354015352','978C7318-AD0A-459C-BEE0-1803A94F50D7','Køleskab');
+	END IF;
+	IF((SELECT COUNT(*) FROM StorageTypes WHERE StorageTypeIdentifier = '0F78276B-87D1-4660-8708-A119C5DAA3A9') = 0) THEN
+		INSERT INTO StorageTypes (StorageTypeIdentifier,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('0F78276B-87D1-4660-8708-A119C5DAA3A9',20,0,45,1,1,1);
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'EC4C26E2-0832-4107-BED7-DD66367B442A') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('EC4C26E2-0832-4107-BED7-DD66367B442A','0F78276B-87D1-4660-8708-A119C5DAA3A9','807E904D-FDF9-418D-9745-B73821B8D07A','Kitchen Cabinets');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '8D8A075B-AAD4-4E29-B785-E19B287C22B7') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('8D8A075B-AAD4-4E29-B785-E19B287C22B7','0F78276B-87D1-4660-8708-A119C5DAA3A9','978C7318-AD0A-459C-BEE0-1803A94F50D7','Køkkenskabe');
+	END IF;
+	IF((SELECT COUNT(*) FROM StorageTypes WHERE StorageTypeIdentifier = 'B5A0B40D-1709-48D9-83F2-E87D54ED80F5') = 0) THEN
+		INSERT INTO StorageTypes (StorageTypeIdentifier,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('B5A0B40D-1709-48D9-83F2-E87D54ED80F5',0,0,0,0,0,0);
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = 'B752FA23-6D58-4005-AA6B-6302A7417C68') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('B752FA23-6D58-4005-AA6B-6302A7417C68','B5A0B40D-1709-48D9-83F2-E87D54ED80F5','807E904D-FDF9-418D-9745-B73821B8D07A','Shopping Basket');
+	END IF;
+	IF((SELECT COUNT(*) FROM Translations WHERE TranslationIdentifier = '2566C2CA-578C-4E92-96B3-81274447C07E') = 0) THEN
+		INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('2566C2CA-578C-4E92-96B3-81274447C07E','B5A0B40D-1709-48D9-83F2-E87D54ED80F5','978C7318-AD0A-459C-BEE0-1803A94F50D7','Indkøbskurv');
+	END IF;
+END $$
+DELIMITER ;
+CALL InsertDataIntoStorageTypes();
+DROP PROCEDURE InsertDataIntoStorageTypes;

@@ -233,6 +233,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Test that the getter of IdentifierForFreezer gets the unique identifier for the freezer storage type.
+        /// </summary>
+        [Test]
+        public void TestThatIdentifierForFreezerGetterGetsUniqueIdentifier()
+        {
+            Guid uniqueIdentifier = StorageType.IdentifierForFreezer;
+            Assert.That(uniqueIdentifier.ToString("D").ToUpper(), Is.EqualTo("959A0D7D-A034-405C-8F6E-EF49ED5E7553"));
+        }
+
+        /// <summary>
+        /// Test that the getter of IdentifierForRefrigerator gets the unique identifier for the refrigerator storage type.
+        /// </summary>
+        [Test]
+        public void TestThatIdentifierForRefrigeratorGetterGetsUniqueIdentifier()
+        {
+            Guid uniqueIdentifier = StorageType.IdentifierForRefrigerator;
+            Assert.That(uniqueIdentifier.ToString("D").ToUpper(), Is.EqualTo("3CEA8A7D-01A4-40BF-AB96-F70354015352"));
+        }
+
+        /// <summary>
+        /// Test that the getter of IdentifierForKitchenCabinets gets the unique identifier for the kitchen cabinets storage type.
+        /// </summary>
+        [Test]
+        public void TestThatIdentifierForKitchenCabinetsGetterGetsUniqueIdentifier()
+        {
+            Guid uniqueIdentifier = StorageType.IdentifierForKitchenCabinets;
+            Assert.That(uniqueIdentifier.ToString("D").ToUpper(), Is.EqualTo("0F78276B-87D1-4660-8708-A119C5DAA3A9"));
+        }
+
+        /// <summary>
+        /// Test that the getter of IdentifierForShoppingBasket gets the unique identifier for the shopping basket storage type.
+        /// </summary>
+        [Test]
+        public void TestThatIdentifierForShoppingBasketGetterGetsUniqueIdentifier()
+        {
+            Guid uniqueIdentifier = StorageType.IdentifierForShoppingBasket;
+            Assert.That(uniqueIdentifier.ToString("D").ToUpper(), Is.EqualTo("B5A0B40D-1709-48D9-83F2-E87D54ED80F5"));
+        }
+
+        /// <summary>
         /// Creates an instance of the storage type which can be used for unit testning.
         /// </summary>
         /// <param name="temperature">Defualt temperature for the storage type.</param>
