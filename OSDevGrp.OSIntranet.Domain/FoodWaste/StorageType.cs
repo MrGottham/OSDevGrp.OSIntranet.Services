@@ -37,6 +37,13 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             _deletable = deletable;
         }
 
+        /// <summary>
+        /// Creates a storage type.
+        /// </summary>
+        protected StorageType()
+        {
+        }
+
         #endregion
 
         #region Properties

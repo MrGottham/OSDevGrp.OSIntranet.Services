@@ -102,6 +102,7 @@
     <Compile Include="DataProxies\FoodWaste\MemberOfHouseholdProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\PaymentProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\StaticTextProxy.cs" />
+    <Compile Include="DataProxies\FoodWaste\StorageTypeProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\TranslationInfoProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\TranslationProxy.cs" />
     <Compile Include="DataProxies\Fælles\SystemProxy.cs" />
