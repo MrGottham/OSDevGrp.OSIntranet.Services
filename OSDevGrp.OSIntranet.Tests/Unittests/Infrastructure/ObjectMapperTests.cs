@@ -184,7 +184,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at en basisadresse kan mappes til et adressekontoview.
         /// </summary>
         [Test]
-        public void TestAtAdresseBaseMappesTilAdressekontoView()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestAtAdresseBaseMappesTilAdressekontoView(bool harBetalingsbetingelse)
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2010, 12, 31));
@@ -192,11 +194,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.Create<Person>();
+            Person person = fixture.Create<Person>();
             person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
             person.SætMailadresse(fixture.Create<string>());
-            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
             person.Calculate(fixture.Create<DateTime>());
             var adressekontoView = objectMapper.Map<AdresseBase, AdressekontoView>(person);
@@ -216,14 +221,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontoView.SekundærTelefon, Is.EqualTo(person.Mobil));
             Assert.That(adressekontoView.Mailadresse, Is.Not.Null);
             Assert.That(adressekontoView.Mailadresse, Is.EqualTo(person.Mailadresse));
-            Assert.That(adressekontoView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(adressekontoView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(adressekontoView.Saldo, Is.GreaterThan(0M));
 
-            var firma = fixture.Create<Firma>();
+            Firma firma = fixture.Create<Firma>();
             firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætMailadresse(fixture.Create<string>());
-            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
             firma.Calculate(fixture.Create<DateTime>());
             adressekontoView = objectMapper.Map<AdresseBase, AdressekontoView>(firma);
@@ -243,7 +251,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(adressekontoView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
             Assert.That(adressekontoView.Mailadresse, Is.Not.Null);
             Assert.That(adressekontoView.Mailadresse, Is.EqualTo(firma.Mailadresse));
-            Assert.That(adressekontoView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(adressekontoView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(adressekontoView.Saldo, Is.GreaterThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
@@ -310,7 +318,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at en basisadresse kan mappes til et debitorview.
         /// </summary>
         [Test]
-        public void TestAtAdresseBaseMappesTilDebitorView()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestAtAdresseBaseMappesTilDebitorView(bool harBetalingsbetingelse)
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2010, 12, 31));
@@ -318,11 +328,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.Create<Person>();
+            Person person = fixture.Create<Person>();
             person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
             person.SætMailadresse(fixture.Create<string>());
-            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
             person.Calculate(fixture.Create<DateTime>());
             var debitorView = objectMapper.Map<AdresseBase, DebitorView>(person);
@@ -342,14 +355,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorView.SekundærTelefon, Is.EqualTo(person.Mobil));
             Assert.That(debitorView.Mailadresse, Is.Not.Null);
             Assert.That(debitorView.Mailadresse, Is.EqualTo(person.Mailadresse));
-            Assert.That(debitorView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(debitorView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(debitorView.Saldo, Is.GreaterThan(0M));
 
-            var firma = fixture.Create<Firma>();
+            Firma firma = fixture.Create<Firma>();
             firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætMailadresse(fixture.Create<string>());
-            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), 0M));
             firma.Calculate(fixture.Create<DateTime>());
             debitorView = objectMapper.Map<AdresseBase, DebitorView>(firma);
@@ -369,7 +385,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(debitorView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
             Assert.That(debitorView.Mailadresse, Is.Not.Null);
             Assert.That(debitorView.Mailadresse, Is.EqualTo(firma.Mailadresse));
-            Assert.That(debitorView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(debitorView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(debitorView.Saldo, Is.GreaterThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
@@ -436,7 +452,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at en basisadresse kan mappes til et kreditorview.
         /// </summary>
         [Test]
-        public void TestAtAdresseBaseMappesTilKreditorView()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestAtAdresseBaseMappesTilKreditorView(bool harBetalingsbetingelse)
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2010, 12, 31));
@@ -444,12 +462,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.Create<Person>();
-            person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(),
-                                         fixture.Create<string>());
+            Person person = fixture.Create<Person>();
+            person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
             person.SætMailadresse(fixture.Create<string>());
-            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             person.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
             person.Calculate(fixture.Create<DateTime>());
             var kreditorView = objectMapper.Map<AdresseBase, KreditorView>(person);
@@ -469,14 +489,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorView.SekundærTelefon, Is.EqualTo(person.Mobil));
             Assert.That(kreditorView.Mailadresse, Is.Not.Null);
             Assert.That(kreditorView.Mailadresse, Is.EqualTo(person.Mailadresse));
-            Assert.That(kreditorView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(kreditorView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(kreditorView.Saldo, Is.LessThan(0M));
 
-            var firma = fixture.Create<Firma>();
+            Firma firma = fixture.Create<Firma>();
             firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætMailadresse(fixture.Create<string>());
-            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             firma.TilføjBogføringslinje(new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), 0M, fixture.Create<decimal>()));
             firma.Calculate(fixture.Create<DateTime>());
             kreditorView = objectMapper.Map<AdresseBase, KreditorView>(firma);
@@ -496,7 +519,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(kreditorView.SekundærTelefon, Is.EqualTo(firma.Telefon2));
             Assert.That(kreditorView.Mailadresse, Is.Not.Null);
             Assert.That(kreditorView.Mailadresse, Is.EqualTo(firma.Mailadresse));
-            Assert.That(kreditorView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(kreditorView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(kreditorView.Saldo, Is.LessThan(0M));
 
             var andenAdresse = new OtherAddress(fixture.Create<int>(), fixture.Create<string>(), fixture.Create<Adressegruppe>());
@@ -512,7 +535,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at en person kan mappes til et personview.
         /// </summary>
         [Test]
-        public void TestAtPersonMappesTilPersonView()
+        [TestCase(true, true, true)]
+        [TestCase(true, true, false)]
+        [TestCase(true, false, true)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, true)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(false, false, false)]
+        public void TestAtPersonMappesTilPersonView(bool harFødselsdato, bool harBetalingsbetingelse, bool harFirma)
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(1975, 08, 21));
@@ -520,19 +551,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var person = fixture.Create<Person>();
+            Person person = fixture.Create<Person>();
             person.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             person.SætTelefon(fixture.Create<string>(), fixture.Create<string>());
-            person.SætFødselsdato(fixture.Create<DateTime>());
+            if (harFødselsdato)
+            {
+                person.SætFødselsdato(fixture.Create<DateTime>());
+            }
             person.SætBekendtskab(fixture.Create<string>());
             person.SætMailadresse(fixture.Create<string>());
             person.SætWebadresse(fixture.Create<string>());
-            person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                person.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             person.SætUdlånsfrist(fixture.Create<int>());
 
-            var firma = fixture.Create<Firma>();
-            firma.TilføjPerson(person);
-            
+            if (harFirma)
+            {
+                var firma = fixture.Create<Firma>();
+                firma.TilføjPerson(person);
+            }
             var personView = objectMapper.Map<Person, PersonView>(person);
             Assert.That(personView, Is.Not.Null);
             Assert.That(personView.Nummer, Is.EqualTo(person.Nummer));
@@ -548,8 +587,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(personView.PrimærTelefon, Is.EqualTo(person.Telefon));
             Assert.That(personView.SekundærTelefon, Is.Not.Null);
             Assert.That(personView.SekundærTelefon, Is.EqualTo(person.Mobil));
-            Assert.That(personView.Fødselsdato, Is.Not.Null);
-            Assert.That(personView.Fødselsdato, Is.EqualTo(person.Fødselsdato));
+            Assert.That(personView.Fødselsdato, harFødselsdato ? Is.Not.Null : Is.Null);
+            if (harFødselsdato)
+            {
+                Assert.That(personView.Fødselsdato, Is.EqualTo(person.Fødselsdato));
+            }
             Assert.That(personView.Adressegruppe, Is.Not.Null);
             Assert.That(personView.Bekendtskab, Is.Not.Null);
             Assert.That(personView.Bekendtskab, Is.EqualTo(person.Bekendtskab));
@@ -557,16 +599,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(personView.Mailadresse, Is.EqualTo(person.Mailadresse));
             Assert.That(personView.Web, Is.Not.Null);
             Assert.That(personView.Web, Is.EqualTo(person.Webadresse));
-            Assert.That(personView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(personView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(personView.Udlånsfrist, Is.EqualTo(personView.Udlånsfrist));
-            Assert.That(personView.Firma, Is.Not.Null);
+            Assert.That(personView.Firma, harFirma ? Is.Not.Null : Is.Null);
         }
 
         /// <summary>
         /// Tester, at et firma kan mappes til et firmaview.
         /// </summary>
         [Test]
-        public void TestAtFirmaMappesTilFimraView()
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void TestAtFirmaMappesTilFimraView(bool harBetalingsbetingelse, bool harPersoner)
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(1975, 08, 21));
@@ -574,15 +620,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var objectMapper = new ObjectMapper();
             Assert.That(objectMapper, Is.Not.Null);
 
-            var firma = fixture.Create<Firma>();
+            Firma firma = fixture.Create<Firma>();
             firma.SætAdresseoplysninger(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætTelefon(fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
             firma.SætBekendtskab(fixture.Create<string>());
             firma.SætMailadresse(fixture.Create<string>());
             firma.SætWebadresse(fixture.Create<string>());
-            firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            if (harBetalingsbetingelse)
+            {
+                firma.SætBetalingsbetingelse(fixture.Create<Betalingsbetingelse>());
+            }
             firma.SætUdlånsfrist(fixture.Create<int>());
-            firma.TilføjPerson(fixture.Create<Person>());
+            if (harPersoner)
+            {
+                firma.TilføjPerson(fixture.Create<Person>());
+            }
 
             var firmaView = objectMapper.Map<Firma, FirmaView>(firma);
             Assert.That(firmaView, Is.Not.Null);
@@ -608,9 +660,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(firmaView.Mailadresse, Is.EqualTo(firma.Mailadresse));
             Assert.That(firmaView.Web, Is.Not.Null);
             Assert.That(firmaView.Web, Is.EqualTo(firma.Webadresse));
-            Assert.That(firmaView.Betalingsbetingelse, Is.Not.Null);
+            Assert.That(firmaView.Betalingsbetingelse, harBetalingsbetingelse ? Is.Not.Null : Is.Null);
             Assert.That(firmaView.Udlånsfrist, Is.EqualTo(firmaView.Udlånsfrist));
             Assert.That(firmaView.Personer, Is.Not.Null);
+            Assert.That(firmaView.Personer, harPersoner ? Is.Not.Empty : Is.Empty);
         }
 
         /// <summary>
@@ -1055,7 +1108,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Test, at en bogføringslinje kan mappes til et bogføringslinjeview.
         /// </summary>
         [Test]
-        public void TestAtBogføringslinjeKanMappesTilBogføringslinjeView()
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void TestAtBogføringslinjeKanMappesTilBogføringslinjeView(bool harBudgetkonto, bool harAdressekonto)
         {
             var fixture = new Fixture();
             fixture.Inject(new DateTime(2010, 12, 31));
@@ -1069,16 +1126,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 
             var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
             konto.TilføjBogføringslinje(bogføringslinje);
-            budgetkonto.TilføjBogføringslinje(bogføringslinje);
-            adresse.TilføjBogføringslinje(bogføringslinje);
+            if (harBudgetkonto)
+            {
+                budgetkonto.TilføjBogføringslinje(bogføringslinje);
+            }
+            if (harAdressekonto)
+            {
+                adresse.TilføjBogføringslinje(bogføringslinje);
+            }
 
             var bogføringslinjeView = objectMapper.Map<Bogføringslinje, BogføringslinjeView>(bogføringslinje);
             Assert.That(bogføringslinjeView, Is.Not.Null);
 
             Assert.That(bogføringslinjeView.Løbenr, Is.EqualTo(bogføringslinje.Løbenummer));
             Assert.That(bogføringslinjeView.Konto, Is.Not.Null);
-            Assert.That(bogføringslinjeView.Budgetkonto, Is.Not.Null);
-            Assert.That(bogføringslinjeView.Adressekonto, Is.Not.Null);
+            Assert.That(bogføringslinjeView.Budgetkonto, harBudgetkonto ? Is.Not.Null : Is.Null);
+            Assert.That(bogføringslinjeView.Adressekonto, harAdressekonto ? Is.Not.Null : Is.Null);
             Assert.That(bogføringslinjeView.Dato, Is.EqualTo(bogføringslinje.Dato));
             Assert.That(bogføringslinjeView.Bilag, Is.Not.Null);
             Assert.That(bogføringslinjeView.Bilag, Is.EqualTo(bogføringslinje.Bilag));
@@ -1092,7 +1155,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at en bogføringsresultat kan mappes til et bogføringslinjeopretresponse.
         /// </summary>
         [Test]
-        public void TestAtBogføringsresultatKanMappesTilBogføringslinjeOpretResponse()
+        [TestCase(true, true)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void TestAtBogføringsresultatKanMappesTilBogføringslinjeOpretResponse(bool harBudgetkonto, bool harAdressekonto)
         {
             var fixture = new Fixture();
             
@@ -1115,8 +1182,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var bogføringslinje = fixture.Create<Bogføringslinje>();
             Assert.That(bogføringslinje, Is.Not.Null);
             konto.TilføjBogføringslinje(bogføringslinje);
-            budgetkonto.TilføjBogføringslinje(bogføringslinje);
-            adressekonto.TilføjBogføringslinje(bogføringslinje);
+            if (harBudgetkonto)
+            {
+                budgetkonto.TilføjBogføringslinje(bogføringslinje);
+            }
+            if (harAdressekonto)
+            {
+                adressekonto.TilføjBogføringslinje(bogføringslinje);
+            }
             fixture.Inject(bogføringslinje);
 
             fixture.Inject<IBogføringsresultat>(fixture.Create<Bogføringsresultat>());
@@ -1131,8 +1204,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(bogføringslinjeOpretResponse, Is.Not.Null);
             Assert.That(bogføringslinjeOpretResponse.Løbenr, Is.EqualTo(bogføringslinje.Løbenummer));
             Assert.That(bogføringslinjeOpretResponse.Konto, Is.Not.Null);
-            Assert.That(bogføringslinjeOpretResponse.Budgetkonto, Is.Not.Null);
-            Assert.That(bogføringslinjeOpretResponse.Adressekonto, Is.Not.Null);
+            Assert.That(bogføringslinjeOpretResponse.Budgetkonto, harBudgetkonto ? Is.Not.Null : Is.Null);
+            Assert.That(bogføringslinjeOpretResponse.Adressekonto, harAdressekonto ? Is.Not.Null : Is.Null);
             Assert.That(bogføringslinjeOpretResponse.Dato, Is.EqualTo(bogføringslinje.Dato));
             Assert.That(bogføringslinjeOpretResponse.Bilag, Is.EqualTo(bogføringslinje.Bilag));
             Assert.That(bogføringslinjeOpretResponse.Tekst, Is.Not.Null);

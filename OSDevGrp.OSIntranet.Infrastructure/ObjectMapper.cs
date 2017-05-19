@@ -43,13 +43,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ConvertUsing(s =>
                     {
                         var mapper = new ObjectMapper();
-                        if (s is Person)
+                        Person person = s as Person;
+                        if (person != null)
                         {
-                            return mapper.Map<Person, TelefonlisteView>(s as Person);
+                            return mapper.Map<Person, TelefonlisteView>(person);
                         }
-                        if (s is Firma)
+                        Firma firma = s as Firma;
+                        if (firma != null)
                         {
-                            return mapper.Map<Firma, TelefonlisteView>(s as Firma);
+                            return mapper.Map<Firma, TelefonlisteView>(firma);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -69,14 +71,20 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<AdresseBase, AdressekontolisteView>()
                     .ConvertUsing(s =>
                     {
-                        var mapper = new ObjectMapper();
-                        if (s is Person)
+                        if (s == null)
                         {
-                            return mapper.Map<Person, AdressekontolisteView>(s as Person);
+                            return null;
                         }
-                        if (s is Firma)
+                        var mapper = new ObjectMapper();
+                        Person person = s as Person;
+                        if (person != null)
                         {
-                            return mapper.Map<Firma, AdressekontolisteView>(s as Firma);
+                            return mapper.Map<Person, AdressekontolisteView>(person);
+                        }
+                        Firma firma = s as Firma;
+                        if (firma != null)
+                        {
+                            return mapper.Map<Firma, AdressekontolisteView>(firma);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -99,13 +107,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ConvertUsing(s =>
                     {
                         var mapper = new ObjectMapper();
-                        if (s is Person)
+                        Person person = s as Person;
+                        if (person != null)
                         {
-                            return mapper.Map<Person, AdressekontoView>(s as Person);
+                            return mapper.Map<Person, AdressekontoView>(person);
                         }
-                        if (s is Firma)
+                        Firma firma = s as Firma;
+                        if (firma != null)
                         {
-                            return mapper.Map<Firma, AdressekontoView>(s as Firma);
+                            return mapper.Map<Firma, AdressekontoView>(firma);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -146,13 +156,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ConvertUsing(s =>
                     {
                         var mapper = new ObjectMapper();
-                        if (s is Person)
+                        Person person = s as Person;
+                        if (person != null)
                         {
-                            return mapper.Map<Person, DebitorlisteView>(s as Person);
+                            return mapper.Map<Person, DebitorlisteView>(person);
                         }
-                        if (s is Firma)
+                        Firma firma = s as Firma;
+                        if (firma != null)
                         {
-                            return mapper.Map<Firma, DebitorlisteView>(s as Firma);
+                            return mapper.Map<Firma, DebitorlisteView>(firma);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -175,13 +187,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ConvertUsing(s =>
                     {
                         var mapper = new ObjectMapper();
-                        if (s is Person)
+                        Person person = s as Person;
+                        if (person != null)
                         {
-                            return mapper.Map<Person, DebitorView>(s as Person);
+                            return mapper.Map<Person, DebitorView>(person);
                         }
-                        if (s is Firma)
+                        Firma firma = s as Firma;
+                        if (firma != null)
                         {
-                            return mapper.Map<Firma, DebitorView>(s as Firma);
+                            return mapper.Map<Firma, DebitorView>(firma);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -222,13 +236,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ConvertUsing(s =>
                     {
                         var mapper = new ObjectMapper();
-                        if (s is Person)
+                        Person person = s as Person;
+                        if (person != null)
                         {
-                            return mapper.Map<Person, KreditorlisteView>(s as Person);
+                            return mapper.Map<Person, KreditorlisteView>(person);
                         }
-                        if (s is Firma)
+                        Firma firma = s as Firma;
+                        if (firma != null)
                         {
-                            return mapper.Map<Firma, KreditorlisteView>(s as Firma);
+                            return mapper.Map<Firma, KreditorlisteView>(firma);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -251,13 +267,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ConvertUsing(s =>
                     {
                         var mapper = new ObjectMapper();
-                        if (s is Person)
+                        Person person = s as Person;
+                        if (person != null)
                         {
-                            return mapper.Map<Person, KreditorView>(s as Person);
+                            return mapper.Map<Person, KreditorView>(person);
                         }
-                        if (s is Firma)
+                        Firma firma = s as Firma;
+                        if (firma != null)
                         {
-                            return mapper.Map<Firma, KreditorView>(s as Firma);
+                            return mapper.Map<Firma, KreditorView>(firma);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -379,13 +397,15 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ConvertUsing(s =>
                     {
                         var objectMapper = new ObjectMapper();
-                        if (s is Konto)
+                        Konto konto = s as Konto;
+                        if (konto != null)
                         {
-                            return objectMapper.Map<Konto, KontoView>(s as Konto);
+                            return objectMapper.Map<Konto, KontoView>(konto);
                         }
-                        if (s is Budgetkonto)
+                        Budgetkonto budgetkonto = s as Budgetkonto;
+                        if (budgetkonto != null)
                         {
-                            return objectMapper.Map<Budgetkonto, BudgetkontoView>(s as Budgetkonto);
+                            return objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
                         }
                         throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
                     });
@@ -578,7 +598,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         {
             if (Equals(source, null))
             {
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             }
             return Mapper.Map<TSource, TDestination>(source);
         }
