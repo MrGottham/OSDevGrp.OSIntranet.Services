@@ -315,7 +315,9 @@
     <Compile Include="Unittests\Domain\FoodWaste\HouseholdTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\IdentifiableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\PaymentTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\RangeTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\StaticTextTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\StorageTypeTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationTests.cs" />
@@ -445,6 +447,7 @@
     <Compile Include="Unittests\Services\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Unittests\Services\IntranetServiceBaseTests.cs" />
     <Compile Include="Unittests\Services\KalenderServiceTests.cs" />
+    <Compile Include="Unittests\TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

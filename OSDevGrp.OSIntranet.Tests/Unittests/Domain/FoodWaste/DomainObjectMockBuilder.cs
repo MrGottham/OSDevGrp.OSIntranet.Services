@@ -617,5 +617,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Repeat.Any();
             return identifibaleMock;
         }
+
+        /// <summary>
+        /// Build a mockup for an integer range.
+        /// </summary>
+        /// <returns>Mockup for an integer range.</returns>
+        public static IRange<int> BuildIntRange()
+        {
+            Fixture fixture = new Fixture();
+
+            IRange<int> intRangeMock = MockRepository.GenerateMock<IRange<int>>();
+            intRangeMock.Stub(m => m.StartValue)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            intRangeMock.Stub(m => m.EndValue)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+
+            return intRangeMock;
+        }
     }
 }

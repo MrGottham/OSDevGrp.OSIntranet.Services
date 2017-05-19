@@ -76,8 +76,10 @@
     <Compile Include="FoodWaste\IHouseholdMember.cs" />
     <Compile Include="FoodWaste\IIdentifiable.cs" />
     <Compile Include="FoodWaste\IPayment.cs" />
+    <Compile Include="FoodWaste\IRange.cs" />
     <Compile Include="FoodWaste\IStakeholder.cs" />
     <Compile Include="FoodWaste\IStaticText.cs" />
+    <Compile Include="FoodWaste\IStorageType.cs" />
     <Compile Include="FoodWaste\ITranslatable.cs" />
     <Compile Include="FoodWaste\ITranslation.cs" />
     <Compile Include="FoodWaste\ITranslationInfo.cs" />
