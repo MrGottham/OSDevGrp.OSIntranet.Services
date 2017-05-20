@@ -35,6 +35,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that getter for UniqueId gets the unique identifier for the storage type.
+        /// </summary>
+        [Test]
+        public void TestThatUniqueIdGetterGetsUniqueIdentificationForStorageTypeProxy()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorageTypeProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.Value, Is.EqualTo(identifier));
+
+            string uniqueId = sut.UniqueId;
+            Assert.That(uniqueId, Is.Not.Null);
+            Assert.That(uniqueId, Is.Not.Empty);
+            Assert.That(uniqueId, Is.EqualTo(identifier.ToString("D").ToUpper()));
+        }
+
+        /// <summary>
         /// Tests that getter of UniqueId throws an IntranetRepositoryException when the storage type has no identifier.
         /// </summary>
         [Test]
