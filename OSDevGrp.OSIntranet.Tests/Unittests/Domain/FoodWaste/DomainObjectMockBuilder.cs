@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -74,6 +75,63 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 householdCollection.Add(BuildHouseholdMock(householdMember));
             }
             return householdCollection;
+        }
+
+        /// <summary>
+        /// Build a mockup for a storage type.
+        /// </summary>
+        /// <returns>Mockup for a storage type.</returns>
+        public static IStorageType BuildStorageTypeMock(Guid? storageTypeIdentifier = null, int? sortOrder = null)
+        {
+            Fixture fixture = new Fixture();
+
+            Guid identifier = storageTypeIdentifier ?? Guid.NewGuid();
+
+            IStorageType storageType = MockRepository.GenerateMock<IStorageType>();
+            storageType.Stub(m => m.Identifier)
+                .Return(identifier)
+                .Repeat.Any();
+            storageType.Stub(m => m.SortOrder)
+                .Return(sortOrder ?? fixture.Create<int>())
+                .Repeat.Any();
+            storageType.Stub(m => m.Temperature)
+                .Return(fixture.Create<int>())
+                .Repeat.Any();
+            storageType.Stub(m => m.TemperatureRange)
+                .Return(BuildIntRange())
+                .Repeat.Any();
+            storageType.Stub(m => m.Creatable)
+                .Return(fixture.Create<bool>())
+                .Repeat.Any();
+            storageType.Stub(m => m.Editable)
+                .Return(fixture.Create<bool>())
+                .Repeat.Any();
+            storageType.Stub(m => m.Deletable)
+                .Return(fixture.Create<bool>())
+                .Repeat.Any();
+            storageType.Stub(m => m.Translation)
+                .Return(BuildTranslationMock(identifier))
+                .Repeat.Any();
+            storageType.Stub(m => m.Translations)
+                .Return(BuildTranslationMockCollection(identifier))
+                .Repeat.Any();
+
+            return storageType;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some storages types.
+        /// </summary>
+        /// <returns>Collection of mockups for some storages types.</returns>
+        public static IEnumerable<IStorageType> BuildStorageTypeMockCollection()
+        {
+            return new List<IStorageType>
+            {
+                BuildStorageTypeMock(StorageType.IdentifierForRefrigerator, 1),
+                BuildStorageTypeMock(StorageType.IdentifierForFreezer, 2),
+                BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets, 3),
+                BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket, 4)
+            };
         }
 
         /// <summary>
@@ -291,7 +349,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
-            var result = new List<IFoodItem>(random.Next(15, 50));
+            var result = new List<IFoodItem>(random.Next(10, 25));
             while (result.Count < result.Capacity)
             {
                 result.Add(BuildFoodItemMock());
@@ -344,7 +402,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
-            var result = new List<IFoodGroup>(random.Next(1, 25));
+            var result = new List<IFoodGroup>(random.Next(1, 5));
             while (result.Count < result.Capacity)
             {
                 result.Add(BuildFoodGroupMock(parentMock));

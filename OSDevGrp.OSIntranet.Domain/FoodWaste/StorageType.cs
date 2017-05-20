@@ -25,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// Creates a storage type.
         /// </summary>
         /// <param name="sortOrder">Order for sortering storage types.</param>
-        /// <param name="temperature">Defualt temperature for the storage type.</param>
+        /// <param name="temperature">Default temperature for the storage type.</param>
         /// <param name="temperatureRange">Temperature range for the storage type.</param>
         /// <param name="creatable">Indicates whether household members can create storages of this type.</param>
         /// <param name="editable">Indicates whether household members can edit storages of this type.</param>
@@ -61,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Gets the defualt temperature for the storage type.
+        /// Gets the default temperature for the storage type.
         /// </summary>
         public virtual int Temperature
         {
@@ -106,14 +106,14 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Gets the unique identifier for the freezer storage type.
-        /// </summary>
-        public static Guid IdentifierForFreezer => new Guid("959A0D7D-A034-405C-8F6E-EF49ED5E7553");
-
-        /// <summary>
         /// Gets the unique identifier for the refrigerator storage type.
         /// </summary>
         public static Guid IdentifierForRefrigerator => new Guid("3CEA8A7D-01A4-40BF-AB96-F70354015352");
+
+        /// <summary>
+        /// Gets the unique identifier for the freezer storage type.
+        /// </summary>
+        public static Guid IdentifierForFreezer => new Guid("959A0D7D-A034-405C-8F6E-EF49ED5E7553");
 
         /// <summary>
         /// Gets the unique identifier for the kitchen cabinets storage type.

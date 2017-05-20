@@ -25,13 +25,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <summary>
         /// Creates a data proxy to a given storage type.
         /// </summary>
-        /// <param name="temperature">Defualt temperature for the storage type.</param>
+        /// <param name="sortOrder">Order for sortering storage types.</param>
+        /// <param name="temperature">Default temperature for the storage type.</param>
         /// <param name="temperatureRange">Temperature range for the storage type.</param>
         /// <param name="creatable">Indicates whether household members can create storages of this type.</param>
         /// <param name="editable">Indicates whether household members can edit storages of this type.</param>
         /// <param name="deletable">Indicates whether household members can delete storages of this type.</param>
-        public StorageTypeProxy(int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable) 
-            : base(temperature, temperatureRange, creatable, editable, deletable)
+        public StorageTypeProxy(int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable) 
+            : base(sortOrder, temperature, temperatureRange, creatable, editable, deletable)
         {
         }
 

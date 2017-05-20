@@ -11,7 +11,7 @@
         int SortOrder { get; }
 
         /// <summary>
-        /// Gets the defualt temperature for the storage type.
+        /// Gets the default temperature for the storage type.
         /// </summary>
         int Temperature { get; }
 

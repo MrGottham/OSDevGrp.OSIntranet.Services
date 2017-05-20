@@ -22,13 +22,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// <summary>
             /// Creates an instance of the private class which can be used to test the storage type domain object.
             /// </summary>
-            /// <param name="temperature">Defualt temperature for the storage type.</param>
+            /// <param name="sortOrder">Order for sortering storage types.</param>
+            /// <param name="temperature">Default temperature for the storage type.</param>
             /// <param name="temperatureRange">Temperature range for the storage type.</param>
             /// <param name="creatable">Indicates whether household members can create storages of this type.</param>
             /// <param name="editable">Indicates whether household members can edit storages of this type.</param>
             /// <param name="deletable">Indicates whether household members can delete storages of this type.</param>
-            public MyStorageType(int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable) 
-                : base(temperature, temperatureRange, creatable, editable, deletable)
+            public MyStorageType(int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable) 
+                : base(sortOrder, temperature, temperatureRange, creatable, editable, deletable)
             {
             }
 
@@ -37,7 +38,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             #region Properties
 
             /// <summary>
-            /// Gets or sets the defualt temperature for the storage type.
+            /// Gets or sets the order for sortering storage types.
+            /// </summary>
+            public new int SortOrder
+            {
+                get => base.SortOrder;
+                set => base.SortOrder = value;
+            }
+
+            /// <summary>
+            /// Gets or sets the default temperature for the storage type.
             /// </summary>
             public new int Temperature
             {
@@ -92,16 +102,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             Fixture fixture = new Fixture();
 
+            int sortOrder = fixture.Create<int>();
             int temperature = fixture.Create<int>();
             IRange<int> temperatureRange = DomainObjectMockBuilder.BuildIntRange();
             bool creatable = fixture.Create<bool>();
             bool editable = fixture.Create<bool>();
             bool deletable = fixture.Create<bool>();
 
-            IStorageType sut = CreateSut(temperature, temperatureRange, creatable, editable, deletable);
+            IStorageType sut = CreateSut(sortOrder, temperature, temperatureRange, creatable, editable, deletable);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
             Assert.That(sut.Temperature, Is.EqualTo(temperature));
             Assert.That(sut.TemperatureRange, Is.Not.Null);
             Assert.That(sut.TemperatureRange, Is.EqualTo(temperatureRange));
@@ -121,9 +133,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             Fixture fixture = new Fixture();
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => CreateSut(fixture.Create<int>(), null, fixture.Create<bool>(), fixture.Create<bool>(), fixture.Create<bool>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => CreateSut(fixture.Create<int>(), fixture.Create<int>(), null, fixture.Create<bool>(), fixture.Create<bool>(), fixture.Create<bool>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "temperatureRange");
+        }
+
+        /// <summary>
+        /// Tests that the setter of SortOrder sets a new value.
+        /// </summary>
+        [Test]
+        public void TestThatSortOrderSetterSetsNewValue()
+        {
+            Fixture fixture = new Fixture();
+
+            MyStorageType sut = CreateMySut(fixture);
+            Assert.That(sut, Is.Not.Null);
+
+            int newValue = sut.SortOrder + fixture.Create<int>();
+            Assert.That(sut.SortOrder, Is.Not.EqualTo(newValue));
+
+            sut.SortOrder = newValue;
+            Assert.That(sut.SortOrder, Is.EqualTo(newValue));
         }
 
         /// <summary>
@@ -233,16 +263,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Test that the getter of IdentifierForFreezer gets the unique identifier for the freezer storage type.
-        /// </summary>
-        [Test]
-        public void TestThatIdentifierForFreezerGetterGetsUniqueIdentifier()
-        {
-            Guid uniqueIdentifier = StorageType.IdentifierForFreezer;
-            Assert.That(uniqueIdentifier.ToString("D").ToUpper(), Is.EqualTo("959A0D7D-A034-405C-8F6E-EF49ED5E7553"));
-        }
-
-        /// <summary>
         /// Test that the getter of IdentifierForRefrigerator gets the unique identifier for the refrigerator storage type.
         /// </summary>
         [Test]
@@ -250,6 +270,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             Guid uniqueIdentifier = StorageType.IdentifierForRefrigerator;
             Assert.That(uniqueIdentifier.ToString("D").ToUpper(), Is.EqualTo("3CEA8A7D-01A4-40BF-AB96-F70354015352"));
+        }
+
+        /// <summary>
+        /// Test that the getter of IdentifierForFreezer gets the unique identifier for the freezer storage type.
+        /// </summary>
+        [Test]
+        public void TestThatIdentifierForFreezerGetterGetsUniqueIdentifier()
+        {
+            Guid uniqueIdentifier = StorageType.IdentifierForFreezer;
+            Assert.That(uniqueIdentifier.ToString("D").ToUpper(), Is.EqualTo("959A0D7D-A034-405C-8F6E-EF49ED5E7553"));
         }
 
         /// <summary>
@@ -275,15 +305,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <summary>
         /// Creates an instance of the storage type which can be used for unit testning.
         /// </summary>
-        /// <param name="temperature">Defualt temperature for the storage type.</param>
+        /// <param name="sortOrder">Order for sortering storage types.</param>
+        /// <param name="temperature">Default temperature for the storage type.</param>
         /// <param name="temperatureRange">Temperature range for the storage type.</param>
         /// <param name="creatable">Indicates whether household members can create storages of this type.</param>
         /// <param name="editable">Indicates whether household members can edit storages of this type.</param>
         /// <param name="deletable">Indicates whether household members can delete storages of this type.</param>
         /// <returns>Instance of the storage type which can be used for unit testning.</returns>
-        private static IStorageType CreateSut(int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
+        private static IStorageType CreateSut(int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
         {
-            return new StorageType(temperature, temperatureRange, creatable, editable, deletable);
+            return new StorageType(sortOrder, temperature, temperatureRange, creatable, editable, deletable);
         }
 
         /// <summary>
@@ -298,7 +329,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 throw new ArgumentNullException(nameof(fixture));
             }
 
-            return new MyStorageType(fixture.Create<int>(), DomainObjectMockBuilder.BuildIntRange(), fixture.Create<bool>(), fixture.Create<bool>(), fixture.Create<bool>());
+            return new MyStorageType(fixture.Create<int>(), fixture.Create<int>(), DomainObjectMockBuilder.BuildIntRange(), fixture.Create<bool>(), fixture.Create<bool>(), fixture.Create<bool>());
         }
     }
 }
