@@ -6,6 +6,11 @@
     public interface IStorageType : ITranslatable
     {
         /// <summary>
+        /// Gets the order for sortering storage types.
+        /// </summary>
+        int SortOrder { get; }
+
+        /// <summary>
         /// Gets the defualt temperature for the storage type.
         /// </summary>
         int Temperature { get; }

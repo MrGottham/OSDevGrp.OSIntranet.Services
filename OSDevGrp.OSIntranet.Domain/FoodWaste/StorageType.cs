@@ -10,6 +10,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
     {
         #region Private variables
 
+        private int _sortOrder;
         private int _temperature;
         private IRange<int> _temperatureRange;
         private bool _creatable;
@@ -23,13 +24,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <summary>
         /// Creates a storage type.
         /// </summary>
+        /// <param name="sortOrder">Order for sortering storage types.</param>
         /// <param name="temperature">Defualt temperature for the storage type.</param>
         /// <param name="temperatureRange">Temperature range for the storage type.</param>
         /// <param name="creatable">Indicates whether household members can create storages of this type.</param>
         /// <param name="editable">Indicates whether household members can edit storages of this type.</param>
         /// <param name="deletable">Indicates whether household members can delete storages of this type.</param>
-        public StorageType(int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
+        public StorageType(int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
         {
+            _sortOrder = sortOrder;
             _temperature = temperature;
             _temperatureRange = temperatureRange ?? throw new ArgumentNullException(nameof(temperatureRange));
             _creatable = creatable;
@@ -47,6 +50,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Gets the order for sortering storage types.
+        /// </summary>
+        public virtual int SortOrder
+        {
+            get => _sortOrder;
+            protected set => _sortOrder = value;
+        }
 
         /// <summary>
         /// Gets the defualt temperature for the storage type.
