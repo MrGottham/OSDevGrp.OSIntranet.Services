@@ -62,7 +62,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for selecting a given storage type.</returns>
         public virtual string GetSqlQueryForId(IStorageType storageType)
         {
-            throw new NotImplementedException();
+            if (storageType == null)
+            {
+                throw new ArgumentNullException(nameof(storageType));
+            }
+            if (storageType.Identifier.HasValue)
+            {
+                throw new NotImplementedException();
+            }
+            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, storageType.Identifier, "Identifier"));
         }
 
         /// <summary>

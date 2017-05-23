@@ -1,9 +1,11 @@
 ﻿using System;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 {
@@ -72,6 +74,61 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             // ReSharper restore ReturnValueOfPureMethodIsNotUsed
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
+        }
+
+        /// <summary>
+        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given storage type is null.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenStorageTypeIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetSqlQueryForId(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "storageType");
+        }
+
+        /// <summary>
+        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given storage type has no value.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnStorageTypeHasNoValue()
+        {
+            IStorageType storageTypeMock = MockRepository.GenerateMock<IStorageType>();
+            storageTypeMock.Stub(m => m.Identifier)
+                .Return(null)
+                .Repeat.Any();
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.GetSqlQueryForId(storageTypeMock));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, storageTypeMock.Identifier, "Identifier");
+        }
+
+        /// <summary>
+        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given storage type.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorageType storageTypeMock = MockRepository.GenerateMock<IStorageType>();
+            storageTypeMock.Stub(m => m.Identifier)
+                .Return(identifier)
+                .Repeat.Any();
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            string result = sut.GetSqlQueryForId(storageTypeMock);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
         }
 
         /// <summary>
