@@ -253,8 +253,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
         {
+            Fixture fixture = new Fixture();
+
             Guid storageTypeIdentifier = Guid.NewGuid();
-            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier);
+            int sortOrder = fixture.Create<int>();
+            int temperatur = fixture.Create<int>();
+            IRange<int> temperaturRange = DomainObjectMockBuilder.BuildIntRange();
+            bool creatable = fixture.Create<bool>();
+            bool editable = fixture.Create<bool>();
+            bool deletable = fixture.Create<bool>();
+
+            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
 
             IDataProviderBase dataProviderMock = CreateDataProviderMock();
 
@@ -273,6 +282,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Translations, Is.Empty);
 
             sut.MapData(mySqlDataReaderStub, dataProviderMock);
+
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.Value, Is.EqualTo(storageTypeIdentifier));
+            Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
+            Assert.That(sut.Temperature, Is.EqualTo(temperaturRange));
+            Assert.That(sut.TemperatureRange, Is.Not.Null);
+            Assert.That(sut.TemperatureRange.StartValue, Is.EqualTo(temperaturRange.StartValue));
+            Assert.That(sut.TemperatureRange.EndValue, Is.EqualTo(temperaturRange.EndValue));
+            Assert.That(sut.Creatable, Is.EqualTo(creatable));
+            Assert.That(sut.Editable, Is.EqualTo(editable));
+            Assert.That(sut.Deletable, Is.EqualTo(deletable));
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Empty);
         }
 
         /// <summary>
@@ -303,11 +329,37 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a MySQL data reader which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a MySQL data reader which should be used for unit testing.</returns>
-        private static MySqlDataReader CreateMySqlDataReaderStub(Guid storageTypeIdentifier)
+        private static MySqlDataReader CreateMySqlDataReaderStub(Guid storageTypeIdentifier, int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
         {
+            if (temperatureRange == null)
+            {
+                throw new ArgumentNullException(nameof(temperatureRange));
+            }
+
             MySqlDataReader mySqlDataReaderStub = MockRepository.GenerateStub<MySqlDataReader>();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<string>.Is.Equal("StorageTypeIdentifier")))
                 .Return(storageTypeIdentifier.ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")))
+                .Return((short) sortOrder)
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")))
+                .Return((short) temperature)
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.GetInt16("TemperatureRangeStartValue"))
+                .Return((short) temperatureRange.StartValue)
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.GetInt16("TemperatureRangeEndValue"))
+                .Return((short) temperatureRange.EndValue)
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.GetBoolean(Arg<string>.Is.Equal("Creatable")))
+                .Return(creatable)
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.GetBoolean(Arg<string>.Is.Equal("Editable")))
+                .Return(editable)
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.GetBoolean(Arg<string>.Is.Equal("Deletable")))
+                .Return(deletable)
                 .Repeat.Any();
             return mySqlDataReaderStub;
         }
