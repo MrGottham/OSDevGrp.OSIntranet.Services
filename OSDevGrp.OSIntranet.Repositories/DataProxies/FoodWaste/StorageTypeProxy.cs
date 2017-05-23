@@ -1,4 +1,5 @@
 ﻿using System;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -68,7 +69,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             if (storageType.Identifier.HasValue)
             {
-                throw new NotImplementedException();
+                return $"SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes WHERE StorageTypeIdentifier='{storageType.Identifier.Value.ToString("D").ToUpper()}'";
             }
             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, storageType.Identifier, "Identifier"));
         }
@@ -79,7 +80,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this storage type.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new NotImplementedException();
+            return $"INSERT INTO StorageTypes (StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('{UniqueId}',{SortOrder},{Temperature},{TemperatureRange.StartValue},{TemperatureRange.EndValue},{Convert.ToInt32(Creatable)},{Convert.ToInt32(Editable)},{Convert.ToInt32(Deletable)})";
         }
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this storage type.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new NotImplementedException();
+            return $"UPDATE StorageTypes SET SortOrder={SortOrder},Temperature={Temperature},TemperatureRangeStartValue={TemperatureRange.StartValue},TemperatureRangeEndValue={TemperatureRange.EndValue},Creatable={Convert.ToInt32(Creatable)},Editable={Convert.ToInt32(Editable)},Deletable={Convert.ToInt32(Deletable)} WHERE StorageTypeIdentifier='{UniqueId}'";
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to delete this storage type.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new NotImplementedException();
+            return $"DELETE FROM StorageTypes WHERE StorageTypeIdentifier='{UniqueId}'";
         }
 
         #endregion
@@ -111,6 +112,20 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException(nameof(dataReader));
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(dataProvider));
+            }
+
+            MySqlDataReader mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
+            }
             throw new NotImplementedException();
         }
 

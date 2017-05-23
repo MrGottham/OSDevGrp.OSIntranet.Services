@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Data;
+using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
+using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
+using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -132,6 +137,145 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert this storage type.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert()
+        {
+            Fixture fixture = new Fixture();
+
+            Guid identifier = Guid.NewGuid();
+            int sortOrder = fixture.Create<int>();
+            int temperatur = fixture.Create<int>();
+            IRange<int> temperaturRange = DomainObjectMockBuilder.BuildIntRange();
+            bool creatable = fixture.Create<bool>();
+            bool editable = fixture.Create<bool>();
+            bool deletable = fixture.Create<bool>();
+
+            IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
+            Assert.That(sut, Is.Not.Null);
+
+            string result = sut.GetSqlCommandForInsert();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"INSERT INTO StorageTypes (StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('{identifier.ToString("D").ToUpper()}',{sortOrder},{temperatur},{temperaturRange.StartValue},{temperaturRange.EndValue},{Convert.ToInt32(creatable)},{Convert.ToInt32(editable)},{Convert.ToInt32(deletable)})"));
+        }
+
+        /// <summary>
+        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update this storage type.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
+        {
+            Fixture fixture = new Fixture();
+
+            Guid identifier = Guid.NewGuid();
+            int sortOrder = fixture.Create<int>();
+            int temperatur = fixture.Create<int>();
+            IRange<int> temperaturRange = DomainObjectMockBuilder.BuildIntRange();
+            bool creatable = fixture.Create<bool>();
+            bool editable = fixture.Create<bool>();
+            bool deletable = fixture.Create<bool>();
+
+            IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
+            Assert.That(sut, Is.Not.Null);
+
+            string result = sut.GetSqlCommandForUpdate();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"UPDATE StorageTypes SET SortOrder={sortOrder},Temperature={temperatur},TemperatureRangeStartValue={temperaturRange.StartValue},TemperatureRangeEndValue={temperaturRange.EndValue},Creatable={Convert.ToInt32(creatable)},Editable={Convert.ToInt32(editable)},Deletable={Convert.ToInt32(deletable)} WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
+        }
+
+        /// <summary>
+        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete this storage type.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorageTypeProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            string result = sut.GetSqlCommandForDelete();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"DELETE FROM StorageTypes WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
+        }
+
+        /// <summary>
+        /// Tests that MapData throws an ArgumentNullException if the data reader is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IDataProviderBase>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
+        }
+
+        /// <summary>
+        /// Tests that MapData throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapDataThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(MockRepository.GenerateStub<MySqlDataReader>(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that MapData throws an IntranetRepositoryException if the data reader is not type of MySqlDataReader.
+        /// </summary>
+        [Test]
+        public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
+        {
+            IDataReader dataReader = MockRepository.GenerateMock<IDataReader>();
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase>()));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name);
+        }
+
+        /// <summary>
+        /// Tests that MapData and MapRelations maps data into the proxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
+        {
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier);
+
+            IDataProviderBase dataProviderMock = CreateDataProviderMock();
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.SortOrder, Is.EqualTo(default(int)));
+            Assert.That(sut.Temperature, Is.EqualTo(default(int)));
+            Assert.That(sut.TemperatureRange, Is.Null);
+            Assert.That(sut.Creatable, Is.EqualTo(default(bool)));
+            Assert.That(sut.Editable, Is.EqualTo(default(bool)));
+            Assert.That(sut.Deletable, Is.EqualTo(default(bool)));
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Empty);
+
+            sut.MapData(mySqlDataReaderStub, dataProviderMock);
+        }
+
+        /// <summary>
         /// Creates an instance of the data proxy to a given storage type which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage type which should be used for unit testing.</returns>
@@ -141,6 +285,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 Identifier = storageTypeIdentifier
             };
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy to a given storage type which should be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of the data proxy to a given storage type which should be used for unit testing.</returns>
+        private static IStorageTypeProxy CreateSut(Guid storageTypeIdentifier, int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
+        {
+            return new StorageTypeProxy(sortOrder, temperature, temperatureRange, creatable, editable, deletable)
+            {
+                Identifier = storageTypeIdentifier
+            };
+        }
+
+        /// <summary>
+        /// Creates an instance of a MySQL data reader which should be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of a MySQL data reader which should be used for unit testing.</returns>
+        private static MySqlDataReader CreateMySqlDataReaderStub(Guid storageTypeIdentifier)
+        {
+            MySqlDataReader mySqlDataReaderStub = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderStub.Stub(m => m.GetString(Arg<string>.Is.Equal("StorageTypeIdentifier")))
+                .Return(storageTypeIdentifier.ToString("D").ToUpper())
+                .Repeat.Any();
+            return mySqlDataReaderStub;
+        }
+
+        /// <summary>
+        /// Creates an instance of a data provider which should be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of a data provider which should be used for unit testing</returns>
+        private static IDataProviderBase CreateDataProviderMock()
+        {
+            IDataProviderBase dataProviderMock = MockRepository.GenerateMock<IDataProviderBase>();
+            return dataProviderMock;
         }
     }
 }
