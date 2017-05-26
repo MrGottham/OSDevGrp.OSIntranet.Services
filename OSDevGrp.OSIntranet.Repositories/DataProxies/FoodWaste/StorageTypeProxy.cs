@@ -127,6 +127,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
             }
 
+            Identifier = Guid.Parse(mySqlDataReader.GetString("StorageTypeIdentifier"));
+            SortOrder = mySqlDataReader.GetInt16("SortOrder");
+            Temperature = mySqlDataReader.GetInt16("Temperature");
+            TemperatureRange = new Range<int>(
+                mySqlDataReader.GetInt16("TemperatureRangeStartValue"),
+                mySqlDataReader.GetInt16("TemperatureRangeEndValue"));
+            Creatable = Convert.ToBoolean(mySqlDataReader.GetInt32("Creatable"));
+            Editable = Convert.ToBoolean(mySqlDataReader.GetInt32("Editable"));
+            Deletable = Convert.ToBoolean(mySqlDataReader.GetInt32("Deletable"));
         }
 
         /// <summary>
@@ -135,7 +144,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(dataProvider));
+            }
         }
 
         /// <summary>

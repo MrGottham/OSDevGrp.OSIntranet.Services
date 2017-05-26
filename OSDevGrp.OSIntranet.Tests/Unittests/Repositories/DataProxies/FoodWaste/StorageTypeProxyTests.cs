@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -265,7 +267,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
 
-            IDataProviderBase dataProviderMock = CreateDataProviderMock();
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
 
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
@@ -285,11 +287,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             Assert.That(sut.Identifier, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Identifier.HasValue, Is.True);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.Identifier.Value, Is.EqualTo(storageTypeIdentifier));
             Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
-            Assert.That(sut.Temperature, Is.EqualTo(temperaturRange));
+            Assert.That(sut.Temperature, Is.EqualTo(temperatur));
             Assert.That(sut.TemperatureRange, Is.Not.Null);
             Assert.That(sut.TemperatureRange.StartValue, Is.EqualTo(temperaturRange.StartValue));
             Assert.That(sut.TemperatureRange.EndValue, Is.EqualTo(temperaturRange.EndValue));
@@ -299,6 +301,69 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Translation, Is.Null);
             Assert.That(sut.Translations, Is.Not.Null);
             Assert.That(sut.Translations, Is.Empty);
+        }
+
+        /// <summary>
+        /// Tests that MapRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that MapRelations calls Clone on the data provider one time.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsCallsCloneOnDataProviderOneTime()
+        {
+            Fixture fixture = new Fixture();
+
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+
+            IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: Guid.NewGuid());
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+
+            sut.MapRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that MapRelations calls GetCollection on the data provider to get all translations for the storage type.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsCallsGetCollectionOnDataProviderToGetTranslations()
+        {
+            Fixture fixture = new Fixture();
+
+            Guid storageTypeIdentifier = Guid.NewGuid();
+
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+
+            IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(sut.Identifier.Value, Is.EqualTo(storageTypeIdentifier));
+            // ReSharper restore PossibleInvalidOperationException
+
+            sut.MapRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal($"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{storageTypeIdentifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
         }
 
         /// <summary>
@@ -368,9 +433,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private static IDataProviderBase CreateDataProviderMock()
+        private static IDataProviderBase CreateDataProviderMock(Fixture fixture, IEnumerable<TranslationProxy> translationProxyCollection = null)
         {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException(nameof(fixture));
+            }
+
             IDataProviderBase dataProviderMock = MockRepository.GenerateMock<IDataProviderBase>();
+            dataProviderMock.Stub(m => m.Clone())
+                .Return(dataProviderMock)
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                .Return(translationProxyCollection ?? fixture.CreateMany<TranslationProxy>().ToList())
+                .Repeat.Any();
             return dataProviderMock;
         }
     }
