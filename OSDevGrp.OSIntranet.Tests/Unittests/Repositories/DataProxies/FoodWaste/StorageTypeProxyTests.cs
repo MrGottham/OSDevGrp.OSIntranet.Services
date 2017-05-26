@@ -352,14 +352,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderStub.Stub(m => m.GetInt16("TemperatureRangeEndValue"))
                 .Return((short) temperatureRange.EndValue)
                 .Repeat.Any();
-            mySqlDataReaderStub.Stub(m => m.GetBoolean(Arg<string>.Is.Equal("Creatable")))
-                .Return(creatable)
+            mySqlDataReaderStub.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Creatable")))
+                .Return(Convert.ToInt32(creatable))
                 .Repeat.Any();
-            mySqlDataReaderStub.Stub(m => m.GetBoolean(Arg<string>.Is.Equal("Editable")))
-                .Return(editable)
+            mySqlDataReaderStub.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Editable")))
+                .Return(Convert.ToInt32(editable))
                 .Repeat.Any();
-            mySqlDataReaderStub.Stub(m => m.GetBoolean(Arg<string>.Is.Equal("Deletable")))
-                .Return(deletable)
+            mySqlDataReaderStub.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Deletable")))
+                .Return(Convert.ToInt32(deletable))
                 .Repeat.Any();
             return mySqlDataReaderStub;
         }
