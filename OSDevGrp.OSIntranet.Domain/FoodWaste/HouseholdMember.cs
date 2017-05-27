@@ -449,7 +449,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
                 var activationCodeBuilder = new StringBuilder();
                 for (var i = 0; i < hash.Length; i++)
                 {
-                    activationCodeBuilder.Append(i.ToString("X2"));
+                    activationCodeBuilder.Append(hash[i].ToString("X2"));
                 }
                 return activationCodeBuilder.ToString();
             }
