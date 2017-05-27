@@ -73,5 +73,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests
             Assert.That(intranetSystemException.Message, Is.EqualTo(Resource.GetExceptionMessage(expectedExceptionMessage, expectedArguments)));
             Assert.That(intranetSystemException.InnerException, Is.Null);
         }
+
+        /// <summary>
+        /// Asserts that an NotSupportedException is valid.
+        /// </summary>
+        /// <param name="notSupportedException">The NotSupportedException to assert on.</param>
+        public static void AssertNotSupportedExceptionIsValid(NotSupportedException notSupportedException)
+        {
+            Assert.That(notSupportedException, Is.Not.Null);
+            Assert.That(notSupportedException.InnerException, Is.Null);
+        }
     }
 }

@@ -250,10 +250,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData and MapRelations maps data into the proxy.
+        /// Tests that MapData maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
+        public void TestThatMapDataMapsDataIntoProxy()
         {
             Fixture fixture = new Fixture();
 
@@ -364,6 +364,102 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             sut.MapRelations(dataProviderMock);
 
             dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal($"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{storageTypeIdentifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
+        }
+
+        /// <summary>
+        /// Tests that MapRelations maps translations for the storage type.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsMapsTranslationsIntoProxy()
+        {
+            Fixture fixture = new Fixture();
+
+            Guid storageTypeIdentifier = Guid.NewGuid();
+
+            IEnumerable<TranslationProxy> translationProxyCollection = fixture.CreateMany<TranslationProxy>().ToList();
+            Assert.That(translationProxyCollection, Is.Not.Null);
+            Assert.That(translationProxyCollection, Is.Not.Empty);
+
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture, translationProxyCollection: translationProxyCollection);
+
+            IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Empty);
+
+            sut.MapRelations(dataProviderMock);
+
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Not.Empty);
+            Assert.That(sut.Translations, Is.EqualTo(translationProxyCollection));
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
+        {
+            Fixture fixture = new Fixture();
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(null, fixture.Create<bool>()));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an NotSupportedException when the data provider is not null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
+        {
+            Fixture fixture = new Fixture();
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateDataProviderMock(fixture), fixture.Create<bool>()));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an NotSupportedException when the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(null));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an NotSupportedException when the data provider is not null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
+        {
+            Fixture fixture = new Fixture();
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateDataProviderMock(fixture)));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>

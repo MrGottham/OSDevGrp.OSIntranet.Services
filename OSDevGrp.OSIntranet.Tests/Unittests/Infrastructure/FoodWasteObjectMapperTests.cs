@@ -45,12 +45,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteObjectMapper.Map<object, object>(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("source"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => foodWasteObjectMapper.Map<object, object>(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(exception, "source");
         }
 
         /// <summary>
@@ -67,12 +64,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetSystemException>(() => foodWasteObjectMapper.Map<object, object>(identifiableMock));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetSystemException exception = Assert.Throws<IntranetSystemException>(() => foodWasteObjectMapper.Map<object, object>(identifiableMock));
+
+            TestHelper.AssertIntranetSystemExceptionIsValid(exception, ExceptionMessage.IllegalValue, identifiableMock.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -89,12 +83,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var foodWasteObjectMapper = new FoodWasteObjectMapper();
             Assert.That(foodWasteObjectMapper, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetSystemException>(() => foodWasteObjectMapper.Map<object, object>(identifiableMock));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetSystemException exception = Assert.Throws<IntranetSystemException>(() => foodWasteObjectMapper.Map<object, object>(identifiableMock));
+
+            TestHelper.AssertIntranetSystemExceptionIsValid(exception, ExceptionMessage.IllegalValue, identifiableMock.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -338,6 +329,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             {
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember, Is.TypeOf<HouseholdMemberProxy>());
+            }
+        }
+
+        /// <summary>
+        /// Tests that Map maps StorageType to StorageTypeProxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStorageTypeToStorageTypeProxy()
+        {
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            IStorageTypeProxy storageTypeProxy = foodWasteObjectMapper.Map<IStorageType, IStorageTypeProxy>(storageTypeMock);
+            Assert.That(storageTypeProxy, Is.Not.Null);
+            Assert.That(storageTypeProxy.Identifier, Is.Not.Null);
+            Assert.That(storageTypeProxy.Identifier, Is.EqualTo(storageTypeMock.Identifier));
+            Assert.That(storageTypeProxy.SortOrder, Is.EqualTo(storageTypeMock.SortOrder));
+            Assert.That(storageTypeProxy.Temperature, Is.EqualTo(storageTypeMock.Temperature));
+            Assert.That(storageTypeProxy.TemperatureRange, Is.Not.Null);
+            Assert.That(storageTypeProxy.TemperatureRange, Is.TypeOf<Range<int>>());
+            Assert.That(storageTypeProxy.TemperatureRange.StartValue, Is.EqualTo(storageTypeMock.TemperatureRange.StartValue));
+            Assert.That(storageTypeProxy.TemperatureRange.EndValue, Is.EqualTo(storageTypeMock.TemperatureRange.EndValue));
+            Assert.That(storageTypeProxy.Creatable, Is.EqualTo(storageTypeMock.Creatable));
+            Assert.That(storageTypeProxy.Editable, Is.EqualTo(storageTypeMock.Editable));
+            Assert.That(storageTypeProxy.Deletable, Is.EqualTo(storageTypeMock.Deletable));
+            Assert.That(storageTypeProxy.Translation, Is.Null);
+            Assert.That(storageTypeProxy.Translations, Is.Not.Null);
+            Assert.That(storageTypeProxy.Translations, Is.Not.Empty);
+            Assert.That(storageTypeProxy.Translations.Count(), Is.EqualTo(storageTypeProxy.Translations.Count()));
+            foreach (ITranslation translation in storageTypeProxy.Translations)
+            {
+                Assert.That(translation, Is.Not.Null);
+                Assert.That(translation, Is.TypeOf<TranslationProxy>());
             }
         }
 

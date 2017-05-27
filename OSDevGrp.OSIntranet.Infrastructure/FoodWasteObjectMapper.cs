@@ -104,6 +104,17 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         return householdProxy;
                     });
 
+                config.CreateMap<IStorageType, IStorageTypeProxy>()
+                    .ConstructUsing(m =>
+                    {
+                        IStorageTypeProxy storageTypeProxy = m as IStorageTypeProxy;
+                        if (storageTypeProxy != null)
+                        {
+                            return storageTypeProxy;
+                        }
+                        return storageTypeProxy;
+                    });
+
                 config.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
                     .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.MailAddress, opt => opt.MapFrom(s => s.MailAddress));
