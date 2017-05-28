@@ -32,16 +32,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <param name="foodWasteObjectMapper">Implementation of an object mapper which can map objects in the food waste domain.</param>
         protected DataRepositoryBase(IFoodWasteDataProvider foodWasteDataProvider, IFoodWasteObjectMapper foodWasteObjectMapper)
         {
-            if (foodWasteDataProvider == null)
-            {
-                throw new ArgumentNullException("foodWasteDataProvider");
-            }
-            if (foodWasteObjectMapper == null)
-            {
-                throw new ArgumentNullException("foodWasteObjectMapper");
-            }
-            _foodWasteDataProvider = foodWasteDataProvider;
-            _foodWasteObjectMapper = foodWasteObjectMapper;
+            _foodWasteDataProvider = foodWasteDataProvider ?? throw new ArgumentNullException(nameof(foodWasteDataProvider));
+            _foodWasteObjectMapper = foodWasteObjectMapper ?? throw new ArgumentNullException(nameof(foodWasteObjectMapper));
         }
 
         #endregion
@@ -51,18 +43,12 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <summary>
         /// Data provider which can access data in the food waste repository.
         /// </summary>
-        protected virtual IFoodWasteDataProvider DataProvider
-        {
-            get { return _foodWasteDataProvider; }
-        }
+        protected virtual IFoodWasteDataProvider DataProvider => _foodWasteDataProvider;
 
         /// <summary>
         /// Object mapper which can map objects in the food waste domain.
         /// </summary>
-        protected virtual IFoodWasteObjectMapper ObjectMapper
-        {
-            get { return _foodWasteObjectMapper; }
-        }
+        protected virtual IFoodWasteObjectMapper ObjectMapper => _foodWasteObjectMapper;
 
         #endregion
 
@@ -129,8 +115,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (Equals(identifiable, null))
             {
-                throw new ArgumentNullException("identifiable");
+                throw new ArgumentNullException(nameof(identifiable));
             }
+
+            
             if (identifiable is IHousehold)
             {
                 return (TIdentifiable) Insert<IHousehold, IHouseholdProxy>(identifiable as IHousehold);

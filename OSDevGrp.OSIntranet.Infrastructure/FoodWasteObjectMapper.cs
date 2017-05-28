@@ -6,6 +6,7 @@ using System.Threading;
 using AutoMapper;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
@@ -111,6 +112,23 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         if (storageTypeProxy != null)
                         {
                             return storageTypeProxy;
+                        }
+                        IRange<int> temperatureRange = new Range<int>(m.TemperatureRange.StartValue, m.TemperatureRange.EndValue);
+                        storageTypeProxy = new StorageTypeProxy(m.SortOrder, m.Temperature, temperatureRange, m.Creatable, m.Editable, m.Deletable)
+                        {
+                            Identifier = m.Identifier
+                        };
+                        foreach (ITranslation translation in m.Translations)
+                        {
+                            if (translation is ITranslationProxy)
+                            {
+                                storageTypeProxy.TranslationAdd(translation);
+                                continue;
+                            }
+                            if (Mapper != null)
+                            {
+                                storageTypeProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                            }
                         }
                         return storageTypeProxy;
                     });
