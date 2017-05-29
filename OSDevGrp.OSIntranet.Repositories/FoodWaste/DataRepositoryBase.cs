@@ -118,47 +118,66 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
                 throw new ArgumentNullException(nameof(identifiable));
             }
 
-            
-            if (identifiable is IHousehold)
+            IHousehold household = identifiable as IHousehold;
+            if (household != null)
             {
-                return (TIdentifiable) Insert<IHousehold, IHouseholdProxy>(identifiable as IHousehold);
+                return (TIdentifiable) Insert<IHousehold, IHouseholdProxy>(household);
             }
-            if (identifiable is IHouseholdMember)
+
+            IHouseholdMember householdMember = identifiable as IHouseholdMember;
+            if (householdMember != null)
             {
-                return (TIdentifiable) Insert<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
+                return (TIdentifiable) Insert<IHouseholdMember, IHouseholdMemberProxy>(householdMember);
             }
-            if (identifiable is IPayment)
+
+            IPayment payment = identifiable as IPayment;
+            if (payment != null)
             {
-                return (TIdentifiable) Insert<IPayment, IPaymentProxy>(identifiable as IPayment);
+                return (TIdentifiable) Insert<IPayment, IPaymentProxy>(payment);
             }
-            if (identifiable is IFoodItem)
+
+            IFoodItem foodItem = identifiable as IFoodItem;
+            if (foodItem != null)
             {
-                return (TIdentifiable) Insert<IFoodItem, IFoodItemProxy>(identifiable as IFoodItem);
+                return (TIdentifiable) Insert<IFoodItem, IFoodItemProxy>(foodItem);
             }
-            if (identifiable is IFoodGroup)
+
+            IFoodGroup foodGroup = identifiable as IFoodGroup;
+            if (foodGroup != null)
             {
-                return (TIdentifiable) Insert<IFoodGroup, IFoodGroupProxy>(identifiable as IFoodGroup);
+                return (TIdentifiable) Insert<IFoodGroup, IFoodGroupProxy>(foodGroup);
             }
-            if (identifiable is IForeignKey)
+
+            IForeignKey foreignKey = identifiable as IForeignKey;
+            if (foreignKey != null)
             {
-                return (TIdentifiable) Insert<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+                return (TIdentifiable) Insert<IForeignKey, IForeignKeyProxy>(foreignKey);
             }
-            if (identifiable is IStaticText)
+
+            IStaticText staticText = identifiable as IStaticText;
+            if (staticText != null)
             {
-                return (TIdentifiable) Insert<IStaticText, IStaticTextProxy>(identifiable as IStaticText);
+                return (TIdentifiable) Insert<IStaticText, IStaticTextProxy>(staticText);
             }
-            if (identifiable is IDataProvider)
+
+            IDataProvider dataProvider = identifiable as IDataProvider;
+            if (dataProvider != null)
             {
-                return (TIdentifiable) Insert<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
+                return (TIdentifiable) Insert<IDataProvider, IDataProviderProxy>(dataProvider);
             }
-            if (identifiable is ITranslation)
+
+            ITranslation translation = identifiable as ITranslation;
+            if (translation != null)
             {
-                return (TIdentifiable) Insert<ITranslation, ITranslationProxy>(identifiable as ITranslation);
+                return (TIdentifiable) Insert<ITranslation, ITranslationProxy>(translation);
             }
-            if (identifiable is ITranslationInfo)
+
+            ITranslationInfo translationInfo = identifiable as ITranslationInfo;
+            if (translationInfo != null)
             {
-                return (TIdentifiable) Insert<ITranslationInfo, ITranslationInfoProxy>(identifiable as ITranslationInfo);
+                return (TIdentifiable) Insert<ITranslationInfo, ITranslationInfoProxy>(translationInfo);
             }
+
             throw new NotSupportedException();
         }
 
@@ -172,48 +191,69 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (Equals(identifiable, null))
             {
-                throw new ArgumentNullException("identifiable");
+                throw new ArgumentNullException(nameof(identifiable));
             }
-            if (identifiable is IHousehold)
+
+            IHousehold household = identifiable as IHousehold;
+            if (household != null)
             {
-                return (TIdentifiable) Update<IHousehold, IHouseholdProxy>(identifiable as IHousehold);
+                return (TIdentifiable) Update<IHousehold, IHouseholdProxy>(household);
             }
-            if (identifiable is IHouseholdMember)
+
+            IHouseholdMember householdMember = identifiable as IHouseholdMember;
+            if (householdMember != null)
             {
-                return (TIdentifiable) Update<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
+                return (TIdentifiable) Update<IHouseholdMember, IHouseholdMemberProxy>(householdMember);
             }
-            if (identifiable is IPayment)
+
+            IPayment payment = identifiable as IPayment;
+            if (payment != null)
             {
-                return (TIdentifiable) Update<IPayment, IPaymentProxy>(identifiable as IPayment);
+                return (TIdentifiable) Update<IPayment, IPaymentProxy>(payment);
             }
-            if (identifiable is IFoodItem)
+
+            IFoodItem foodItem = identifiable as IFoodItem;
+            if (foodItem != null)
             {
-                return (TIdentifiable) Update<IFoodItem, IFoodItemProxy>(identifiable as IFoodItem);
+                return (TIdentifiable) Update<IFoodItem, IFoodItemProxy>(foodItem);
             }
-            if (identifiable is IFoodGroup)
+
+            IFoodGroup foodGroup = identifiable as IFoodGroup;
+            if (foodGroup != null)
             {
-                return (TIdentifiable) Update<IFoodGroup, IFoodGroupProxy>(identifiable as IFoodGroup);
+                return (TIdentifiable) Update<IFoodGroup, IFoodGroupProxy>(foodGroup);
             }
-            if (identifiable is IForeignKey)
+
+            IForeignKey foreignKey = identifiable as IForeignKey;
+            if (foreignKey != null)
             {
-                return (TIdentifiable) Update<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+                return (TIdentifiable) Update<IForeignKey, IForeignKeyProxy>(foreignKey);
             }
-            if (identifiable is IStaticText)
+
+            IStaticText staticText = identifiable as IStaticText;
+            if (staticText != null)
             {
-                return (TIdentifiable) Update<IStaticText, IStaticTextProxy>(identifiable as IStaticText);
+                return (TIdentifiable) Update<IStaticText, IStaticTextProxy>(staticText);
             }
-            if (identifiable is IDataProvider)
+
+            IDataProvider dataProvider = identifiable as IDataProvider;
+            if (dataProvider != null)
             {
-                return (TIdentifiable) Update<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
+                return (TIdentifiable) Update<IDataProvider, IDataProviderProxy>(dataProvider);
             }
-            if (identifiable is ITranslation)
+
+            ITranslation translation = identifiable as ITranslation;
+            if (translation != null)
             {
-                return (TIdentifiable) Update<ITranslation, ITranslationProxy>(identifiable as ITranslation);
+                return (TIdentifiable) Update<ITranslation, ITranslationProxy>(translation);
             }
-            if (identifiable is ITranslationInfo)
+
+            ITranslationInfo translationInfo = identifiable as ITranslationInfo;
+            if (translationInfo != null)
             {
-                return (TIdentifiable) Update<ITranslationInfo, ITranslationInfoProxy>(identifiable as ITranslationInfo);
+                return (TIdentifiable) Update<ITranslationInfo, ITranslationInfoProxy>(translationInfo);
             }
+
             throw new NotSupportedException();
         }
 
@@ -226,58 +266,79 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (Equals(identifiable, null))
             {
-                throw new ArgumentNullException("identifiable");
+                throw new ArgumentNullException(nameof(identifiable));
             }
-            if (identifiable is IHousehold)
+
+            IHousehold household = identifiable as IHousehold;
+            if (household != null)
             {
-                Delete<IHousehold, IHouseholdProxy>(identifiable as IHousehold);
+                Delete<IHousehold, IHouseholdProxy>(household);
                 return;
             }
-            if (identifiable is IHouseholdMember)
+
+            IHouseholdMember householdMember = identifiable as IHouseholdMember;
+            if (householdMember != null)
             {
-                Delete<IHouseholdMember, IHouseholdMemberProxy>(identifiable as IHouseholdMember);
+                Delete<IHouseholdMember, IHouseholdMemberProxy>(householdMember);
                 return;
             }
-            if (identifiable is IPayment)
+
+            IPayment payment = identifiable as IPayment;
+            if (payment != null)
             {
-                Delete<IPayment, IPaymentProxy>(identifiable as IPayment);
+                Delete<IPayment, IPaymentProxy>(payment);
                 return;
             }
-            if (identifiable is IFoodItem)
+
+            IFoodItem foodItem = identifiable as IFoodItem;
+            if (foodItem != null)
             {
-                Delete<IFoodItem, IFoodItemProxy>(identifiable as IFoodItem);
+                Delete<IFoodItem, IFoodItemProxy>(foodItem);
                 return;
             }
-            if (identifiable is IFoodGroup)
+
+            IFoodGroup foodGroup = identifiable as IFoodGroup;
+            if (foodGroup != null)
             {
-                Delete<IFoodGroup, IFoodGroupProxy>(identifiable as IFoodGroup);
+                Delete<IFoodGroup, IFoodGroupProxy>(foodGroup);
                 return;
             }
-            if (identifiable is IForeignKey)
+
+            IForeignKey foreignKey = identifiable as IForeignKey;
+            if (foreignKey != null)
             {
-                Delete<IForeignKey, IForeignKeyProxy>(identifiable as IForeignKey);
+                Delete<IForeignKey, IForeignKeyProxy>(foreignKey);
                 return;
             }
-            if (identifiable is IStaticText)
+
+            IStaticText staticText = identifiable as IStaticText;
+            if (staticText != null)
             {
-                Delete<IStaticText, IStaticTextProxy>(identifiable as IStaticText);
+                Delete<IStaticText, IStaticTextProxy>(staticText);
                 return;
             }
-            if (identifiable is IDataProvider)
+
+            IDataProvider dataProvider = identifiable as IDataProvider;
+            if (dataProvider != null)
             {
-                Delete<IDataProvider, IDataProviderProxy>(identifiable as IDataProvider);
+                Delete<IDataProvider, IDataProviderProxy>(dataProvider);
                 return;
             }
-            if (identifiable is ITranslation)
+
+            ITranslation translation = identifiable as ITranslation;
+            if (translation != null)
             {
-                Delete<ITranslation, ITranslationProxy>(identifiable as ITranslation);
+                Delete<ITranslation, ITranslationProxy>(translation);
                 return;
             }
-            if (identifiable is ITranslationInfo)
+
+            ITranslationInfo translationInfo = identifiable as ITranslationInfo;
+            if (translationInfo != null)
             {
-                Delete<ITranslationInfo, ITranslationInfoProxy>(identifiable as ITranslationInfo);
+                Delete<ITranslationInfo, ITranslationInfoProxy>(translationInfo);
                 return;
             }
+
             throw new NotSupportedException();
         }
 
@@ -319,7 +380,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (Equals(identifiable, null))
             {
-                throw new ArgumentNullException("identifiable");
+                throw new ArgumentNullException(nameof(identifiable));
             }
             try
             {
@@ -351,7 +412,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (Equals(identifiable, null))
             {
-                throw new ArgumentNullException("identifiable");
+                throw new ArgumentNullException(nameof(identifiable));
             }
             try
             {
@@ -378,7 +439,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (Equals(identifiable, null))
             {
-                throw new ArgumentNullException("identifiable");
+                throw new ArgumentNullException(nameof(identifiable));
             }
             try
             {
