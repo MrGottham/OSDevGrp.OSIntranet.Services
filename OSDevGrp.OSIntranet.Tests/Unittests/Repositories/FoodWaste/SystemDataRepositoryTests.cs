@@ -9,6 +9,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -21,17 +22,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
     [TestFixture]
     public class SystemDataRepositoryTests
     {
+        #region Private variables
+
+        private IFoodWasteDataProvider _foodWasteDataProviderMock;
+        private IFoodWasteObjectMapper _foodWasteObjectMapperMock;
+
+        #endregion
+
         /// <summary>
         /// Tests that the constructor initialize a repository which can access system data for the food waste domain.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializeSystemDataRepository()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
+            ISystemDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
         }
 
         /// <summary>
@@ -40,14 +45,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatConstructorThrowsArgumentNullExceptionIfFoodWasteDataProviderIsNull()
         {
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            IFoodWasteObjectMapper foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new SystemDataRepository(null, foodWasteObjectMapperMock));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("foodWasteDataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new SystemDataRepository(null, foodWasteObjectMapperMock));
+            // ReSharper restore ObjectCreationAsStatement
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "foodWasteDataProvider");
         }
 
         /// <summary>
@@ -56,14 +60,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatConstructorThrowsArgumentNullExceptionIfFoodWasteObjectMapperIsNull()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            IFoodWasteDataProvider foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new SystemDataRepository(foodWasteDataProviderMock, null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("foodWasteObjectMapper"));
-            Assert.That(exception.InnerException, Is.Null);
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new SystemDataRepository(foodWasteDataProviderMock, null));
+            // ReSharper restore ObjectCreationAsStatement
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "foodWasteObjectMapper");
         }
 
         /// <summary>
@@ -72,19 +75,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllCallsGetCollectionOnFoodWasteDataProvider()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
-                .Return(new List<FoodItemProxy>(0))
-                .Repeat.Any();
+            ISystemDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            sut.FoodItemGetAll();
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
-
-            systemDataRepository.FoodItemGetAll();
-
-            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Equal("SELECT FoodItemIdentifier,IsActive FROM FoodItems")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Equal("SELECT FoodItemIdentifier,IsActive FROM FoodItems")));
         }
 
         /// <summary>
@@ -93,25 +89,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllReturnsResultFromFoodWasteDataProvider()
         {
-            var foodItemCollection = new List<FoodItemProxy>
+            IEnumerable<FoodItemProxy> foodItemProxyCollection = new List<FoodItemProxy>
             {
                 new FoodItemProxy(MockRepository.GenerateMock<IFoodGroup>()),
                 new FoodItemProxy(MockRepository.GenerateMock<IFoodGroup>()),
                 new FoodItemProxy(MockRepository.GenerateMock<IFoodGroup>())
             };
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
-                .Return(foodItemCollection)
-                .Repeat.Any();
 
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            ISystemDataRepository sut = CreateSut(foodItemProxyCollection: foodItemProxyCollection);
+            Assert.That(sut, Is.Not.Null);
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
-
-            var result = systemDataRepository.FoodItemGetAll();
+            IEnumerable<IFoodItem> result = sut.FoodItemGetAll();
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.EqualTo(foodItemCollection));
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(foodItemProxyCollection));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -120,23 +113,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
+            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
 
-            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.FoodItemGetAll());
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(exceptionToThrow));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodItemGetAll());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
 
         /// <summary>
@@ -145,26 +130,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
+            Exception exceptionToThrow = fixture.Create<Exception>();
 
-            var exceptionToThrow = fixture.Create<Exception>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodItemGetAll());
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.FoodItemGetAll());
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "FoodItemGetAll", exceptionToThrow.Message)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "FoodItemGetAll", exceptionToThrow.Message);
         }
 
         /// <summary>
@@ -173,18 +147,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllForFoodGroupThrowsArgumentNullExceptionWhenFoodGroupIsNull()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            ISystemDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
+            ArgumentNullException result  = Assert.Throws<ArgumentNullException>(() => sut.FoodItemGetAllForFoodGroup(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => systemDataRepository.FoodItemGetAllForFoodGroup(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("foodGroup"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "foodGroup");
         }
 
         /// <summary>
@@ -193,23 +161,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllForFoodGroupThrowsIntranetRepositoryExceptionWhenIdentifierOnFoodGroupHasNoValue()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
-            var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            IFoodGroup foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
             foodGroupMock.Stub(m => m.Identifier)
                 .Return(null)
                 .Repeat.Any();
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
+            ISystemDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.FoodItemGetAllForFoodGroup(foodGroupMock));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroupMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodItemGetAllForFoodGroup(foodGroupMock));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, foodGroupMock.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -218,26 +180,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllForFoodGroupCallsGetCollectionOnFoodWasteDataProvider()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
-                .Return(new List<FoodItemProxy>(0))
-                .Repeat.Any();
-
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
-            var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            Guid identifier = Guid.NewGuid();
+            IFoodGroup foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
             foodGroupMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
+                .Return(identifier)
                 .Repeat.Any();
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
+            ISystemDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            systemDataRepository.FoodItemGetAllForFoodGroup(foodGroupMock);
+            sut.FoodItemGetAllForFoodGroup(foodGroupMock);
 
-            // ReSharper disable PossibleInvalidOperationException
-            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Equal(string.Format("SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{0}'", foodGroupMock.Identifier.Value.ToString("D").ToUpper()))));
-            // ReSharper restore PossibleInvalidOperationException
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Equal($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{identifier.ToString("D").ToUpper()}'")));
         }
 
         /// <summary>
@@ -246,30 +200,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodItemGetAllForFoodGroupReturnsResultFromFoodWasteDataProvider()
         {
-            var foodItemCollection = new List<FoodItemProxy>
+            IEnumerable<FoodItemProxy> foodItemProxyCollection = new List<FoodItemProxy>
             {
                 new FoodItemProxy(MockRepository.GenerateMock<IFoodGroup>()),
                 new FoodItemProxy(MockRepository.GenerateMock<IFoodGroup>()),
                 new FoodItemProxy(MockRepository.GenerateMock<IFoodGroup>())
             };
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
-                .Return(foodItemCollection)
-                .Repeat.Any();
 
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
-            var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            IFoodGroup foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
             foodGroupMock.Stub(m => m.Identifier)
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
+            ISystemDataRepository sut = CreateSut(foodItemProxyCollection: foodItemProxyCollection);
+            Assert.That(sut, Is.Not.Null);
 
-            var result = systemDataRepository.FoodItemGetAllForFoodGroup(foodGroupMock);
+            IEnumerable<IFoodItem> result = sut.FoodItemGetAllForFoodGroup(foodGroupMock);
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.EqualTo(foodItemCollection));
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(foodItemProxyCollection));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -2068,6 +2019,31 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "TranslationInfoGetAll", exceptionToThrow.Message)));
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+        }
+
+        /// <summary>
+        /// Creates an instance of the repository which can access system data for the food waste domain.
+        /// </summary>
+        /// <returns>Instance of the repository which can access system data for the food waste domain.</returns>
+        private ISystemDataRepository CreateSut(IEnumerable<FoodItemProxy> foodItemProxyCollection = null, Exception exceptionToThrow = null)
+        {
+            _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            if (exceptionToThrow != null)
+            {
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
+                    .Throw(exceptionToThrow)
+                    .Repeat.Any();
+            }
+            else
+            {
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
+                    .Return(foodItemProxyCollection ?? new List<FoodItemProxy>(0))
+                    .Repeat.Any();
+            }
+
+            _foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+
+            return new SystemDataRepository(_foodWasteDataProviderMock, _foodWasteObjectMapperMock);
         }
     }
 }

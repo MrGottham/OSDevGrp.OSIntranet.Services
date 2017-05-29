@@ -26,16 +26,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
     {
         private static readonly IList<Tuple<Type, Type, Type>> TypesToTest = new List<Tuple<Type, Type, Type>>
         {
-            new Tuple<Type, Type, Type>(typeof (IHousehold), typeof (IHouseholdProxy), typeof (HouseholdProxy)),
-            new Tuple<Type, Type, Type>(typeof (IHouseholdMember), typeof (IHouseholdMemberProxy), typeof (HouseholdMemberProxy)),
-            new Tuple<Type, Type, Type>(typeof (IPayment), typeof (IPaymentProxy), typeof (PaymentProxy)),
-            new Tuple<Type, Type, Type>(typeof (IFoodItem), typeof (IFoodItemProxy), typeof (FoodItemProxy)),
-            new Tuple<Type, Type, Type>(typeof (IFoodGroup), typeof (IFoodGroupProxy), typeof (FoodGroupProxy)),
-            new Tuple<Type, Type, Type>(typeof (IForeignKey), typeof (IForeignKeyProxy), typeof (ForeignKeyProxy)),
-            new Tuple<Type, Type, Type>(typeof (IStaticText), typeof (IStaticTextProxy), typeof (StaticTextProxy)),
-            new Tuple<Type, Type, Type>(typeof (IDataProvider), typeof (IDataProviderProxy), typeof (DataProviderProxy)),
-            new Tuple<Type, Type, Type>(typeof (ITranslation), typeof (ITranslationProxy), typeof (TranslationProxy)),
-            new Tuple<Type, Type, Type>(typeof (ITranslationInfo), typeof (ITranslationInfoProxy), typeof (TranslationInfoProxy))
+            new Tuple<Type, Type, Type>(typeof(IHousehold), typeof(IHouseholdProxy), typeof(HouseholdProxy)),
+            new Tuple<Type, Type, Type>(typeof(IStorageType), typeof(IStorageTypeProxy), typeof(StorageTypeProxy)),
+            new Tuple<Type, Type, Type>(typeof(IHouseholdMember), typeof(IHouseholdMemberProxy), typeof(HouseholdMemberProxy)),
+            new Tuple<Type, Type, Type>(typeof(IPayment), typeof(IPaymentProxy), typeof(PaymentProxy)),
+            new Tuple<Type, Type, Type>(typeof(IFoodItem), typeof(IFoodItemProxy), typeof(FoodItemProxy)),
+            new Tuple<Type, Type, Type>(typeof(IFoodGroup), typeof(IFoodGroupProxy), typeof(FoodGroupProxy)),
+            new Tuple<Type, Type, Type>(typeof(IForeignKey), typeof(IForeignKeyProxy), typeof(ForeignKeyProxy)),
+            new Tuple<Type, Type, Type>(typeof(IStaticText), typeof(IStaticTextProxy), typeof(StaticTextProxy)),
+            new Tuple<Type, Type, Type>(typeof(IDataProvider), typeof(IDataProviderProxy), typeof(DataProviderProxy)),
+            new Tuple<Type, Type, Type>(typeof(ITranslation), typeof(ITranslationProxy), typeof(TranslationProxy)),
+            new Tuple<Type, Type, Type>(typeof(ITranslationInfo), typeof(ITranslationInfoProxy), typeof(TranslationInfoProxy))
         };
 
         /// <summary>
@@ -273,7 +274,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertCallsMapOnFoodWasteObjectMapper");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertCallsMapOnFoodWasteObjectMapper");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatInsertCallsMapOnFoodWasteObjectMapper' on the type named '{GetType().Name}'.");
@@ -303,7 +304,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertCallsAddOnFoodWasteDataProvider");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertCallsAddOnFoodWasteDataProvider");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatInsertCallsAddOnFoodWasteDataProvider' on the type named '{GetType().Name}'.");
@@ -333,7 +334,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertReturnsInsertedDataProxy");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertReturnsInsertedDataProxy");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatInsertReturnsInsertedDataProxy' on the type named '{GetType().Name}'.");
@@ -363,7 +364,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs' on the type named '{GetType().Name}'.");
@@ -393,7 +394,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs' on the type named '{GetType().Name}'.");
@@ -437,7 +438,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateCallsMapOnFoodWasteObjectMapper");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateCallsMapOnFoodWasteObjectMapper");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatUpdateCallsMapOnFoodWasteObjectMapper' on the type named '{GetType().Name}'.");
@@ -467,7 +468,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateCallsSaveOnFoodWasteDataProvider");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateCallsSaveOnFoodWasteDataProvider");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatUpdateCallsSaveOnFoodWasteDataProvider' on the type named '{GetType().Name}'.");
@@ -497,7 +498,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateReturnsUpdatedDataProxy");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateReturnsUpdatedDataProxy");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatUpdateReturnsUpdatedDataProxy' on the type named '{GetType().Name}'.");
@@ -527,7 +528,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs' on the type named '{GetType().Name}'.");
@@ -557,7 +558,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs' on the type named '{GetType().Name}'.");
@@ -601,7 +602,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteCallsMapOnFoodWasteObjectMapper");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteCallsMapOnFoodWasteObjectMapper");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatDeleteCallsMapOnFoodWasteObjectMapper' on the type named '{GetType().Name}'.");
@@ -631,7 +632,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteCallsDeleteOnFoodWasteDataProvider");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteCallsDeleteOnFoodWasteDataProvider");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatDeleteCallsDeleteOnFoodWasteDataProvider' on the type named '{GetType().Name}'.");
@@ -661,7 +662,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs' on the type named '{GetType().Name}'.");
@@ -691,7 +692,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             foreach (var typeToTest in TypesToTest)
             {
-                MethodInfo method = GetType().GetMethods(BindingFlags.Static | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
+                MethodInfo method = GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(m => m.IsGenericMethod && m.Name == "TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs");
                 if (method == null)
                 {
                     throw new Exception($"Can't find a method named 'TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs' on the type named '{GetType().Name}'.");
@@ -719,14 +720,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Instanse of the private class for testing the basic functionality used by repositories in the food waste domain.</returns>
         private MyDataRepository CreateSut()
         {
-            return CreateSut<IHousehold, HouseholdProxy>();
+            return CreateSutForGettingData<IHousehold, HouseholdProxy>();
         }
 
         /// <summary>
         /// Creates an instanse of the private class for testing the basic functionality used by repositories in the food waste domain.
         /// </summary>
         /// <returns>Instanse of the private class for testing the basic functionality used by repositories in the food waste domain.</returns>
-        private MyDataRepository CreateSut<TIdentifiable, TDataProxy>(TDataProxy dataProxy = null, Exception exceptionToThrow = null) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        private MyDataRepository CreateSutForGettingData<TIdentifiable, TDataProxy>(TDataProxy dataProxy = null, Exception exceptionToThrow = null) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
         {
             _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             if (exceptionToThrow != null)
@@ -748,13 +749,50 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Creates an instanse of the private class for testing the basic functionality used by repositories in the food waste domain.
+        /// </summary>
+        /// <returns>Instanse of the private class for testing the basic functionality used by repositories in the food waste domain.</returns>
+        private MyDataRepository CreateSutForModifyingData<TIdentifiable, TDataProxy>(TDataProxy dataProxy, Exception exceptionToThrow = null) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        {
+            _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            if (exceptionToThrow != null)
+            {
+                _foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
+                    .Throw(exceptionToThrow)
+                    .Repeat.Any();
+                _foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
+                    .Throw(exceptionToThrow)
+                    .Repeat.Any();
+                _foodWasteDataProviderMock.Stub(m => m.Delete(Arg<TDataProxy>.Is.NotNull))
+                    .Throw(exceptionToThrow)
+                    .Repeat.Any();
+            }
+            else
+            {
+                _foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
+                    .Return(dataProxy)
+                    .Repeat.Any();
+                _foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
+                    .Return(dataProxy)
+                    .Repeat.Any();
+            }
+
+            _foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            _foodWasteObjectMapperMock.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
+                .Return(dataProxy)
+                .Repeat.Any();
+
+            return new MyDataRepository(_foodWasteDataProviderMock, _foodWasteObjectMapperMock);
+        }
+
+        /// <summary>
         /// Tests that Get calls Get on the data provider which can access data in the food waste repository.
         /// </summary>
         // ReSharper disable UnusedMember.Local
         private void TestThatGetCallsGetOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
         // ReSharper restore UnusedMember.Local
         {
-            MyDataRepository sut = CreateSut<TIdentifiable, TDataProxy>();
+            MyDataRepository sut = CreateSutForGettingData<TIdentifiable, TDataProxy>();
             Assert.That(sut, Is.Not.Null);
 
             sut.Get<TIdentifiable>(identifier);
@@ -771,10 +809,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             TDataProxy dataProxy = new TDataProxy();
 
-            MyDataRepository sut = CreateSut<TIdentifiable, TDataProxy>(dataProxy: dataProxy);
+            MyDataRepository sut = CreateSutForGettingData<TIdentifiable, TDataProxy>(dataProxy: dataProxy);
             Assert.That(sut, Is.Not.Null);
 
-            var result = sut.Get<TIdentifiable>(identifier);
+            TIdentifiable result = sut.Get<TIdentifiable>(identifier);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(dataProxy));
         }
@@ -789,12 +827,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             Fixture fixture = new Fixture();
             IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
 
-            MyDataRepository sut = CreateSut<TIdentifiable, TDataProxy>(exceptionToThrow: exceptionToThrow);
+            MyDataRepository sut = CreateSutForGettingData<TIdentifiable, TDataProxy>(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => sut.Get<TIdentifiable>(identifier));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Get<TIdentifiable>(identifier));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
 
         /// <summary>
@@ -807,7 +845,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             Fixture fixture = new Fixture();
             Exception exceptionToThrow = fixture.Create<Exception>();
 
-            MyDataRepository sut = CreateSut<TIdentifiable, TDataProxy>(exceptionToThrow: exceptionToThrow);
+            MyDataRepository sut = CreateSutForGettingData<TIdentifiable, TDataProxy>(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
 
             IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Get<TIdentifiable>(identifier));
@@ -818,68 +856,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Insert calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
-        private static void TestThatInsertCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatInsertCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            sut.Insert(identifiable);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            dataRepositoryBase.Insert(identifiable);
-
-            foodWasteObjectMapper.AssertWasCalled(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.Equal(identifiable), Arg<CultureInfo>.Is.Null));
+            _foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.Equal(identifiable), Arg<CultureInfo>.Is.Null));
         }
 
         /// <summary>
         /// Tests that Insert calls Add on the data provider which can access data in the food waste repository.
         /// </summary>
-        private static void TestThatInsertCallsAddOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatInsertCallsAddOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            sut.Insert(identifiable);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            dataRepositoryBase.Insert(identifiable);
-
-            foodWasteDataProviderMock.AssertWasCalled(m => m.Add(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.Add(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
         }
 
         /// <summary>
         /// Tests that Insert returns the inserted data proxy.
         /// </summary>
-        private static void TestThatInsertReturnsInsertedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatInsertReturnsInsertedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            sut.Insert(identifiable);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            var result = dataRepositoryBase.Insert(identifiable);
+            TIdentifiable result = sut.Insert(identifiable);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(dataProxyMock));
         }
@@ -887,121 +903,80 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Insert throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
-        private static void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var fixture = new Fixture();
-            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
+            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock, exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Insert(identifiable));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Insert(identifiable));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
 
         /// <summary>
         /// Tests that Insert throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
-        private static void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var fixture = new Fixture();
-            var exceptionToThrow = fixture.Create<Exception>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Add(Arg<TDataProxy>.Is.NotNull))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
+            Exception exceptionToThrow = fixture.Create<Exception>();
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock, exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Insert(identifiable));
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Insert(identifiable));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Insert", exceptionToThrow.Message)));
-            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "Insert", exceptionToThrow.Message);
         }
 
         /// <summary>
         /// Tests that Update calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
-        private static void TestThatUpdateCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatUpdateCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            sut.Update(identifiable);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            dataRepositoryBase.Update(identifiable);
-
-            foodWasteObjectMapper.AssertWasCalled(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.Equal(identifiable), Arg<CultureInfo>.Is.Null));
+            _foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.Equal(identifiable), Arg<CultureInfo>.Is.Null));
         }
 
         /// <summary>
         /// Tests that Update calls Save on the data provider which can access data in the food waste repository.
         /// </summary>
-        private static void TestThatUpdateCallsSaveOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatUpdateCallsSaveOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            sut.Update(identifiable);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            dataRepositoryBase.Update(identifiable);
-
-            foodWasteDataProviderMock.AssertWasCalled(m => m.Save(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.Save(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
         }
 
         /// <summary>
         /// Tests that Update returns the updated data proxy.
         /// </summary>
-        private static void TestThatUpdateReturnsUpdatedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatUpdateReturnsUpdatedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
-
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            var result = dataRepositoryBase.Update(identifiable);
+            IIdentifiable result = sut.Update(identifiable);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(dataProxyMock));
         }
@@ -1009,147 +984,103 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <summary>
         /// Tests that Update throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
-        private static void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var fixture = new Fixture();
-            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
+            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock, exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Update(identifiable));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Update(identifiable));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
 
         /// <summary>
         /// Tests that Update throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
-        private static void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var fixture = new Fixture();
-            var exceptionToThrow = fixture.Create<Exception>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Save(Arg<TDataProxy>.Is.NotNull))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
+            Exception exceptionToThrow = fixture.Create<Exception>();
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock, exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Update(identifiable));
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Update(identifiable));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Update", exceptionToThrow.Message)));
-            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "Update", exceptionToThrow.Message);
         }
 
         /// <summary>
         /// Tests that Delete calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
-        private static void TestThatDeleteCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatDeleteCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            sut.Delete(identifiable);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            dataRepositoryBase.Delete(identifiable);
-
-            foodWasteObjectMapper.AssertWasCalled(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.Equal(identifiable), Arg<CultureInfo>.Is.Null));
+            _foodWasteObjectMapperMock.AssertWasCalled(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.Equal(identifiable), Arg<CultureInfo>.Is.Null));
         }
 
         /// <summary>
         /// Tests that Delete calls Delete on the data provider which can access data in the food waste repository.
         /// </summary>
-        private static void TestThatDeleteCallsDeleteOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatDeleteCallsDeleteOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            sut.Delete(identifiable);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            dataRepositoryBase.Delete(identifiable);
-
-            foodWasteDataProviderMock.AssertWasCalled(m => m.Delete(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.Delete(Arg<TDataProxy>.Is.Equal(dataProxyMock)));
         }
 
         /// <summary>
         /// Tests that Delete throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
-        private static void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var fixture = new Fixture();
-            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Delete(Arg<TDataProxy>.Is.NotNull))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
+            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock, exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Delete(identifiable));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(exceptionToThrow));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Delete(identifiable));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
 
         /// <summary>
         /// Tests that Delete throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
-        private static void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper disable UnusedMember.Local
+        private void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        // ReSharper restore UnusedMember.Local
         {
-            var fixture = new Fixture();
-            var exceptionToThrow = fixture.Create<Exception>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.Delete(Arg<TDataProxy>.Is.NotNull))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
+            Exception exceptionToThrow = fixture.Create<Exception>();
 
-            var foodWasteObjectMapper = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-            foodWasteObjectMapper.Stub(m => m.Map<TIdentifiable, TDataProxy>(Arg<TIdentifiable>.Is.NotNull, Arg<CultureInfo>.Is.Anything))
-                .Return(dataProxyMock)
-                .Repeat.Any();
+            MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock, exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataRepositoryBase = new MyDataRepository(foodWasteDataProviderMock, foodWasteObjectMapper);
-            Assert.That(dataRepositoryBase, Is.Not.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Delete(identifiable));
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => dataRepositoryBase.Delete(identifiable));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "Delete", exceptionToThrow.Message)));
-            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "Delete", exceptionToThrow.Message);
         }
 
         /// <summary>
@@ -1161,11 +1092,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         {
             if (mockType == null)
             {
-                throw new ArgumentNullException("mockType");
+                throw new ArgumentNullException(nameof(mockType));
             }
-            return typeof (MockRepository).GetMethods(BindingFlags.Static | BindingFlags.Public)
+
+            return typeof(MockRepository).GetMethods(BindingFlags.Static | BindingFlags.Public)
                 .Single(m => m.IsGenericMethod && m.Name == "GenerateMock" && m.GetGenericArguments().Length == 1)
-                .MakeGenericMethod(new[] {mockType})
+                .MakeGenericMethod(mockType)
                 .Invoke(null, new object[] {null});
         }
     }

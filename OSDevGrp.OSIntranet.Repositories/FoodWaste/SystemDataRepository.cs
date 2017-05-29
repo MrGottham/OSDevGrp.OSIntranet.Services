@@ -70,13 +70,13 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (foodGroup == null)
             {
-                throw new ArgumentNullException("foodGroup");
+                throw new ArgumentNullException(nameof(foodGroup));
             }
             try
             {
                 if (foodGroup.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<FoodItemProxy>(string.Format("SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{0}'", foodGroup.Identifier.Value.ToString("D").ToUpper()));
+                    return DataProvider.GetCollection<FoodItemProxy>($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{foodGroup.Identifier.Value.ToString("D").ToUpper()}'");
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroup.Identifier, "Identifier"));
             }
@@ -100,17 +100,17 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
             if (string.IsNullOrEmpty(foreignKeyValue))
             {
-                throw new ArgumentNullException("foreignKeyValue");
+                throw new ArgumentNullException(nameof(foreignKeyValue));
             }
             try
             {
                 if (dataProvider.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<FoodItemProxy>(string.Format("SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{0}' AND fk.ForeignKeyForTypes LIKE '%{1}%' AND fk.ForeignKeyValue='{2}'", dataProvider.Identifier.Value.ToString("D").ToUpper(), typeof (IFoodItem).Name, foreignKeyValue)).FirstOrDefault();
+                    return DataProvider.GetCollection<FoodItemProxy>($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{dataProvider.Identifier.Value.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodItem).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'").FirstOrDefault();
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
             }
@@ -174,17 +174,17 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
             if (string.IsNullOrEmpty(foreignKeyValue))
             {
-                throw new ArgumentNullException("foreignKeyValue");
+                throw new ArgumentNullException(nameof(foreignKeyValue));
             }
             try
             {
                 if (dataProvider.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<FoodGroupProxy>(string.Format("SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{0}' AND fk.ForeignKeyForTypes LIKE '%{1}%' AND fk.ForeignKeyValue='{2}'", dataProvider.Identifier.Value.ToString("D").ToUpper(), typeof (IFoodGroup).Name, foreignKeyValue)).FirstOrDefault();
+                    return DataProvider.GetCollection<FoodGroupProxy>($"SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{dataProvider.Identifier.Value.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodGroup).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'").FirstOrDefault();
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
             }
@@ -207,7 +207,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (identifiableDomainObject == null)
             {
-                throw new ArgumentNullException("identifiableDomainObject");
+                throw new ArgumentNullException(nameof(identifiableDomainObject));
             }
             try
             {
@@ -236,7 +236,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                var staticText = DataProvider.GetCollection<StaticTextProxy>(string.Format("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={0}", (int)staticTextType)).SingleOrDefault(m => m.Type == staticTextType);
+                var staticText = DataProvider.GetCollection<StaticTextProxy>($"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int) staticTextType}").SingleOrDefault(m => m.Type == staticTextType);
                 if (staticText == null)
                 {
                     throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (IStaticText).Name, staticTextType));
@@ -370,7 +370,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             if (identifiableDomainObject == null)
             {
-                throw new ArgumentNullException("identifiableDomainObject");
+                throw new ArgumentNullException(nameof(identifiableDomainObject));
             }
             try
             {

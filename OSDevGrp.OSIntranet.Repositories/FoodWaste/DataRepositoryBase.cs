@@ -62,43 +62,47 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>The identifiable domain object.</returns>
         public virtual TIdentifiable Get<TIdentifiable>(Guid identifier) where TIdentifiable : IIdentifiable
         {
-            if (typeof (TIdentifiable) == typeof (IHousehold))
+            if (typeof(TIdentifiable) == typeof(IHousehold))
             {
                 return (TIdentifiable) Get<IHousehold, HouseholdProxy>(identifier);
+            }
+            if (typeof(TIdentifiable) == typeof(IStorageType))
+            {
+                return (TIdentifiable) Get<IStorageType, StorageTypeProxy>(identifier);
             }
             if (typeof(TIdentifiable) == typeof(IHouseholdMember))
             {
                 return (TIdentifiable) Get<IHouseholdMember, HouseholdMemberProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (IPayment))
+            if (typeof(TIdentifiable) == typeof(IPayment))
             {
                 return (TIdentifiable) Get<IPayment, PaymentProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (IFoodItem))
+            if (typeof(TIdentifiable) == typeof(IFoodItem))
             {
                 return (TIdentifiable) Get<IFoodItem, FoodItemProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (IFoodGroup))
+            if (typeof(TIdentifiable) == typeof(IFoodGroup))
             {
                 return (TIdentifiable) Get<IFoodGroup, FoodGroupProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (IForeignKey))
+            if (typeof(TIdentifiable) == typeof(IForeignKey))
             {
                 return (TIdentifiable) Get<IForeignKey, ForeignKeyProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (IStaticText))
+            if (typeof(TIdentifiable) == typeof(IStaticText))
             {
                 return (TIdentifiable) Get<IStaticText, StaticTextProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (IDataProvider))
+            if (typeof(TIdentifiable) == typeof(IDataProvider))
             {
                 return (TIdentifiable) Get<IDataProvider, DataProviderProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (ITranslation))
+            if (typeof(TIdentifiable) == typeof(ITranslation))
             {
                 return (TIdentifiable) Get<ITranslation, TranslationProxy>(identifier);
             }
-            if (typeof (TIdentifiable) == typeof (ITranslationInfo))
+            if (typeof(TIdentifiable) == typeof(ITranslationInfo))
             {
                 return (TIdentifiable) Get<ITranslationInfo, TranslationInfoProxy>(identifier);
             }
@@ -122,6 +126,12 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (household != null)
             {
                 return (TIdentifiable) Insert<IHousehold, IHouseholdProxy>(household);
+            }
+
+            IStorageType storageType = identifiable as IStorageType;
+            if (storageType != null)
+            {
+                return (TIdentifiable) Insert<IStorageType, IStorageTypeProxy>(storageType);
             }
 
             IHouseholdMember householdMember = identifiable as IHouseholdMember;
@@ -200,6 +210,12 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
                 return (TIdentifiable) Update<IHousehold, IHouseholdProxy>(household);
             }
 
+            IStorageType storageType = identifiable as IStorageType;
+            if (storageType != null)
+            {
+                return (TIdentifiable) Update<IStorageType, IStorageTypeProxy>(storageType);
+            }
+
             IHouseholdMember householdMember = identifiable as IHouseholdMember;
             if (householdMember != null)
             {
@@ -273,6 +289,13 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (household != null)
             {
                 Delete<IHousehold, IHouseholdProxy>(household);
+                return;
+            }
+
+            IStorageType storageType = identifiable as IStorageType;
+            if (storageType != null)
+            {
+                Delete<IStorageType, IStorageTypeProxy>(storageType);
                 return;
             }
 
