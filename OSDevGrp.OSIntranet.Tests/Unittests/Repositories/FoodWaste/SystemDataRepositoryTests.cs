@@ -757,7 +757,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             Fixture fixture = new Fixture();
             IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
 
-            var identifiableDomainObjectMock = BuildIdentifiableMock();
+            IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -773,31 +773,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatForeignKeysForDomainObjectGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
+            Exception exceptionToThrow = fixture.Create<Exception>();
 
-            var identifiableDomainObjectMock = MockRepository.GenerateMock<IIdentifiable>();
-            identifiableDomainObjectMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
+            IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
-            var exceptionToThrow = fixture.Create<Exception>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock));
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => systemDataRepository.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "ForeignKeysForDomainObjectGet", exceptionToThrow.Message)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "ForeignKeysForDomainObjectGet", exceptionToThrow.Message);
         }
 
         /// <summary>
@@ -806,24 +792,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeCallsGetCollectionOnFoodWasteDataProvider()
         {
-            foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
+            foreach (StaticTextType staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
             {
-                var staticTextProxy = new StaticTextProxy(staticTextTypeToTest, Guid.NewGuid());
-                var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-                foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
-                    .Return(new List<StaticTextProxy> {staticTextProxy})
-                    .Repeat.Any();
+                StaticTextProxy staticText = new StaticTextProxy(staticTextTypeToTest, Guid.NewGuid());
+                IEnumerable<StaticTextProxy> staticTextProxyCollection = new List<StaticTextProxy> { staticText };
 
-                var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+                ISystemDataRepository sut = CreateSut(staticTextProxyCollection: staticTextProxyCollection);
+                Assert.That(sut, Is.Not.Null);
 
-                var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-                Assert.That(systemDataRepository, Is.Not.Null);
+                sut.StaticTextGetByStaticTextType(staticTextTypeToTest);
 
-                systemDataRepository.StaticTextGetByStaticTextType(staticTextTypeToTest);
-
-                // ReSharper disable AccessToForEachVariableInClosure
-                foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Equal(string.Format("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={0}", (int) staticTextTypeToTest))));
-                // ReSharper restore AccessToForEachVariableInClosure
+                _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Equal($"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int) staticTextTypeToTest}")));
             }
         }
 
@@ -833,23 +812,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeReturnsResultFromFoodWasteDataProvider()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
+            StaticTextType staticTextType = fixture.Create<StaticTextType>();
 
-            var staticTextType = fixture.Create<StaticTextType>();
-            var staticTextProxy = new StaticTextProxy(staticTextType, Guid.NewGuid());
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
-                .Return(new List<StaticTextProxy> {staticTextProxy})
-                .Repeat.Any();
+            StaticTextProxy staticText = new StaticTextProxy(staticTextType, Guid.NewGuid());
+            IEnumerable<StaticTextProxy> staticTextProxyCollection = new List<StaticTextProxy> {staticText};
 
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            ISystemDataRepository sut = CreateSut(staticTextProxyCollection: staticTextProxyCollection);
+            Assert.That(sut, Is.Not.Null);
 
-            var systemDataRepository = new SystemDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(systemDataRepository, Is.Not.Null);
-
-            var result = systemDataRepository.StaticTextGetByStaticTextType(staticTextType);
+            IStaticText result = sut.StaticTextGetByStaticTextType(staticTextType);
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.EqualTo(staticTextProxy));
+            Assert.That(result, Is.EqualTo(staticText));
         }
 
         /// <summary>
@@ -1714,7 +1688,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Creates an instance of the repository which can access system data for the food waste domain.
         /// </summary>
         /// <returns>Instance of the repository which can access system data for the food waste domain.</returns>
-        private ISystemDataRepository CreateSut(IEnumerable<FoodItemProxy> foodItemProxyCollection = null, IEnumerable<FoodGroupProxy> foodGroupProxyCollection = null, IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = null, Exception exceptionToThrow = null)
+        private ISystemDataRepository CreateSut(IEnumerable<FoodItemProxy> foodItemProxyCollection = null, IEnumerable<FoodGroupProxy> foodGroupProxyCollection = null, IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = null, IEnumerable<StaticTextProxy> staticTextProxyCollection = null, Exception exceptionToThrow = null)
         {
             _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             if (exceptionToThrow != null)
@@ -1728,6 +1702,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
                 _foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                    .Throw(exceptionToThrow)
+                    .Repeat.Any();
             }
             else
             {
@@ -1739,6 +1716,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
                     .Repeat.Any();
                 _foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
                     .Return(foreignKeyProxyCollection ?? new List<ForeignKeyProxy>(0))
+                    .Repeat.Any();
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                    .Return(staticTextProxyCollection ?? new List<StaticTextProxy>(0))
                     .Repeat.Any();
             }
 
