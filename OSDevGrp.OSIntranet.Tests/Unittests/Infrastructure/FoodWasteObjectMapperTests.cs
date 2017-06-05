@@ -10,6 +10,7 @@ using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -330,6 +331,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember, Is.TypeOf<HouseholdMemberProxy>());
             }
+        }
+
+        /// <summary>
+        /// Tests that Map maps StorageType to StorageTypeIdentificationView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStorageTypeToStorageTypeIdentificationView()
+        {
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
+
+            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            StorageTypeIdentificationView storageTypeIdentificationView = foodWasteObjectMapper.Map<IStorageType, StorageTypeIdentificationView>(storageTypeMock);
+            Assert.That(storageTypeIdentificationView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(storageTypeIdentificationView.StorageTypeIdentifier, Is.EqualTo(storageTypeMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(storageTypeIdentificationView.Name, Is.Not.Null);
+            Assert.That(storageTypeIdentificationView.Name, Is.Not.Empty);
+            Assert.That(storageTypeIdentificationView.Name, Is.EqualTo(storageTypeMock.Translation.Value));
         }
 
         /// <summary>

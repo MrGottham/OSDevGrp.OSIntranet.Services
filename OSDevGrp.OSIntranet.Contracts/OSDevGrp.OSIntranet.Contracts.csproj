@@ -186,6 +186,7 @@
     <Compile Include="Views\StakeholderView.cs" />
     <Compile Include="Views\StaticTextSystemView.cs" />
     <Compile Include="Views\StaticTextView.cs" />
+    <Compile Include="Views\StorageTypeIdentificationView.cs" />
     <Compile Include="Views\SystemView.cs" />
     <Compile Include="Views\TabelView.cs" />
     <Compile Include="Views\TelefonlisteView.cs" />

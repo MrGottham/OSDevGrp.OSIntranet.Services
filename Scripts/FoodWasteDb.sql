@@ -560,3 +560,15 @@ END $$
 DELIMITER ;
 CALL InsertDataIntoStorageTypes();
 DROP PROCEDURE InsertDataIntoStorageTypes;
+
+DROP PROCEDURE IF EXISTS CreateIX_StorageTypes_SortOrder;
+DELIMITER $$
+CREATE PROCEDURE CreateIX_StorageTypes_SortOrder()
+BEGIN
+	IF((SELECT COUNT(*) FROM information_schema.Statistics WHERE Table_Schema=DATABASE() AND Table_Name='StorageTypes' AND Index_Name='IX_StorageTypes_SortOrder') = 0) THEN
+		CREATE UNIQUE INDEX IX_StorageTypes_SortOrder ON StorageTypes (SortOrder);
+	END IF;
+END $$
+DELIMITER ;
+CALL CreateIX_StorageTypes_SortOrder();
+DROP PROCEDURE CreateIX_StorageTypes_SortOrder;

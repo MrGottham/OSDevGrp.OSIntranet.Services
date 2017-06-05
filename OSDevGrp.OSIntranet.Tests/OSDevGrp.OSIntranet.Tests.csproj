@@ -286,6 +286,7 @@
     <Compile Include="Unittests\Contracts\Views\StakeholderViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\StorageTypeIdentificationViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\SystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TelefonlisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TranslationInfoSystemViewTests.cs" />

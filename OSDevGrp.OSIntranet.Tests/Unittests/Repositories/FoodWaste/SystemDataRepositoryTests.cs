@@ -70,6 +70,75 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that StorageTypeGetAll calls GetCollection on the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllCallsGetCollectionOnFoodWasteDataProvider()
+        {
+            ISystemDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            sut.StorageTypeGetAll();
+
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StorageTypeProxy>(Arg<string>.Is.Equal("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder")));
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll returns the result from the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllReturnsResultFromFoodWasteDataProvider()
+        {
+            Fixture fixture = new Fixture();
+
+            IEnumerable<StorageTypeProxy> storageTypeProxyCollection = BuildStorageTypeProxyCollection(fixture);
+
+            ISystemDataRepository sut = CreateSut(storageTypeProxyCollection: storageTypeProxyCollection);
+            Assert.That(sut, Is.Not.Null);
+
+            IEnumerable<IStorageType> result = sut.StorageTypeGetAll();
+            // ReSharper disable PossibleMultipleEnumeration
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(storageTypeProxyCollection));
+            // ReSharper restore PossibleMultipleEnumeration
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
+        {
+            Fixture fixture = new Fixture();
+            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+
+            ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.StorageTypeGetAll());
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(exceptionToThrow));
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll throws an IntranetRepositoryException when an Exception occurs.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
+        {
+            Fixture fixture = new Fixture();
+            Exception exceptionToThrow = fixture.Create<Exception>();
+
+            ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.StorageTypeGetAll());
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "StorageTypeGetAll", exceptionToThrow.Message);
+        }
+
+        /// <summary>
         /// Tests that FoodItemGetAll calls GetCollection on the data provider which can access data in the food waste repository.
         /// </summary>
         [Test]
@@ -1409,11 +1478,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Creates an instance of the repository which can access system data for the food waste domain.
         /// </summary>
         /// <returns>Instance of the repository which can access system data for the food waste domain.</returns>
-        private ISystemDataRepository CreateSut(IEnumerable<FoodItemProxy> foodItemProxyCollection = null, IEnumerable<FoodGroupProxy> foodGroupProxyCollection = null, IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = null, IEnumerable<StaticTextProxy> staticTextProxyCollection = null, IEnumerable<DataProviderProxy> dataProviderProxyCollection = null, IEnumerable<TranslationProxy> translationProxyCollection = null, IEnumerable<TranslationInfoProxy> translationInfoProxyCollection = null, DataProviderProxy dataProviderProxy = null, Exception exceptionToThrow = null)
+        private ISystemDataRepository CreateSut(IEnumerable<StorageTypeProxy> storageTypeProxyCollection = null, IEnumerable<FoodItemProxy> foodItemProxyCollection = null, IEnumerable<FoodGroupProxy> foodGroupProxyCollection = null, IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = null, IEnumerable<StaticTextProxy> staticTextProxyCollection = null, IEnumerable<DataProviderProxy> dataProviderProxyCollection = null, IEnumerable<TranslationProxy> translationProxyCollection = null, IEnumerable<TranslationInfoProxy> translationInfoProxyCollection = null, DataProviderProxy dataProviderProxy = null, Exception exceptionToThrow = null)
         {
             _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             if (exceptionToThrow != null)
             {
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StorageTypeProxy>(Arg<string>.Is.Anything))
+                    .Throw(exceptionToThrow)
+                    .Repeat.Any();
                 _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
@@ -1441,6 +1513,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             }
             else
             {
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StorageTypeProxy>(Arg<string>.Is.Anything))
+                    .Return(storageTypeProxyCollection ?? new List<StorageTypeProxy>(0))
+                    .Repeat.Any();
                 _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
                     .Return(foodItemProxyCollection ?? new List<FoodItemProxy>(0))
                     .Repeat.Any();
@@ -1470,6 +1545,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             _foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
             return new SystemDataRepository(_foodWasteDataProviderMock, _foodWasteObjectMapperMock);
+        }
+
+        /// <summary>
+        /// Creates a collection of storage type proxies which can be used for unit testing.
+        /// </summary>
+        /// <returns>Collection of storage type proxies which can be used for unit testing</returns>
+        private static IEnumerable<StorageTypeProxy> BuildStorageTypeProxyCollection(Fixture fixture)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException(nameof(fixture));
+            }
+
+            return fixture.CreateMany<StorageTypeProxy>(5);
         }
 
         /// <summary>

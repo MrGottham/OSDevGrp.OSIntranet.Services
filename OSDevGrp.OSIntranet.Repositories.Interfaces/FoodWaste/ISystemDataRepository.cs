@@ -10,6 +10,12 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
     public interface ISystemDataRepository : IDataRepository
     {
         /// <summary>
+        /// Gets all the storage types.
+        /// </summary>
+        /// <returns>All storage types.</returns>
+        IEnumerable<IStorageType> StorageTypeGetAll();
+
+        /// <summary>
         /// Gets all the food items.
         /// </summary>
         /// <returns>All food items.</returns>

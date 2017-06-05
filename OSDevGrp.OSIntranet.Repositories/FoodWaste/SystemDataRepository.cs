@@ -42,6 +42,26 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Gets all the storage types.
+        /// </summary>
+        /// <returns>All storage types.</returns>
+        public virtual IEnumerable<IStorageType> StorageTypeGetAll()
+        {
+            try
+            {
+                return DataProvider.GetCollection<StorageTypeProxy>("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder");
+            }
+            catch (IntranetRepositoryException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
+            }
+        }
+
+        /// <summary>
         /// Gets all the food items.
         /// </summary>
         /// <returns>All food items.</returns>

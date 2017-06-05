@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
@@ -33,6 +34,23 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that StorageTypeGetAll returns all the storages types.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllReturnsStorageTypes()
+        {
+            IEnumerable<IStorageType> storageTypes = _systemDataRepository.StorageTypeGetAll();
+            // ReSharper disable PossibleMultipleEnumeration
+            Assert.That(storageTypes, Is.Not.Null);
+            Assert.That(storageTypes, Is.Not.Empty);
+            Assert.That(storageTypes.Count(), Is.EqualTo(4));
+            Assert.That(storageTypes.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == StorageType.IdentifierForRefrigerator), Is.Not.Null);
+            Assert.That(storageTypes.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == StorageType.IdentifierForFreezer), Is.Not.Null);
+            Assert.That(storageTypes.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == StorageType.IdentifierForKitchenCabinets), Is.Not.Null);
+            Assert.That(storageTypes.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == StorageType.IdentifierForShoppingBasket), Is.Not.Null);
+            // ReSharper restore PossibleMultipleEnumeration
+        }
+        /// <summary>
         /// Tests that FoodItemGetByForeignKey returns the food item for the given data providers foreign key.
         /// </summary>
         [Test]
@@ -55,7 +73,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                         var result = _systemDataRepository.FoodItemGetByForeignKey(dataProvider, "ForeignKeyToFoodItem");
                         Assert.That(result, Is.Not.Null);
                         Assert.That(result.Identifier, Is.Not.Null);
+                        // ReSharper disable ConditionIsAlwaysTrueOrFalse
                         Assert.That(result.Identifier.HasValue, Is.True);
+                        // ReSharper restore ConditionIsAlwaysTrueOrFalse
                         // ReSharper disable PossibleInvalidOperationException
                         Assert.That(result.Identifier.Value, Is.EqualTo(foodItem.Identifier.Value));
                         // ReSharper restore PossibleInvalidOperationException
@@ -89,9 +109,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 try
                 {
                     var result = _systemDataRepository.FoodItemGetAllForFoodGroup(primaryFoodGroup);
+                    // ReSharper disable PossibleMultipleEnumeration
                     Assert.That(result, Is.Not.Null);
                     Assert.That(result, Is.Not.Empty);
                     Assert.That(result.Any(fi => fi.Identifier.HasValue && fi.Identifier.Equals(foodItem.Identifier)), Is.True);
+                    // ReSharper restore PossibleMultipleEnumeration
                 }
                 finally
                 {
@@ -117,9 +139,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 try
                 {
                     var result = _systemDataRepository.FoodItemGetAll();
+                    // ReSharper disable PossibleMultipleEnumeration
                     Assert.That(result, Is.Not.Null);
                     Assert.That(result, Is.Not.Empty);
                     Assert.That(result.Any(fi => fi.Identifier.HasValue && fi.Identifier.Equals(foodItem.Identifier)), Is.True);
+                    // ReSharper restore PossibleMultipleEnumeration
                 }
                 finally
                 {
@@ -150,7 +174,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                     Assert.That(result, Is.Not.Null);
                     Assert.That(result.PrimaryFoodGroup, Is.Not.Null);
                     Assert.That(result.PrimaryFoodGroup.Identifier, Is.Not.Null);
+                    // ReSharper disable ConditionIsAlwaysTrueOrFalse
                     Assert.That(result.PrimaryFoodGroup.Identifier.HasValue, Is.True);
+                    // ReSharper restore ConditionIsAlwaysTrueOrFalse
                     // ReSharper disable PossibleInvalidOperationException
                     Assert.That(result.PrimaryFoodGroup.Identifier.Value, Is.EqualTo(primaryFoodGroup.Identifier.Value));
                     // ReSharper restore PossibleInvalidOperationException
@@ -196,7 +222,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                         Assert.That(result, Is.Not.Null);
                         Assert.That(result.PrimaryFoodGroup, Is.Not.Null);
                         Assert.That(result.PrimaryFoodGroup.Identifier, Is.Not.Null);
+                        // ReSharper disable ConditionIsAlwaysTrueOrFalse
                         Assert.That(result.PrimaryFoodGroup.Identifier.HasValue, Is.True);
+                        // ReSharper restore ConditionIsAlwaysTrueOrFalse
                         // ReSharper disable PossibleInvalidOperationException
                         Assert.That(result.PrimaryFoodGroup.Identifier.Value, Is.EqualTo(primaryFoodGroup.Identifier.Value));
                         // ReSharper restore PossibleInvalidOperationException
@@ -301,7 +329,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                     var result = _systemDataRepository.FoodGroupGetByForeignKey(dataProvider, "ForeignKeyToFoodGroup");
                     Assert.That(result, Is.Not.Null);
                     Assert.That(result.Identifier, Is.Not.Null);
+                    // ReSharper disable ConditionIsAlwaysTrueOrFalse
                     Assert.That(result.Identifier.HasValue, Is.True);
+                    // ReSharper restore ConditionIsAlwaysTrueOrFalse
                     // ReSharper disable PossibleInvalidOperationException
                     Assert.That(result.Identifier.Value, Is.EqualTo(foodGroup.Identifier.Value));
                     // ReSharper restore PossibleInvalidOperationException
@@ -337,7 +367,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                         // ReSharper restore PossibleInvalidOperationException
                         Assert.That(result.Parent, Is.Not.Null);
                         Assert.That(result.Parent.Identifier, Is.Not.Null);
+                        // ReSharper disable ConditionIsAlwaysTrueOrFalse
                         Assert.That(result.Parent.Identifier.HasValue, Is.True);
+                        // ReSharper restore ConditionIsAlwaysTrueOrFalse
                         // ReSharper disable PossibleInvalidOperationException
                         Assert.That(result.Parent.Identifier.Value, Is.EqualTo(foodGroupAtRoot.Identifier.Value));
                         // ReSharper restore PossibleInvalidOperationException
@@ -412,8 +444,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
             try
             {
                 var result = _systemDataRepository.ForeignKeysForDomainObjectGet(foreignKeyFor);
+                // ReSharper disable PossibleMultipleEnumeration
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result, Is.Not.Empty);
+                // ReSharper restore PossibleMultipleEnumeration
             }
             finally
             {
@@ -490,9 +524,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         public void TestThatStaticTextGetAllReturnsStaticTexts()
         {
             var staticTexts = _systemDataRepository.StaticTextGetAll();
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(staticTexts, Is.Not.Null);
             Assert.That(staticTexts, Is.Not.Empty);
             Assert.That(staticTexts.Count(),Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -522,9 +558,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         public void TestThatDataProviderGetAllReturnsDataProviders()
         {
             var dataProviders = _systemDataRepository.DataProviderGetAll();
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(dataProviders, Is.Not.Null);
             Assert.That(dataProviders, Is.Not.Empty);
             Assert.That(dataProviders.Count(), Is.EqualTo(2));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -534,9 +572,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         public void TestThatDataProviderWhoHandlesPaymentsGetAllReturnsDataProvidersWhoHandlesPayments()
         {
             var dataProviders = _systemDataRepository.DataProviderWhoHandlesPaymentsGetAll();
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(dataProviders, Is.Not.Null);
             Assert.That(dataProviders, Is.Not.Empty);
             Assert.That(dataProviders.Count(), Is.EqualTo(1));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -558,8 +598,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 // ReSharper disable PossibleInvalidOperationException
                 var result = _systemDataRepository.TranslationsForDomainObjectGet(tranlationOf);
                 // ReSharper restore PossibleInvalidOperationException
+                // ReSharper disable PossibleMultipleEnumeration
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result, Is.Not.Empty);
+                // ReSharper restore PossibleMultipleEnumeration
             }
             finally
             {
@@ -623,9 +665,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         public void TestThatTranslationInfoGetAllReturnsTranslationInfos()
         {
             var translationInfos = _systemDataRepository.TranslationInfoGetAll();
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(translationInfos, Is.Not.Null);
             Assert.That(translationInfos, Is.Not.Empty);
             Assert.That(translationInfos.Count(), Is.EqualTo(2));
+            // ReSharper restore PossibleMultipleEnumeration
         }
     }
 }
