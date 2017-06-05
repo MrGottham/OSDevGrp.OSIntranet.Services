@@ -105,6 +105,33 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         return householdProxy;
                     });
 
+                config.CreateMap<IStorageType, StorageTypeIdentificationView>()
+                    .ForMember(m => m.StorageTypeIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty));
+
+                config.CreateMap<IStorageType, StorageTypeView>()
+                    .ForMember(m => m.StorageTypeIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.SortOrder, opt => opt.MapFrom(s => s.SortOrder))
+                    .ForMember(m => m.Temperature, opt => opt.MapFrom(s => s.Temperature))
+                    .ForMember(m => m.TemperatureRange, opt => opt.MapFrom(s => s.TemperatureRange))
+                    .ForMember(m => m.Creatable, opt => opt.MapFrom(s => s.Creatable))
+                    .ForMember(m => m.Editable, opt => opt.MapFrom(s => s.Editable))
+                    .ForMember(m => m.Deletable, opt => opt.MapFrom(s => s.Deletable));
+
+                config.CreateMap<IStorageType, StorageTypeSystemView>()
+                    .ForMember(m => m.StorageTypeIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Translation != null ? s.Translation.Value : string.Empty))
+                    .ForMember(m => m.SortOrder, opt => opt.MapFrom(s => s.SortOrder))
+                    .ForMember(m => m.Temperature, opt => opt.MapFrom(s => s.Temperature))
+                    .ForMember(m => m.TemperatureRange, opt => opt.MapFrom(s => s.TemperatureRange))
+                    .ForMember(m => m.Creatable, opt => opt.MapFrom(s => s.Creatable))
+                    .ForMember(m => m.Editable, opt => opt.MapFrom(s => s.Editable))
+                    .ForMember(m => m.Deletable, opt => opt.MapFrom(s => s.Deletable))
+                    .ForMember(m => m.Translations, opt => opt.MapFrom(s => s.Translations));
+
                 config.CreateMap<IStorageType, IStorageTypeProxy>()
                     .ConstructUsing(m =>
                     {
@@ -631,6 +658,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 config.CreateMap<IIdentifiable, ServiceReceiptResponse>()
                     .ForMember(m => m.Identifier, opt => opt.MapFrom(s => s.Identifier))
                     .ForMember(m => m.EventDate, opt => opt.MapFrom(s => DateTime.Now));
+
+                config.CreateMap<IRange<int>, IntRangeView>()
+                    .ForMember(m => m.StartValue, opt => opt.MapFrom(s => s.StartValue))
+                    .ForMember(m => m.EndValue, opt => opt.MapFrom(s => s.EndValue));
 
                 config.CreateMap<bool, BooleanResultResponse>()
                     .ForMember(m => m.Result, opt => opt.MapFrom(s => s))

@@ -167,6 +167,7 @@
     <Compile Include="Views\HouseholdMemberIdentificationView.cs" />
     <Compile Include="Views\HouseholdMemberView.cs" />
     <Compile Include="Views\HouseholdView.cs" />
+    <Compile Include="Views\IntRangeView.cs" />
     <Compile Include="Views\KalenderbrugerAftaleView.cs" />
     <Compile Include="Views\KalenderbrugerView.cs" />
     <Compile Include="Views\KontoBaseView.cs" />
@@ -187,6 +188,8 @@
     <Compile Include="Views\StaticTextSystemView.cs" />
     <Compile Include="Views\StaticTextView.cs" />
     <Compile Include="Views\StorageTypeIdentificationView.cs" />
+    <Compile Include="Views\StorageTypeSystemView.cs" />
+    <Compile Include="Views\StorageTypeView.cs" />
     <Compile Include="Views\SystemView.cs" />
     <Compile Include="Views\TabelView.cs" />
     <Compile Include="Views\TelefonlisteView.cs" />

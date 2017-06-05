@@ -355,6 +355,68 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps StorageType to StorageTypeView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStorageTypeToStorageTypeView()
+        {
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
+
+            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            StorageTypeView storageTypeView = foodWasteObjectMapper.Map<IStorageType, StorageTypeView>(storageTypeMock);
+            Assert.That(storageTypeView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(storageTypeView.StorageTypeIdentifier, Is.EqualTo(storageTypeMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(storageTypeView.Name, Is.Not.Null);
+            Assert.That(storageTypeView.Name, Is.Not.Empty);
+            Assert.That(storageTypeView.Name, Is.EqualTo(storageTypeMock.Translation.Value));
+            Assert.That(storageTypeView.SortOrder, Is.EqualTo(storageTypeMock.SortOrder));
+            Assert.That(storageTypeView.Temperature, Is.EqualTo(storageTypeMock.Temperature));
+            Assert.That(storageTypeView.TemperatureRange, Is.Not.Null);
+            Assert.That(storageTypeView.TemperatureRange.StartValue, Is.EqualTo(storageTypeMock.TemperatureRange.StartValue));
+            Assert.That(storageTypeView.TemperatureRange.EndValue, Is.EqualTo(storageTypeMock.TemperatureRange.EndValue));
+            Assert.That(storageTypeView.Creatable, Is.EqualTo(storageTypeMock.Creatable));
+            Assert.That(storageTypeView.Editable, Is.EqualTo(storageTypeMock.Editable));
+            Assert.That(storageTypeView.Deletable, Is.EqualTo(storageTypeMock.Deletable));
+        }
+
+        /// <summary>
+        /// Tests that Map maps StorageType to StorageTypeSystemView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStorageTypeToStorageTypeSystemView()
+        {
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
+
+            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            StorageTypeSystemView storageTypeSystemView = foodWasteObjectMapper.Map<IStorageType, StorageTypeSystemView>(storageTypeMock);
+            Assert.That(storageTypeSystemView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(storageTypeSystemView.StorageTypeIdentifier, Is.EqualTo(storageTypeMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(storageTypeSystemView.Name, Is.Not.Null);
+            Assert.That(storageTypeSystemView.Name, Is.Not.Empty);
+            Assert.That(storageTypeSystemView.Name, Is.EqualTo(storageTypeMock.Translation.Value));
+            Assert.That(storageTypeSystemView.SortOrder, Is.EqualTo(storageTypeMock.SortOrder));
+            Assert.That(storageTypeSystemView.Temperature, Is.EqualTo(storageTypeMock.Temperature));
+            Assert.That(storageTypeSystemView.TemperatureRange, Is.Not.Null);
+            Assert.That(storageTypeSystemView.TemperatureRange.StartValue, Is.EqualTo(storageTypeMock.TemperatureRange.StartValue));
+            Assert.That(storageTypeSystemView.TemperatureRange.EndValue, Is.EqualTo(storageTypeMock.TemperatureRange.EndValue));
+            Assert.That(storageTypeSystemView.Creatable, Is.EqualTo(storageTypeMock.Creatable));
+            Assert.That(storageTypeSystemView.Editable, Is.EqualTo(storageTypeMock.Editable));
+            Assert.That(storageTypeSystemView.Deletable, Is.EqualTo(storageTypeMock.Deletable));
+            Assert.That(storageTypeSystemView.Translations, Is.Not.Null);
+            Assert.That(storageTypeSystemView.Translations, Is.Not.Empty);
+            Assert.That(storageTypeSystemView.Translations, Is.TypeOf<List<TranslationSystemView>>());
+            Assert.That(storageTypeSystemView.Translations.Count(), Is.EqualTo(storageTypeMock.Translations.Count()));
+        }
+
+        /// <summary>
         /// Tests that Map maps StorageType to StorageTypeProxy.
         /// </summary>
         [Test]
@@ -1446,6 +1508,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             var serviceReceiptResponse = foodWasteObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(identifiableMock);
             Assert.That(serviceReceiptResponse.Identifier, Is.EqualTo(identifiableMock.Identifier));
             Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+        }
+
+        /// <summary>
+        /// Tests that Map maps IntRange to IntRangeView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsIntRangeToIntRangeView()
+        {
+            IRange<int> intRangeMock = DomainObjectMockBuilder.BuildIntRange();
+
+            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            IntRangeView intRangeView = foodWasteObjectMapper.Map<IRange<int>, IntRangeView>(intRangeMock);
+            Assert.That(intRangeView, Is.Not.Null);
+            Assert.That(intRangeView.StartValue, Is.EqualTo(intRangeMock.StartValue));
+            Assert.That(intRangeView.EndValue, Is.EqualTo(intRangeMock.EndValue));
         }
 
         /// <summary>

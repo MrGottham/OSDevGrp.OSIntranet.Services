@@ -22,7 +22,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         }
 
         /// <summary>
-        /// Tests that the identification view for a storage type  can be serialized.
+        /// Tests that the identification view for a storage type can be serialized.
         /// </summary>
         [Test]
         public void TestThatStorageTypeIdentificationViewCanBeSerialized()

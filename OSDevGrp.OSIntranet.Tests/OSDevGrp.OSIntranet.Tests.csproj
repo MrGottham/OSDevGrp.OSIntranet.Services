@@ -271,6 +271,7 @@
     <Compile Include="Unittests\Contracts\Views\HouseholdMemberIdentificationViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\HouseholdMemberViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\HouseholdViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\IntRangeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerAftaleViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />
@@ -287,6 +288,8 @@
     <Compile Include="Unittests\Contracts\Views\StaticTextSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StorageTypeIdentificationViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\StorageTypeSystemViewTests.cs" />
+    <Compile Include="Unittests\Contracts\Views\StorageTypeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\SystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TelefonlisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TranslationInfoSystemViewTests.cs" />
