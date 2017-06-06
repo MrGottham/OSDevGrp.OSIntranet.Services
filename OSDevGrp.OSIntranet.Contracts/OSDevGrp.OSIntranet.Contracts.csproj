@@ -119,6 +119,7 @@
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Queries\StaticTextCollectionGetQuery.cs" />
     <Compile Include="Queries\StaticTextGetQueryBase.cs" />
+    <Compile Include="Queries\StorageTypeCollectionGetQuery.cs" />
     <Compile Include="Queries\SystemerGetQuery.cs" />
     <Compile Include="Queries\TelefonlisteGetQuery.cs" />
     <Compile Include="Queries\TranslationInfoCollectionGetQuery.cs" />

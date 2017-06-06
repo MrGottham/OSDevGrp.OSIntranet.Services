@@ -71,6 +71,7 @@
     <Compile Include="Core\KalenderQueryHandlerBase.cs" />
     <Compile Include="Core\RegnskabQueryHandlerBase.cs" />
     <Compile Include="Core\StaticTextGetQueryHandlerBase.cs" />
+    <Compile Include="Core\StorageTypeCollectionGetQueryHandlerBase.cs" />
     <Compile Include="DataProviderCollectionGetQueryHandler.cs" />
     <Compile Include="DataProviderWhoHandlesPaymentsCollectionGetQueryHandler.cs" />
     <Compile Include="DebitorGetQueryHandler.cs" />

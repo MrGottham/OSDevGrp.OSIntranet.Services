@@ -232,6 +232,7 @@
     <Compile Include="Unittests\Contracts\Queries\PrivacyPolicyGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StaticTextCollectionGetQueryTests.cs" />
+    <Compile Include="Unittests\Contracts\Queries\StorageTypeCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\SystemerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\TelefonlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\TranslationInfoCollectionGetQueryTests.cs" />
@@ -360,6 +361,7 @@
     <Compile Include="Unittests\QueryHandlers\Core\KalenderQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\RegnskabQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\StaticTextGetQueryHandlerBaseTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\Core\StorageTypeCollectionGetQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DataProviderCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DataProviderWhoHandlesPaymentsCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DebitorGetQueryHandlerTests.cs" />
