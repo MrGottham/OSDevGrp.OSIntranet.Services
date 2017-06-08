@@ -105,6 +105,7 @@
     <Compile Include="Core\QueryHandlerBase.cs" />
     <Compile Include="RegnskabslisteGetQueryHandler.cs" />
     <Compile Include="StaticTextCollectionGetQueryHandler.cs" />
+    <Compile Include="StorageTypeCollectionGetQueryHandlerForSystemView.cs" />
     <Compile Include="SystemerGetQueryHandler.cs" />
     <Compile Include="TelefonlisteGetQueryHandler.cs" />
     <Compile Include="TranslationInfoCollectionGetQueryHandler.cs" />
