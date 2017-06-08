@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 
@@ -46,7 +47,15 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         /// <returns>Collection of the storages types.</returns>
         public virtual IEnumerable<TView> Query(TQuery query)
         {
-            throw new NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            ITranslationInfo translationInfo = _systemDataRepository.Get<ITranslationInfo>(query.TranslationInfoIdentifier);
+            IEnumerable<IStorageType> storageTypeCollection = _systemDataRepository.StorageTypeGetAll();
+
+            return _objectMapper.Map<IEnumerable<IStorageType>, IEnumerable<TView>>(storageTypeCollection, translationInfo.CultureInfo);
         }
 
         #endregion
