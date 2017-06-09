@@ -394,6 +394,8 @@
     <Compile Include="Unittests\QueryHandlers\PrivacyPolicyGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StaticTextCollectionGetQueryHandlerTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\StorageTypeCollectionGetQueryHandlerForSystemViewTests.cs" />
+    <Compile Include="Unittests\QueryHandlers\StorageTypeCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\SystemerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\TelefonlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\TranslationInfoCollectionGetQueryHandlerTests.cs" />
