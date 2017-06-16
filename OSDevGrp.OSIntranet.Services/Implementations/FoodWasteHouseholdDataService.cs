@@ -42,21 +42,9 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         /// <param name="foodWasteFaultExceptionBuilder">Implementation of builder which can generate faults.</param>
         public FoodWasteHouseholdDataService(ICommandBus commandBus, IQueryBus queryBus, IFaultExceptionBuilder<FoodWasteFault> foodWasteFaultExceptionBuilder)
         {
-            if (commandBus == null)
-            {
-                throw new ArgumentNullException("commandBus");
-            }
-            if (queryBus == null)
-            {
-                throw new ArgumentNullException("queryBus");
-            }
-            if (foodWasteFaultExceptionBuilder == null)
-            {
-                throw new ArgumentNullException("foodWasteFaultExceptionBuilder");
-            }
-            _commandBus = commandBus;
-            _queryBus = queryBus;
-            _foodWasteFaultExceptionBuilder = foodWasteFaultExceptionBuilder;
+            _commandBus = commandBus ?? throw new ArgumentNullException(nameof(commandBus));
+            _queryBus = queryBus ?? throw new ArgumentNullException(nameof(queryBus));
+            _foodWasteFaultExceptionBuilder = foodWasteFaultExceptionBuilder ?? throw new ArgumentNullException(nameof(foodWasteFaultExceptionBuilder));
         }
 
         #endregion
@@ -73,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -96,7 +84,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (command == null)
             {
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException(nameof(command));
             }
             try
             {
@@ -118,7 +106,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (command == null)
             {
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException(nameof(command));
             }
             try
             {
@@ -140,7 +128,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (command == null)
             {
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException(nameof(command));
             }
             try
             {
@@ -162,7 +150,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (command == null)
             {
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException(nameof(command));
             }
             try
             {
@@ -184,7 +172,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -206,7 +194,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -228,7 +216,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -250,7 +238,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -272,7 +260,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (command == null)
             {
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException(nameof(command));
             }
             try
             {
@@ -294,7 +282,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (command == null)
             {
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException(nameof(command));
             }
             try
             {
@@ -316,7 +304,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (command == null)
             {
-                throw new ArgumentNullException("command");
+                throw new ArgumentNullException(nameof(command));
             }
             try
             {
@@ -338,7 +326,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -360,7 +348,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -382,7 +370,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -404,7 +392,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {
@@ -426,7 +414,7 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         {
             if (query == null)
             {
-                throw new ArgumentNullException("query");
+                throw new ArgumentNullException(nameof(query));
             }
             try
             {

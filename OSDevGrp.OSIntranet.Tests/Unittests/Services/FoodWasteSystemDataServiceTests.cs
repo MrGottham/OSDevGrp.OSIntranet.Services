@@ -604,20 +604,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatForeignKeyDeleteThrowsArgumentNullExceptionIfForeignKeyDeleteCommandIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.ForeignKeyDelete(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.ForeignKeyDelete(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("command"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "command");
         }
 
         /// <summary>
@@ -626,23 +618,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatForeignKeyDeleteCallsPublishOnCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<ForeignKeyDeleteCommand, ServiceReceiptResponse>(Arg<ForeignKeyDeleteCommand>.Is.Anything))
-                .Return(fixture.Create<ServiceReceiptResponse>())
-                .Repeat.Any();
+            ForeignKeyDeleteCommand command = fixture.Create<ForeignKeyDeleteCommand>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ForeignKeyDeleteCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>());
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<ForeignKeyDeleteCommand>();
+            sut.ForeignKeyDelete(command);
 
-            foodWasteSystemDataService.ForeignKeyDelete(command);
-
-            commandBusMock.AssertWasCalled(m => m.Publish<ForeignKeyDeleteCommand, ServiceReceiptResponse>(Arg<ForeignKeyDeleteCommand>.Is.Equal(command)));
+            _commandBusMock.AssertWasCalled(m => m.Publish<ForeignKeyDeleteCommand, ServiceReceiptResponse>(Arg<ForeignKeyDeleteCommand>.Is.Equal(command)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -651,22 +636,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatForeignKeyDeleteeturnsResultFromCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<ForeignKeyDeleteCommand, ServiceReceiptResponse>(Arg<ForeignKeyDeleteCommand>.Is.Anything))
-                .Return(serviceReceipt)
-                .Repeat.Any();
+            ServiceReceiptResponse serviceReceipt = fixture.Create<ServiceReceiptResponse>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ForeignKeyDeleteCommand, IQuery, ServiceReceiptResponse>(serviceReceipt);
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<ForeignKeyDeleteCommand>();
-
-            var result = foodWasteSystemDataService.ForeignKeyDelete(command);
+            ServiceReceiptResponse result = sut.ForeignKeyDelete(fixture.Create<ForeignKeyDeleteCommand>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(serviceReceipt));
         }
@@ -677,30 +654,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatForeignKeyDeleteThrowsFaultExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<ForeignKeyDeleteCommand, ServiceReceiptResponse>(Arg<ForeignKeyDeleteCommand>.Is.Anything))
-                .Throw(exception)
-                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
 
-            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
-            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
-                .Return(fixture.Create<FaultException<FoodWasteFault>>())
-                .Repeat.Any();
+            IFoodWasteSystemDataService sut = CreateSut<ForeignKeyDeleteCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), foodWasteFaultExceptionBuilderMock);
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.ForeignKeyDelete(fixture.Create<ForeignKeyDeleteCommand>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
 
-            var command = fixture.Create<ForeignKeyDeleteCommand>();
-
-            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.ForeignKeyDelete(command));
-            Assert.That(faultException, Is.Not.Null);
-            Assert.That(faultException.Detail, Is.Not.Null);
-
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "ForeignKeyDelete", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -709,20 +679,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatDataProviderGetAllThrowsArgumentNullExceptionIfDataProviderCollectionGetQueryIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.DataProviderGetAll(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.DataProviderGetAll(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("query"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "query");
         }
 
         /// <summary>
@@ -731,23 +693,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatDataProviderGetAllCallsQueryOnQueryBus()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.NotNull))
-                .Return(fixture.CreateMany<DataProviderSystemView>(random.Next(1, 25)).ToList())
-                .Repeat.Any();
+            DataProviderCollectionGetQuery query = fixture.Create<DataProviderCollectionGetQuery>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(fixture.CreateMany<DataProviderSystemView>(random.Next(1, 25)).ToList());
+            Assert.That(sut, Is.Not.Null);
 
-            var query = fixture.Create<DataProviderCollectionGetQuery>();
-            foodWasteSystemDataService.DataProviderGetAll(query);
+            sut.DataProviderGetAll(query);
 
-            queryBusMock.AssertWasCalled(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.Equal(query)));
+            _queryBusMock.AssertWasCalled(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.Equal(query)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -756,24 +712,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatDataProviderGetAllReturnsResultFromQueryBus()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var dataProviderSystemViewCollection = fixture.CreateMany<DataProviderSystemView>(random.Next(1, 25)).ToList();
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.NotNull))
-                .Return(dataProviderSystemViewCollection)
-                .Repeat.Any();
+            IEnumerable<DataProviderSystemView> dataProviderSystemViewCollection = fixture.CreateMany<DataProviderSystemView>(random.Next(1, 25)).ToList();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(dataProviderSystemViewCollection);
+            Assert.That(sut, Is.Not.Null);
 
-            var result = foodWasteSystemDataService.DataProviderGetAll(fixture.Create<DataProviderCollectionGetQuery>());
+            IEnumerable<DataProviderSystemView> result = sut.DataProviderGetAll(fixture.Create<DataProviderCollectionGetQuery>());
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo(dataProviderSystemViewCollection));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -782,28 +734,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatDataProviderGetAllThrowsFaultExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = fixture.Create<Exception>();
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(Arg<DataProviderCollectionGetQuery>.Is.NotNull))
-                .Throw(exception)
-                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
 
-            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
-            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
-                .Return(fixture.Create<FaultException<FoodWasteFault>>())
-                .Repeat.Any();
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, DataProviderCollectionGetQuery, IEnumerable<DataProviderSystemView>>(fixture.CreateMany<DataProviderSystemView>(random.Next(1, 25)).ToList(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.DataProviderGetAll(fixture.Create<DataProviderCollectionGetQuery>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
 
-            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.DataProviderGetAll(fixture.Create<DataProviderCollectionGetQuery>()));
-            Assert.That(faultException, Is.Not.Null);
-            Assert.That(faultException.Detail, Is.Not.Null);
-
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "DataProviderGetAll", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -812,20 +760,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationAddThrowsArgumentNullExceptionIfTranslationAddCommandIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.TranslationAdd(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.TranslationAdd(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("command"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "command");
         }
 
         /// <summary>
@@ -834,23 +774,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationAddCallsPublishOnCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationAddCommand, ServiceReceiptResponse>(Arg<TranslationAddCommand>.Is.Anything))
-                .Return(fixture.Create<ServiceReceiptResponse>())
-                .Repeat.Any();
+            TranslationAddCommand command = fixture.Create<TranslationAddCommand>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<TranslationAddCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>());
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<TranslationAddCommand>();
+            sut.TranslationAdd(command);
 
-            foodWasteSystemDataService.TranslationAdd(command);
-
-            commandBusMock.AssertWasCalled(m => m.Publish<TranslationAddCommand, ServiceReceiptResponse>(Arg<TranslationAddCommand>.Is.Equal(command)));
+            _commandBusMock.AssertWasCalled(m => m.Publish<TranslationAddCommand, ServiceReceiptResponse>(Arg<TranslationAddCommand>.Is.Equal(command)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -859,22 +792,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationAddReturnsResultFromCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationAddCommand, ServiceReceiptResponse>(Arg<TranslationAddCommand>.Is.Anything))
-                .Return(serviceReceipt)
-                .Repeat.Any();
+            ServiceReceiptResponse serviceReceipt = fixture.Create<ServiceReceiptResponse>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<TranslationAddCommand, IQuery, ServiceReceiptResponse>(serviceReceipt);
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<TranslationAddCommand>();
-
-            var result = foodWasteSystemDataService.TranslationAdd(command);
+            ServiceReceiptResponse result = sut.TranslationAdd(fixture.Create<TranslationAddCommand>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(serviceReceipt));
         }
@@ -885,30 +810,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationAddThrowsFaultExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationAddCommand, ServiceReceiptResponse>(Arg<TranslationAddCommand>.Is.Anything))
-                .Throw(exception)
-                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
 
-            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
-            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
-                .Return(fixture.Create<FaultException<FoodWasteFault>>())
-                .Repeat.Any();
+            IFoodWasteSystemDataService sut = CreateSut<TranslationAddCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), foodWasteFaultExceptionBuilderMock);
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.TranslationAdd(fixture.Create<TranslationAddCommand>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
 
-            var command = fixture.Create<TranslationAddCommand>();
-
-            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.TranslationAdd(command));
-            Assert.That(faultException, Is.Not.Null);
-            Assert.That(faultException.Detail, Is.Not.Null);
-
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "TranslationAdd", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -917,20 +835,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationModifyThrowsArgumentNullExceptionIfTranslationModifyCommandIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.TranslationModify(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.TranslationModify(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("command"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "command");
         }
 
         /// <summary>
@@ -939,23 +849,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationModifyCallsPublishOnCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationModifyCommand, ServiceReceiptResponse>(Arg<TranslationModifyCommand>.Is.Anything))
-                .Return(fixture.Create<ServiceReceiptResponse>())
-                .Repeat.Any();
+            TranslationModifyCommand command = fixture.Create<TranslationModifyCommand>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<TranslationModifyCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>());
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<TranslationModifyCommand>();
+            sut.TranslationModify(command);
 
-            foodWasteSystemDataService.TranslationModify(command);
-
-            commandBusMock.AssertWasCalled(m => m.Publish<TranslationModifyCommand, ServiceReceiptResponse>(Arg<TranslationModifyCommand>.Is.Equal(command)));
+            _commandBusMock.AssertWasCalled(m => m.Publish<TranslationModifyCommand, ServiceReceiptResponse>(Arg<TranslationModifyCommand>.Is.Equal(command)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -964,22 +867,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationModifyReturnsResultFromCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationModifyCommand, ServiceReceiptResponse>(Arg<TranslationModifyCommand>.Is.Anything))
-                .Return(serviceReceipt)
-                .Repeat.Any();
+            ServiceReceiptResponse serviceReceipt = fixture.Create<ServiceReceiptResponse>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<TranslationModifyCommand, IQuery, ServiceReceiptResponse>(serviceReceipt);
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<TranslationModifyCommand>();
-
-            var result = foodWasteSystemDataService.TranslationModify(command);
+            ServiceReceiptResponse result = sut.TranslationModify(fixture.Create<TranslationModifyCommand>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(serviceReceipt));
         }
@@ -990,30 +885,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationModifyThrowsFaultExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationModifyCommand, ServiceReceiptResponse>(Arg<TranslationModifyCommand>.Is.Anything))
-                .Throw(exception)
-                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
 
-            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
-            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
-                .Return(fixture.Create<FaultException<FoodWasteFault>>())
-                .Repeat.Any();
+            IFoodWasteSystemDataService sut = CreateSut<TranslationModifyCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), foodWasteFaultExceptionBuilderMock);
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.TranslationModify(fixture.Create<TranslationModifyCommand>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
 
-            var command = fixture.Create<TranslationModifyCommand>();
-
-            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.TranslationModify(command));
-            Assert.That(faultException, Is.Not.Null);
-            Assert.That(faultException.Detail, Is.Not.Null);
-
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "TranslationModify", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1022,20 +910,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationDeleteThrowsArgumentNullExceptionIfTranslationDeleteCommandIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.TranslationDelete(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.TranslationDelete(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("command"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "command");
         }
 
         /// <summary>
@@ -1044,23 +924,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationDeleteCallsPublishOnCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationDeleteCommand, ServiceReceiptResponse>(Arg<TranslationDeleteCommand>.Is.Anything))
-                .Return(fixture.Create<ServiceReceiptResponse>())
-                .Repeat.Any();
+            TranslationDeleteCommand command = fixture.Create<TranslationDeleteCommand>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<TranslationDeleteCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>());
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<TranslationDeleteCommand>();
+            sut.TranslationDelete(command);
 
-            foodWasteSystemDataService.TranslationDelete(command);
-
-            commandBusMock.AssertWasCalled(m => m.Publish<TranslationDeleteCommand, ServiceReceiptResponse>(Arg<TranslationDeleteCommand>.Is.Equal(command)));
+            _commandBusMock.AssertWasCalled(m => m.Publish<TranslationDeleteCommand, ServiceReceiptResponse>(Arg<TranslationDeleteCommand>.Is.Equal(command)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1069,22 +942,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationDeleteReturnsResultFromCommandBus()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
 
-            var serviceReceipt = fixture.Create<ServiceReceiptResponse>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationDeleteCommand, ServiceReceiptResponse>(Arg<TranslationDeleteCommand>.Is.Anything))
-                .Return(serviceReceipt)
-                .Repeat.Any();
+            ServiceReceiptResponse serviceReceipt = fixture.Create<ServiceReceiptResponse>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<TranslationDeleteCommand, IQuery, ServiceReceiptResponse>(serviceReceipt);
+            Assert.That(sut, Is.Not.Null);
 
-            var command = fixture.Create<TranslationDeleteCommand>();
-
-            var result = foodWasteSystemDataService.TranslationDelete(command);
+            ServiceReceiptResponse result = sut.TranslationDelete(fixture.Create<TranslationDeleteCommand>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(serviceReceipt));
         }
@@ -1095,30 +960,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationDeleteThrowsFaultExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
+            Fixture fixture = new Fixture();
 
-            var exception = fixture.Create<Exception>();
-            var commandBusMock = MockRepository.GenerateMock<ICommandBus>();
-            commandBusMock.Stub(m => m.Publish<TranslationDeleteCommand, ServiceReceiptResponse>(Arg<TranslationDeleteCommand>.Is.Anything))
-                .Throw(exception)
-                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
 
-            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
-            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
-                .Return(fixture.Create<FaultException<FoodWasteFault>>())
-                .Repeat.Any();
+            IFoodWasteSystemDataService sut = CreateSut<TranslationDeleteCommand, IQuery, ServiceReceiptResponse>(fixture.Create<ServiceReceiptResponse>(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(commandBusMock, fixture.Create<IQueryBus>(), foodWasteFaultExceptionBuilderMock);
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.TranslationDelete(fixture.Create<TranslationDeleteCommand>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
 
-            var command = fixture.Create<TranslationDeleteCommand>();
-
-            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.TranslationDelete(command));
-            Assert.That(faultException, Is.Not.Null);
-            Assert.That(faultException.Detail, Is.Not.Null);
-
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "TranslationDelete", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1127,20 +985,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatStaticTextGetAllThrowsArgumentNullExceptionIfStaticTextCollectionGetQueryIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.StaticTextGetAll(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.StaticTextGetAll(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("query"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "query");
         }
 
         /// <summary>
@@ -1149,23 +999,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatStaticTextGetAllCallsQueryOnQueryBus()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.NotNull))
-                .Return(fixture.CreateMany<StaticTextSystemView>(random.Next(1, 25)).ToList())
-                .Repeat.Any();
+            StaticTextCollectionGetQuery query = fixture.Create<StaticTextCollectionGetQuery>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(fixture.CreateMany<StaticTextSystemView>(random.Next(1, 25)).ToList());
+            Assert.That(sut, Is.Not.Null);
 
-            var query = fixture.Create<StaticTextCollectionGetQuery>();
-            foodWasteSystemDataService.StaticTextGetAll(query);
+            sut.StaticTextGetAll(query);
 
-            queryBusMock.AssertWasCalled(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.Equal(query)));
+            _queryBusMock.AssertWasCalled(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.Equal(query)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1174,24 +1018,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatStaticTextGetAllReturnsResultFromQueryBus()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var translationInfoSystemViewCollection = fixture.CreateMany<StaticTextSystemView>(random.Next(1, 25)).ToList();
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.NotNull))
-                .Return(translationInfoSystemViewCollection)
-                .Repeat.Any();
+            IEnumerable<StaticTextSystemView> staticTextSystemViewCollection = fixture.CreateMany<StaticTextSystemView>(random.Next(1, 25)).ToList();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(staticTextSystemViewCollection);
+            Assert.That(sut, Is.Not.Null);
 
-            var result = foodWasteSystemDataService.StaticTextGetAll(fixture.Create<StaticTextCollectionGetQuery>());
+            IEnumerable<StaticTextSystemView> result = sut.StaticTextGetAll(fixture.Create<StaticTextCollectionGetQuery>());
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo(translationInfoSystemViewCollection));
+            Assert.That(result, Is.EqualTo(staticTextSystemViewCollection));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -1200,28 +1040,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatStaticTextGetAllThrowsFaultExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = fixture.Create<Exception>();
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(Arg<StaticTextCollectionGetQuery>.Is.NotNull))
-                .Throw(exception)
-                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
 
-            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
-            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
-                .Return(fixture.Create<FaultException<FoodWasteFault>>())
-                .Repeat.Any();
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, StaticTextCollectionGetQuery, IEnumerable<StaticTextSystemView>>(fixture.CreateMany<StaticTextSystemView>(random.Next(1, 25)).ToList(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.StaticTextGetAll(fixture.Create<StaticTextCollectionGetQuery>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
 
-            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.StaticTextGetAll(fixture.Create<StaticTextCollectionGetQuery>()));
-            Assert.That(faultException, Is.Not.Null);
-            Assert.That(faultException.Detail, Is.Not.Null);
-
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "StaticTextGetAll", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1230,20 +1066,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationInfoGetAllThrowsArgumentNullExceptionIfTranslationInfoCollectionGetQueryIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IQueryBus>(e => e.FromFactory(() => MockRepository.GenerateMock<IQueryBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), fixture.Create<IQueryBus>(), fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.TranslationInfoGetAll(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodWasteSystemDataService.TranslationInfoGetAll(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("query"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "query");
         }
 
         /// <summary>
@@ -1252,23 +1080,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationInfoGetAllCallsQueryOnQueryBus()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(Arg<TranslationInfoCollectionGetQuery>.Is.NotNull))
-                .Return(fixture.CreateMany<TranslationInfoSystemView>(random.Next(1, 25)).ToList())
-                .Repeat.Any();
+            TranslationInfoCollectionGetQuery query = fixture.Create<TranslationInfoCollectionGetQuery>();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(fixture.CreateMany<TranslationInfoSystemView>(random.Next(1, 25)).ToList());
+            Assert.That(sut, Is.Not.Null);
 
-            var query = fixture.Create<TranslationInfoCollectionGetQuery>();
-            foodWasteSystemDataService.TranslationInfoGetAll(query);
+            sut.TranslationInfoGetAll(query);
 
-            queryBusMock.AssertWasCalled(m => m.Query<TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(Arg<TranslationInfoCollectionGetQuery>.Is.Equal(query)));
+            _queryBusMock.AssertWasCalled(m => m.Query<TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(Arg<TranslationInfoCollectionGetQuery>.Is.Equal(query)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1277,24 +1099,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationInfoGetAllReturnsResultFromQueryBus()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
-            fixture.Customize<IFaultExceptionBuilder<FoodWasteFault>>(e => e.FromFactory(() => MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var translationInfoSystemViewCollection = fixture.CreateMany<TranslationInfoSystemView>(random.Next(1, 25)).ToList();
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(Arg<TranslationInfoCollectionGetQuery>.Is.NotNull))
-                .Return(translationInfoSystemViewCollection)
-                .Repeat.Any();
+            IEnumerable<TranslationInfoSystemView> translationInfoSystemViewCollection = fixture.CreateMany<TranslationInfoSystemView>(random.Next(1, 25)).ToList();
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, fixture.Create<IFaultExceptionBuilder<FoodWasteFault>>());
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(translationInfoSystemViewCollection);
+            Assert.That(sut, Is.Not.Null);
 
-            var result = foodWasteSystemDataService.TranslationInfoGetAll(fixture.Create<TranslationInfoCollectionGetQuery>());
+            IEnumerable<TranslationInfoSystemView> result = sut.TranslationInfoGetAll(fixture.Create<TranslationInfoCollectionGetQuery>());
+            // ReSharper disable PossibleMultipleEnumeration
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo(translationInfoSystemViewCollection));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -1303,28 +1121,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         [Test]
         public void TestThatTranslationInfoGetAllThrowsFaultExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            fixture.Customize<ICommandBus>(e => e.FromFactory(() => MockRepository.GenerateMock<ICommandBus>()));
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var exception = fixture.Create<Exception>();
-            var queryBusMock = MockRepository.GenerateMock<IQueryBus>();
-            queryBusMock.Stub(m => m.Query<TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(Arg<TranslationInfoCollectionGetQuery>.Is.NotNull))
-                .Throw(exception)
-                .Repeat.Any();
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
 
-            var foodWasteFaultExceptionBuilderMock = MockRepository.GenerateMock<IFaultExceptionBuilder<FoodWasteFault>>();
-            foodWasteFaultExceptionBuilderMock.Stub(m => m.Build(Arg<Exception>.Is.NotNull, Arg<string>.Is.NotNull, Arg<MethodBase>.Is.NotNull))
-                .Return(fixture.Create<FaultException<FoodWasteFault>>())
-                .Repeat.Any();
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, TranslationInfoCollectionGetQuery, IEnumerable<TranslationInfoSystemView>>(fixture.CreateMany<TranslationInfoSystemView>(random.Next(1, 25)).ToList(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteSystemDataService = new FoodWasteSystemDataService(fixture.Create<ICommandBus>(), queryBusMock, foodWasteFaultExceptionBuilderMock);
-            Assert.That(foodWasteSystemDataService, Is.Not.Null);
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.TranslationInfoGetAll(fixture.Create<TranslationInfoCollectionGetQuery>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
 
-            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => foodWasteSystemDataService.TranslationInfoGetAll(fixture.Create<TranslationInfoCollectionGetQuery>()));
-            Assert.That(faultException, Is.Not.Null);
-            Assert.That(faultException.Detail, Is.Not.Null);
-
-            foodWasteFaultExceptionBuilderMock.AssertWasCalled(m => m.Build(Arg<Exception>.Is.Equal(exception), Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName), Arg<MethodBase>.Is.NotNull));
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "TranslationInfoGetAll", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
