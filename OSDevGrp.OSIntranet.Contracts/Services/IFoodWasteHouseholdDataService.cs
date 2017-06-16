@@ -11,16 +11,27 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     /// <summary>
     /// Interface for the service which can access and modify data on a house hold in the food waste domain.
     /// </summary>
-    [ServiceContract(Name = SoapNamespaces.FoodWasteHouseholdDataServiceName, Namespace = SoapNamespaces.FoodWasteNamespace)]
+    [ServiceContract(Name = SoapNamespaces.FoodWasteHouseholdDataServiceName,
+        Namespace = SoapNamespaces.FoodWasteNamespace)]
     public interface IFoodWasteHouseholdDataService : IIntranetService
     {
+        /// <summary>
+        /// Gets all the storage types.
+        /// </summary>
+        /// <param name="query">Query for getting all the storage types.</param>
+        /// <returns>Collection of all the storage types.</returns>
+        [OperationContract]
+        [FaultContract(typeof(FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<StorageTypeView> StorageTypeGetAll(StorageTypeCollectionGetQuery query);
+
         /// <summary>
         /// Gets household data for one of the current callers households.
         /// </summary>
         /// <param name="query">Query for getting household data for one of the current callers households.</param>
         /// <returns>Household data.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         HouseholdView HouseholdDataGet(HouseholdDataGetQuery query);
 
@@ -31,7 +42,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for adding a household to the current users household account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdAdd(HouseholdAddCommand command);
 
@@ -41,7 +52,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for updatering a household on the current callers household account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdUpdate(HouseholdUpdateCommand command);
 
@@ -51,7 +62,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for adding a household member to a given household on the current callers household account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdAddHouseholdMember(HouseholdAddHouseholdMemberCommand command);
 
@@ -61,7 +72,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for removing a household member from a given household on the current callers household account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdRemoveHouseholdMember(HouseholdRemoveHouseholdMemberCommand command);
 
@@ -71,7 +82,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query which can check whether the current caller has been created as a household member.</param>
         /// <returns>Boolean result.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         BooleanResultResponse HouseholdMemberIsCreated(HouseholdMemberIsCreatedQuery query);
 
@@ -81,7 +92,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query which can check whether the current caller has been activated.</param>
         /// <returns>Boolean result.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         BooleanResultResponse HouseholdMemberIsActivated(HouseholdMemberIsActivatedQuery query);
 
@@ -91,7 +102,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query which can check whether the current caller has accepted the privacy policy.</param>
         /// <returns>Boolean result.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         BooleanResultResponse HouseholdMemberHasAcceptedPrivacyPolicy(HouseholdMemberHasAcceptedPrivacyPolicyQuery query);
 
@@ -101,7 +112,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query which can get household member data for the current caller.</param>
         /// <returns>Household member data for the current caller.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         HouseholdMemberView HouseholdMemberDataGet(HouseholdMemberDataGetQuery query);
 
@@ -111,7 +122,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for activating the current callers household member account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdMemberActivate(HouseholdMemberActivateCommand command);
 
@@ -121,7 +132,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for accepting privacy policy on the current callers household member account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdMemberAcceptPrivacyPolicy(HouseholdMemberAcceptPrivacyPolicyCommand command);
 
@@ -131,7 +142,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for upgrading the membership on the current callers household member account.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse HouseholdMemberUpgradeMembership(HouseholdMemberUpgradeMembershipCommand command);
 
@@ -141,7 +152,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting the collection of food items.</param>
         /// <returns>Collection of food items.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         FoodItemCollectionView FoodItemCollectionGet(FoodItemCollectionGetQuery query);
 
@@ -151,7 +162,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting the tree of food groups.</param>
         /// <returns>Tree of food groups.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         FoodGroupTreeView FoodGroupTreeGet(FoodGroupTreeGetQuery query);
 
@@ -161,7 +172,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting the privacy policy.</param>
         /// <returns>Privacy policy.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         StaticTextView PrivacyPolicyGet(PrivacyPolicyGetQuery query);
 
@@ -171,7 +182,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting a collection of data providers who handles payments.</param>
         /// <returns>Collection of all the data providers who handles payments.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<DataProviderView> DataProviderWhoHandlesPaymentsCollectionGet(DataProviderWhoHandlesPaymentsCollectionGetQuery query);
 
@@ -181,7 +192,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>
         /// <returns>Collection of all the translation informations which can be used for translations.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<TranslationInfoSystemView> TranslationInfoGetAll(TranslationInfoCollectionGetQuery query);
     }

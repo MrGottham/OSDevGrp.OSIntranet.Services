@@ -52,6 +52,17 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region Methods
 
         /// <summary>
+        /// Gets all the storage types.
+        /// </summary>
+        /// <param name="query">Query for getting all the storage types.</param>
+        /// <returns>Collection of all the storage types.</returns>
+        [OperationBehavior(TransactionScopeRequired = false)]
+        public virtual IEnumerable<StorageTypeSystemView> StorageTypeGetAll(StorageTypeCollectionGetQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>

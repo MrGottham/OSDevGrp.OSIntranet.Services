@@ -15,6 +15,16 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFoodWasteSystemDataService : IIntranetService
     {
         /// <summary>
+        /// Gets all the storage types.
+        /// </summary>
+        /// <param name="query">Query for getting all the storage types.</param>
+        /// <returns>Collection of all the storage types.</returns>
+        [OperationContract]
+        [FaultContract(typeof(FoodWasteFault))]
+        [TransactionFlow(TransactionFlowOption.Allowed)]
+        IEnumerable<StorageTypeSystemView> StorageTypeGetAll(StorageTypeCollectionGetQuery query);
+
+        /// <summary>
         /// Gets the collection of food items.
         /// </summary>
         /// <param name="query">Query for getting the collection of food items.</param>
@@ -30,7 +40,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for importing a food item from a given data provider.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse FoodItemImportFromDataProvider(FoodItemImportFromDataProviderCommand command);
 
@@ -40,7 +50,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting the tree of food groups.</param>
         /// <returns>Tree of food groups.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         FoodGroupTreeSystemView FoodGroupTreeGet(FoodGroupTreeGetQuery query);
 
@@ -50,7 +60,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for importing a food group from a given data provider.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse FoodGroupImportFromDataProvider(FoodGroupImportFromDataProviderCommand command);
 
@@ -60,7 +70,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for adding a dataproviders foreign key to a given domain object in the food waste domain.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse ForeignKeyAdd(ForeignKeyAddCommand command);
 
@@ -70,7 +80,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for modifying a dataproviders foreign key to a given domain object in the food waste domain.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse ForeignKeyModify(ForeignKeyModifyCommand command);
 
@@ -80,7 +90,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for deleting a dataproviders foreign key to a given domain object in the food waste domain.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse ForeignKeyDelete(ForeignKeyDeleteCommand command);
 
@@ -90,7 +100,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting all the data providers.</param>
         /// <returns>Collection of all the data providers.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<DataProviderSystemView> DataProviderGetAll(DataProviderCollectionGetQuery query);
 
@@ -100,7 +110,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for adding a translation.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse TranslationAdd(TranslationAddCommand command);
 
@@ -110,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for modifying a translation.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse TranslationModify(TranslationModifyCommand command);
 
@@ -120,7 +130,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="command">Command for deleting a translation.</param>
         /// <returns>Service receipt.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         ServiceReceiptResponse TranslationDelete(TranslationDeleteCommand command);
 
@@ -130,17 +140,17 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         /// <param name="query">Query for getting all the static texts.</param>
         /// <returns>Collection of all the static texts.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<StaticTextSystemView> StaticTextGetAll(StaticTextCollectionGetQuery query);
 
-            /// <summary>
+        /// <summary>
         /// Gets all the translation informations which can be used for translations.
         /// </summary>
         /// <param name="query">Query for getting all the translation informations which can be used for translations.</param>
         /// <returns>Collection of all the translation informations which can be used for translations.</returns>
         [OperationContract]
-        [FaultContract(typeof (FoodWasteFault))]
+        [FaultContract(typeof(FoodWasteFault))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<TranslationInfoSystemView> TranslationInfoGetAll(TranslationInfoCollectionGetQuery query);
     }

@@ -102,6 +102,87 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
         }
 
         /// <summary>
+        /// Tests that StorageTypeGetAll throws an ArgumentNullException when the query for getting all the storage types is null.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllThrowsArgumentNullExceptionIfStorageTypeCollectionGetQueryIsNull()
+        {
+            IFoodWasteSystemDataService sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.StorageTypeGetAll(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "query");
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll calls Query on the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllCallsQueryOnQueryBus()
+        {
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            StorageTypeCollectionGetQuery query = fixture.Create<StorageTypeCollectionGetQuery>();
+
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, StorageTypeCollectionGetQuery, IEnumerable<StorageTypeSystemView>>(fixture.CreateMany<StorageTypeSystemView>(random.Next(1, 25)).ToList());
+            Assert.That(sut, Is.Not.Null);
+
+            sut.StorageTypeGetAll(query);
+
+            _queryBusMock.AssertWasCalled(m => m.Query<StorageTypeCollectionGetQuery, IEnumerable<StorageTypeSystemView>>(Arg<StorageTypeCollectionGetQuery>.Is.Equal(query)), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll returns the result from the query bus.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllReturnsResultFromQueryBus()
+        {
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            IEnumerable<StorageTypeSystemView> storageTypeSystemViewCollection = fixture.CreateMany<StorageTypeSystemView>(random.Next(1, 25)).ToList();
+
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, StorageTypeCollectionGetQuery, IEnumerable<StorageTypeSystemView>>(storageTypeSystemViewCollection);
+            Assert.That(sut, Is.Not.Null);
+
+            IEnumerable<StorageTypeSystemView> result = sut.StorageTypeGetAll(fixture.Create<StorageTypeCollectionGetQuery>());
+            // ReSharper disable PossibleMultipleEnumeration
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo(storageTypeSystemViewCollection));
+            // ReSharper restore PossibleMultipleEnumeration
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll throws an FaultException if an error occurs.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllThrowsFaultExceptionWhenExceptionOccurs()
+        {
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            Exception exception = fixture.Create<Exception>();
+            FaultException<FoodWasteFault> faultException = fixture.Create<FaultException<FoodWasteFault>>();
+
+            IFoodWasteSystemDataService sut = CreateSut<ICommand, StorageTypeCollectionGetQuery, IEnumerable<StorageTypeSystemView>>(fixture.CreateMany<StorageTypeSystemView>(random.Next(1, 25)).ToList(), exception, faultException);
+            Assert.That(sut, Is.Not.Null);
+
+            FaultException<FoodWasteFault> result = Assert.Throws<FaultException<FoodWasteFault>>(() => sut.StorageTypeGetAll(fixture.Create<StorageTypeCollectionGetQuery>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(faultException));
+
+            _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
+                    Arg<Exception>.Is.Equal(exception),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<MethodBase>.Matches(src => string.Compare(src.Name, "StorageTypeGetAll", StringComparison.Ordinal) == 0)),
+                opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
         /// Tests that FoodItemCollectionGet throws an ArgumentNullException when the query for getting the collection of food items is null.
         /// </summary>
         [Test]
