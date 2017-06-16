@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
-using OSDevGrp.OSIntranet.Contracts.Services;
-using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Commands;
-using System;
+using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
@@ -53,7 +54,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -102,7 +103,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery()).ToArray();
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -295,6 +296,17 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             {
                 ChannelTools.CloseChannel(client);
             }
+        }
+
+        /// <summary>
+        /// Gets all the translatios informations.
+        /// </summary>
+        /// <param name="client">The client to the service which can access and modify system data in the food waste domain.</param>
+        /// <returns>Colleciton of all the translatios informations.</returns>
+        private IList<TranslationInfoSystemView> GetTranslationInfoCollection(IFoodWasteSystemDataService client)
+        {
+            TranslationInfoCollectionGetQuery translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+            return new List<TranslationInfoSystemView>(client.TranslationInfoGetAll(translationInfoCollectionGetQuery));
         }
     }
 }

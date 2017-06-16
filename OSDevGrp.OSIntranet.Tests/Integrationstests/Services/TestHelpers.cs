@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Contracts.Commands;
+using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
 {
@@ -312,11 +316,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
         {
             if (foodGroupTree == null)
             {
-                throw new ArgumentNullException("foodGroupTree");
+                throw new ArgumentNullException(nameof(foodGroupTree));
             }
             if (translationInfoCollection == null)
             {
-                throw new ArgumentNullException("translationInfoCollection");
+                throw new ArgumentNullException(nameof(translationInfoCollection));
             }
 
             var dataProviderIdentifier = foodGroupTree.DataProvider.DataProviderIdentifier;
@@ -337,7 +341,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
                     while (streamReader.EndOfStream == false)
                     {
                         var buffer = streamReader.ReadLine();
-                        if (buffer.Length < 2 + 4 + 3)
+                        if (buffer == null || buffer.Length < 2 + 4 + 3)
                         {
                             continue;
                         }
@@ -446,15 +450,51 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
         {
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
             var assembly = typeof (TestHelpers).Assembly;
-            var stream = assembly.GetManifestResourceStream(string.Format("{0}.{1}", assembly.GetName().Name, name));
+            var stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.{name}");
             if (stream == null)
             {
-                throw new FileNotFoundException(string.Format("The embedded manifest resource named '{0}.{1}' could not be found.", assembly.GetName().Name, name));
+                throw new FileNotFoundException($"The embedded manifest resource named '{assembly.GetName().Name}.{name}' could not be found.");
             }
             return stream;
+        }
+
+        /// <summary>
+        /// Assert an expected FaultException where the details is typeof FoodWasteFault.
+        /// </summary>
+        /// <param name="faultException">The fault exception.</param>
+        /// <param name="expectedFaultType">The expected fault type.</param>
+        /// <param name="expectedServiceName">The expected service name.</param>
+        /// <param name="expectedExceptionMessage">The expected service message.</param>
+        /// <param name="expectedServiceMethod">The expected name of the service method.</param>
+        /// <param name="expectedArguments">The expected arguments for the exception message.</param>
+        public static void AssertFaultExceptionWithFoodWasteFault(FaultException<FoodWasteFault> faultException, FoodWasteFaultType expectedFaultType, string expectedServiceName, string expectedServiceMethod, ExceptionMessage expectedExceptionMessage, params object[] expectedArguments)
+        {
+            if (string.IsNullOrEmpty(expectedServiceName))
+            {
+                throw new ArgumentNullException(nameof(expectedServiceName));
+            }
+            if (string.IsNullOrEmpty(expectedServiceMethod))
+            {
+                throw new ArgumentNullException(nameof(expectedServiceMethod));
+            }
+
+            Assert.That(faultException, Is.Not.Null);
+            Assert.That(faultException.Detail, Is.Not.Null);
+            Assert.That(faultException.Detail.FaultType, Is.EqualTo(expectedFaultType));
+            Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
+            Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
+            Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(expectedExceptionMessage, expectedArguments)));
+            Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
+            Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
+            Assert.That(faultException.Detail.ServiceName, Is.EqualTo(expectedServiceName));
+            Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
+            Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
+            Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo(expectedServiceMethod));
+            Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
+            Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
         }
     }
 }

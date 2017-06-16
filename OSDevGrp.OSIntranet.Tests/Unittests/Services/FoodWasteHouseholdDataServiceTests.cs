@@ -177,7 +177,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Services
 
             _faultExceptionBuilderMock.AssertWasCalled(m => m.Build(
                     Arg<Exception>.Is.Equal(exception),
-                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteSystemDataServiceName),
+                    Arg<string>.Is.Equal(SoapNamespaces.FoodWasteHouseholdDataServiceName),
                     Arg<MethodBase>.Matches(src => string.Compare(src.Name, "StorageTypeGetAll", StringComparison.Ordinal) == 0)),
                 opt => opt.Repeat.Once());
         }

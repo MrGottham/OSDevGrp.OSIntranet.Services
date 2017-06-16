@@ -59,7 +59,18 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         [OperationBehavior(TransactionScopeRequired = false)]
         public virtual IEnumerable<StorageTypeView> StorageTypeGetAll(StorageTypeCollectionGetQuery query)
         {
-            throw new NotImplementedException();
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            try
+            {
+                return _queryBus.Query<StorageTypeCollectionGetQuery, IEnumerable<StorageTypeView>>(query);
+            }
+            catch (Exception ex)
+            {
+                throw _foodWasteFaultExceptionBuilder.Build(ex, SoapNamespaces.FoodWasteHouseholdDataServiceName, MethodBase.GetCurrentMethod());
+            }
         }
 
         /// <summary>

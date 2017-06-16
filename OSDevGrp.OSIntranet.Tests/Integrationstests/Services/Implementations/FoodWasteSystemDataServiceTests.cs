@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
@@ -39,7 +40,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodItemCollectionGetGetsFoodItemCollection()
         {
-            var translationInfoCollection = _foodWasteSystemDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection();
             Assert.That(translationInfoCollection, Is.Not.Null);
             Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -80,7 +81,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodItemImportFromDataProviderImportsFoodItems()
         {
-            var translationInfoCollection = _foodWasteSystemDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery()).ToArray();
+            IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection();
             Assert.That(translationInfoCollection, Is.Not.Null);
             Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -103,7 +104,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodGroupTreeGetGetsFoodGroupTree()
         {
-            var translationInfoCollection = _foodWasteSystemDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+            IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection();
             Assert.That(translationInfoCollection, Is.Not.Null);
             Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -143,8 +144,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatDataProviderGetAllGetsDataProviderSystemViewCollection()
         {
-            var dataProviderCollectionGetQuery = new DataProviderCollectionGetQuery();
-            var dataProviderSystemViewCollection = _foodWasteSystemDataService.DataProviderGetAll(dataProviderCollectionGetQuery);
+            DataProviderCollectionGetQuery dataProviderCollectionGetQuery = new DataProviderCollectionGetQuery();
+            IList<DataProviderSystemView> dataProviderSystemViewCollection = new List<DataProviderSystemView>(_foodWasteSystemDataService.DataProviderGetAll(dataProviderCollectionGetQuery));
             Assert.That(dataProviderSystemViewCollection, Is.Not.Null);
             Assert.That(dataProviderSystemViewCollection, Is.Not.Empty);
         }
@@ -155,15 +156,14 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestTranslationCommands()
         {
-            var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-            var translationInfoSystemViewCollection = _foodWasteSystemDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
-            Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
-            Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+            IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection();
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
 
             var translationAddCommand = new TranslationAddCommand
             {
                 TranslationOfIdentifier = Guid.NewGuid(),
-                TranslationInfoIdentifier = translationInfoSystemViewCollection.First().TranslationInfoIdentifier,
+                TranslationInfoIdentifier = translationInfoCollection.First().TranslationInfoIdentifier,
                 TranslationValue = "Test"
             };
             var translationAddResult = _foodWasteSystemDataService.TranslationAdd(translationAddCommand);
@@ -192,21 +192,20 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatStaticTextGetAllGetsStaticTextSystemViewCollection()
         {
-            var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-            var translationInfoSystemViewCollection = _foodWasteSystemDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
-            Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
-            Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+            IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection();
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
 
-            foreach (var translationInfoSystemView in translationInfoSystemViewCollection)
+            foreach (var translationInfoSystemView in translationInfoCollection)
             {
-                var staticTextCollectionGetQuery = new StaticTextCollectionGetQuery
+                StaticTextCollectionGetQuery staticTextCollectionGetQuery = new StaticTextCollectionGetQuery
                 {
                     TranslationInfoIdentifier = translationInfoSystemView.TranslationInfoIdentifier
                 };
-                var staticTextSystemViewCollection = _foodWasteSystemDataService.StaticTextGetAll(staticTextCollectionGetQuery);
+                IList<StaticTextSystemView> staticTextSystemViewCollection = new List<StaticTextSystemView>(_foodWasteSystemDataService.StaticTextGetAll(staticTextCollectionGetQuery));
                 Assert.That(staticTextSystemViewCollection, Is.Not.Null);
                 Assert.That(staticTextSystemViewCollection, Is.Not.Empty);
-                Assert.That(staticTextSystemViewCollection.Count(), Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
+                Assert.That(staticTextSystemViewCollection.Count, Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
             }
         }
 
@@ -216,10 +215,20 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatTranslationInfoGetAllGetsTranslationInfoSystemViewCollection()
         {
-            var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-            var translationInfoSystemViewCollection = _foodWasteSystemDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+            TranslationInfoCollectionGetQuery translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+            IList<TranslationInfoSystemView> translationInfoSystemViewCollection = new List<TranslationInfoSystemView>(_foodWasteSystemDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery));
             Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
             Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+        }
+
+        /// <summary>
+        /// Gets all the translatios informations.
+        /// </summary>
+        /// <returns>Colleciton of all the translatios informations.</returns>
+        private IList<TranslationInfoSystemView> GetTranslationInfoCollection()
+        {
+            TranslationInfoCollectionGetQuery translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+            return new List<TranslationInfoSystemView>(_foodWasteSystemDataService.TranslationInfoGetAll(translationInfoCollectionGetQuery));
         }
     }
 }
