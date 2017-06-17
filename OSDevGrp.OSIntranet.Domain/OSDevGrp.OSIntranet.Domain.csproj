@@ -78,6 +78,7 @@
     <Compile Include="FoodWaste\Payment.cs" />
     <Compile Include="FoodWaste\Range.cs" />
     <Compile Include="FoodWaste\StaticText.cs" />
+    <Compile Include="FoodWaste\Storage.cs" />
     <Compile Include="FoodWaste\StorageType.cs" />
     <Compile Include="FoodWaste\TranslatableBase.cs" />
     <Compile Include="FoodWaste\Translation.cs" />

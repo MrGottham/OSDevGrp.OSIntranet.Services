@@ -44,5 +44,13 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// <param name="upgradeToMembership">Memvership which should be upgraded to.</param>
         /// <returns>True if the current membership can be upgraded to the other membership otherwise false.</returns>
         bool CanUpgradeMembership(Membership currentMembership, Membership upgradeToMembership);
+
+        /// <summary>
+        /// Validates whether a value is inside a given range.
+        /// </summary>
+        /// <param name="value">The value to validate.</param>
+        /// <param name="range">The range where the value should be inside.</param>
+        /// <returns>True when the value is inside the given range otherwise false.</returns>
+        bool InRange(int value, IRange<int> range);
     }
 }

@@ -79,6 +79,7 @@
     <Compile Include="FoodWaste\IRange.cs" />
     <Compile Include="FoodWaste\IStakeholder.cs" />
     <Compile Include="FoodWaste\IStaticText.cs" />
+    <Compile Include="FoodWaste\IStorage.cs" />
     <Compile Include="FoodWaste\IStorageType.cs" />
     <Compile Include="FoodWaste\ITranslatable.cs" />
     <Compile Include="FoodWaste\ITranslation.cs" />

@@ -322,6 +322,7 @@
     <Compile Include="Unittests\Domain\FoodWaste\PaymentTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\RangeTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\StaticTextTests.cs" />
+    <Compile Include="Unittests\Domain\FoodWaste\StorageTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\StorageTypeTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />

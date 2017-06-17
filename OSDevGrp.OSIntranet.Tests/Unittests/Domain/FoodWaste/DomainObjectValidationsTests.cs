@@ -2,7 +2,9 @@
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
+using Ploeh.AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
@@ -18,8 +20,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatConstructorInitializeDomainObjectValidations()
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
         }
 
         /// <summary>
@@ -30,15 +32,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase("")]
         public void TestThatIsMailAddressThrowsArgumentNullExceptionWhenMailAddressIsNullOrEmpty(string validMailAddress)
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => domainObjectValidations.IsMailAddress(validMailAddress));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("value"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.IsMailAddress(validMailAddress));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "value");
         }
 
         /// <summary>
@@ -50,10 +49,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase("ole.sorensen@visma.com")]
         public void TestThatIsMailAddressReturnsTrueForValidMailAddress(string validMailAddress)
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            var result = domainObjectValidations.IsMailAddress(validMailAddress);
+            bool result = sut.IsMailAddress(validMailAddress);
             Assert.That(result, Is.True);
         }
 
@@ -66,10 +65,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase("XYZ.XXX.COM")]
         public void TestThatIsMailAddressReturnsFalseForInvalidMailAddress(string validMailAddress)
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            var result = domainObjectValidations.IsMailAddress(validMailAddress);
+            bool result = sut.IsMailAddress(validMailAddress);
             Assert.That(result, Is.False);
         }
 
@@ -79,12 +78,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatGetHouseholdLimitReturnsHouseholdLimitForEachMembership()
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            foreach (var membershipToTest in Enum.GetValues(typeof (Membership)).Cast<Membership>())
+            foreach (Membership membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
             {
-                var result = domainObjectValidations.GetHouseholdLimit(membershipToTest);
+                var result = sut.GetHouseholdLimit(membershipToTest);
                 Assert.That(result, Is.GreaterThan(0));
             }
         }
@@ -98,10 +97,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium, 999)]
         public void TestThatGetHouseholdLimitReturnsActualHouseholdLimit(Membership membership, int householdLimit)
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            var result = domainObjectValidations.GetHouseholdLimit(membership);
+            int result = sut.GetHouseholdLimit(membership);
             Assert.That(result, Is.EqualTo(householdLimit));
         }
 
@@ -127,10 +126,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium, 1000, true)]
         public void TestThatHasReachedHouseholdLimitValidatesWhetherHouseholdLimitHasBeenReached(Membership membership, int numberOfHouseholds, bool expectedResult)
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            var result = domainObjectValidations.HasReachedHouseholdLimit(membership, numberOfHouseholds);
+            bool result = sut.HasReachedHouseholdLimit(membership, numberOfHouseholds);
             Assert.That(result, Is.EqualTo(expectedResult));
         }
 
@@ -149,10 +148,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium, Membership.Premium, true)]
         public void TestThatHasRequiredMembershipValidatesWhetherMembershipMatchesRequiredMembership(Membership membership, Membership requiredMembership, bool expectedResult)
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            var result = domainObjectValidations.HasRequiredMembership(membership, requiredMembership);
+            bool result = sut.HasRequiredMembership(membership, requiredMembership);
             Assert.That(result, Is.EqualTo(expectedResult));
         }
 
@@ -171,11 +170,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium, Membership.Premium, true)]
         public void TestThatCanUpgradeMembershipValidatesWhetherMembershipCanBeUpgraded(Membership currentMembership, Membership upgradeToMembership, bool expectedResult)
         {
-            var domainObjectValidations = new DomainObjectValidations();
-            Assert.That(domainObjectValidations, Is.Not.Null);
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
 
-            var result = domainObjectValidations.CanUpgradeMembership(currentMembership, upgradeToMembership);
+            bool result = sut.CanUpgradeMembership(currentMembership, upgradeToMembership);
             Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        /// <summary>
+        /// Tests that InRange validates whether the value is in a given range.
+        /// </summary>
+        [Test]
+        [TestCase(-129, -128, 127, false)]
+        [TestCase(-128, -128, 127, true)]
+        [TestCase(-127, -128, 127, true)]
+        [TestCase(-1, -128, 127, true)]
+        [TestCase(0, -128, 127, true)]
+        [TestCase(1, -128, 127, true)]
+        [TestCase(126, -128, 127, true)]
+        [TestCase(127, -128, 127, true)]
+        [TestCase(128, -128, 127, false)]
+        public void TestThatInRangeValidatesWhetherValueIsInRange(int value, int startValue, int endValue, bool expectedResult)
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            bool result = sut.InRange(value, new Range<int>(startValue, endValue));
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        /// <summary>
+        /// Tests that InRange throws an ArgumentNullException when the given range is null.
+        /// </summary>
+        [Test]
+        public void TestThatInRangeThrowsArgumentNullExceptionWhenRangeIsNull()
+        {
+            Fixture fixture = new Fixture();
+
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.InRange(fixture.Create<int>(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "range");
         }
 
         /// <summary>
@@ -184,7 +221,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCreateInitializeDomainObjectValidations()
         {
-            var domainObjectValidations = DomainObjectValidations.Create();
+            IDomainObjectValidations domainObjectValidations = DomainObjectValidations.Create();
             Assert.That(domainObjectValidations, Is.Not.Null);
             Assert.That(domainObjectValidations, Is.TypeOf<DomainObjectValidations>());
         }

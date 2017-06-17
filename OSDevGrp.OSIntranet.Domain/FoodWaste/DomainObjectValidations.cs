@@ -31,7 +31,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (string.IsNullOrEmpty(value))
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
             var regularExpression = new Regex(@"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$", RegexOptions.Compiled);
             return regularExpression.IsMatch(value);
@@ -92,6 +92,21 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         public virtual bool CanUpgradeMembership(Membership currentMembership, Membership upgradeToMembership)
         {
             return (int) currentMembership <= (int) upgradeToMembership;
+        }
+
+        /// <summary>
+        /// Validates whether a value is inside a given range.
+        /// </summary>
+        /// <param name="value">The value to validate.</param>
+        /// <param name="range">The range where the value should be inside.</param>
+        /// <returns>True when the value is inside the given range otherwise false.</returns>
+        public virtual bool InRange(int value, IRange<int> range)
+        {
+            if (range == null)
+            {
+                throw new ArgumentNullException(nameof(range));
+            }
+            return value >= range.StartValue && value <= range.EndValue;
         }
 
         /// <summary>
