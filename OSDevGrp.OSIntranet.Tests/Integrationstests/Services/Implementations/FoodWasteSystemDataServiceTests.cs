@@ -7,6 +7,7 @@ using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
@@ -32,6 +33,33 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             var container = ContainerFactory.Create();
             _foodWasteSystemDataService = container.Resolve<IFoodWasteSystemDataService>();
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll gets the collection of all storages types.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllGetGetsStorageTypeSystemViewCollection()
+        {
+            IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection();
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
+
+            foreach (TranslationInfoSystemView translationInfo in translationInfoCollection)
+            {
+                StorageTypeCollectionGetQuery storageTypeCollectionGetQuery = new StorageTypeCollectionGetQuery
+                {
+                    TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                };
+                IList<StorageTypeSystemView> storageTypeCollection = new List<StorageTypeSystemView>(_foodWasteSystemDataService.StorageTypeGetAll(storageTypeCollectionGetQuery));
+                Assert.That(storageTypeCollection, Is.Not.Null);
+                Assert.That(storageTypeCollection, Is.Not.Empty);
+                Assert.That(storageTypeCollection.Count, Is.EqualTo(4));
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForRefrigerator), Is.Not.Null);
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForFreezer), Is.Not.Null);
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForKitchenCabinets), Is.Not.Null);
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForShoppingBasket), Is.Not.Null);
+            }
         }
 
         /// <summary>
@@ -88,7 +116,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             var foodGroupTree = _foodWasteSystemDataService.FoodGroupTreeGet(new FoodGroupTreeGetQuery {TranslationInfoIdentifier = translationInfoCollection.First().TranslationInfoIdentifier});
             Assert.That(foodGroupTree, Is.Not.Null);
 
-            foreach (var command in TestHelpers.GetFoodItemImportFromDataProviderCommands(foodGroupTree, translationInfoCollection))
+            foreach (var command in TestHelper.GetFoodItemImportFromDataProviderCommands(foodGroupTree, translationInfoCollection))
             {
                 var result = _foodWasteSystemDataService.FoodItemImportFromDataProvider(command);
                 Assert.That(result, Is.Not.Null);
@@ -128,7 +156,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         [Test]
         public void TestThatFoodGroupImportFromDataProviderImportsFoodGroups()
         {
-            foreach (var command in TestHelpers.FoodGroupImportFromDataProviderCommands)
+            foreach (var command in TestHelper.FoodGroupImportFromDataProviderCommands)
             {
                 var result = _foodWasteSystemDataService.FoodGroupImportFromDataProvider(command);
                 Assert.That(result, Is.Not.Null);

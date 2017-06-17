@@ -9,6 +9,8 @@ using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Resources;
 
@@ -44,7 +46,42 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             {
                 return;
             }
-            _channelFactory.Credentials.UserName.UserName = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower());
+            _channelFactory.Credentials.UserName.UserName = $"test.{Guid.NewGuid().ToString("D").ToLower()}@osdevgrp.dk";
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll gets the collection of all storages types.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllGetGetsStorageTypeViewCollection()
+        {
+            IFoodWasteHouseholdDataService client = _channelFactory.CreateChannel();
+            try
+            {
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                foreach (TranslationInfoSystemView translationInfo in translationInfoCollection)
+                {
+                    StorageTypeCollectionGetQuery storageTypeCollectionGetQuery = new StorageTypeCollectionGetQuery
+                    {
+                        TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                    };
+                    IList<StorageTypeView> storageTypeCollection = new List<StorageTypeView>(client.StorageTypeGetAll(storageTypeCollectionGetQuery));
+                    Assert.That(storageTypeCollection, Is.Not.Null);
+                    Assert.That(storageTypeCollection, Is.Not.Empty);
+                    Assert.That(storageTypeCollection.Count, Is.EqualTo(4));
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForRefrigerator), Is.Not.Null);
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForFreezer), Is.Not.Null);
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForKitchenCabinets), Is.Not.Null);
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForShoppingBasket), Is.Not.Null);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
         }
 
         /// <summary>
@@ -56,32 +93,20 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
                 foreach (var translationInfo in translationInfoCollection)
                 {
-                    var householdDataGetQuery = new HouseholdDataGetQuery
+                    HouseholdDataGetQuery householdDataGetQuery = new HouseholdDataGetQuery
                     {
                         HouseholdIdentifier = Guid.NewGuid(),
                         TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                     };
-                    var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdDataGet(householdDataGetQuery));
-                    Assert.That(faultException, Is.Not.Null);
-                    Assert.That(faultException.Detail, Is.Not.Null);
-                    Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdDataGet"));
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                    FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdDataGet(householdDataGetQuery));
+
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdDataGet", ExceptionMessage.HouseholdMemberNotCreated);
                 }
             }
             finally
@@ -99,33 +124,21 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
                 foreach (var translationInfo in translationInfoCollection)
                 {
-                    var householdAddCommand = new HouseholdAddCommand
+                    HouseholdAddCommand householdAddCommand = new HouseholdAddCommand
                     {
                         Name = null,
                         Description = null,
                         TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                     };
-                    var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdAdd(householdAddCommand));
-                    Assert.That(faultException, Is.Not.Null);
-                    Assert.That(faultException.Detail, Is.Not.Null);
-                    Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")));
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdAdd"));
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                    FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdAdd(householdAddCommand));
+
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdAdd", ExceptionMessage.ValueMustBeGivenForProperty, "Name");
                 }
             }
             finally
@@ -143,27 +156,15 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var householdUpdateCommand = new HouseholdUpdateCommand
+                HouseholdUpdateCommand householdUpdateCommand = new HouseholdUpdateCommand
                 {
                     HouseholdIdentifier = Guid.NewGuid(),
                     Name = Guid.NewGuid().ToString("D"),
                     Description = null
                 };
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdUpdate(householdUpdateCommand));
-                Assert.That(faultException, Is.Not.Null);
-                Assert.That(faultException.Detail, Is.Not.Null);
-                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdUpdate"));
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdUpdate(householdUpdateCommand));
+
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdUpdate", ExceptionMessage.HouseholdMemberNotCreated);
             }
             finally
             {
@@ -180,33 +181,21 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
                 foreach (var translationInfo in translationInfoCollection)
                 {
-                    var householdAddHouseholdMemberCommand = new HouseholdAddHouseholdMemberCommand
+                    HouseholdAddHouseholdMemberCommand householdAddHouseholdMemberCommand = new HouseholdAddHouseholdMemberCommand
                     {
                         HouseholdIdentifier = Guid.NewGuid(),
-                        MailAddress = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower()),
+                        MailAddress = $"test.{Guid.NewGuid().ToString("D").ToLower()}@osdevgrp.dk",
                         TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                     };
-                    var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdAddHouseholdMember(householdAddHouseholdMemberCommand));
-                    Assert.That(faultException, Is.Not.Null);
-                    Assert.That(faultException.Detail, Is.Not.Null);
-                    Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdAddHouseholdMember"));
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                    FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdAddHouseholdMember(householdAddHouseholdMemberCommand));
+
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdAddHouseholdMember", ExceptionMessage.HouseholdMemberNotCreated);
                 }
             }
             finally
@@ -224,26 +213,14 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var householdRemoveHouseholdMemberCommand = new HouseholdRemoveHouseholdMemberCommand
+                HouseholdRemoveHouseholdMemberCommand householdRemoveHouseholdMemberCommand = new HouseholdRemoveHouseholdMemberCommand
                 {
                     HouseholdIdentifier = Guid.NewGuid(),
-                    MailAddress = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower())
+                    MailAddress = $"test.{Guid.NewGuid().ToString("D").ToLower()}@osdevgrp.dk"
                 };
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdRemoveHouseholdMember(householdRemoveHouseholdMemberCommand));
-                Assert.That(faultException, Is.Not.Null);
-                Assert.That(faultException.Detail, Is.Not.Null);
-                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdRemoveHouseholdMember"));
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdRemoveHouseholdMember(householdRemoveHouseholdMemberCommand));
+
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdRemoveHouseholdMember", ExceptionMessage.HouseholdMemberNotCreated);
             }
             finally
             {
@@ -280,21 +257,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery()));
-                Assert.That(faultException, Is.Not.Null);
-                Assert.That(faultException.Detail, Is.Not.Null);
-                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberIsActivated"));
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery()));
+
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberIsActivated", ExceptionMessage.HouseholdMemberNotCreated);
             }
             finally
             {
@@ -311,21 +276,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery()));
-                Assert.That(faultException, Is.Not.Null);
-                Assert.That(faultException.Detail, Is.Not.Null);
-                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberHasAcceptedPrivacyPolicy"));
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery()));
+
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberHasAcceptedPrivacyPolicy", ExceptionMessage.HouseholdMemberNotCreated);
             }
             finally
             {
@@ -342,31 +295,19 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
                 foreach (var translationInfo in translationInfoCollection)
                 {
-                    var householdMemberDataGetQuery = new HouseholdMemberDataGetQuery
+                    HouseholdMemberDataGetQuery householdMemberDataGetQuery = new HouseholdMemberDataGetQuery
                     {
                         TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                     };
-                    var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberDataGet(householdMemberDataGetQuery));
-                    Assert.That(faultException, Is.Not.Null);
-                    Assert.That(faultException.Detail, Is.Not.Null);
-                    Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                    Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberDataGet"));
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                    Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                    FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberDataGet(householdMemberDataGetQuery));
+
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberDataGet", ExceptionMessage.HouseholdMemberNotCreated);
                 }
             }
             finally
@@ -384,25 +325,13 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var householdMemberActivateCommand = new HouseholdMemberActivateCommand
+                HouseholdMemberActivateCommand householdMemberActivateCommand = new HouseholdMemberActivateCommand
                 {
                     ActivationCode = Guid.NewGuid().ToString("N")
                 };
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberActivate(householdMemberActivateCommand));
-                Assert.That(faultException, Is.Not.Null);
-                Assert.That(faultException.Detail, Is.Not.Null);
-                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberActivate"));
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberActivate(householdMemberActivateCommand));
+
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberActivate", ExceptionMessage.HouseholdMemberNotCreated);
             }
             finally
             {
@@ -419,21 +348,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand()));
-                Assert.That(faultException, Is.Not.Null);
-                Assert.That(faultException.Detail, Is.Not.Null);
-                Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberAcceptPrivacyPolicy"));
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand()));
+
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberAcceptPrivacyPolicy", ExceptionMessage.HouseholdMemberNotCreated);
             }
             finally
             {
@@ -454,7 +371,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             {
                 using (new ClaimsPrincipalTestExecutor())
                 {
-                    var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                    IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                     Assert.That(translationInfoCollection, Is.Not.Null);
                     Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -464,13 +381,13 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                         {
                             TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                         };
-                        var dataProviderCollection = client.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery);
+                        IList<DataProviderView> dataProviderCollection = new List<DataProviderView>(client.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery));
                         Assert.That(dataProviderCollection, Is.Not.Null);
                         Assert.That(dataProviderCollection, Is.Not.Empty);
 
                         foreach (var dataProvider in dataProviderCollection)
                         {
-                            var householdMemberUpgradeMembershipCommand = new HouseholdMemberUpgradeMembershipCommand
+                            HouseholdMemberUpgradeMembershipCommand householdMemberUpgradeMembershipCommand = new HouseholdMemberUpgradeMembershipCommand
                             {
                                 Membership = upgradeToMembership.ToString(),
                                 DataProviderIdentifier = dataProvider.DataProviderIdentifier,
@@ -478,21 +395,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                                 PaymentReference = Guid.NewGuid().ToString("D").ToUpper(),
                                 PaymentReceipt = null
                             };
-                            var faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipCommand));
-                            Assert.That(faultException, Is.Not.Null);
-                            Assert.That(faultException.Detail, Is.Not.Null);
-                            Assert.That(faultException.Detail.FaultType, Is.EqualTo(FoodWasteFaultType.BusinessFault));
-                            Assert.That(faultException.Detail.ErrorMessage, Is.Not.Null);
-                            Assert.That(faultException.Detail.ErrorMessage, Is.Not.Empty);
-                            Assert.That(faultException.Detail.ErrorMessage, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)));
-                            Assert.That(faultException.Detail.ServiceName, Is.Not.Null);
-                            Assert.That(faultException.Detail.ServiceName, Is.Not.Empty);
-                            Assert.That(faultException.Detail.ServiceName, Is.EqualTo(SoapNamespaces.FoodWasteHouseholdDataServiceName));
-                            Assert.That(faultException.Detail.ServiceMethod, Is.Not.Null);
-                            Assert.That(faultException.Detail.ServiceMethod, Is.Not.Empty);
-                            Assert.That(faultException.Detail.ServiceMethod, Is.EqualTo("HouseholdMemberUpgradeMembership"));
-                            Assert.That(faultException.Detail.StackTrace, Is.Not.Null);
-                            Assert.That(faultException.Detail.StackTrace, Is.Not.Empty);
+                            FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => client.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipCommand));
+
+                            TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberUpgradeMembership", ExceptionMessage.HouseholdMemberNotCreated);
                         }
                     }
                 }
@@ -512,7 +417,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -561,7 +466,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -593,12 +498,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
-                Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
-                Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
 
-                foreach (var translationInfoSystemView in translationInfoSystemViewCollection)
+                foreach (var translationInfoSystemView in translationInfoCollection)
                 {
                     var privacyPolicyGetQuery = new PrivacyPolicyGetQuery
                     {
@@ -628,7 +532,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -638,7 +542,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                     {
                         TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
                     };
-                    var dataProviderWhoHandlesPaymentsCollection = client.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery);
+                    IList<DataProviderView> dataProviderWhoHandlesPaymentsCollection = new List<DataProviderView>(client.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery));
                     Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Null);
                     Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Empty);
                 }
@@ -658,8 +562,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+                TranslationInfoCollectionGetQuery translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+                IList<TranslationInfoSystemView> translationInfoSystemViewCollection = new List<TranslationInfoSystemView>(client.TranslationInfoGetAll(translationInfoCollectionGetQuery));
                 Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
                 Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
             }
@@ -667,6 +571,17 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             {
                 ChannelTools.CloseChannel(client);
             }
+        }
+
+        /// <summary>
+        /// Gets all the translatios informations.
+        /// </summary>
+        /// <param name="client">The client to the service which can access and modify data on a house hold in the food waste domain.</param>
+        /// <returns>Colleciton of all the translatios informations.</returns>
+        private IList<TranslationInfoSystemView> GetTranslationInfoCollection(IFoodWasteHouseholdDataService client)
+        {
+            TranslationInfoCollectionGetQuery translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+            return new List<TranslationInfoSystemView>(client.TranslationInfoGetAll(translationInfoCollectionGetQuery));
         }
     }
 }

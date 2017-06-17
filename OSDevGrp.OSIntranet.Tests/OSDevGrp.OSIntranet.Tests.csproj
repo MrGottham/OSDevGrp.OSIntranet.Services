@@ -141,7 +141,7 @@
     <Compile Include="Integrationstests\Services\Implementations\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\KalenderServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\TestHelpers.cs" />
+    <Compile Include="Integrationstests\Services\TestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unittests\CommandHandlers\BogføringslinjeOpretCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\AdressekartotekCommandHandlerBaseTests.cs" />

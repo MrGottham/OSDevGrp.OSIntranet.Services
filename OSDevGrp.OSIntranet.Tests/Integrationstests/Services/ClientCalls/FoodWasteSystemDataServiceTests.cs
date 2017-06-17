@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
@@ -43,6 +44,41 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 return;
             }
             _channelFactory.Credentials.UserName.UserName = "mrgottham@gmail.com";
+        }
+
+        /// <summary>
+        /// Tests that StorageTypeGetAll gets the collection of all storages types.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllGetGetsStorageTypeSystemViewCollection()
+        {
+            IFoodWasteSystemDataService client = _channelFactory.CreateChannel();
+            try
+            {
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
+
+                foreach (TranslationInfoSystemView translationInfo in translationInfoCollection)
+                {
+                    StorageTypeCollectionGetQuery storageTypeCollectionGetQuery = new StorageTypeCollectionGetQuery
+                    {
+                        TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                    };
+                    IList<StorageTypeSystemView> storageTypeCollection = new List<StorageTypeSystemView>(client.StorageTypeGetAll(storageTypeCollectionGetQuery));
+                    Assert.That(storageTypeCollection, Is.Not.Null);
+                    Assert.That(storageTypeCollection, Is.Not.Empty);
+                    Assert.That(storageTypeCollection.Count, Is.EqualTo(4));
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForRefrigerator), Is.Not.Null);
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForFreezer), Is.Not.Null);
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForKitchenCabinets), Is.Not.Null);
+                    Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForShoppingBasket), Is.Not.Null);
+                }
+            }
+            finally
+            {
+                ChannelTools.CloseChannel(client);
+            }
         }
 
         /// <summary>
@@ -110,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 var foodGroupTree = client.FoodGroupTreeGet(new FoodGroupTreeGetQuery { TranslationInfoIdentifier = translationInfoCollection.First().TranslationInfoIdentifier });
                 Assert.That(foodGroupTree, Is.Not.Null);
 
-                foreach (var command in TestHelpers.GetFoodItemImportFromDataProviderCommands(foodGroupTree, translationInfoCollection))
+                foreach (var command in TestHelper.GetFoodItemImportFromDataProviderCommands(foodGroupTree, translationInfoCollection))
                 {
                     var result = client.FoodItemImportFromDataProvider(command);
                     Assert.That(result, Is.Not.Null);
@@ -134,7 +170,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollection = client.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
@@ -166,7 +202,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                foreach (var command in TestHelpers.FoodGroupImportFromDataProviderCommands)
+                foreach (var command in TestHelper.FoodGroupImportFromDataProviderCommands)
                 {
                     var result = client.FoodGroupImportFromDataProvider(command);
                     Assert.That(result, Is.Not.Null);
@@ -190,8 +226,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var dataProviderCollectionGetQuery = new DataProviderCollectionGetQuery();
-                var dataProviderSystemViewCollection = client.DataProviderGetAll(dataProviderCollectionGetQuery);
+                DataProviderCollectionGetQuery dataProviderCollectionGetQuery = new DataProviderCollectionGetQuery();
+                IList<DataProviderSystemView> dataProviderSystemViewCollection = new List<DataProviderSystemView>(client.DataProviderGetAll(dataProviderCollectionGetQuery));
                 Assert.That(dataProviderSystemViewCollection, Is.Not.Null);
                 Assert.That(dataProviderSystemViewCollection, Is.Not.Empty);
             }
@@ -210,15 +246,14 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
-                Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
-                Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
 
                 var translationAddCommand = new TranslationAddCommand
                 {
                     TranslationOfIdentifier = Guid.NewGuid(),
-                    TranslationInfoIdentifier = translationInfoSystemViewCollection.First().TranslationInfoIdentifier,
+                    TranslationInfoIdentifier = translationInfoCollection.First().TranslationInfoIdentifier,
                     TranslationValue = "Test"
                 };
                 var translationAddResult = client.TranslationAdd(translationAddCommand);
@@ -255,21 +290,20 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
-                Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
-                Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
+                IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection(client);
+                Assert.That(translationInfoCollection, Is.Not.Null);
+                Assert.That(translationInfoCollection, Is.Not.Empty);
 
-                foreach (var translationInfoSystemView in translationInfoSystemViewCollection)
+                foreach (var translationInfoSystemView in translationInfoCollection)
                 {
-                    var staticTextCollectionGetQuery = new StaticTextCollectionGetQuery
+                    StaticTextCollectionGetQuery staticTextCollectionGetQuery = new StaticTextCollectionGetQuery
                     {
                         TranslationInfoIdentifier = translationInfoSystemView.TranslationInfoIdentifier
                     };
-                    var staticTextSystemViewCollection = client.StaticTextGetAll(staticTextCollectionGetQuery);
+                    IList<StaticTextSystemView> staticTextSystemViewCollection = new List<StaticTextSystemView>(client.StaticTextGetAll(staticTextCollectionGetQuery));
                     Assert.That(staticTextSystemViewCollection, Is.Not.Null);
                     Assert.That(staticTextSystemViewCollection, Is.Not.Empty);
-                    Assert.That(staticTextSystemViewCollection.Count(), Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
+                    Assert.That(staticTextSystemViewCollection.Count, Is.EqualTo(Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>().Count()));
                 }
             }
             finally
@@ -287,8 +321,8 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
             var client = _channelFactory.CreateChannel();
             try
             {
-                var translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
-                var translationInfoSystemViewCollection = client.TranslationInfoGetAll(translationInfoCollectionGetQuery);
+                TranslationInfoCollectionGetQuery translationInfoCollectionGetQuery = new TranslationInfoCollectionGetQuery();
+                IList<TranslationInfoSystemView> translationInfoSystemViewCollection = new List<TranslationInfoSystemView>(client.TranslationInfoGetAll(translationInfoCollectionGetQuery));
                 Assert.That(translationInfoSystemViewCollection, Is.Not.Null);
                 Assert.That(translationInfoSystemViewCollection, Is.Not.Empty);
             }

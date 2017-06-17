@@ -171,7 +171,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentReceipt, Is.Null);
 
                     var householdMemberUpgradeMembershipToPremiumPaymentReference = Guid.NewGuid().ToString("D").ToUpper();
-                    var householdMemberUpgradeMembershipToPremiumPaymentReceipt = Convert.ToBase64String(Services.TestHelpers.GetTestDocument().ToArray());
+                    var householdMemberUpgradeMembershipToPremiumPaymentReceipt = Convert.ToBase64String(Services.TestHelper.GetTestDocument().ToArray());
                     var householdMemberUpgradeMembershipToPremiumCommand = new HouseholdMemberUpgradeMembershipCommand
                     {
                         Membership = Membership.Premium.ToString(),

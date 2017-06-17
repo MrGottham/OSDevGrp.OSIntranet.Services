@@ -16,7 +16,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
     /// <summary>
     /// Helper for integrationstests of services.
     /// </summary>
-    public static class TestHelpers
+    public static class TestHelper
     {
         /// <summary>
         /// Gets the food groups to import.
@@ -452,7 +452,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services
             {
                 throw new ArgumentNullException(nameof(name));
             }
-            var assembly = typeof (TestHelpers).Assembly;
+            var assembly = typeof (TestHelper).Assembly;
             var stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.{name}");
             if (stream == null)
             {

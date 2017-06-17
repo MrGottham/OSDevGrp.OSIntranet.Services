@@ -10,6 +10,7 @@ using OSDevGrp.OSIntranet.Contracts.Faults;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using OSDevGrp.OSIntranet.Contracts.Views;
+using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Resources;
 
@@ -39,6 +40,33 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
+        /// Tests that StorageTypeGetAll gets the collection of all storages types.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeGetAllGetGetsStorageTypeViewCollection()
+        {
+            IList<TranslationInfoSystemView> translationInfoCollection = GetTranslationInfoCollection();
+            Assert.That(translationInfoCollection, Is.Not.Null);
+            Assert.That(translationInfoCollection, Is.Not.Empty);
+
+            foreach (TranslationInfoSystemView translationInfo in translationInfoCollection)
+            {
+                StorageTypeCollectionGetQuery storageTypeCollectionGetQuery = new StorageTypeCollectionGetQuery
+                {
+                    TranslationInfoIdentifier = translationInfo.TranslationInfoIdentifier
+                };
+                IList<StorageTypeView> storageTypeCollection = new List<StorageTypeView>(_foodWasteHouseholdDataService.StorageTypeGetAll(storageTypeCollectionGetQuery));
+                Assert.That(storageTypeCollection, Is.Not.Null);
+                Assert.That(storageTypeCollection, Is.Not.Empty);
+                Assert.That(storageTypeCollection.Count, Is.EqualTo(4));
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForRefrigerator), Is.Not.Null);
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForFreezer), Is.Not.Null);
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForKitchenCabinets), Is.Not.Null);
+                Assert.That(storageTypeCollection.SingleOrDefault(m => m.StorageTypeIdentifier == StorageType.IdentifierForShoppingBasket), Is.Not.Null);
+            }
+        }
+
+        /// <summary>
         /// Tests that HouseholdDataGet throws an FaultException when the household member has not been created.
         /// </summary>
         [Test]
@@ -59,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                     };
                     FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdDataGet(householdDataGetQuery));
 
-                    TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdDataGet", ExceptionMessage.HouseholdMemberNotCreated);
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdDataGet", ExceptionMessage.HouseholdMemberNotCreated);
                 }
             }
         }
@@ -86,7 +114,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                     };
                     FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdAdd(householdAddCommand));
 
-                    TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdAdd", ExceptionMessage.ValueMustBeGivenForProperty, "Name");
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdAdd", ExceptionMessage.ValueMustBeGivenForProperty, "Name");
                 }
             }
         }
@@ -107,7 +135,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 };
                 FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdUpdate(householdUpdateCommand));
 
-                TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdUpdate", ExceptionMessage.HouseholdMemberNotCreated);
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdUpdate", ExceptionMessage.HouseholdMemberNotCreated);
             }
         }
 
@@ -133,7 +161,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                     };
                     FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdAddHouseholdMember(householdAddHouseholdMemberCommand));
 
-                    TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdAddHouseholdMember", ExceptionMessage.HouseholdMemberNotCreated);
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdAddHouseholdMember", ExceptionMessage.HouseholdMemberNotCreated);
                 }
             }
         }
@@ -153,7 +181,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 };
                 FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdRemoveHouseholdMember(householdRemoveHouseholdMemberCommand));
 
-                TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdRemoveHouseholdMember", ExceptionMessage.HouseholdMemberNotCreated);
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdRemoveHouseholdMember", ExceptionMessage.HouseholdMemberNotCreated);
             }
         }
 
@@ -182,7 +210,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             {
                 FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery()));
 
-                TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberIsActivated", ExceptionMessage.HouseholdMemberNotCreated);
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberIsActivated", ExceptionMessage.HouseholdMemberNotCreated);
             }
         }
 
@@ -196,7 +224,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             {
                 FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery()));
 
-                TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberHasAcceptedPrivacyPolicy", ExceptionMessage.HouseholdMemberNotCreated);
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberHasAcceptedPrivacyPolicy", ExceptionMessage.HouseholdMemberNotCreated);
             }
         }
 
@@ -220,7 +248,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                     };
                     FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery));
 
-                    TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberDataGet", ExceptionMessage.HouseholdMemberNotCreated);
+                    TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberDataGet", ExceptionMessage.HouseholdMemberNotCreated);
                 }
             }
         }
@@ -239,7 +267,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                 };
                 FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberActivate(householdMemberActivateCommand));
 
-                TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberActivate", ExceptionMessage.HouseholdMemberNotCreated);
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberActivate", ExceptionMessage.HouseholdMemberNotCreated);
             }
         }
 
@@ -253,7 +281,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             {
                 FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand()));
 
-                TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberAcceptPrivacyPolicy", ExceptionMessage.HouseholdMemberNotCreated);
+                TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberAcceptPrivacyPolicy", ExceptionMessage.HouseholdMemberNotCreated);
             }
         }
 
@@ -293,7 +321,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
                         };
                         FaultException<FoodWasteFault> faultException = Assert.Throws<FaultException<FoodWasteFault>>(() => _foodWasteHouseholdDataService.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipCommand));
 
-                        TestHelpers.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberUpgradeMembership", ExceptionMessage.HouseholdMemberNotCreated);
+                        TestHelper.AssertFaultExceptionWithFoodWasteFault(faultException, FoodWasteFaultType.BusinessFault, SoapNamespaces.FoodWasteHouseholdDataServiceName, "HouseholdMemberUpgradeMembership", ExceptionMessage.HouseholdMemberNotCreated);
                     }
                 }
             }
