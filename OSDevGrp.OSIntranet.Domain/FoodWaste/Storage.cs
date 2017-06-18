@@ -14,6 +14,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
 
         private IHousehold _household;
         private int _sortOrder;
+        private IStorageType _storageType;
         private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
@@ -25,8 +26,9 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         /// <param name="household">Household where the storage are placed.</param>
         /// <param name="sortOrder">Sort order for the storage.</param>
-        public Storage(IHousehold household, int sortOrder)
-            : this(household, sortOrder, DomainObjectValidations.Create())
+        /// <param name="storageType">Storage type for the storage.</param>
+        public Storage(IHousehold household, int sortOrder, IStorageType storageType)
+            : this(household, sortOrder, storageType, DomainObjectValidations.Create())
         {
         }
 
@@ -43,10 +45,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         /// <param name="household">Household where the storage are placed.</param>
         /// <param name="sortOrder">Sort order for the storage.</param>
+        /// <param name="storageType">Storage type for the storage.</param>
         /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
-        protected Storage(IHousehold household, int sortOrder, IDomainObjectValidations domainObjectValidations)
+        protected Storage(IHousehold household, int sortOrder, IStorageType storageType, IDomainObjectValidations domainObjectValidations)
         {
             _household = household ?? throw new ArgumentNullException(nameof(household));
+            _storageType = storageType ?? throw new ArgumentNullException(nameof(storageType));
             _domainObjectValidations = domainObjectValidations ?? throw new ArgumentNullException(nameof(domainObjectValidations));
 
             _sortOrder = ValidateSortOrder(sortOrder, nameof(sortOrder));
@@ -74,6 +78,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             set => _sortOrder = ValidateSortOrder(value, nameof(value));
         }
 
+
+        /// <summary>
+        /// Gets the storage type for the storage.
+        /// </summary>
+        public virtual IStorageType StorageType
+        {
+            get => _storageType;
+            protected set => _storageType = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         #endregion
 

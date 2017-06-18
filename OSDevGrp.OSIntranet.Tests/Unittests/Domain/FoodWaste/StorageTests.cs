@@ -27,9 +27,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             /// <param name="household">Household where the storage are placed.</param>
             /// <param name="sortOrder">Sort order for the storage.</param>
+            /// <param name="storageType">Storage type for the storage.</param>
             /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
-            public MyStorage(IHousehold household, int sortOrder, IDomainObjectValidations domainObjectValidations)
-                : base(household, sortOrder, domainObjectValidations)
+            public MyStorage(IHousehold household, int sortOrder, IStorageType storageType, IDomainObjectValidations domainObjectValidations)
+                : base(household, sortOrder, storageType, domainObjectValidations)
             {
             }
 
@@ -44,6 +45,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             {
                 get => base.Household;
                 set => base.Household = value;
+            }
+
+            /// <summary>
+            /// Gets or sets the storage type for the storage.
+            /// </summary>
+            public new IStorageType StorageType
+            {
+                get => base.StorageType;
+                set => base.StorageType = value;
             }
 
             #endregion
@@ -65,14 +75,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             int sortOrder = GetLegalSortOrder(fixture);
+            IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
 
-            IStorage sut = new Storage(householdMock, sortOrder);
+            IStorage sut = new Storage(householdMock, sortOrder, storageType);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
             Assert.That(sut.Household, Is.Not.Null);
             Assert.That(sut.Household, Is.EqualTo(householdMock));
             Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
+            Assert.That(sut.StorageType, Is.Not.Null);
+            Assert.That(sut.StorageType, Is.EqualTo(storageType));
         }
 
         /// <summary>
@@ -84,10 +97,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Fixture fixture = new Fixture();
 
             // ReSharper disable ObjectCreationAsStatement
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Storage(null, GetLegalSortOrder(fixture)));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Storage(null, GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock()));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "household");
+        }
+
+        /// <summary>
+        /// Tests that the constructor throws an ArgumentNullException when the storage type for the storage is null.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenStorageTypeIsNull()
+        {
+            Fixture fixture = new Fixture();
+
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), null));
+            // ReSharper restore ObjectCreationAsStatement
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "storageType");
         }
 
         /// <summary>
@@ -99,7 +127,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Fixture fixture = new Fixture();
 
             // ReSharper disable ObjectCreationAsStatement
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock(), null));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "domainObjectValidations");
@@ -135,7 +163,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             int sortOrder = GetIllegalSortOrder(fixture);
 
             // ReSharper disable ObjectCreationAsStatement
-            IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder));
+            IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder, DomainObjectMockBuilder.BuildStorageTypeMock()));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertIntranetSystemExceptionIsValid(result, ExceptionMessage.IllegalValue, sortOrder, "sortOrder");
@@ -223,7 +251,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         {
             Fixture fixture = new Fixture();
 
-            IStorage sut = new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture));
+            IStorage sut = new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock());
             Assert.That(sut, Is.Not.Null);
 
             int newValue = GetIllegalSortOrder(fixture);
@@ -252,7 +280,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(true)
                 .Repeat.Any();
 
-            return new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder ?? GetLegalSortOrder(fixture), _domainObjectValidationsMock);
+            return new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder ?? GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock(), _domainObjectValidationsMock);
         }
 
         /// <summary>

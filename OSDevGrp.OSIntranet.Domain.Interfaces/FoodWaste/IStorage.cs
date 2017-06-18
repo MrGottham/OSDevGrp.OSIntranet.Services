@@ -14,5 +14,10 @@
         /// Gets or sets the sort order for the storage.
         /// </summary>
         int SortOrder { get; set; }
+
+        /// <summary>
+        /// Gets the storage type for the storage.
+        /// </summary>
+        IStorageType StorageType { get; }
     }
 }

@@ -683,13 +683,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         public static IRange<int> BuildIntRange()
         {
             Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            int startValue = random.Next(1, 100);
+            int endValue = startValue += random.Next(1, 100);
 
             IRange<int> intRangeMock = MockRepository.GenerateMock<IRange<int>>();
             intRangeMock.Stub(m => m.StartValue)
-                .Return(fixture.Create<int>())
+                .Return(startValue)
                 .Repeat.Any();
             intRangeMock.Stub(m => m.EndValue)
-                .Return(fixture.Create<int>())
+                .Return(endValue)
                 .Repeat.Any();
 
             return intRangeMock;
