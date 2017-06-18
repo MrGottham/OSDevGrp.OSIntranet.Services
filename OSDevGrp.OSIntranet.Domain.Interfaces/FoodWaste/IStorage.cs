@@ -24,5 +24,10 @@
         /// Gets or sets the description for the storage.
         /// </summary>
         string Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the temperature for the storage.
+        /// </summary>
+        int Temperature { get; set; }
     }
 }

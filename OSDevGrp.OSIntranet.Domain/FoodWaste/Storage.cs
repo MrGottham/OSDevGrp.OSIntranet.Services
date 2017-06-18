@@ -16,6 +16,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         private int _sortOrder;
         private IStorageType _storageType;
         private string _description;
+        private int _temperature;
         private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
@@ -28,9 +29,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="household">Household where the storage are placed.</param>
         /// <param name="sortOrder">Sort order for the storage.</param>
         /// <param name="storageType">Storage type for the storage.</param>
+        /// <param name="temperature">Temperature for the storage.</param>
         /// <param name="description">Description for the storage.</param>
-        public Storage(IHousehold household, int sortOrder, IStorageType storageType, string description = null)
-            : this(household, sortOrder, storageType, description, DomainObjectValidations.Create())
+        public Storage(IHousehold household, int sortOrder, IStorageType storageType, int temperature, string description = null)
+            : this(household, sortOrder, storageType, description, temperature, DomainObjectValidations.Create())
         {
         }
 
@@ -49,16 +51,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="sortOrder">Sort order for the storage.</param>
         /// <param name="storageType">Storage type for the storage.</param>
         /// <param name="description">Description for the storage.</param>
+        /// <param name="temperature">Temperature for the storage.</param>
         /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
-        protected Storage(IHousehold household, int sortOrder, IStorageType storageType, string description, IDomainObjectValidations domainObjectValidations)
+        protected Storage(IHousehold household, int sortOrder, IStorageType storageType, string description, int temperature, IDomainObjectValidations domainObjectValidations)
         {
             _household = household ?? throw new ArgumentNullException(nameof(household));
             _storageType = storageType ?? throw new ArgumentNullException(nameof(storageType));
-
             _domainObjectValidations = domainObjectValidations ?? throw new ArgumentNullException(nameof(domainObjectValidations));
 
             _sortOrder = ValidateSortOrder(sortOrder, nameof(sortOrder));
             _description = description;
+            _temperature = ValidateTemperatue(temperature, nameof(temperature));
         }
 
         #endregion
@@ -83,7 +86,6 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             set => _sortOrder = ValidateSortOrder(value, nameof(value));
         }
 
-
         /// <summary>
         /// Gets the storage type for the storage.
         /// </summary>
@@ -100,6 +102,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             get => _description;
             set => _description = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the temperature for the storage.
+        /// </summary>
+        public virtual int Temperature
+        {
+            get => _temperature;
+            set => _temperature = ValidateTemperatue(value, nameof(value));
         }
 
         #endregion
@@ -125,6 +136,27 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             }
 
             throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, sortOrder, propertyName));
+        }
+
+        /// <summary>
+        /// Validates the temperature for the storage.
+        /// </summary>
+        /// <param name="temperature">Temperature for the storage.</param>
+        /// <param name="propertyName">Name of the property which sets the temperature for the storage.</param>
+        /// <returns>Validated temperature for the storage.</returns>
+        private int ValidateTemperatue(int temperature, string propertyName)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            if (StorageType == null || _domainObjectValidations.InRange(temperature, StorageType.TemperatureRange))
+            {
+                return temperature;
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, temperature, propertyName));
         }
 
         #endregion

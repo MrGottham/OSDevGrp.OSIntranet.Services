@@ -78,6 +78,58 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Build a mockup for a storage.
+        /// </summary>
+        /// <returns>Mockup for a storage.</returns>
+        public static IStorage BuildStorageMock(IHousehold household = null, int? sortOrder = null, IStorageType storageType = null, bool hasDescription = true)
+        {
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            if (storageType == null)
+            {
+                storageType = BuildStorageTypeMock();
+            }
+
+            IStorage storage = MockRepository.GenerateMock<IStorage>();
+            storage.Stub(m => m.Identifier)
+                .Return(Guid.NewGuid())
+                .Repeat.Any();
+            storage.Stub(m => m.Household)
+                .Return(household ?? BuildHouseholdMock())
+                .Repeat.Any();
+            storage.Stub(m => m.SortOrder)
+                .Return(sortOrder ?? random.Next(1, 100))
+                .Repeat.Any();
+            storage.Stub(m => m.StorageType)
+                .Return(storageType)
+                .Repeat.Any();
+            storage.Stub(m => m.Description)
+                .Return(hasDescription ? fixture.Create<string>() : null)
+                .Repeat.Any();
+            storage.Stub(m => m.Temperature)
+                .Return(random.Next(storageType.TemperatureRange.StartValue, storageType.TemperatureRange.EndValue))
+                .Repeat.Any();
+
+            return storage;
+        }
+
+        /// <summary>
+        /// Build a collection of mockups for some storages.
+        /// </summary>
+        /// <returns>Collection of mockups for some storages.</returns>
+        public static IEnumerable<IStorage> BuildStorageMockCollection(IHousehold household = null)
+        {
+            return new List<IStorage>
+            {
+                BuildStorageMock(household, 1, BuildStorageTypeMock(StorageType.IdentifierForRefrigerator, 1)),
+                BuildStorageMock(household, 2, BuildStorageTypeMock(StorageType.IdentifierForFreezer, 2)),
+                BuildStorageMock(household, 3, BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets, 3)),
+                BuildStorageMock(household, 4, BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket, 4))
+            };
+        }
+
+        /// <summary>
         /// Build a mockup for a storage type.
         /// </summary>
         /// <returns>Mockup for a storage type.</returns>
