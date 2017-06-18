@@ -19,5 +19,10 @@
         /// Gets the storage type for the storage.
         /// </summary>
         IStorageType StorageType { get; }
+
+        /// <summary>
+        /// Gets or sets the description for the storage.
+        /// </summary>
+        string Description { get; set; }
     }
 }

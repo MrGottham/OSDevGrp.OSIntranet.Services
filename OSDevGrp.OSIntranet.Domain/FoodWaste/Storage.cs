@@ -15,6 +15,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         private IHousehold _household;
         private int _sortOrder;
         private IStorageType _storageType;
+        private string _description;
         private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
@@ -27,8 +28,9 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="household">Household where the storage are placed.</param>
         /// <param name="sortOrder">Sort order for the storage.</param>
         /// <param name="storageType">Storage type for the storage.</param>
-        public Storage(IHousehold household, int sortOrder, IStorageType storageType)
-            : this(household, sortOrder, storageType, DomainObjectValidations.Create())
+        /// <param name="description">Description for the storage.</param>
+        public Storage(IHousehold household, int sortOrder, IStorageType storageType, string description = null)
+            : this(household, sortOrder, storageType, description, DomainObjectValidations.Create())
         {
         }
 
@@ -46,14 +48,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="household">Household where the storage are placed.</param>
         /// <param name="sortOrder">Sort order for the storage.</param>
         /// <param name="storageType">Storage type for the storage.</param>
+        /// <param name="description">Description for the storage.</param>
         /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
-        protected Storage(IHousehold household, int sortOrder, IStorageType storageType, IDomainObjectValidations domainObjectValidations)
+        protected Storage(IHousehold household, int sortOrder, IStorageType storageType, string description, IDomainObjectValidations domainObjectValidations)
         {
             _household = household ?? throw new ArgumentNullException(nameof(household));
             _storageType = storageType ?? throw new ArgumentNullException(nameof(storageType));
+
             _domainObjectValidations = domainObjectValidations ?? throw new ArgumentNullException(nameof(domainObjectValidations));
 
             _sortOrder = ValidateSortOrder(sortOrder, nameof(sortOrder));
+            _description = description;
         }
 
         #endregion
@@ -86,6 +91,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             get => _storageType;
             protected set => _storageType = value ?? throw new ArgumentNullException(nameof(value));
+        }
+
+        /// <summary>
+        /// Gets or sets the description for the storage.
+        /// </summary>
+        public virtual string Description
+        {
+            get => _description;
+            set => _description = value;
         }
 
         #endregion

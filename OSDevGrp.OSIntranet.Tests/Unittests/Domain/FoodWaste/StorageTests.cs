@@ -28,9 +28,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// <param name="household">Household where the storage are placed.</param>
             /// <param name="sortOrder">Sort order for the storage.</param>
             /// <param name="storageType">Storage type for the storage.</param>
+            /// <param name="description">Description for the storage.</param>
             /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
-            public MyStorage(IHousehold household, int sortOrder, IStorageType storageType, IDomainObjectValidations domainObjectValidations)
-                : base(household, sortOrder, storageType, domainObjectValidations)
+            public MyStorage(IHousehold household, int sortOrder, IStorageType storageType, string description, IDomainObjectValidations domainObjectValidations)
+                : base(household, sortOrder, storageType, description, domainObjectValidations)
             {
             }
 
@@ -66,10 +67,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         #endregion
 
         /// <summary>
-        /// Tests that the constructor initialize a storage.
+        /// Tests that the constructor initialize a storage without a description.
         /// </summary>
         [Test]
-        public void TestThatConstructorInitializeStorage()
+        public void TestThatConstructorInitializeStorageWithoutDescription()
         {
             Fixture fixture = new Fixture();
 
@@ -86,6 +87,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
             Assert.That(sut.StorageType, Is.Not.Null);
             Assert.That(sut.StorageType, Is.EqualTo(storageType));
+            Assert.That(sut.Description, Is.Null);
+        }
+
+        /// <summary>
+        /// Tests that the constructor initialize a storage with a description.
+        /// </summary>
+        [Test]
+        public void TestThatConstructorInitializeStorageWithDescription()
+        {
+            Fixture fixture = new Fixture();
+
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            int sortOrder = GetLegalSortOrder(fixture);
+            IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
+            string description = fixture.Create<string>();
+                
+            IStorage sut = new Storage(householdMock, sortOrder, storageType, description);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Household, Is.Not.Null);
+            Assert.That(sut.Household, Is.EqualTo(householdMock));
+            Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
+            Assert.That(sut.StorageType, Is.Not.Null);
+            Assert.That(sut.StorageType, Is.EqualTo(storageType));
+            Assert.That(sut.Description, Is.Not.Null);
+            Assert.That(sut.Description, Is.Not.Empty);
+            Assert.That(sut.Description, Is.EqualTo(description));
         }
 
         /// <summary>
@@ -127,7 +156,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Fixture fixture = new Fixture();
 
             // ReSharper disable ObjectCreationAsStatement
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock(), null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock(), fixture.Create<string>(), null));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "domainObjectValidations");
@@ -263,6 +292,40 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
+        /// Tests that the setter of StorageType sets a new value.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeSetterSetsNewValue()
+        {
+            Fixture fixture = new Fixture();
+
+            MyStorage sut = CreateMySut(fixture);
+            Assert.That(sut, Is.Not.Null);
+
+            IStorageType newValue = DomainObjectMockBuilder.BuildStorageTypeMock();
+            Assert.That(newValue, Is.Not.EqualTo(sut.StorageType));
+
+            sut.StorageType = newValue;
+            Assert.That(sut.StorageType, Is.EqualTo(newValue));
+        }
+
+        /// <summary>
+        /// Tests that the setter of StorageType throws an ArgumentNullException when the value is null.
+        /// </summary>
+        [Test]
+        public void TestThatStorageTypeSetterThrowsArgumentNullExceptionWhenValueIsNull()
+        {
+            Fixture fixture = new Fixture();
+
+            MyStorage sut = CreateMySut(fixture);
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.StorageType = null);
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "value");
+        }
+
+        /// <summary>
         /// Creates an instance of the private class for testing the storage.
         /// </summary>
         /// <param name="fixture">Auto fixture.</param>
@@ -280,7 +343,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(true)
                 .Repeat.Any();
 
-            return new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder ?? GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock(), _domainObjectValidationsMock);
+            return new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder ?? GetLegalSortOrder(fixture), DomainObjectMockBuilder.BuildStorageTypeMock(), fixture.Create<string>(), _domainObjectValidationsMock);
         }
 
         /// <summary>
