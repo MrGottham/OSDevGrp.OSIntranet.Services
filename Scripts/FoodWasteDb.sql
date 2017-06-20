@@ -580,5 +580,6 @@ CREATE TABLE IF NOT EXISTS Storages (
 	SortOrder TINYINT NOT NULL,
 	Temperature TINYINT NOT NULL,
 	PRIMARY KEY (StorageIdentifier),
-	UNIQUE INDEX IX_StorageIdentifier_HouseholdIdentifier_SortOrder (HouseholdIdentifier,SortOrder),
+	UNIQUE INDEX IX_Storages_HouseholdIdentifier_SortOrder (HouseholdIdentifier,SortOrder),
+	FOREIGN KEY FK_Storages_HouseholdIdentifier (HouseholdIdentifier) REFERENCES Households (HouseholdIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );

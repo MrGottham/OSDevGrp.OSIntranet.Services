@@ -59,6 +59,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 set => base.StorageType = value;
             }
 
+            /// <summary>
+            /// Gets or sets the creation date and time for when the storage was created.
+            /// </summary>
+            public new DateTime CreationTime
+            {
+                get => base.CreationTime;
+                set => base.CreationTime = value;
+            }
+
             #endregion
         }
 
@@ -482,6 +491,25 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => sut.Temperature = newValue);
 
             TestHelper.AssertIntranetSystemExceptionIsValid(result, ExceptionMessage.IllegalValue, newValue, "value");
+        }
+
+        /// <summary>
+        /// Tests that the setter of CreationTime sets a new value.
+        /// </summary>
+        [Test]
+        public void TestThatCreationTimeSetterSetsNewValue()
+        {
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            MyStorage sut = CreateMySut(fixture, creationTime: DateTime.Now.AddDays(random.Next(1, 7) * -1).AddMinutes(random.Next(-120, 120)));
+            Assert.That(sut, Is.Not.Null);
+
+            DateTime newValue = sut.CreationTime.AddMinutes(random.Next(1, 60));
+            Assert.That(newValue, Is.Not.EqualTo(sut.CreationTime));
+
+            sut.CreationTime = newValue;
+            Assert.That(sut.CreationTime, Is.EqualTo(newValue));
         }
 
         /// <summary>

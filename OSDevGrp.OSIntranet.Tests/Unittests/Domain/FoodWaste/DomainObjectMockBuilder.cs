@@ -110,6 +110,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             storage.Stub(m => m.Temperature)
                 .Return(random.Next(storageType.TemperatureRange.StartValue, storageType.TemperatureRange.EndValue))
                 .Repeat.Any();
+            storage.Stub(m => m.CreationTime)
+                .Return(DateTime.Now)
+                .Repeat.Any();
 
             return storage;
         }
