@@ -573,13 +573,46 @@ DELIMITER ;
 CALL CreateIX_StorageTypes_SortOrder();
 DROP PROCEDURE CreateIX_StorageTypes_SortOrder;
 
-DROP TABLE IF EXISTS Storages;
 CREATE TABLE IF NOT EXISTS Storages (
 	StorageIdentifier CHAR(36) NOT NULL,
 	HouseholdIdentifier CHAR(36) NOT NULL,
 	SortOrder TINYINT NOT NULL,
+	StorageTypeIdentifier CHAR(36) NOT NULL,
+	Descr NVARCHAR(2048) NULL,
 	Temperature TINYINT NOT NULL,
+	CreationTime DATETIME NOT NULL,
 	PRIMARY KEY (StorageIdentifier),
 	UNIQUE INDEX IX_Storages_HouseholdIdentifier_SortOrder (HouseholdIdentifier,SortOrder),
-	FOREIGN KEY FK_Storages_HouseholdIdentifier (HouseholdIdentifier) REFERENCES Households (HouseholdIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
+	FOREIGN KEY FK_Storages_HouseholdIdentifier (HouseholdIdentifier) REFERENCES Households (HouseholdIdentifier) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY FK_Storages_StorageTypeIdentifier (StorageTypeIdentifier) REFERENCES StorageTypes (StorageTypeIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP PROCEDURE IF EXISTS GrantStorages;
+DELIMITER $$
+CREATE PROCEDURE GrantStorages(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
+BEGIN
+	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Storages TO "', userName, '"@"', hostName, '"');
+	PREPARE statement FROM @sql;
+	EXECUTE statement;
+END $$
+DELIMITER ;
+CALL GrantStorages(@HostName, DATABASE(), @ServiceUserName);
+DROP PROCEDURE GrantStorages;
+
+DROP PROCEDURE IF EXISTS InsertDataIntoStorages;
+DELIMITER $$
+CREATE PROCEDURE InsertDataIntoStorages()
+BEGIN
+	CREATE TEMPORARY TABLE IF NOT EXISTS Temp AS ( 
+		SELECT
+			household.HouseholdIdentifier AS HouseholdIdentifier
+		FROM Households AS household
+		LEFT JOIN Storages AS storage ON storage.HouseholdIdentifier=household.HouseholdIdentifier
+		WHERE
+			storage.HouseholdIdentifier IS NULL);
+
+	DROP TABLE Temp;
+END $$
+DELIMITER ;
+CALL InsertDataIntoStorages();
+DROP PROCEDURE InsertDataIntoStorages;
