@@ -17,6 +17,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         private IStorageType _storageType;
         private string _description;
         private int _temperature;
+        private DateTime _creationTime;
         private readonly IDomainObjectValidations _domainObjectValidations;
 
         #endregion
@@ -30,9 +31,10 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="sortOrder">Sort order for the storage.</param>
         /// <param name="storageType">Storage type for the storage.</param>
         /// <param name="temperature">Temperature for the storage.</param>
+        /// <param name="creationTime">Creation date and time for when the storage was created.</param>
         /// <param name="description">Description for the storage.</param>
-        public Storage(IHousehold household, int sortOrder, IStorageType storageType, int temperature, string description = null)
-            : this(household, sortOrder, storageType, description, temperature, DomainObjectValidations.Create())
+        public Storage(IHousehold household, int sortOrder, IStorageType storageType, int temperature, DateTime creationTime, string description = null)
+            : this(household, sortOrder, storageType, description, temperature, creationTime, DomainObjectValidations.Create())
         {
         }
 
@@ -52,8 +54,9 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="storageType">Storage type for the storage.</param>
         /// <param name="description">Description for the storage.</param>
         /// <param name="temperature">Temperature for the storage.</param>
+        /// <param name="creationTime">Creation date and time for when the storage was created.</param>
         /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
-        protected Storage(IHousehold household, int sortOrder, IStorageType storageType, string description, int temperature, IDomainObjectValidations domainObjectValidations)
+        protected Storage(IHousehold household, int sortOrder, IStorageType storageType, string description, int temperature, DateTime creationTime, IDomainObjectValidations domainObjectValidations)
         {
             _household = household ?? throw new ArgumentNullException(nameof(household));
             _storageType = storageType ?? throw new ArgumentNullException(nameof(storageType));
@@ -62,6 +65,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             _sortOrder = ValidateSortOrder(sortOrder, nameof(sortOrder));
             _description = description;
             _temperature = ValidateTemperatue(temperature, nameof(temperature));
+            _creationTime = creationTime;
         }
 
         #endregion
@@ -111,6 +115,15 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             get => _temperature;
             set => _temperature = ValidateTemperatue(value, nameof(value));
+        }
+
+        /// <summary>
+        /// Gets the creation date and time for when the storage was created.
+        /// </summary>
+        public virtual DateTime CreationTime
+        {
+            get => _creationTime;
+            protected set => _creationTime = value;
         }
 
         #endregion

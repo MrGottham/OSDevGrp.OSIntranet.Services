@@ -30,9 +30,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// <param name="storageType">Storage type for the storage.</param>
             /// <param name="description">Description for the storage.</param>
             /// <param name="temperature">Temperature for the storage.</param>
+            /// <param name="creationTime">Creation date and time for when the storage was created.</param>
             /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
-            public MyStorage(IHousehold household, int sortOrder, IStorageType storageType, string description, int temperature, IDomainObjectValidations domainObjectValidations)
-                : base(household, sortOrder, storageType, description, temperature, domainObjectValidations)
+            public MyStorage(IHousehold household, int sortOrder, IStorageType storageType, string description, int temperature, DateTime creationTime, IDomainObjectValidations domainObjectValidations)
+                : base(household, sortOrder, storageType, description, temperature, creationTime, domainObjectValidations)
             {
             }
 
@@ -74,13 +75,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         public void TestThatConstructorInitializeStorageWithoutDescription()
         {
             Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
             IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             int sortOrder = GetLegalSortOrder(fixture);
             IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
             int temperature = GetLegalTemperature(fixture, storageType.TemperatureRange);
+            DateTime creationTime = DateTime.Now.AddDays(random.Next(1, 7) * -1).AddMinutes(random.Next(-120, 120));
 
-            IStorage sut = new Storage(householdMock, sortOrder, storageType, temperature);
+            IStorage sut = new Storage(householdMock, sortOrder, storageType, temperature, creationTime);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
@@ -91,6 +94,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.StorageType, Is.EqualTo(storageType));
             Assert.That(sut.Description, Is.Null);
             Assert.That(sut.Temperature, Is.EqualTo(temperature));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
         }
 
         /// <summary>
@@ -100,14 +104,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         public void TestThatConstructorInitializeStorageWithDescription()
         {
             Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
             IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
             int sortOrder = GetLegalSortOrder(fixture);
             IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
             int temperature = GetLegalTemperature(fixture, storageType.TemperatureRange);
+            DateTime creationTime = DateTime.Now.AddDays(random.Next(1, 7) * -1).AddMinutes(random.Next(-120, 120));
             string description = fixture.Create<string>();
-                
-            IStorage sut = new Storage(householdMock, sortOrder, storageType, temperature, description);
+
+            IStorage sut = new Storage(householdMock, sortOrder, storageType, temperature, creationTime, description);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
@@ -120,6 +126,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.Description, Is.Not.Empty);
             Assert.That(sut.Description, Is.EqualTo(description));
             Assert.That(sut.Temperature, Is.EqualTo(temperature));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
         }
 
         /// <summary>
@@ -133,7 +140,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
 
             // ReSharper disable ObjectCreationAsStatement
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Storage(null, GetLegalSortOrder(fixture), storageType, GetLegalTemperature(fixture, storageType.TemperatureRange)));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Storage(null, GetLegalSortOrder(fixture), storageType, GetLegalTemperature(fixture, storageType.TemperatureRange), fixture.Create<DateTime>()));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "household");
@@ -148,7 +155,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Fixture fixture = new Fixture();
 
             // ReSharper disable ObjectCreationAsStatement
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), null, fixture.Create<int>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), null, fixture.Create<int>(), fixture.Create<DateTime>()));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "storageType");
@@ -165,7 +172,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
 
             // ReSharper disable ObjectCreationAsStatement
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, fixture.Create<string>(), GetLegalTemperature(fixture, storageType.TemperatureRange), null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, fixture.Create<string>(), GetLegalTemperature(fixture, storageType.TemperatureRange), fixture.Create<DateTime>(), null));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "domainObjectValidations");
@@ -202,7 +209,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
 
             // ReSharper disable ObjectCreationAsStatement
-            IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder, storageType, GetLegalTemperature(fixture, storageType.TemperatureRange)));
+            IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder, storageType, GetLegalTemperature(fixture, storageType.TemperatureRange), fixture.Create<DateTime>()));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertIntranetSystemExceptionIsValid(result, ExceptionMessage.IllegalValue, sortOrder, "sortOrder");
@@ -240,7 +247,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             int temperature = GetIllegalTemperature(fixture, storageType.TemperatureRange);
 
             // ReSharper disable ObjectCreationAsStatement
-            IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, temperature));
+            IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, temperature, fixture.Create<DateTime>()));
             // ReSharper restore ObjectCreationAsStatement
 
             TestHelper.AssertIntranetSystemExceptionIsValid(result, ExceptionMessage.IllegalValue, temperature, "temperature");
@@ -330,7 +337,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
 
-            IStorage sut = new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, GetLegalTemperature(fixture, storageType.TemperatureRange));
+            IStorage sut = new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, GetLegalTemperature(fixture, storageType.TemperatureRange), fixture.Create<DateTime>());
             Assert.That(sut, Is.Not.Null);
 
             int newValue = GetIllegalSortOrder(fixture);
@@ -466,7 +473,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             IStorageType storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
 
-            IStorage sut = new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, GetLegalTemperature(fixture, storageType.TemperatureRange));
+            IStorage sut = new Storage(DomainObjectMockBuilder.BuildHouseholdMock(), GetLegalSortOrder(fixture), storageType, GetLegalTemperature(fixture, storageType.TemperatureRange), fixture.Create<DateTime>());
             Assert.That(sut, Is.Not.Null);
 
             int newValue = GetIllegalTemperature(fixture, storageType.TemperatureRange);
@@ -484,8 +491,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// <param name="sortOrder">Sets the sort order for the storage.</param>
         /// <param name="storageType">Sets the storage type for the storage.</param>
         /// <param name="temperature">Sets the temperature for the storage.</param>
+        /// <param name="creationTime">Sets the creation date and time for when the storage was created.</param>
         /// <returns>Instance of the private class for testing the storage</returns>
-        private MyStorage CreateMySut(Fixture fixture, int? sortOrder = null, IStorageType storageType = null, int? temperature = null)
+        private MyStorage CreateMySut(Fixture fixture, int? sortOrder = null, IStorageType storageType = null, int? temperature = null, DateTime? creationTime = null)
         {
             if (fixture == null)
             {
@@ -502,7 +510,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 storageType = DomainObjectMockBuilder.BuildStorageTypeMock();
             }
 
-            return new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder ?? GetLegalSortOrder(fixture), storageType, fixture.Create<string>(), temperature ?? GetLegalTemperature(fixture, storageType.TemperatureRange), _domainObjectValidationsMock);
+            return new MyStorage(DomainObjectMockBuilder.BuildHouseholdMock(), sortOrder ?? GetLegalSortOrder(fixture), storageType, fixture.Create<string>(), temperature ?? GetLegalTemperature(fixture, storageType.TemperatureRange), creationTime ?? fixture.Create<DateTime>(), _domainObjectValidationsMock);
         }
 
         /// <summary>

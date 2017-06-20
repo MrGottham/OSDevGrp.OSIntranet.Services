@@ -572,3 +572,13 @@ END $$
 DELIMITER ;
 CALL CreateIX_StorageTypes_SortOrder();
 DROP PROCEDURE CreateIX_StorageTypes_SortOrder;
+
+DROP TABLE IF EXISTS Storages;
+CREATE TABLE IF NOT EXISTS Storages (
+	StorageIdentifier CHAR(36) NOT NULL,
+	HouseholdIdentifier CHAR(36) NOT NULL,
+	SortOrder TINYINT NOT NULL,
+	Temperature TINYINT NOT NULL,
+	PRIMARY KEY (StorageIdentifier),
+	UNIQUE INDEX IX_StorageIdentifier_HouseholdIdentifier_SortOrder (HouseholdIdentifier,SortOrder),
+);

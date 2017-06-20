@@ -1,4 +1,6 @@
-﻿namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
+﻿using System;
+
+namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
 {
     /// <summary>
     /// Interface for a storage.
@@ -29,5 +31,10 @@
         /// Gets or sets the temperature for the storage.
         /// </summary>
         int Temperature { get; set; }
+
+        /// <summary>
+        /// Gets the creation date and time for when the storage was created.
+        /// </summary>
+        DateTime CreationTime { get; }
     }
 }
