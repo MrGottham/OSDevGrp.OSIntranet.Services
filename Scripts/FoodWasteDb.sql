@@ -611,6 +611,11 @@ BEGIN
 		WHERE
 			storage.HouseholdIdentifier IS NULL);
 
+	IF((SELECT COUNT(*) FROM Temp) > 0) THEN
+		INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) 
+		SELECT UPPER(UUID()),HouseholdIdentifier,1,'3CEA8A7D-01A4-40BF-AB96-F70354015352',NULL,5,NULL FROM Temp;
+	END IF;
+
 	DROP TABLE Temp;
 END $$
 DELIMITER ;
