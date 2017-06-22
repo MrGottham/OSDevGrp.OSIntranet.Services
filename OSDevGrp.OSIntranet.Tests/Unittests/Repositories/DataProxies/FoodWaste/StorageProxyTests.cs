@@ -81,6 +81,61 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given storage is null.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenStorageIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetSqlQueryForId(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "storage");
+        }
+
+        /// <summary>
+        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given storage has no value.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnStorageHasNoValue()
+        {
+            IStorage storageMock = MockRepository.GenerateMock<IStorage>();
+            storageMock.Stub(m => m.Identifier)
+                .Return(null)
+                .Repeat.Any();
+
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.GetSqlQueryForId(storageMock));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, storageMock.Identifier, "Identifier");
+        }
+
+        /// <summary>
+        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given storage.
+        /// </summary>
+        [Test]
+        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorage storageMock = MockRepository.GenerateMock<IStorage>();
+            storageMock.Stub(m => m.Identifier)
+                .Return(identifier)
+                .Repeat.Any();
+
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            string result = sut.GetSqlQueryForId(storageMock);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"SELECT StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime FROM Storages WHERE StorageIdentifier='{identifier.ToString("D").ToUpper()}'"));
+        }
+
+        /// <summary>
         /// Creates an instance of the data proxy to a given storage which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage which should be used for unit testing.</returns>

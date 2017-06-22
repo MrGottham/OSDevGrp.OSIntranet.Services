@@ -62,7 +62,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for selecting a given storage.</returns>
         public virtual string GetSqlQueryForId(IStorage storage)
         {
-            throw new NotImplementedException();
+            if (storage == null)
+            {
+                throw new ArgumentNullException(nameof(storage));
+            }
+            if (storage.Identifier.HasValue)
+            {
+                return $"SELECT StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime FROM Storages WHERE StorageIdentifier='{storage.Identifier.Value.ToString("D").ToUpper()}'";
+            }
+            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, storage.Identifier, "Identifier"));
         }
 
         /// <summary>
