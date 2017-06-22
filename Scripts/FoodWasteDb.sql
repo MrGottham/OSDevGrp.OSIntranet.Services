@@ -613,7 +613,16 @@ BEGIN
 
 	IF((SELECT COUNT(*) FROM Temp) > 0) THEN
 		INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) 
-		SELECT UPPER(UUID()),HouseholdIdentifier,1,'3CEA8A7D-01A4-40BF-AB96-F70354015352',NULL,5,NULL FROM Temp;
+		SELECT UPPER(UUID()),HouseholdIdentifier,1,'3CEA8A7D-01A4-40BF-AB96-F70354015352',NULL,5,UTC_TIMESTAMP() FROM Temp;
+
+		INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) 
+		SELECT UPPER(UUID()),HouseholdIdentifier,2,'959A0D7D-A034-405C-8F6E-EF49ED5E7553',NULL,-10,UTC_TIMESTAMP() FROM Temp;
+
+		INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) 
+		SELECT UPPER(UUID()),HouseholdIdentifier,3,'0F78276B-87D1-4660-8708-A119C5DAA3A9',NULL,20,UTC_TIMESTAMP() FROM Temp;
+
+		INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) 
+		SELECT UPPER(UUID()),HouseholdIdentifier,4,'B5A0B40D-1709-48D9-83F2-E87D54ED80F5',NULL,0,UTC_TIMESTAMP() FROM Temp;
 	END IF;
 
 	DROP TABLE Temp;
