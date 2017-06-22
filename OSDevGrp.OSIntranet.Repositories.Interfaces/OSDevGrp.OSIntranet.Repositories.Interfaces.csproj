@@ -64,6 +64,7 @@
     <Compile Include="DataProxies\FoodWaste\IMemberOfHouseholdProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\IPaymentProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\IStaticTextProxy.cs" />
+    <Compile Include="DataProxies\FoodWaste\IStorageProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\IStorageTypeProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationInfoProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\ITranslationProxy.cs" />
