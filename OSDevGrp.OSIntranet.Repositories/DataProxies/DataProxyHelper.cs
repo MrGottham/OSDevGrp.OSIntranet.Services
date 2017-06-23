@@ -23,15 +23,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         {
             if (dataProxy == null)
             {
-                throw new ArgumentNullException("dataProxy");
+                throw new ArgumentNullException(nameof(dataProxy));
             }
             if (string.IsNullOrEmpty(fieldName))
             {
-                throw new ArgumentNullException("fieldName");
+                throw new ArgumentNullException(nameof(fieldName));
             }
             if (Equals(value, null))
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             var field = dataProxy.GetType().GetField(fieldName,
@@ -69,9 +69,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         {
             if (dataProxy == null)
             {
-                throw new ArgumentNullException("dataProxy");
+                throw new ArgumentNullException(nameof(dataProxy));
             }
-            return value == null ? "NULL" : string.Format("'{0}'", value);
+            return string.IsNullOrWhiteSpace(value) ? "NULL" : $"'{value}'";
         }
 
         /// <summary>
@@ -87,19 +87,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         {
             if (dataProxy == null)
             {
-                throw new ArgumentNullException("dataProxy");
+                throw new ArgumentNullException(nameof(dataProxy));
             }
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
             if (queryForDataProxy == null)
             {
-                throw new ArgumentNullException("queryForDataProxy");
+                throw new ArgumentNullException(nameof(queryForDataProxy));
             }
             if (string.IsNullOrEmpty(callerName))
             {
-                throw new ArgumentNullException("callerName");
+                throw new ArgumentNullException(nameof(callerName));
             }
             try
             {

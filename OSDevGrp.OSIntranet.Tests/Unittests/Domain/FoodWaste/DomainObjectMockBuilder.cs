@@ -23,12 +23,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a household.
         /// </summary>
         /// <returns>Mockup for a household.</returns>
-        public static IHousehold BuildHouseholdMock(IHouseholdMember householdMember = null)
+        public static IHousehold BuildHouseholdMock(Guid? householdIdentifier = null, IHouseholdMember householdMember = null)
         {
             var fixture = new Fixture();
             var householdMock = MockRepository.GenerateMock<IHousehold>();
             householdMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
+                .Return(householdIdentifier ?? Guid.NewGuid())
                 .Repeat.Any();
             householdMock.Stub(m => m.Name)
                 .Return(fixture.Create<string>())
@@ -72,7 +72,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             var householdCollection = new List<IHousehold>(numberOfHouseholds);
             while (householdCollection.Count < numberOfHouseholds)
             {
-                householdCollection.Add(BuildHouseholdMock(householdMember));
+                householdCollection.Add(BuildHouseholdMock(householdMember: householdMember));
             }
             return householdCollection;
         }

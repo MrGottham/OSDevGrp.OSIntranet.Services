@@ -45,13 +45,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             /// <summary>
             /// Nummer.
             /// </summary>
-            public int Nummer
-            {
-                get
-                {
-                    return _nummer;
-                }
-            }
+            public int Nummer => _nummer;
 
             #endregion
 
@@ -239,21 +233,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             var sqlString = dataProxy.GetNullableSqlString(value);
             Assert.That(sqlString, Is.Not.Null);
-            Assert.That(sqlString, Is.EqualTo(string.Format("'{0}'", value)));
+            Assert.That(sqlString, Is.EqualTo($"'{value}'"));
         }
 
         /// <summary>
         /// Tester, at GetNullableSqlString returnerer SQL streng for null.
         /// </summary>
         [Test]
-        public void TestAtGetNullableSqlStringReturnererSqlStringForNull()
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("   ")]
+        public void TestAtGetNullableSqlStringReturnererSqlStringForNullEmptyAndWhitespace(string value)
         {
             var fixture = new Fixture();
 
             var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
-            var sqlString = dataProxy.GetNullableSqlString(null);
+            var sqlString = dataProxy.GetNullableSqlString(value);
             Assert.That(sqlString, Is.Not.Null);
             Assert.That(sqlString, Is.EqualTo("NULL"));
         }

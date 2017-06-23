@@ -6,7 +6,9 @@ using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
+using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -136,6 +138,36 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert this storage type.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(bool hasDescription)
+        {
+            Fixture fixture = new Fixture();
+
+            Guid identifier = Guid.NewGuid();
+            Guid householdIdentifier = Guid.NewGuid();
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock(householdIdentifier);
+            int sortOrder = GetLegalSortOrder(fixture);
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
+            int temperatur = GetLegalTemperature(fixture, storageTypeMock.TemperatureRange);
+            DateTime creationTime = DateTime.Now;
+            string description = hasDescription ? fixture.Create<string>() : null;
+            string descritionAsSql = string.IsNullOrWhiteSpace(description) ? "NULL" : $"'{description}'";
+
+            IStorageProxy sut = CreateSut(identifier, householdMock, sortOrder, storageTypeMock, temperatur, creationTime, description);
+            Assert.That(sut, Is.Not.Null);
+
+            string result = sut.GetSqlCommandForInsert();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) VALUES('{identifier.ToString("D").ToUpper()}','{householdIdentifier.ToString("D").ToUpper()}',{sortOrder},'{storageTypeIdentifier.ToString("D").ToUpper()}',{descritionAsSql},{temperatur},{DataRepositoryHelper.GetSqlValueForDateTime(creationTime)})"));
+        }
+
+        /// <summary>
         /// Creates an instance of the data proxy to a given storage which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage which should be used for unit testing.</returns>
@@ -217,6 +249,43 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Return(storageTypeProxy ?? fixture.Create<StorageTypeProxy>())
                 .Repeat.Any();
             return dataProviderMock;
+        }
+
+        /// <summary>
+        /// Gets a legal sort order for a storage.
+        /// </summary>
+        /// <param name="fixture">Auto fixture.</param>
+        /// <returns>Legal sort order for a storage.</returns>
+        private int GetLegalSortOrder(Fixture fixture)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException(nameof(fixture));
+            }
+
+            Random random = new Random(fixture.Create<int>());
+            return random.Next(1, 100);
+        }
+
+        /// <summary>
+        /// Gets a legal temperature for a storage.
+        /// </summary>
+        /// <param name="fixture">Auto fixture.</param>
+        /// <param name="temperatureRange">Temperature range.</param>
+        /// <returns>Legal temperature for a storage.</returns>
+        private int GetLegalTemperature(Fixture fixture, IRange<int> temperatureRange)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException(nameof(fixture));
+            }
+            if (temperatureRange == null)
+            {
+                throw new ArgumentNullException(nameof(temperatureRange));
+            }
+
+            Random random = new Random(fixture.Create<int>());
+            return random.Next(temperatureRange.StartValue, temperatureRange.EndValue);
         }
     }
 }
