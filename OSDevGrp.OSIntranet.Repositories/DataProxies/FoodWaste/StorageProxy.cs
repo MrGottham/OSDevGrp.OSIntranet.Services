@@ -1,7 +1,9 @@
 ﻿using System;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -79,7 +81,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this storage.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            throw new NotImplementedException();
+            string householdIdentifierAsSql = (Household?.Identifier ?? Guid.Empty).ToString("D").ToUpper();
+            string storageTypeIdentifierAsSql = (StorageType?.Identifier ?? Guid.Empty).ToString("D").ToUpper();
+            string desriptionAsSql = string.IsNullOrWhiteSpace(Description) ? "NULL" : $"'{Description}'";
+
+            return $"INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) VALUES('{UniqueId}','{householdIdentifierAsSql}',{SortOrder},'{storageTypeIdentifierAsSql}',{desriptionAsSql},{Temperature},{DataRepositoryHelper.GetSqlValueForDateTime(CreationTime)})";
         }
 
         /// <summary>
@@ -88,7 +94,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this storage.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            throw new NotImplementedException();
+            string householdIdentifierAsSql = (Household?.Identifier ?? Guid.Empty).ToString("D").ToUpper();
+            string storageTypeIdentifierAsSql = (StorageType?.Identifier ?? Guid.Empty).ToString("D").ToUpper();
+            string desriptionAsSql = string.IsNullOrWhiteSpace(Description) ? "NULL" : $"'{Description}'";
+
+            return $"UPDATE Storages SET HouseholdIdentifier='{householdIdentifierAsSql}',SortOrder={SortOrder},StorageTypeIdentifier='{storageTypeIdentifierAsSql}',Descr={desriptionAsSql},Temperature={Temperature},CreationTime={DataRepositoryHelper.GetSqlValueForDateTime(CreationTime)} WHERE StorageIdentifier='{UniqueId}'";
         }
 
         /// <summary>
@@ -97,7 +107,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to delete this storage.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            throw new NotImplementedException();
+            return $"DELETE FROM Storages WHERE StorageIdentifier='{UniqueId}'";
         }
 
         #endregion
@@ -111,6 +121,21 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
         {
+            if (dataReader == null)
+            {
+                throw new ArgumentNullException(nameof(dataReader));
+            }
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(dataProvider));
+            }
+
+            MySqlDataReader mySqlDataReader = dataReader as MySqlDataReader;
+            if (mySqlDataReader == null)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
+            }
+
             throw new NotImplementedException();
         }
 
