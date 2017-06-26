@@ -260,6 +260,65 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that MapData maps data into the proxy.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapDataMapsDataIntoProxy(bool hasDescription)
+        {
+            Fixture fixture = new Fixture();
+
+            Guid identifier = Guid.NewGuid();
+            Guid householdIdentifier = Guid.NewGuid();
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock(householdIdentifier);
+            int sortOrder = GetLegalSortOrder(fixture);
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
+            int temperatur = GetLegalTemperature(fixture, storageTypeMock.TemperatureRange);
+            DateTime creationTime = DateTime.Now;
+            string description = hasDescription ? fixture.Create<string>() : null;
+            string descritionAsSql = string.IsNullOrWhiteSpace(description) ? "NULL" : $"'{description}'";
+
+            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
+
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.SortOrder, Is.EqualTo(default(int)));
+            Assert.That(sut.Temperature, Is.EqualTo(default(int)));
+            Assert.That(sut.TemperatureRange, Is.Null);
+            Assert.That(sut.Creatable, Is.EqualTo(default(bool)));
+            Assert.That(sut.Editable, Is.EqualTo(default(bool)));
+            Assert.That(sut.Deletable, Is.EqualTo(default(bool)));
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Empty);
+
+            sut.MapData(mySqlDataReaderStub, dataProviderMock);
+
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.Value, Is.EqualTo(storageTypeIdentifier));
+            Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
+            Assert.That(sut.Temperature, Is.EqualTo(temperatur));
+            Assert.That(sut.TemperatureRange, Is.Not.Null);
+            Assert.That(sut.TemperatureRange.StartValue, Is.EqualTo(temperaturRange.StartValue));
+            Assert.That(sut.TemperatureRange.EndValue, Is.EqualTo(temperaturRange.EndValue));
+            Assert.That(sut.Creatable, Is.EqualTo(creatable));
+            Assert.That(sut.Editable, Is.EqualTo(editable));
+            Assert.That(sut.Deletable, Is.EqualTo(deletable));
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Empty);
+        }
+
+        /// <summary>
         /// Creates an instance of the data proxy to a given storage which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage which should be used for unit testing.</returns>
