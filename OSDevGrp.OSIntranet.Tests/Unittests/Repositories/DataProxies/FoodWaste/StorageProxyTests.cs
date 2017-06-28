@@ -271,7 +271,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             Guid identifier = Guid.NewGuid();
             Guid householdIdentifier = Guid.NewGuid();
-            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock(householdIdentifier);
             int sortOrder = GetLegalSortOrder(fixture);
             Guid storageTypeIdentifier = Guid.NewGuid();
             IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
@@ -280,23 +279,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             string description = hasDescription ? fixture.Create<string>() : null;
             string descritionAsSql = string.IsNullOrWhiteSpace(description) ? "NULL" : $"'{description}'";
 
-            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
+            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(identifier, householdIdentifier, sortOrder, storageTypeIdentifier, description, temperatur, );
 
             IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
 
-            IStorageTypeProxy sut = CreateSut();
+            IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Household, Is.Null);
             Assert.That(sut.SortOrder, Is.EqualTo(default(int)));
+            Assert.That(sut.StorageType, Is.Null);
+            Assert.That(sut.Description, Is.Null);
             Assert.That(sut.Temperature, Is.EqualTo(default(int)));
-            Assert.That(sut.TemperatureRange, Is.Null);
-            Assert.That(sut.Creatable, Is.EqualTo(default(bool)));
-            Assert.That(sut.Editable, Is.EqualTo(default(bool)));
-            Assert.That(sut.Deletable, Is.EqualTo(default(bool)));
-            Assert.That(sut.Translation, Is.Null);
-            Assert.That(sut.Translations, Is.Not.Null);
-            Assert.That(sut.Translations, Is.Empty);
+            Assert.That(sut.CreationTime, Is.EqualTo(default(DateTime)));
 
             sut.MapData(mySqlDataReaderStub, dataProviderMock);
 
