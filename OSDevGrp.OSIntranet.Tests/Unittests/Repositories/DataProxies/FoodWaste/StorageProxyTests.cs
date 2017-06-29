@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
@@ -273,13 +269,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Guid householdIdentifier = Guid.NewGuid();
             int sortOrder = GetLegalSortOrder(fixture);
             Guid storageTypeIdentifier = Guid.NewGuid();
-            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
-            int temperatur = GetLegalTemperature(fixture, storageTypeMock.TemperatureRange);
-            DateTime creationTime = DateTime.Now;
             string description = hasDescription ? fixture.Create<string>() : null;
-            string descritionAsSql = string.IsNullOrWhiteSpace(description) ? "NULL" : $"'{description}'";
+            int temperatur = GetLegalTemperature(fixture, DomainObjectMockBuilder.BuildIntRange());
+            DateTime creationTime = DateTime.Now;
 
-            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(identifier, householdIdentifier, sortOrder, storageTypeIdentifier, description, temperatur, );
+            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(identifier, householdIdentifier, sortOrder, storageTypeIdentifier, description, temperatur, creationTime);
 
             IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
 
@@ -300,18 +294,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.Identifier.HasValue, Is.True);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.Value, Is.EqualTo(storageTypeIdentifier));
+            Assert.That(sut.Identifier.Value, Is.EqualTo(identifier));
+            Assert.That(sut.Household, Is.Null);
             Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
+            Assert.That(sut.StorageType, Is.Null);
+            if (hasDescription)
+            {
+                Assert.That(sut.Description, Is.Not.Null);
+                Assert.That(sut.Description, Is.Not.Empty);
+                Assert.That(sut.Description, Is.EqualTo(description));
+            }
+            else
+            {
+                Assert.That(sut.Description, Is.Null);
+            }
             Assert.That(sut.Temperature, Is.EqualTo(temperatur));
-            Assert.That(sut.TemperatureRange, Is.Not.Null);
-            Assert.That(sut.TemperatureRange.StartValue, Is.EqualTo(temperaturRange.StartValue));
-            Assert.That(sut.TemperatureRange.EndValue, Is.EqualTo(temperaturRange.EndValue));
-            Assert.That(sut.Creatable, Is.EqualTo(creatable));
-            Assert.That(sut.Editable, Is.EqualTo(editable));
-            Assert.That(sut.Deletable, Is.EqualTo(deletable));
-            Assert.That(sut.Translation, Is.Null);
-            Assert.That(sut.Translations, Is.Not.Null);
-            Assert.That(sut.Translations, Is.Empty);
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
         }
 
         /// <summary>
@@ -342,13 +340,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a MySQL data reader which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a MySQL data reader which should be used for unit testing.</returns>
-        private static MySqlDataReader CreateMySqlDataReaderStub(Guid storageIdentifier, Guid householdIdentifier, int sortOrder, Guid storageTypeIdentifier, string description, int temperature, IRange<int> temperatureRange, DateTime creationTime)
+        private static MySqlDataReader CreateMySqlDataReaderStub(Guid storageIdentifier, Guid householdIdentifier, int sortOrder, Guid storageTypeIdentifier, string description, int temperature, DateTime creationTime)
         {
-            if (temperatureRange == null)
-            {
-                throw new ArgumentNullException(nameof(temperatureRange));
-            }
-
             MySqlDataReader mySqlDataReaderStub = MockRepository.GenerateStub<MySqlDataReader>();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<string>.Is.Equal("StorageIdentifier")))
                 .Return(storageIdentifier.ToString("D").ToUpper())
@@ -364,6 +357,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("Descr")))
                 .Return(4)
+                .Repeat.Any();
+            mySqlDataReaderStub.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(4)))
+                .Return(string.IsNullOrWhiteSpace(description))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<int>.Is.Equal(4)))
                 .Return(description)

@@ -136,7 +136,16 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
             }
 
-            throw new NotImplementedException();
+            Identifier = new Guid(mySqlDataReader.GetString("StorageIdentifier"));
+            SortOrder = mySqlDataReader.GetInt16("SortOrder");
+            Temperature = mySqlDataReader.GetInt16("Temperature");
+            CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
+
+            int descriptionColumnNo = mySqlDataReader.GetOrdinal("Descr");
+            if (mySqlDataReader.IsDBNull(descriptionColumnNo) == false)
+            {
+                Description = mySqlDataReader.GetString(descriptionColumnNo);
+            }
         }
 
         /// <summary>
