@@ -92,7 +92,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>Household member who has been removed af member of this household.</returns>
         public override IHouseholdMember HouseholdMemberRemove(IHouseholdMember householdMember)
         {
-            var householdMemberToRemove = base.HouseholdMemberRemove(householdMember);
+            IHouseholdMember householdMemberToRemove = base.HouseholdMemberRemove(householdMember);
             if (householdMemberToRemove != null)
             {
                 _removedHouseholdMembers.Add(householdMemberToRemove);
@@ -128,11 +128,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             if (household == null)
             {
-                throw new ArgumentNullException("household");
+                throw new ArgumentNullException(nameof(household));
             }
             if (household.Identifier.HasValue)
             {
-                return string.Format("SELECT HouseholdIdentifier,Name,Descr,CreationTime FROM Households WHERE HouseholdIdentifier='{0}'", household.Identifier.Value.ToString("D").ToUpper());
+                return $"SELECT HouseholdIdentifier,Name,Descr,CreationTime FROM Households WHERE HouseholdIdentifier='{household.Identifier.Value.ToString("D").ToUpper()}'";
             }
             throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, household.Identifier, "Identifier"));
         }
@@ -143,8 +143,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to insert this household.</returns>
         public virtual string GetSqlCommandForInsert()
         {
-            var descriptionSqlValue = string.IsNullOrWhiteSpace(Description) ? "NULL" : string.Format("'{0}'", Description);
-            return string.Format("INSERT INTO Households (HouseholdIdentifier,Name,Descr,CreationTime) VALUES('{0}','{1}',{2},{3})", UniqueId, Name, descriptionSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
+            string descriptionSqlValue = string.IsNullOrWhiteSpace(Description) ? "NULL" : $"'{Description}'";
+            return $"INSERT INTO Households (HouseholdIdentifier,Name,Descr,CreationTime) VALUES('{UniqueId}','{Name}',{descriptionSqlValue},{DataRepositoryHelper.GetSqlValueForDateTime(CreationTime)})";
         }
 
         /// <summary>
@@ -153,8 +153,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to update this household.</returns>
         public virtual string GetSqlCommandForUpdate()
         {
-            var descriptionSqlValue = string.IsNullOrWhiteSpace(Description) ? "NULL" : string.Format("'{0}'", Description);
-            return string.Format("UPDATE Households SET Name='{1}',Descr={2},CreationTime={3} WHERE HouseholdIdentifier='{0}'", UniqueId, Name, descriptionSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
+            string descriptionSqlValue = string.IsNullOrWhiteSpace(Description) ? "NULL" : $"'{Description}'";
+            return $"UPDATE Households SET Name='{Name}',Descr={descriptionSqlValue},CreationTime={DataRepositoryHelper.GetSqlValueForDateTime(CreationTime)} WHERE HouseholdIdentifier='{UniqueId}'";
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement to delete this household.</returns>
         public virtual string GetSqlCommandForDelete()
         {
-            return string.Format("DELETE FROM Households WHERE HouseholdIdentifier='{0}'", UniqueId);
+            return $"DELETE FROM Households WHERE HouseholdIdentifier='{UniqueId}'";
         }
 
         #endregion
@@ -179,14 +179,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             if (dataReader == null)
             {
-                throw new ArgumentNullException("dataReader");
+                throw new ArgumentNullException(nameof(dataReader));
             }
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
 
-            var mySqlDataReader = dataReader as MySqlDataReader;
+            MySqlDataReader mySqlDataReader = dataReader as MySqlDataReader;
             if (mySqlDataReader == null)
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
@@ -194,12 +194,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             Identifier = Guid.Parse(mySqlDataReader.GetString("HouseholdIdentifier"));
             Name = mySqlDataReader.GetString("Name");
-            var descriptionColumnNo = mySqlDataReader.GetOrdinal("Descr");
+            CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
+
+            int descriptionColumnNo = mySqlDataReader.GetOrdinal("Descr");
             if (!mySqlDataReader.IsDBNull(descriptionColumnNo))
             {
                 Description = mySqlDataReader.GetString(descriptionColumnNo);
             }
-            CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
 
             if (_dataProvider == null)
             {
@@ -215,7 +216,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
         }
 
@@ -228,7 +229,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
             if (Identifier.HasValue == false)
             {
@@ -240,24 +241,24 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 _dataProvider = dataProvider;
             }
 
-            var unsavedHouseholdMembers = base.HouseholdMembers.ToArray(); // This will not force the proxy to reload the household members.
-            var unsavedHouseholdMemberWithoutIdentifier = unsavedHouseholdMembers.FirstOrDefault(unsavedHouseholdMember => unsavedHouseholdMember.Identifier.HasValue == false);
+            IEnumerable<IHouseholdMember> unsavedHouseholdMembers = base.HouseholdMembers.ToArray(); // This will not force the proxy to reload the household members.
+            IHouseholdMember unsavedHouseholdMemberWithoutIdentifier = unsavedHouseholdMembers.FirstOrDefault(unsavedHouseholdMember => unsavedHouseholdMember.Identifier.HasValue == false);
             if (unsavedHouseholdMemberWithoutIdentifier != null)
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, unsavedHouseholdMemberWithoutIdentifier.Identifier, "Identifier"));
             }
 
-            var existingMemberOfHouseholds = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this).ToList();
-            foreach (var unsavedHouseholdMember in unsavedHouseholdMembers.Where(m => m.Identifier.HasValue))
+            IList<MemberOfHouseholdProxy> existingMemberOfHouseholds = MemberOfHouseholdProxy.GetMemberOfHouseholds(_dataProvider, this).ToList();
+            foreach (IHouseholdMember unsavedHouseholdMember in unsavedHouseholdMembers.Where(m => m.Identifier.HasValue))
             {
-                var householdMember = unsavedHouseholdMember;
+                IHouseholdMember householdMember = unsavedHouseholdMember;
                 if (existingMemberOfHouseholds.Any(existingMemberOfHousehold => existingMemberOfHousehold.HouseholdMemberIdentifier == householdMember.Identifier))
                 {
                     continue;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                using (IDataProviderBase subDataProvider = (IDataProviderBase) _dataProvider.Clone())
                 {
-                    var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMember, this)
+                    MemberOfHouseholdProxy memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMember, this)
                     {
                         Identifier = Guid.NewGuid()
                     };
@@ -266,28 +267,28 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             while (_removedHouseholdMembers.Count > 0)
             {
-                var householdMemberToRemove = _removedHouseholdMembers.First();
+                IHouseholdMember householdMemberToRemove = _removedHouseholdMembers.First();
                 if (householdMemberToRemove.Identifier.HasValue == false)
                 {
                     _removedHouseholdMembers.Remove(householdMemberToRemove);
                     continue;
                 }
 
-                var memberOfHouseholdToRemove = existingMemberOfHouseholds.SingleOrDefault(existingMemberOfHousehold => existingMemberOfHousehold.HouseholdMemberIdentifier == householdMemberToRemove.Identifier);
+                MemberOfHouseholdProxy memberOfHouseholdToRemove = existingMemberOfHouseholds.SingleOrDefault(existingMemberOfHousehold => existingMemberOfHousehold.HouseholdMemberIdentifier == householdMemberToRemove.Identifier);
                 if (memberOfHouseholdToRemove == null)
                 {
                     _removedHouseholdMembers.Remove(householdMemberToRemove);
                     continue;
                 }
 
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                using (IDataProviderBase subDataProvider = (IDataProviderBase) _dataProvider.Clone())
                 {
                     subDataProvider.Delete(memberOfHouseholdToRemove);
                 }
-                var householdMemberProxy = memberOfHouseholdToRemove.HouseholdMember as IHouseholdMemberProxy;
+                IHouseholdMemberProxy householdMemberProxy = memberOfHouseholdToRemove.HouseholdMember as IHouseholdMemberProxy;
                 if (householdMemberProxy == null)
                 {
-                    using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                    using (IDataProviderBase subDataProvider = (IDataProviderBase) _dataProvider.Clone())
                     {
                         householdMemberProxy = subDataProvider.Get(new HouseholdMemberProxy {Identifier = memberOfHouseholdToRemove.HouseholdMemberIdentifier});
                     }
@@ -306,7 +307,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
             if (Identifier.HasValue == false)
             {
@@ -318,7 +319,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 _dataProvider = dataProvider;
             }
 
-            foreach (var affectedHouseholdMember in MemberOfHouseholdProxy.DeleteMemberOfHouseholds(_dataProvider, this))
+            foreach (IHouseholdMemberProxy affectedHouseholdMember in MemberOfHouseholdProxy.DeleteMemberOfHouseholds(_dataProvider, this))
             {
                 HandleAffectedHouseholdMember(_dataProvider, affectedHouseholdMember);
             }
@@ -333,11 +334,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             if (dataProvider == null)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new ArgumentNullException(nameof(dataProvider));
             }
             if (affectedHouseholdMember == null)
             {
-                throw new ArgumentNullException("affectedHouseholdMember");
+                throw new ArgumentNullException(nameof(affectedHouseholdMember));
             }
             if (affectedHouseholdMember.Membership != Membership.Basic)
             {
