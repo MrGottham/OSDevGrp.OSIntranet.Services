@@ -132,6 +132,38 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Deletable, opt => opt.MapFrom(s => s.Deletable))
                     .ForMember(m => m.Translations, opt => opt.MapFrom(s => s.Translations));
 
+                config.CreateMap<IStorage, IStorageProxy>()
+                    .ConstructUsing(m =>
+                    {
+                        IStorageProxy storageProxy = m as IStorageProxy;
+                        if (storageProxy != null)
+                        {
+                            return storageProxy;
+                        }
+                        IHouseholdProxy householdProxy;
+                        lock (SyncRoot)
+                        {
+                            if (_mappingHousehold == null)
+                            {
+                                householdProxy = m.Household as IHouseholdProxy;
+                                if (householdProxy == null && Mapper != null)
+                                {
+                                    householdProxy = Mapper.Map<IHousehold, IHouseholdProxy>(m.Household);
+                                }
+                            }
+                            else
+                            {
+                                householdProxy = _mappingHousehold;
+                            }
+                        }
+                        IStorageTypeProxy storageTypeProxy = m.StorageType as IStorageTypeProxy;
+                        if (storageTypeProxy == null && Mapper != null)
+                        {
+                            storageTypeProxy = Mapper.Map<IStorageType, IStorageTypeProxy>(m.StorageType);
+                        }
+                        return new StorageProxy(householdProxy, m.SortOrder, storageTypeProxy, m.Temperature, m.CreationTime, m.Description);
+                    });
+
                 config.CreateMap<IStorageType, IStorageTypeProxy>()
                     .ConstructUsing(m =>
                     {

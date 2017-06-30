@@ -66,6 +66,10 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 return (TIdentifiable) Get<IHousehold, HouseholdProxy>(identifier);
             }
+            if (typeof(TIdentifiable) == typeof(IStorage))
+            {
+                return (TIdentifiable) Get<IStorage, StorageProxy>(identifier);
+            }
             if (typeof(TIdentifiable) == typeof(IStorageType))
             {
                 return (TIdentifiable) Get<IStorageType, StorageTypeProxy>(identifier);
@@ -126,6 +130,12 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (household != null)
             {
                 return (TIdentifiable) Insert<IHousehold, IHouseholdProxy>(household);
+            }
+
+            IStorage storage = identifiable as IStorage;
+            if (storage != null)
+            {
+                return (TIdentifiable) Insert<IStorage, IStorageProxy>(storage);
             }
 
             IStorageType storageType = identifiable as IStorageType;
@@ -210,6 +220,12 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
                 return (TIdentifiable) Update<IHousehold, IHouseholdProxy>(household);
             }
 
+            IStorage storage = identifiable as IStorage;
+            if (storage != null)
+            {
+                return (TIdentifiable) Update<IStorage, IStorageProxy>(storage);
+            }
+
             IStorageType storageType = identifiable as IStorageType;
             if (storageType != null)
             {
@@ -289,6 +305,13 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             if (household != null)
             {
                 Delete<IHousehold, IHouseholdProxy>(household);
+                return;
+            }
+
+            IStorage storage = identifiable as IStorage;
+            if (storage != null)
+            {
+                Delete<IStorage, IStorageProxy>(storage);
                 return;
             }
 

@@ -46,10 +46,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 // ReSharper restore PossibleInvalidOperationException
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Identifier, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(result.Identifier.HasValue, Is.True);
-                // ReSharper disable PossibleInvalidOperationException
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 Assert.That(result.Identifier.Value, Is.EqualTo(household.Identifier.Value));
-                // ReSharper restore PossibleInvalidOperationException
             }
             finally
             {
@@ -87,12 +87,93 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
+        /// Tests that Get gets a given storage.
+        /// </summary>
+        [Test]
+        public void TestThatGetGetsStorage()
+        {
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            IStorageType storageType = _householdDataRepository.Get<IStorageType>(StorageType.IdentifierForRefrigerator);
+            Assert.That(storageType, Is.Not.Null);
+
+            IHousehold household = _householdDataRepository.Insert(new Household(fixture.Create<string>()));
+            try
+            {
+                IStorage storage = _householdDataRepository.Insert(new Storage(household, random.Next(1, 100), storageType, random.Next(storageType.TemperatureRange.StartValue, storageType.TemperatureRange.EndValue), DateTime.Now));
+                try
+                {
+                    // ReSharper disable PossibleInvalidOperationException
+                    IStorage result = _householdDataRepository.Get<IStorage>(storage.Identifier.Value);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result.Identifier, Is.Not.Null);
+                    // ReSharper disable ConditionIsAlwaysTrueOrFalse
+                    Assert.That(result.Identifier.HasValue, Is.True);
+                    // ReSharper restore ConditionIsAlwaysTrueOrFalse
+                    Assert.That(result.Identifier.Value, Is.EqualTo(storage.Identifier.Value));
+                }
+                finally
+                {
+                    _householdDataRepository.Delete(storage);
+                }
+            }
+            finally
+            {
+                _householdDataRepository.Delete(household);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Get updates a given storage.
+        /// </summary>
+        [Test]
+        public void TestThatGetUpdatesStorage()
+        {
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
+
+            IStorageType storageType = _householdDataRepository.Get<IStorageType>(StorageType.IdentifierForRefrigerator);
+            Assert.That(storageType, Is.Not.Null);
+
+            IHousehold household = _householdDataRepository.Insert(new Household(fixture.Create<string>()));
+            try
+            {
+                IStorage storage = _householdDataRepository.Insert(new Storage(household, random.Next(1, 100), storageType, random.Next(storageType.TemperatureRange.StartValue, storageType.TemperatureRange.EndValue), DateTime.Now));
+                try
+                {
+                    Assert.That(storage.Description, Is.Null);
+
+                    storage.Description = fixture.Create<string>();
+                    _householdDataRepository.Update(storage);
+
+                    // ReSharper disable PossibleInvalidOperationException
+                    IStorage result = _householdDataRepository.Get<IStorage>(storage.Identifier.Value);
+                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(result, Is.Not.Null);
+                    Assert.That(result.Description, Is.Not.Null);
+                    Assert.That(result.Description, Is.Not.Empty);
+                    Assert.That(result.Description, Is.EqualTo(storage.Description));
+                }
+                finally
+                {
+                    _householdDataRepository.Delete(storage);
+                }
+            }
+            finally
+            {
+                _householdDataRepository.Delete(household);
+            }
+        }
+
+        /// <summary>
         /// Tests that HouseholdMemberGetByMailAddress returns the household member when the mail address does exist.
         /// </summary>
         [Test]
         public void TestThatHouseholdMemberGetByMailAddressReturnsHouseholdMemberWhenMailAddressDoesExist()
         {
-            var mailAddress = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower());
+            var mailAddress = $"test.{Guid.NewGuid().ToString("D").ToLower()}@osdevgrp.dk";
             var householdMember = _householdDataRepository.Insert(new HouseholdMember(mailAddress));
             try
             {
@@ -114,7 +195,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatHouseholdMemberGetByMailAddressReturnsNullWhenMailAddressDoesNotExist()
         {
-            var mailAddress = string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower());
+            var mailAddress = $"test.{Guid.NewGuid().ToString("D").ToLower()}@osdevgrp.dk";
             var result = _householdDataRepository.HouseholdMemberGetByMailAddress(mailAddress);
             Assert.That(result, Is.Null);
         }
@@ -125,7 +206,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatGetGetsHouseholdMember()
         {
-            var householdMember = _householdDataRepository.Insert(new HouseholdMember(string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower())));
+            var householdMember = _householdDataRepository.Insert(new HouseholdMember($"test.{Guid.NewGuid().ToString("D").ToLower()}@osdevgrp.dk"));
             try
             {
                 // ReSharper disable PossibleInvalidOperationException
@@ -133,10 +214,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 // ReSharper restore PossibleInvalidOperationException
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Identifier, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(result.Identifier.HasValue, Is.True);
-                // ReSharper disable PossibleInvalidOperationException
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 Assert.That(result.Identifier.Value, Is.EqualTo(householdMember.Identifier.Value));
-                // ReSharper restore PossibleInvalidOperationException
             }
             finally
             {
@@ -150,7 +231,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         [Test]
         public void TestThatUpdateUpdatesHouseholdMember()
         {
-            var householdMember = _householdDataRepository.Insert(new HouseholdMember(string.Format("test.{0}@osdevgrp.dk", Guid.NewGuid().ToString("D").ToLower())));
+            var householdMember = _householdDataRepository.Insert(new HouseholdMember($"test.{Guid.NewGuid().ToString("D").ToLower()}@osdevgrp.dk"));
             try
             {
                 householdMember.ActivationTime = DateTime.Now;
@@ -161,10 +242,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
                 // ReSharper restore PossibleInvalidOperationException
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.ActivationTime, Is.Not.Null);
+                // ReSharper disable ConditionIsAlwaysTrueOrFalse
                 Assert.That(result.ActivationTime.HasValue, Is.True);
-                // ReSharper disable PossibleInvalidOperationException
+                // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 Assert.That(result.ActivationTime.Value, Is.EqualTo(DateTime.Now).Within(3).Seconds);
-                // ReSharper restore PossibleInvalidOperationException
             }
             finally
             {

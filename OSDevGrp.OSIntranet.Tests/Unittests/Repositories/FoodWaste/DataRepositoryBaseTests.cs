@@ -27,6 +27,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         private static readonly IList<Tuple<Type, Type, Type>> TypesToTest = new List<Tuple<Type, Type, Type>>
         {
             new Tuple<Type, Type, Type>(typeof(IHousehold), typeof(IHouseholdProxy), typeof(HouseholdProxy)),
+            new Tuple<Type, Type, Type>(typeof(IStorage), typeof(IStorageProxy), typeof(StorageProxy)),
             new Tuple<Type, Type, Type>(typeof(IStorageType), typeof(IStorageTypeProxy), typeof(StorageTypeProxy)),
             new Tuple<Type, Type, Type>(typeof(IHouseholdMember), typeof(IHouseholdMemberProxy), typeof(HouseholdMemberProxy)),
             new Tuple<Type, Type, Type>(typeof(IPayment), typeof(IPaymentProxy), typeof(PaymentProxy)),

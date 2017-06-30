@@ -275,7 +275,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(identifier, householdIdentifier, sortOrder, storageTypeIdentifier, description, temperatur, creationTime);
 
-            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+            HouseholdProxy householdProxy = fixture.Create<HouseholdProxy>();
+            StorageTypeProxy storageTypeProxy = fixture.Create<StorageTypeProxy>();
+
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture, householdProxy, storageTypeProxy);
 
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
@@ -295,9 +298,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Identifier.HasValue, Is.True);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.Identifier.Value, Is.EqualTo(identifier));
-            Assert.That(sut.Household, Is.Null);
+            Assert.That(sut.Household, Is.Not.Null);
+            Assert.That(sut.Household, Is.EqualTo(householdProxy));
             Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
-            Assert.That(sut.StorageType, Is.Null);
+            Assert.That(sut.StorageType, Is.Not.Null);
+            Assert.That(sut.StorageType, Is.EqualTo(storageTypeProxy));
             if (hasDescription)
             {
                 Assert.That(sut.Description, Is.Not.Null);
@@ -310,6 +315,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             }
             Assert.That(sut.Temperature, Is.EqualTo(temperatur));
             Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
+
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
+            dataProviderMock.AssertWasCalled(m => m.Get(Arg<HouseholdProxy>.Matches(src => src != null && src.Identifier.HasValue && src.Identifier.Value == householdIdentifier)), opt => opt.Repeat.Once());
+            dataProviderMock.AssertWasCalled(m => m.Get(Arg<StorageTypeProxy>.Matches(src => src != null && src.Identifier.HasValue && src.Identifier.Value == storageTypeIdentifier)), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that MapRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            Fixture fixture = new Fixture();
+
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.SaveRelations(null, fixture.Create<bool>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.DeleteRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
@@ -377,7 +430,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private static IDataProviderBase CreateDataProviderMock(Fixture fixture, StorageTypeProxy storageTypeProxy = null, HouseholdProxy householdProxy = null)
+        private static IDataProviderBase CreateDataProviderMock(Fixture fixture, HouseholdProxy householdProxy = null, StorageTypeProxy storageTypeProxy = null)
         {
             if (fixture == null)
             {

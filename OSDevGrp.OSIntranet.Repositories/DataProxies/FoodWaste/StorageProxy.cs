@@ -15,6 +15,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class StorageProxy : Storage, IStorageProxy
     {
+        #region Private variables
+
+        private Guid? _householdIdentifier;
+        private Guid? _storageTypeIdentifier;
+        private IDataProviderBase _dataProvider;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -36,6 +44,56 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public StorageProxy(IHousehold household, int sortOrder, IStorageType storageType, int temperature, DateTime creationTime, string description = null)
             : base(household, sortOrder, storageType, temperature, creationTime, description)
         {
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the household where the storage are placed.
+        /// </summary>
+        public override IHousehold Household
+        {
+            get
+            {
+                if (base.Household != null || _householdIdentifier.HasValue == false || _dataProvider == null)
+                {
+                    return base.Household;
+                }
+                using (IDataProviderBase subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                {
+                    HouseholdProxy householdProxy = new HouseholdProxy
+                    {
+                        Identifier = _householdIdentifier.Value
+                    };
+                    base.Household = subDataProvider.Get(householdProxy);
+                }
+                return base.Household;
+            }
+        }
+
+        /// <summary>
+        /// Gets the storage type for the storage.
+        /// </summary>
+        public override IStorageType StorageType
+        {
+            get
+            {
+                if (base.StorageType != null || _storageTypeIdentifier.HasValue == false || _dataProvider == null)
+                {
+                    return base.StorageType;
+                }
+                using (IDataProviderBase subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                {
+                    StorageTypeProxy storageTypeProxy = new StorageTypeProxy
+                    {
+                        Identifier = _storageTypeIdentifier.Value
+                    };
+                    base.StorageType = subDataProvider.Get(storageTypeProxy);
+                }
+                return base.StorageType;
+            }
         }
 
         #endregion
@@ -146,6 +204,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 Description = mySqlDataReader.GetString(descriptionColumnNo);
             }
+
+            _householdIdentifier = new Guid(mySqlDataReader.GetString("HouseholdIdentifier"));
+            _storageTypeIdentifier = new Guid(mySqlDataReader.GetString("StorageTypeIdentifier"));
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -154,7 +220,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(dataProvider));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -164,7 +238,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
         public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(dataProvider));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         /// <summary>
@@ -173,7 +255,15 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase dataProvider)
         {
-            throw new NotImplementedException();
+            if (dataProvider == null)
+            {
+                throw new ArgumentNullException(nameof(dataProvider));
+            }
+
+            if (_dataProvider == null)
+            {
+                _dataProvider = dataProvider;
+            }
         }
 
         #endregion

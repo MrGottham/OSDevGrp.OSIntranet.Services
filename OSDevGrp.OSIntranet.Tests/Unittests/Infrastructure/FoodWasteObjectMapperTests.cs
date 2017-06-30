@@ -334,6 +334,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
+        /// Tests that Map maps Storage to StorageProxy.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapMapsStorageToStorageProxy(bool hasDescription)
+        {
+            IStorage storageMock = DomainObjectMockBuilder.BuildStorageMock(hasDescription: hasDescription);
+
+            var foodWasteObjectMapper = new FoodWasteObjectMapper();
+            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+
+            IStorageProxy storageProxy = foodWasteObjectMapper.Map<IStorage, IStorageProxy>(storageMock);
+            Assert.That(storageProxy.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(storageProxy.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(storageProxy.Identifier.Value, Is.EqualTo(storageMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(storageProxy.Household, Is.Not.Null);
+            Assert.That(storageProxy.Household, Is.TypeOf<HouseholdProxy>());
+            Assert.That(storageProxy.SortOrder, Is.EqualTo(storageMock.SortOrder));
+            Assert.That(storageProxy.StorageType, Is.Not.Null);
+            Assert.That(storageProxy.StorageType, Is.TypeOf<StorageTypeProxy>());
+            if (hasDescription)
+            {
+                Assert.That(storageProxy.Description, Is.Not.Null);
+                Assert.That(storageProxy.Description, Is.Not.Empty);
+                Assert.That(storageProxy.Description, Is.EqualTo(storageMock.Description));
+            }
+            else
+            {
+                Assert.That(storageProxy.Description, Is.Null);
+            }
+            Assert.That(storageProxy.Temperature, Is.EqualTo(storageMock.Temperature));
+            Assert.That(storageProxy.CreationTime, Is.EqualTo(storageMock.CreationTime));
+        }
+
+        /// <summary>
         /// Tests that Map maps StorageType to StorageTypeIdentificationView.
         /// </summary>
         [Test]
