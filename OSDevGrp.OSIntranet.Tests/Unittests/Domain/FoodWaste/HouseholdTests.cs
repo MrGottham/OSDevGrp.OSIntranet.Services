@@ -42,8 +42,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new DateTime CreationTime
             {
-                get { return base.CreationTime; }
-                set { base.CreationTime = value; }
+                get => base.CreationTime;
+                set => base.CreationTime = value;
             }
 
             /// <summary>
@@ -51,8 +51,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             /// </summary>
             public new IEnumerable<IHouseholdMember> HouseholdMembers
             {
-                get { return base.HouseholdMembers; }
-                set { base.HouseholdMembers = value; }
+                get => base.HouseholdMembers;
+                set => base.HouseholdMembers = value;
             }
 
             #endregion
@@ -64,20 +64,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatConstructorWithoutDescriptionInitializeHousehold()
         {
-            var fixture = new Fixture();
-            var name = fixture.Create<string>();
+            Fixture fixture = new Fixture();
+
+            string name = fixture.Create<string>();
             
-            var household = new Household(name);
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.Identifier, Is.Null);
-            Assert.That(household.Identifier.HasValue, Is.False);
-            Assert.That(household.Name, Is.Not.Null);
-            Assert.That(household.Name, Is.Not.Empty);
-            Assert.That(household.Name, Is.EqualTo(name));
-            Assert.That(household.Description, Is.Null);
-            Assert.That(household.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = new Household(name);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Name, Is.Not.Null);
+            Assert.That(sut.Name, Is.Not.Empty);
+            Assert.That(sut.Name, Is.EqualTo(name));
+            Assert.That(sut.Description, Is.Null);
+            Assert.That(sut.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
         }
 
         /// <summary>
@@ -86,23 +87,24 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatConstructorWithDescriptionInitializeHousehold()
         {
-            var fixture = new Fixture();
-            var name = fixture.Create<string>();
-            var description = fixture.Create<string>();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(name, description);
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.Identifier, Is.Null);
-            Assert.That(household.Identifier.HasValue, Is.False);
-            Assert.That(household.Name, Is.Not.Null);
-            Assert.That(household.Name, Is.Not.Empty);
-            Assert.That(household.Name, Is.EqualTo(name));
-            Assert.That(household.Description, Is.Not.Null);
-            Assert.That(household.Description, Is.Not.Empty);
-            Assert.That(household.Description, Is.EqualTo(description));
-            Assert.That(household.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            string name = fixture.Create<string>();
+            string description = fixture.Create<string>();
+
+            IHousehold sut = new Household(name, description);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Name, Is.Not.Null);
+            Assert.That(sut.Name, Is.Not.Empty);
+            Assert.That(sut.Name, Is.EqualTo(name));
+            Assert.That(sut.Description, Is.Not.Null);
+            Assert.That(sut.Description, Is.Not.Empty);
+            Assert.That(sut.Description, Is.EqualTo(description));
+            Assert.That(sut.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
         }
 
         /// <summary>
@@ -116,12 +118,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase("   ")]
         public void TestThatConstructorThrowsArgumentNullExceptionWhenNameIsInvalid(string invalidValue)
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new Household(invalidValue));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("name"));
-            Assert.That(exception.InnerException, Is.Null);
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new Household(invalidValue));
+            // ReSharper restore ObjectCreationAsStatement
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "name");
         }
 
         /// <summary>
@@ -135,17 +136,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase("   ")]
         public void TestThatNameSetterThrowsArgumentNullExceptionWhenValueIsInvalid(string invalidValue)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => household.Name = invalidValue);
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("value"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Name = invalidValue);
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "value");
         }
 
         /// <summary>
@@ -154,22 +152,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatNameSetterUpdatesValueOfName()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.Name, Is.Not.Null);
-            Assert.That(household.Name, Is.Not.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Name, Is.Not.Null);
+            Assert.That(sut.Name, Is.Not.Empty);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             Assert.That(newValue, Is.Not.Null);
             Assert.That(newValue, Is.Not.Empty);
-            Assert.That(newValue, Is.Not.EqualTo(household.Name));
+            Assert.That(newValue, Is.Not.EqualTo(sut.Name));
 
-            household.Name = newValue;
-            Assert.That(household.Name, Is.Not.Null);
-            Assert.That(household.Name, Is.Not.Empty);
-            Assert.That(household.Name, Is.EqualTo(newValue));
+            sut.Name = newValue;
+            Assert.That(sut.Name, Is.Not.Null);
+            Assert.That(sut.Name, Is.Not.Empty);
+            Assert.That(sut.Name, Is.EqualTo(newValue));
         }
 
         /// <summary>
@@ -178,21 +176,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatDescriptionSetterUpdatesValueOfDescriptionWhenValueIsNotNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.Description, Is.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Description, Is.Null);
 
-            var newValue = fixture.Create<string>();
+            string newValue = fixture.Create<string>();
             Assert.That(newValue, Is.Not.Null);
             Assert.That(newValue, Is.Not.Empty);
-            Assert.That(newValue, Is.Not.EqualTo(household.Description));
+            Assert.That(newValue, Is.Not.EqualTo(sut.Description));
 
-            household.Description = newValue;
-            Assert.That(household.Description, Is.Not.Null);
-            Assert.That(household.Description, Is.Not.Empty);
-            Assert.That(household.Description, Is.EqualTo(newValue));
+            sut.Description = newValue;
+            Assert.That(sut.Description, Is.Not.Null);
+            Assert.That(sut.Description, Is.Not.Empty);
+            Assert.That(sut.Description, Is.EqualTo(newValue));
         }
 
         /// <summary>
@@ -201,15 +199,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatDescriptionSetterUpdatesValueOfDescriptionValueIsNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>(), fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.Description, Is.Not.Null);
-            Assert.That(household.Description, Is.Not.Empty);
+            IHousehold sut = CreateSut(fixture, true);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Description, Is.Not.Null);
+            Assert.That(sut.Description, Is.Not.Empty);
 
-            household.Description = null;
-            Assert.That(household.Description, Is.Null);
+            sut.Description = null;
+            Assert.That(sut.Description, Is.Null);
         }
 
         /// <summary>
@@ -218,18 +216,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCreationTimeSetterUpdatesValueOfCreationTime()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var household = new MyHousehold(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            MyHousehold sut = CreateMySut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
 
-            var newValue = household.CreationTime.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
-            Assert.That(newValue, Is.Not.EqualTo(household.CreationTime));
+            DateTime newValue = sut.CreationTime.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
+            Assert.That(newValue, Is.Not.EqualTo(sut.CreationTime));
 
-            household.CreationTime = newValue;
-            Assert.That(household.CreationTime, Is.EqualTo(newValue));
+            sut.CreationTime = newValue;
+            Assert.That(sut.CreationTime, Is.EqualTo(newValue));
         }
 
         /// <summary>
@@ -238,17 +236,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMembersSetterThrowsArgumentNullExceptionWhenValueIsNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new MyHousehold(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            MyHousehold sut = CreateMySut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => household.HouseholdMembers = null);
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("value"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.HouseholdMembers = null);
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "value");
         }
 
         /// <summary>
@@ -257,14 +252,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMembersSetterUpdatesValueOfHouseholdMembers()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new MyHousehold(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            MyHousehold sut = CreateMySut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            var householdMemberMockCollection = new List<IHouseholdMember>
+            IEnumerable<IHouseholdMember> householdMemberMockCollection = new List<IHouseholdMember>
             {
                 MockRepository.GenerateMock<IHouseholdMember>(),
                 MockRepository.GenerateMock<IHouseholdMember>(),
@@ -272,12 +267,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             };
             Assert.That(householdMemberMockCollection, Is.Not.Null);
             Assert.That(householdMemberMockCollection, Is.Not.Empty);
-            Assert.That(householdMemberMockCollection, Is.Not.EqualTo(household.HouseholdMembers));
+            Assert.That(householdMemberMockCollection, Is.Not.EqualTo(sut.HouseholdMembers));
 
-            household.HouseholdMembers = householdMemberMockCollection;
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers, Is.EqualTo(householdMemberMockCollection));
+            sut.HouseholdMembers = householdMemberMockCollection;
+            // ReSharper disable PossibleMultipleEnumeration
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers, Is.EqualTo(householdMemberMockCollection));
+            // ReSharper restore PossibleMultipleEnumeration
         }
 
         /// <summary>
@@ -286,17 +283,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberAddThrowsArgumentNullExceptionWhenHouseholdMemberIsNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => household.HouseholdMemberAdd(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.HouseholdMemberAdd(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "householdMember");
         }
 
         /// <summary>
@@ -305,23 +299,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberAddAddsHouseholdMember()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMemberMock.Stub(m => m.Households)
                 .Return(new List<IHousehold>(0))
                 .Repeat.Any();
 
-            household.HouseholdMemberAdd(householdMemberMock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(1));
-            Assert.That(household.HouseholdMembers.Contains(householdMemberMock), Is.True);
+            sut.HouseholdMemberAdd(householdMemberMock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(1));
+            Assert.That(sut.HouseholdMembers.Contains(householdMemberMock), Is.True);
         }
 
         /// <summary>
@@ -330,17 +324,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberAddCallsHouseholdsOnHouseholdMember()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMemberMock.Stub(m => m.Households)
                 .Return(new List<IHousehold>(0))
                 .Repeat.Any();
 
-            household.HouseholdMemberAdd(householdMemberMock);
+            sut.HouseholdMemberAdd(householdMemberMock);
 
             householdMemberMock.AssertWasCalled(m => m.Households);
         }
@@ -351,19 +345,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberAddCallsHouseholdAddOnHouseholdMemberWhenHouseholdMemberIsNotMemberOfHousehold()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMemberMock.Stub(m => m.Households)
                 .Return(new List<IHousehold>(0))
                 .Repeat.Any();
 
-            household.HouseholdMemberAdd(householdMemberMock);
+            sut.HouseholdMemberAdd(householdMemberMock);
 
-            householdMemberMock.AssertWasCalled(m => m.HouseholdAdd(Arg<IHousehold>.Is.Equal(household)));
+            householdMemberMock.AssertWasCalled(m => m.HouseholdAdd(Arg<IHousehold>.Is.Equal(sut)));
         }
 
         /// <summary>
@@ -372,17 +366,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberAddDoesNotCallHouseholdAddOnHouseholdMemberWhenHouseholdMemberIsMemberOfHousehold()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMemberMock.Stub(m => m.Households)
-                .Return(new List<IHousehold> {household})
+                .Return(new List<IHousehold> {sut})
                 .Repeat.Any();
 
-            household.HouseholdMemberAdd(householdMemberMock);
+            sut.HouseholdMemberAdd(householdMemberMock);
 
             householdMemberMock.AssertWasNotCalled(m => m.HouseholdAdd(Arg<IHousehold>.Is.Anything));
         }
@@ -393,17 +387,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberRemoveThrowsArgumentNullExceptionWhenHouseholdMemberIsNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => household.HouseholdMemberRemove(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.HouseholdMemberRemove(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "householdMember");
         }
 
         /// <summary>
@@ -412,39 +403,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberRemoveReturnsNullWhenHouseholdMemberDoesNotExistOnHousehold()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember1Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember2Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember3Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            household.HouseholdMemberAdd(householdMember1Mock);
-            household.HouseholdMemberAdd(householdMember2Mock);
-            household.HouseholdMemberAdd(householdMember3Mock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
-            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+            sut.HouseholdMemberAdd(householdMember1Mock);
+            sut.HouseholdMemberAdd(householdMember2Mock);
+            sut.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(sut.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember3Mock), Is.True);
 
-            var result = household.HouseholdMemberRemove(MockRepository.GenerateMock<IHouseholdMember>());
+            IHouseholdMember result = sut.HouseholdMemberRemove(MockRepository.GenerateMock<IHouseholdMember>());
             Assert.That(result, Is.Null);
         }
 
@@ -454,45 +445,45 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberRemoveRemovesHouseholdMember()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember1Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember2Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember3Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            household.HouseholdMemberAdd(householdMember1Mock);
-            household.HouseholdMemberAdd(householdMember2Mock);
-            household.HouseholdMemberAdd(householdMember3Mock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
-            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+            sut.HouseholdMemberAdd(householdMember1Mock);
+            sut.HouseholdMemberAdd(householdMember2Mock);
+            sut.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(sut.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember3Mock), Is.True);
 
-            household.HouseholdMemberRemove(householdMember2Mock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(2));
-            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.False);
-            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+            sut.HouseholdMemberRemove(householdMember2Mock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(2));
+            Assert.That(sut.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember2Mock), Is.False);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember3Mock), Is.True);
         }
 
         /// <summary>
@@ -501,39 +492,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberRemoveCallsHouseholdsOnHouseholdMember()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember1Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember2Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember3Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            household.HouseholdMemberAdd(householdMember1Mock);
-            household.HouseholdMemberAdd(householdMember2Mock);
-            household.HouseholdMemberAdd(householdMember3Mock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
-            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+            sut.HouseholdMemberAdd(householdMember1Mock);
+            sut.HouseholdMemberAdd(householdMember2Mock);
+            sut.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(sut.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember3Mock), Is.True);
 
-            household.HouseholdMemberRemove(householdMember2Mock);
+            sut.HouseholdMemberRemove(householdMember2Mock);
 
             householdMember2Mock.AssertWasCalled(m => m.Households, opt => opt.Repeat.Times(2));  // One time when added and one time when removed.
         }
@@ -544,41 +535,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberRemoveCallsHouseholdRemoveOnHouseholdMemberWhenHouseholdExistsOnHouseholdMember()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
             var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember1Mock.Stub(m => m.Households)
-                .Return(new List<Household> {household})
+                .Return(new List<IHousehold> {sut})
                 .Repeat.Any();
 
             var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember2Mock.Stub(m => m.Households)
-                .Return(new List<Household> {household})
+                .Return(new List<IHousehold> {sut})
                 .Repeat.Any();
 
             var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember3Mock.Stub(m => m.Households)
-                .Return(new List<Household> {household})
+                .Return(new List<IHousehold> {sut})
                 .Repeat.Any();
 
-            household.HouseholdMemberAdd(householdMember1Mock);
-            household.HouseholdMemberAdd(householdMember2Mock);
-            household.HouseholdMemberAdd(householdMember3Mock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
-            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+            sut.HouseholdMemberAdd(householdMember1Mock);
+            sut.HouseholdMemberAdd(householdMember2Mock);
+            sut.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(sut.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember3Mock), Is.True);
 
-            household.HouseholdMemberRemove(householdMember2Mock);
+            sut.HouseholdMemberRemove(householdMember2Mock);
 
-            householdMember2Mock.AssertWasCalled(m => m.HouseholdRemove(Arg<IHousehold>.Is.Equal(household)));
+            householdMember2Mock.AssertWasCalled(m => m.HouseholdRemove(Arg<IHousehold>.Is.Equal(sut)));
         }
 
         /// <summary>
@@ -587,39 +578,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberRemoveDoesNotCallHouseholdRemoveOnHouseholdMemberWhenHouseholdDoesNotExistOnHouseholdMember()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember1Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember2Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember3Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            household.HouseholdMemberAdd(householdMember1Mock);
-            household.HouseholdMemberAdd(householdMember2Mock);
-            household.HouseholdMemberAdd(householdMember3Mock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
-            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+            sut.HouseholdMemberAdd(householdMember1Mock);
+            sut.HouseholdMemberAdd(householdMember2Mock);
+            sut.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(sut.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember3Mock), Is.True);
 
-            household.HouseholdMemberRemove(householdMember2Mock);
+            sut.HouseholdMemberRemove(householdMember2Mock);
 
             householdMember2Mock.AssertWasNotCalled(m => m.HouseholdRemove(Arg<IHousehold>.Is.Anything));
         }
@@ -630,39 +621,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdMemberRemoveReturnsRemovedHouseholdMember()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember1Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember1Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember2Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember2Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
+            IHouseholdMember householdMember3Mock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMember3Mock.Stub(m => m.Households)
                 .Return(new List<Household>(0))
                 .Repeat.Any();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            household.HouseholdMemberAdd(householdMember1Mock);
-            household.HouseholdMemberAdd(householdMember2Mock);
-            household.HouseholdMemberAdd(householdMember3Mock);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(3));
-            Assert.That(household.HouseholdMembers.Contains(householdMember1Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember2Mock), Is.True);
-            Assert.That(household.HouseholdMembers.Contains(householdMember3Mock), Is.True);
+            sut.HouseholdMemberAdd(householdMember1Mock);
+            sut.HouseholdMemberAdd(householdMember2Mock);
+            sut.HouseholdMemberAdd(householdMember3Mock);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(3));
+            Assert.That(sut.HouseholdMembers.Contains(householdMember1Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember2Mock), Is.True);
+            Assert.That(sut.HouseholdMembers.Contains(householdMember3Mock), Is.True);
 
-            var result = household.HouseholdMemberRemove(householdMember2Mock);
+            IHouseholdMember result = sut.HouseholdMemberRemove(householdMember2Mock);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(householdMember2Mock));
         }
@@ -673,17 +664,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateThrowsArgumentNullExceptionWhenTranslationCultureIsNull()
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => household.Translate(null, fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("translationCulture"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Translate(null, fixture.Create<bool>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "translationCulture");
         }
 
         /// <summary>
@@ -692,32 +680,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateCallsTranslateOnEachHouseholdMemberWhenTranslateHouseholdMembersIsTrue()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            var numberOfHouseholdMembers = random.Next(1, 5);
-            while (household.HouseholdMembers.Count() < numberOfHouseholdMembers)
+            int numberOfHouseholdMembers = random.Next(1, 5);
+            while (sut.HouseholdMembers.Count() < numberOfHouseholdMembers)
             {
-                var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+                IHouseholdMember householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
                 householdMemberMock.Stub(m => m.Households)
                     .Return(new List<IHousehold>(0))
                     .Repeat.Any();
-                household.HouseholdMemberAdd(householdMemberMock);
+                sut.HouseholdMemberAdd(householdMemberMock);
             }
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(numberOfHouseholdMembers));
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(numberOfHouseholdMembers));
 
-            var translationCulture = CultureInfo.CurrentCulture;
+            CultureInfo translationCulture = CultureInfo.CurrentCulture;
 
-            household.Translate(translationCulture, true);
+            sut.Translate(translationCulture, true);
 
-            foreach (var householdMemberMock in household.HouseholdMembers)
+            foreach (var householdMemberMock in sut.HouseholdMembers)
             {
                 householdMemberMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture), Arg<bool>.Is.Equal(false), Arg<bool>.Is.Equal(true)));
             }
@@ -729,33 +717,59 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateDoesNotCallTranslateOnAnyHouseholdMemberWhenTranslateHouseholdMembersIsFalse()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var household = new Household(fixture.Create<string>());
-            Assert.That(household, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Empty);
+            IHousehold sut = CreateSut(fixture);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
 
-            var numberOfHouseholdMembers = random.Next(1, 5);
-            while (household.HouseholdMembers.Count() < numberOfHouseholdMembers)
+            int numberOfHouseholdMembers = random.Next(1, 5);
+            while (sut.HouseholdMembers.Count() < numberOfHouseholdMembers)
             {
-                var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+                IHouseholdMember householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
                 householdMemberMock.Stub(m => m.Households)
                     .Return(new List<IHousehold>(0))
                     .Repeat.Any();
-                household.HouseholdMemberAdd(householdMemberMock);
+                sut.HouseholdMemberAdd(householdMemberMock);
             }
-            Assert.That(household.HouseholdMembers, Is.Not.Null);
-            Assert.That(household.HouseholdMembers, Is.Not.Empty);
-            Assert.That(household.HouseholdMembers.Count(), Is.EqualTo(numberOfHouseholdMembers));
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Not.Empty);
+            Assert.That(sut.HouseholdMembers.Count(), Is.EqualTo(numberOfHouseholdMembers));
 
-            household.Translate(CultureInfo.CurrentCulture, false);
+            sut.Translate(CultureInfo.CurrentCulture, false);
 
-            foreach (var householdMemberMock in household.HouseholdMembers)
+            foreach (var householdMemberMock in sut.HouseholdMembers)
             {
                 householdMemberMock.AssertWasNotCalled(m => m.Translate(Arg<CultureInfo>.Is.Anything, Arg<bool>.Is.Anything, Arg<bool>.Is.Anything));
             }
+        }
+
+        /// <summary>
+        /// Creates an instance of a household which can be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of a household which can be used for unit testing.</returns>
+        private IHousehold CreateSut(Fixture fixture, bool hasDescription = false)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException(nameof(fixture));
+            }
+            return new Household(fixture.Create<string>(), hasDescription ? fixture.Create<string>() : null);
+        }
+
+        /// <summary>
+        /// Creates an instance of the private class for a household which can be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of the private class for a household which can be used for unit testing.</returns>
+        private MyHousehold CreateMySut(Fixture fixture, bool hasDescription = false)
+        {
+            if (fixture == null)
+            {
+                throw new ArgumentNullException(nameof(fixture));
+            }
+            return new MyHousehold(fixture.Create<string>(), hasDescription ? fixture.Create<string>() : null);
         }
     }
 }

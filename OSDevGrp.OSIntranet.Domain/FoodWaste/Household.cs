@@ -49,7 +49,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
             _name = name;
             _description = description;
@@ -65,15 +65,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual string Name
         {
-            get
-            {
-                return _name;
-            }
+            get => _name;
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 }
                 _name = value;
             }
@@ -84,14 +81,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual string Description
         {
-            get
-            {
-                return _description;
-            }
-            set
-            {
-                _description = value;
-            }
+            get => _description;
+            set => _description = value;
         }
 
         /// <summary>
@@ -99,14 +90,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual DateTime CreationTime
         {
-            get
-            {
-                return _creationTime;
-            }
-            protected set
-            {
-                _creationTime = value;
-            }
+            get => _creationTime;
+            protected set => _creationTime = value;
         }
 
         /// <summary>
@@ -114,18 +99,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// </summary>
         public virtual IEnumerable<IHouseholdMember> HouseholdMembers
         {
-            get
-            {
-                return _householdMembers;
-            }
-            protected set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
-                _householdMembers = value.ToList();
-            }
+            get => _householdMembers;
+            protected set => _householdMembers = value?.ToList() ?? throw new ArgumentNullException(nameof(value));
         }
 
         #endregion
@@ -140,7 +115,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (householdMember == null)
             {
-                throw new ArgumentNullException("householdMember");
+                throw new ArgumentNullException(nameof(householdMember));
             }
             _householdMembers.Add(householdMember);
             if (householdMember.Households.Contains(this))
@@ -159,7 +134,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (householdMember == null)
             {
-                throw new ArgumentNullException("householdMember");
+                throw new ArgumentNullException(nameof(householdMember));
             }
 
             var householdMemberToRemove = HouseholdMembers.SingleOrDefault(householdMember.Equals);
@@ -185,7 +160,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         {
             if (translationCulture == null)
             {
-                throw new ArgumentNullException("translationCulture");
+                throw new ArgumentNullException(nameof(translationCulture));
             }
             if (translateHouseholdMembers == false)
             {
