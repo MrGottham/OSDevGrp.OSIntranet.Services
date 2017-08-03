@@ -29,15 +29,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatConstructorInitializeHouseholdProxy()
         {
-            var householdProxy = new HouseholdProxy();
-            Assert.That(householdProxy, Is.Not.Null);
-            Assert.That(householdProxy.Identifier, Is.Null);
-            Assert.That(householdProxy.Identifier.HasValue, Is.False);
-            Assert.That(householdProxy.Name, Is.Null);
-            Assert.That(householdProxy.Description, Is.Null);
-            Assert.That(householdProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
-            Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
-            Assert.That(householdProxy.HouseholdMembers, Is.Empty);
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Name, Is.Null);
+            Assert.That(sut.Description, Is.Null);
+            Assert.That(sut.CreationTime, Is.EqualTo(default(DateTime)));
+            Assert.That(sut.HouseholdMembers, Is.Not.Null);
+            Assert.That(sut.HouseholdMembers, Is.Empty);
         }
 
         /// <summary>
@@ -46,19 +46,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenHouseholdProxyHasNoIdentifier()
         {
-            var householdProxy = new HouseholdProxy
-            {
-                Identifier = null
-            };
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
 
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var uniqueId = householdProxy.UniqueId; });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, householdProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => { sut.UniqueId.ToUpper(); });
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -67,17 +64,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterGetsUniqueIdentificationForHouseholdProxy()
         {
-            var householdProxy = new HouseholdProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
+            Guid identifier = Guid.NewGuid();
 
-            var uniqueId = householdProxy.UniqueId;
+            IHouseholdProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.Value, Is.EqualTo(identifier));
+
+            string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(uniqueId, Is.EqualTo(householdProxy.Identifier.Value.ToString("D").ToUpper()));
-            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(uniqueId, Is.EqualTo(identifier.ToString("D").ToUpper()));
         }
 
         /// <summary>
@@ -86,16 +86,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenHouseholdIsNull()
         {
-            var householdProxy = new HouseholdProxy();
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<ArgumentNullException>(() => { var sqlQueryForId = householdProxy.GetSqlQueryForId(null); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("household"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetSqlQueryForId(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "household");
         }
 
         /// <summary>
@@ -104,21 +100,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnHouseholdHasNoValue()
         {
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Expect(m => m.Identifier)
+            IHousehold householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.Identifier)
                 .Return(null)
                 .Repeat.Any();
 
-            var householdProxy = new HouseholdProxy();
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var sqlQueryForId = householdProxy.GetSqlQueryForId(householdMock); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, householdMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.GetSqlQueryForId(householdMock));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, householdMock.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -127,19 +119,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
         {
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Expect(m => m.Identifier)
-                .Return(Guid.NewGuid())
+            Guid identifier = Guid.NewGuid();
+
+            IHousehold householdMock = MockRepository.GenerateMock<IHousehold>();
+            householdMock.Stub(m => m.Identifier)
+                .Return(identifier)
                 .Repeat.Any();
 
-            var householdProxy = new HouseholdProxy();
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var sqlQueryForId = householdProxy.GetSqlQueryForId(householdMock);
-            Assert.That(sqlQueryForId, Is.Not.Null);
-            Assert.That(sqlQueryForId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT HouseholdIdentifier,Name,Descr,CreationTime FROM Households WHERE HouseholdIdentifier='{0}'", householdMock.Identifier.Value.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
+            string result = sut.GetSqlQueryForId(householdMock);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"SELECT HouseholdIdentifier,Name,Descr,CreationTime FROM Households WHERE HouseholdIdentifier='{identifier.ToString("D").ToUpper()}'"));
         }
 
         /// <summary>
@@ -150,23 +143,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [TestCase(false)]
         public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(bool hasDescription)
         {
-            var fixture = new Fixture();
+            Fixture fixture = new Fixture();
             
-            var identifier = Guid.NewGuid();
-            var name = fixture.Create<string>();
-            var description = hasDescription ? fixture.Create<string>() : null;
-            var creationTime = DateTime.Now;
-            var householdProxy = new HouseholdProxy(name, description, creationTime)
-            {
-                Identifier = identifier
-            };
+            Guid identifier = Guid.NewGuid();
+            string name = fixture.Create<string>();
+            string description = hasDescription ? fixture.Create<string>() : null;
+            string descriptionAsSql = hasDescription ? $"'{description}'" : "NULL";
+            DateTime creationTime = DateTime.Now;
 
-            var descriptionAsSql = hasDescription ? string.Format("'{0}'", description) : "NULL";
+            IHouseholdProxy sut = CreateSut(identifier, name, description, creationTime);
 
-            var sqlCommand = householdProxy.GetSqlCommandForInsert();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Households (HouseholdIdentifier,Name,Descr,CreationTime) VALUES('{0}','{1}',{2},{3})", householdProxy.UniqueId, name, descriptionAsSql, DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
+            string result = sut.GetSqlCommandForInsert();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo($"INSERT INTO Households (HouseholdIdentifier,Name,Descr,CreationTime) VALUES('{identifier.ToString("D").ToUpper()}','{name}',{descriptionAsSql},{DataRepositoryHelper.GetSqlValueForDateTime(creationTime)})"));
         }
 
         /// <summary>
@@ -860,6 +850,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             householdProxy.DeleteRelations(dataProviderBaseMock);
 
             dataProviderBaseMock.AssertWasCalled(m => m.Delete(Arg<MemberOfHouseholdProxy>.Is.NotNull), opt => opt.Repeat.Times(memberOfHouseholdProxyCollection.Count));
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy to a given household which should be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of the data proxy to a given household which should be used for unit testing.</returns>
+        private static IHouseholdProxy CreateSut(Guid? householdIdentifier = null)
+        {
+            return new HouseholdProxy
+            {
+                Identifier = householdIdentifier
+            };
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy to a given household which should be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of the data proxy to a given household which should be used for unit testing.</returns>
+        private static IHouseholdProxy CreateSut(Guid householdIdentifier, string name, string description, DateTime creationTime)
+        {
+            return new HouseholdProxy(name, description, creationTime)
+            {
+                Identifier = householdIdentifier
+            };
         }
     }
 }
