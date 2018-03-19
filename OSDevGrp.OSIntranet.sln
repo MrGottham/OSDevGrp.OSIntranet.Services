@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Infrastructure.Interfaces", "OSDevGrp.OSIntranet.Infrastructure.Interfaces\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj", "{E510F652-6E85-402E-9EFF-474841121181}"
 EndProject
@@ -82,49 +82,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E4C630
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 14
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = OSDevGrp.OSIntranet.Infrastructure.Interfaces\\OSDevGrp.OSIntranet.Infrastructure.Interfaces.csproj
-		SccLocalPath1 = .
-		SccProjectFilePathRelativizedFromConnection1 = OSDevGrp.OSIntranet.Infrastructure.Interfaces\\
-		SccProjectUniqueName2 = OSDevGrp.OSIntranet.Tests\\OSDevGrp.OSIntranet.Tests.csproj
-		SccLocalPath2 = .
-		SccProjectFilePathRelativizedFromConnection2 = OSDevGrp.OSIntranet.Tests\\
-		SccProjectUniqueName3 = OSDevGrp.OSIntranet.Infrastructure\\OSDevGrp.OSIntranet.Infrastructure.csproj
-		SccLocalPath3 = .
-		SccProjectFilePathRelativizedFromConnection3 = OSDevGrp.OSIntranet.Infrastructure\\
-		SccProjectUniqueName4 = OSDevGrp.OSIntranet.Resources\\OSDevGrp.OSIntranet.Resources.csproj
-		SccLocalPath4 = .
-		SccProjectFilePathRelativizedFromConnection4 = OSDevGrp.OSIntranet.Resources\\
-		SccProjectUniqueName5 = OSDevGrp.OSIntranet.Repositories.Interfaces\\OSDevGrp.OSIntranet.Repositories.Interfaces.csproj
-		SccLocalPath5 = .
-		SccProjectFilePathRelativizedFromConnection5 = OSDevGrp.OSIntranet.Repositories.Interfaces\\
-		SccProjectUniqueName6 = OSDevGrp.OSIntranet.Repositories\\OSDevGrp.OSIntranet.Repositories.csproj
-		SccLocalPath6 = .
-		SccProjectFilePathRelativizedFromConnection6 = OSDevGrp.OSIntranet.Repositories\\
-		SccProjectUniqueName7 = OSDevGrp.OSIntranet.Contracts\\OSDevGrp.OSIntranet.Contracts.csproj
-		SccLocalPath7 = .
-		SccProjectFilePathRelativizedFromConnection7 = OSDevGrp.OSIntranet.Contracts\\
-		SccProjectUniqueName8 = OSDevGrp.OSIntranet.Services\\OSDevGrp.OSIntranet.Services.csproj
-		SccLocalPath8 = .
-		SccProjectFilePathRelativizedFromConnection8 = OSDevGrp.OSIntranet.Services\\
-		SccProjectUniqueName9 = OSDevGrp.OSIntranet.QueryHandlers\\OSDevGrp.OSIntranet.QueryHandlers.csproj
-		SccLocalPath9 = .
-		SccProjectFilePathRelativizedFromConnection9 = OSDevGrp.OSIntranet.QueryHandlers\\
-		SccProjectUniqueName10 = OSDevGrp.OSIntranet.CommandHandlers\\OSDevGrp.OSIntranet.CommandHandlers.csproj
-		SccLocalPath10 = .
-		SccProjectFilePathRelativizedFromConnection10 = OSDevGrp.OSIntranet.CommandHandlers\\
-		SccProjectUniqueName11 = OSDevGrp.OSIntranet.Domain.Interfaces\\OSDevGrp.OSIntranet.Domain.Interfaces.csproj
-		SccLocalPath11 = .
-		SccProjectFilePathRelativizedFromConnection11 = OSDevGrp.OSIntranet.Domain.Interfaces\\
-		SccProjectUniqueName12 = OSDevGrp.OSIntranet.Domain\\OSDevGrp.OSIntranet.Domain.csproj
-		SccLocalPath12 = .
-		SccProjectFilePathRelativizedFromConnection12 = OSDevGrp.OSIntranet.Domain\\
-		SccProjectUniqueName13 = OSDevGrp.OSIntranet.Security\\OSDevGrp.OSIntranet.Security.csproj
-		SccLocalPath13 = .
-		SccProjectFilePathRelativizedFromConnection13 = OSDevGrp.OSIntranet.Security\\
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -189,5 +146,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7CB00384-51F7-4001-A7F9-AB45F59F6412} = {8CC59821-8B5B-420E-81DA-01CB7CABB700}
 		{A8CFDF7F-ADD7-4554-92D2-AFA497A7BD76} = {8CC59821-8B5B-420E-81DA-01CB7CABB700}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9F1403BD-6CA4-4907-8ECC-AAAA4219FFA2}
 	EndGlobalSection
 EndGlobal
