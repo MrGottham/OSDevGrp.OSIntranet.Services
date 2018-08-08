@@ -573,20 +573,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
-            var householdProxy = new HouseholdProxy
-            {
-                Identifier = null
-            };
-            Assert.That(householdProxy, Is.Not.Null);
-            Assert.That(householdProxy.Identifier, Is.Null);
-            Assert.That(householdProxy.Identifier.HasValue, Is.False);
+            Fixture fixture = new Fixture();
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => householdProxy.DeleteRelations(MockRepository.GenerateStub<IDataProviderBase>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, householdProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.DeleteRelations(dataProviderMock));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -595,25 +593,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsCloneOnDataProviderOneTime()
         {
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
-            dataProviderBaseMock.Stub(m => m.Clone())
-                .Return(dataProviderBaseMock)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Anything))
-                .Return(new List<MemberOfHouseholdProxy>(0))
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
 
-            var householdProxy = new HouseholdProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
-            Assert.That(householdProxy, Is.Not.Null);
-            Assert.That(householdProxy.Identifier, Is.Not.Null);
-            Assert.That(householdProxy.Identifier.HasValue, Is.True);
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture, new List<MemberOfHouseholdProxy>(0));
 
-            householdProxy.DeleteRelations(dataProviderBaseMock);
+            IHouseholdProxy sut = CreateSut(Guid.NewGuid());
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
-            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
+            sut.DeleteRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
         }
 
         /// <summary>
@@ -622,25 +616,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetMemberOfHouseholdProxies()
         {
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
-            dataProviderBaseMock.Stub(m => m.Clone())
-                .Return(dataProviderBaseMock)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Anything))
-                .Return(new List<MemberOfHouseholdProxy>(0))
-                .Repeat.Any();
+            Fixture fixture = new Fixture();
 
-            var householdProxy = new HouseholdProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
-            Assert.That(householdProxy, Is.Not.Null);
-            Assert.That(householdProxy.Identifier, Is.Not.Null);
-            Assert.That(householdProxy.Identifier.HasValue, Is.True);
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture, new List<MemberOfHouseholdProxy>(0));
 
-            householdProxy.DeleteRelations(dataProviderBaseMock);
+            Guid householdIdentifier = Guid.NewGuid();
+            IHouseholdProxy sut = CreateSut(householdIdentifier);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
-            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Equal(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdIdentifier='{0}' ORDER BY CreationTime DESC", householdProxy.UniqueId))));
+            sut.DeleteRelations(dataProviderMock);
+
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Equal($"SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdIdentifier='{householdIdentifier.ToString("D").ToUpper()}' ORDER BY CreationTime DESC")));
         }
 
         /// <summary>
@@ -649,52 +639,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsDeleteOnDataProviderForEachMemberOfHouseholdProxy()
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
+            Fixture fixture = new Fixture();
+            Random random = new Random(fixture.Create<int>());
 
-            var memberOfHouseholdProxyCollection = new List<MemberOfHouseholdProxy>(random.Next(7, 15));
-            while (memberOfHouseholdProxyCollection.Count < memberOfHouseholdProxyCollection.Capacity)
+            int memberOfHouseholdCount = random.Next(7, 15);
+            List<MemberOfHouseholdProxy> memberOfHouseholdProxyCollection = new List<MemberOfHouseholdProxy>(memberOfHouseholdCount);
+            while (memberOfHouseholdProxyCollection.Count < memberOfHouseholdCount)
             {
-                var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
+                IHouseholdMember householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
                 householdMemberMock.Stub(m => m.Identifier)
                     .Return(Guid.NewGuid())
                     .Repeat.Any();
-                var householdMock = MockRepository.GenerateMock<IHousehold>();
+                IHousehold householdMock = MockRepository.GenerateMock<IHousehold>();
                 householdMock.Stub(m => m.Identifier)
                     .Return(Guid.NewGuid())
                     .Repeat.Any();
                 memberOfHouseholdProxyCollection.Add(new MemberOfHouseholdProxy(householdMemberMock, householdMock));
             }
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
-            dataProviderBaseMock.Stub(m => m.Clone())
-                .Return(dataProviderBaseMock)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<string>.Is.Anything))
-                .Return(memberOfHouseholdProxyCollection)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.Get(Arg<HouseholdMemberProxy>.Is.NotNull))
-                .Return(fixture.Create<HouseholdMemberProxy>())
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.Delete(Arg<MemberOfHouseholdProxy>.Is.NotNull))
-                .WhenCalled(e =>
-                {
-                    var memberOfHouseholdProxy = (MemberOfHouseholdProxy) e.Arguments.ElementAt(0);
-                    Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-                    Assert.That(memberOfHouseholdProxyCollection.Contains(memberOfHouseholdProxy), Is.True);
-                })
-                .Repeat.Any();
+            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture, memberOfHouseholdProxyCollection);
 
-            var householdProxy = new HouseholdProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
-            Assert.That(householdProxy, Is.Not.Null);
-            Assert.That(householdProxy.Identifier, Is.Not.Null);
-            Assert.That(householdProxy.Identifier.HasValue, Is.True);
+            IHouseholdProxy sut = CreateSut(Guid.NewGuid());
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.Identifier.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
-            householdProxy.DeleteRelations(dataProviderBaseMock);
+            sut.DeleteRelations(dataProviderMock);
 
-            dataProviderBaseMock.AssertWasCalled(m => m.Delete(Arg<MemberOfHouseholdProxy>.Is.NotNull), opt => opt.Repeat.Times(memberOfHouseholdProxyCollection.Count));
+            dataProviderMock.AssertWasCalled(m => m.Delete(Arg<MemberOfHouseholdProxy>.Is.NotNull), opt => opt.Repeat.Times(memberOfHouseholdCount));
         }
 
         /// <summary>
