@@ -137,7 +137,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var domainObjectBuilder = new DomainObjectBuilder();
             Assert.That(domainObjectBuilder, Is.Not.Null);
 
-            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, Postnummer>(fixture.Create<PersonView>()));
+            Assert.Throws<IntranetRepositoryException>(() => domainObjectBuilder.Build<PersonView, Person>(fixture.Create<PersonView>()));
         }
 
         /// <summary>
