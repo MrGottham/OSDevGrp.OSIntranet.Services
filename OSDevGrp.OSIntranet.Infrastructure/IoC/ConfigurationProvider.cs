@@ -41,6 +41,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
         /// <param name="container">Container, hvortil der skal tilføjes konfiguration.</param>
         public void AddConfiguration(IWindsorContainer container)
         {
+            container.Register(Component.For<IArgumentNullGuard>().ImplementedBy<ArgumentNullGuard>().LifeStyle.Singleton);
             container.Register(Component.For<IDomainObjectBuilder>().ImplementedBy<DomainObjectBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<IFoodWasteObjectMapper>().ImplementedBy<FoodWasteObjectMapper>().LifeStyle.Singleton);

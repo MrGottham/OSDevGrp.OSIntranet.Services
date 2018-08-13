@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgumentNullGuard.cs" />
     <Compile Include="ClaimValueProvider.cs" />
     <Compile Include="ExceptionBuilder.cs" />
     <Compile Include="FoodWasteFaultExceptionBuilder.cs" />

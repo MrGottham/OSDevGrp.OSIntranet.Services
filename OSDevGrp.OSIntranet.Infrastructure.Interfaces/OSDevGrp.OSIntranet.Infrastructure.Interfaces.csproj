@@ -57,6 +57,7 @@
     <Compile Include="Exceptions\IntranetBusinessException.cs" />
     <Compile Include="Exceptions\IntranetRepositoryException.cs" />
     <Compile Include="Exceptions\IntranetSystemException.cs" />
+    <Compile Include="IArgumentNullGuard.cs" />
     <Compile Include="IClaimValueProvider.cs" />
     <Compile Include="IExceptionBuilder.cs" />
     <Compile Include="IFaultExceptionBuilder.cs" />

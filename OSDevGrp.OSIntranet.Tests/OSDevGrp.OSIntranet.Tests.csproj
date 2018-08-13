@@ -350,6 +350,7 @@
     <Compile Include="Unittests\Domain\Kalender\BrugeraftaleTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\BrugerlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\BrugerTests.cs" />
+    <Compile Include="Unittests\Infrastructure\ArgumentNullGuardTests.cs" />
     <Compile Include="Unittests\Infrastructure\ClaimValueProviderTests.cs" />
     <Compile Include="Unittests\Infrastructure\ContainerTests.cs" />
     <Compile Include="Unittests\Infrastructure\ExceptionBuilderTests.cs" />
