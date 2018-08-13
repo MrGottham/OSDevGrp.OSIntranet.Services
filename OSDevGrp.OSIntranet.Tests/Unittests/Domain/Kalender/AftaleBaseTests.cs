@@ -1,6 +1,6 @@
 ﻿using OSDevGrp.OSIntranet.Domain.Kalender;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {

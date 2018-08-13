@@ -8,7 +8,7 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using MySql.Data.MySqlClient;
 using MySql.Data.Types;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender

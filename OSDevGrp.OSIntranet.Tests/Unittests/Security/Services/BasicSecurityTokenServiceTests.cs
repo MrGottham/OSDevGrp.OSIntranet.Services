@@ -11,7 +11,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Services;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services

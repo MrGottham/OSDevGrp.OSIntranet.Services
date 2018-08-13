@@ -14,7 +14,7 @@ using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 using ObjectMapper = OSDevGrp.OSIntranet.Infrastructure.ObjectMapper;
 

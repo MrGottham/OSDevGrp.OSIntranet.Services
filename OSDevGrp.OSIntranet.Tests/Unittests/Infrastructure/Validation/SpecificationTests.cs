@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Infrastructure.Validation;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure.Validation
 {

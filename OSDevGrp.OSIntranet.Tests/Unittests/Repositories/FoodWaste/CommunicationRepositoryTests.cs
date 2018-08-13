@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste

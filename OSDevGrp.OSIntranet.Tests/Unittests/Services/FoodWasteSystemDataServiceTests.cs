@@ -15,7 +15,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Services.Implementations;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.Contracts.Services;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Services

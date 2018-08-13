@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using AutoFixture;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
-using NUnit.Framework;
-using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
@@ -27,17 +26,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisFællesRepositoryErNull()
         {
-            var fixture = new Fixture();
+            IFinansstyringRepository finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            IObjectMapper objectMapper = MockRepository.GenerateMock<IObjectMapper>();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new RegnskabslisteGetQueryHandler(finansstyringRepository, null, objectMapper));
+            // ReSharper restore ObjectCreationAsStatement
 
-            fixture.Inject(finansstyringRepository);
-            fixture.Inject<IFællesRepository>(null);
-            fixture.Inject(objectMapper);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(() => fixture.Create<RegnskabslisteGetQueryHandler>())
-                    .InnerException, Is.TypeOf(typeof (ArgumentNullException)));
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "fællesRepository");
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Adressekartotek
 {

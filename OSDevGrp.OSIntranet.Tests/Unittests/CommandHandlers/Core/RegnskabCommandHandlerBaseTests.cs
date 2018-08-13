@@ -9,7 +9,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core

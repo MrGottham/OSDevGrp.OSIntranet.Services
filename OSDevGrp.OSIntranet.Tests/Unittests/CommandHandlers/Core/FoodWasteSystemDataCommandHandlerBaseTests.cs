@@ -8,7 +8,7 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core

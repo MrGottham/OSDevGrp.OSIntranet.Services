@@ -4,7 +4,7 @@ using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 {

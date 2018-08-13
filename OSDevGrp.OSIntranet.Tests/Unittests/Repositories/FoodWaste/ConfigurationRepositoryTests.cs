@@ -4,7 +4,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 {

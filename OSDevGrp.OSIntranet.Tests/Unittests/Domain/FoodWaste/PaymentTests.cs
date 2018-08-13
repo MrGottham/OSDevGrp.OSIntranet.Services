@@ -5,7 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste

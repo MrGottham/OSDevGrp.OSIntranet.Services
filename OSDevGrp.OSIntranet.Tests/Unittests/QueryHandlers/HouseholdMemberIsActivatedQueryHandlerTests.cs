@@ -6,7 +6,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers

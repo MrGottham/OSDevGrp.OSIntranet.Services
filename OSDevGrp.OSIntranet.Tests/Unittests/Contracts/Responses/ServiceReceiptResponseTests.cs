@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Responses;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Responses
 {

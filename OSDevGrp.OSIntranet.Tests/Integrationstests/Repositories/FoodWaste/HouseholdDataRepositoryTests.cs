@@ -4,7 +4,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
 {

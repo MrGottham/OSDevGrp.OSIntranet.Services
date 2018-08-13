@@ -4,7 +4,7 @@ using System.IdentityModel.Policy;
 using System.Security.Principal;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Security.Core;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core

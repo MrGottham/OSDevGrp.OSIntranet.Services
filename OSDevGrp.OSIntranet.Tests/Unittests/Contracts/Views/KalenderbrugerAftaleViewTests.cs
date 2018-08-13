@@ -2,7 +2,7 @@
 using System.Linq;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {

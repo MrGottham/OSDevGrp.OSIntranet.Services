@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using AutoFixture;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Adressekartotek;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
-using NUnit.Framework;
-using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
@@ -28,21 +27,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisKonfigurationRepositoryErNull()
         {
-            var fixture = new Fixture();
+            IFinansstyringRepository finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
+            IAdresseRepository adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
+            IFællesRepository fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
+            IObjectMapper objectMapper = MockRepository.GenerateMock<IObjectMapper>();
 
-            var finansstyringRepository = MockRepository.GenerateMock<IFinansstyringRepository>();
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            var fællesRepository = MockRepository.GenerateMock<IFællesRepository>();
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new DebitorlisteGetQueryHandler(finansstyringRepository, adresseRepository, fællesRepository, null, objectMapper));
+            // ReSharper restore ObjectCreationAsStatement
 
-            fixture.Inject(finansstyringRepository);
-            fixture.Inject(adresseRepository);
-            fixture.Inject(fællesRepository);
-            fixture.Inject<IKonfigurationRepository>(null);
-            fixture.Inject(objectMapper);
-            Assert.That(
-                Assert.Throws<TargetInvocationException>(() => fixture.Create<DebitorlisteGetQueryHandler>()).
-                    InnerException, Is.TypeOf(typeof (ArgumentNullException)));
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "konfigurationRepository");
         }
 
         /// <summary>

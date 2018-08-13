@@ -2,7 +2,7 @@
 using System.Reflection;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Resources;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources

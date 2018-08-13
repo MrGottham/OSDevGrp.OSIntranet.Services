@@ -13,7 +13,7 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste

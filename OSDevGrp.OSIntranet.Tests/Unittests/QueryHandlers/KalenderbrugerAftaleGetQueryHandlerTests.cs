@@ -10,7 +10,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers

@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Infrastructure;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
 {

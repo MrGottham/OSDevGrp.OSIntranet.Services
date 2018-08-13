@@ -1,6 +1,6 @@
 ﻿using OSDevGrp.OSIntranet.Contracts.Faults;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Faults
 {

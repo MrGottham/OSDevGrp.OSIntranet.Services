@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OSDevGrp.OSIntranet.Domain.Comparers;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Comparers

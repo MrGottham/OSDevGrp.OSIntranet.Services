@@ -3,7 +3,7 @@ using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Finansstyring
 {

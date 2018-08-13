@@ -7,7 +7,7 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 using System.Collections.Generic;
 

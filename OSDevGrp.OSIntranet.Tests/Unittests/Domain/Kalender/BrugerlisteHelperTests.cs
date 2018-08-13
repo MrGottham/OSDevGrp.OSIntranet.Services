@@ -3,7 +3,7 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.Kalender

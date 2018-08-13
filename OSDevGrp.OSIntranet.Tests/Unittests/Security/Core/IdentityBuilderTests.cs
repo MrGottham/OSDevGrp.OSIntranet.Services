@@ -8,7 +8,7 @@ using NUnit.Framework;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Security.Configuration;
 using OSDevGrp.OSIntranet.Security.Core;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Core

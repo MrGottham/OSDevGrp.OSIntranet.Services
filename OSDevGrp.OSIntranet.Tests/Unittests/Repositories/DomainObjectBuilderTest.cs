@@ -9,7 +9,7 @@ using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
 {

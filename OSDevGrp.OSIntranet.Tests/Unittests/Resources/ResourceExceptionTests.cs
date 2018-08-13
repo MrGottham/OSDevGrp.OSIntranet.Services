@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization.Formatters.Soap;
 using OSDevGrp.OSIntranet.Resources;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using NUnit.Framework;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources

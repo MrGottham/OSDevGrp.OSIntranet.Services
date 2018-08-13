@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Views;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {

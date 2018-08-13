@@ -6,7 +6,7 @@ using OSDevGrp.OSIntranet.CommandHandlers.Validation;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
-using Ploeh.AutoFixture;
+using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Validation
 {

@@ -13,7 +13,7 @@ using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using NUnit.Framework;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories

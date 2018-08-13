@@ -11,7 +11,7 @@ using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using Ploeh.AutoFixture;
+using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
