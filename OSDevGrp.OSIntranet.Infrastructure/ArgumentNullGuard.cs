@@ -29,7 +29,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// <param name="argumentName">The name of the argument.</param>
         /// <returns>Instance of Argument Null Guard.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the <see cref="value"/> is null or empty or when the <see cref="argumentName"/> is null, empty or white space.</exception>
-        public IArgumentNullGuard NotNullOrEmpty(string value, string argumentName)
+        IArgumentNullGuard IArgumentNullGuard.NotNullOrEmpty(string value, string argumentName)
         {
             return Validate(value, argumentName, string.IsNullOrEmpty);
         }
@@ -41,7 +41,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
         /// <param name="argumentName">The name of the argument.</param>
         /// <returns>Instance of Argument Null Guard.</returns>
         /// <exception cref="ArgumentNullException">Thrown when the <see cref="value"/> is null, empty or white space or when the <see cref="argumentName"/> is null, empty or white space.</exception>
-        public IArgumentNullGuard NotNullOrWhiteSpace(string value, string argumentName)
+        IArgumentNullGuard IArgumentNullGuard.NotNullOrWhiteSpace(string value, string argumentName)
         {
             return Validate(value, argumentName, string.IsNullOrWhiteSpace);
         }
@@ -72,6 +72,54 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             }
 
             return this;
+        }
+
+        /// <summary>
+        /// Validates whether the <paramref name="value"/> is null and throws an <see cref="ArgumentNullException"/> when so.
+        /// </summary>
+        /// <param name="value">The value to validate.</param>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <returns>Instance of Argument Null Guard.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the <see cref="value"/> is null or when the <see cref="argumentName"/> is null, empty or white space.</exception>
+        public static IArgumentNullGuard NotNull(object value, string argumentName)
+        {
+            IArgumentNullGuard argumentNullGuard = Create();
+            return argumentNullGuard.NotNull(value, argumentName);
+        }
+
+        /// <summary>
+        /// Validates whether the <paramref name="value"/> is null or empty and throws an <see cref="ArgumentNullException"/> when so.
+        /// </summary>
+        /// <param name="value">The value to validate.</param>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <returns>Instance of Argument Null Guard.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the <see cref="value"/> is null or empty or when the <see cref="argumentName"/> is null, empty or white space.</exception>
+        public static IArgumentNullGuard NotNullOrEmpty(string value, string argumentName)
+        {
+            IArgumentNullGuard argumentNullGuard = Create();
+            return argumentNullGuard.NotNullOrEmpty(value, argumentName);
+        }
+
+        /// <summary>
+        /// Validates whether the <paramref name="value"/> is null, empty or white space and throws an <see cref="ArgumentNullException"/> when so.
+        /// </summary>
+        /// <param name="value">The value to validate.</param>
+        /// <param name="argumentName">The name of the argument.</param>
+        /// <returns>Instance of Argument Null Guard.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the <see cref="value"/> is null, empty or white space or when the <see cref="argumentName"/> is null, empty or white space.</exception>
+        public static IArgumentNullGuard NotNullOrWhiteSpace(string value, string argumentName)
+        {
+            IArgumentNullGuard argumentNullGuard = Create();
+            return argumentNullGuard.NotNullOrWhiteSpace(value, argumentName);
+        }
+
+        /// <summary>
+        /// Creates an instance of the Argument Null Guard.
+        /// </summary>
+        /// <returns>Instance of the Argument Null Guard.</returns>
+        private static IArgumentNullGuard Create()
+        {
+            return new ArgumentNullGuard();
         }
 
         #endregion
