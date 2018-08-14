@@ -54,6 +54,7 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgumentNullGuard.cs" />
     <Compile Include="Exceptions\IntranetBusinessException.cs" />
     <Compile Include="Exceptions\IntranetRepositoryException.cs" />
     <Compile Include="Exceptions\IntranetSystemException.cs" />

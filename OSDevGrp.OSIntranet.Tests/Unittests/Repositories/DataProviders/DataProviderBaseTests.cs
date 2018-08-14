@@ -2,7 +2,7 @@
 using System.Linq;
 using AutoFixture;
 using NUnit.Framework;
-using OSDevGrp.OSIntranet.Infrastructure;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;

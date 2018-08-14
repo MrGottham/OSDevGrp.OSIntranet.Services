@@ -1,7 +1,6 @@
 ﻿using System;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 
-namespace OSDevGrp.OSIntranet.Infrastructure
+namespace OSDevGrp.OSIntranet.Infrastructure.Interfaces
 {
     /// <summary>
     /// Argument Null Guard.
