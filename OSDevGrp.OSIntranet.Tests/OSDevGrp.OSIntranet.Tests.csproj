@@ -422,7 +422,7 @@
     <Compile Include="Unittests\QueryHandlers\TelefonlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\TranslationInfoCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
-    <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseBaseTests.cs" />
+    <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\FoodWasteDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\DataProxyHelperTests.cs" />

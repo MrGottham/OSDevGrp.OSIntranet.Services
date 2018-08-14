@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
+using NUnit.Framework;
+using OSDevGrp.OSIntranet.Infrastructure;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
-using NUnit.Framework;
-using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 {
@@ -12,7 +13,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
     /// Tester basis data provider.
     /// </summary>
     [TestFixture]
-    public class DataProviderBaseBaseTests 
+    public class DataProviderBaseTests 
     {
         /// <summary>
         /// Egen klasse for en data proxy til test af basis data provider.
@@ -46,7 +47,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
             /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-            public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+            public void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
             {
                 Assert.That(dataProvider, Is.Not.Null);
             }
@@ -55,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Sletter relationer.
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
-            public virtual void DeleteRelations(IDataProviderBase dataProvider)
+            public void DeleteRelations(IDataProviderBase dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
             }
@@ -82,6 +83,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <param name="fixture">AutoFixture.</param>
             public MyDataProvider(Fixture fixture)
             {
+                ArgumentNullGuard.NotNull(fixture, nameof(fixture));
+
                 _fixture = fixture;
             }
 
@@ -113,7 +116,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>Collection indeholdende data.</returns>
             public override IEnumerable<TDataProxy> GetCollection<TDataProxy>(string query)
             {
-                var dataProxies = _fixture.CreateMany<TDataProxy>(3).ToList();
+                IEnumerable<TDataProxy> dataProxies = _fixture.CreateMany<TDataProxy>(3).ToList();
                 foreach (var dataProxy in dataProxies)
                 {
                     dataProxy.MapData(_fixture, this);
@@ -129,7 +132,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>Data proxy.</returns>
             public override TDataProxy Get<TDataProxy>(TDataProxy queryForDataProxy)
             {
-                var dataProxy = _fixture.Create<TDataProxy>();
+                TDataProxy dataProxy = _fixture.Create<TDataProxy>();
                 dataProxy.MapData(_fixture, this);
                 return dataProxy;
             }
@@ -168,19 +171,30 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             #endregion
         }
 
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each unit test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tester, at konstruktøren initierer en basis data provider.
         /// </summary>
         [Test]
         public void TestAtConstructorInitiererDataProviderBase()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new MyDataProxy());
-            fixture.Inject(new MyDataProvider(fixture));
-
-            using (var dataProvider = fixture.Create<MyDataProvider>())
+            using (IDataProviderBase sut = CreateSut())
             {
-                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
             }
         }
 
@@ -190,15 +204,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtCloneInitiererNyDataProviderBase()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new MyDataProxy());
-            fixture.Inject(new MyDataProvider(fixture));
-
-            using (var dataProvider = fixture.Create<MyDataProvider>())
+            using (IDataProviderBase sut = CreateSut())
             {
-                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                using (var clonedDataProvider = dataProvider.Clone() as IDataProviderBase)
+                using (IDataProviderBase clonedDataProvider = sut.Clone() as IDataProviderBase)
                 {
                     Assert.That(clonedDataProvider, Is.Not.Null);
                 }
@@ -211,17 +221,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetCollectionHenterData()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new MyDataProxy());
-            fixture.Inject(new MyDataProvider(fixture));
-
-            using (var dataProvider = fixture.Create<MyDataProvider>())
+            using (IDataProviderBase sut = CreateSut())
             {
-                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var result = dataProvider.GetCollection<MyDataProxy>(fixture.Create<string>());
+                IEnumerable<MyDataProxy> result = sut.GetCollection<MyDataProxy>(_fixture.Create<string>());
+                // ReSharper disable PossibleMultipleEnumeration
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Count(), Is.EqualTo(3));
+                // ReSharper restore PossibleMultipleEnumeration
             }
         }
 
@@ -231,15 +239,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetHenterData()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new MyDataProxy());
-            fixture.Inject(new MyDataProvider(fixture));
-
-            using (var dataProvider = fixture.Create<MyDataProvider>())
+            using (IDataProviderBase sut = CreateSut())
             {
-                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var result = dataProvider.Get(new MyDataProxy());
+                MyDataProxy result = sut.Get(_fixture.Create<MyDataProxy>());
                 Assert.That(result, Is.Not.Null);
             }
         }
@@ -250,15 +254,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtAddTilføjerData()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new MyDataProxy());
-            fixture.Inject(new MyDataProvider(fixture));
-
-            using (var dataProvider = fixture.Create<MyDataProvider>())
+            using (IDataProviderBase sut = CreateSut())
             {
-                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var result = dataProvider.Add(fixture.Create<MyDataProxy>());
+                MyDataProxy result = sut.Add(_fixture.Create<MyDataProxy>());
                 Assert.That(result, Is.Not.Null);
             }
         }
@@ -269,15 +269,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtSaveGemmerData()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new MyDataProxy());
-            fixture.Inject(new MyDataProvider(fixture));
-
-            using (var dataProvider = fixture.Create<MyDataProvider>())
+            using (IDataProviderBase sut = CreateSut())
             {
-                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var result = dataProvider.Save(fixture.Create<MyDataProxy>());
+                MyDataProxy result = sut.Save(_fixture.Create<MyDataProxy>());
                 Assert.That(result, Is.Not.Null);
             }
         }
@@ -288,16 +284,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtDeleteSletterData()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new MyDataProxy());
-            fixture.Inject(new MyDataProvider(fixture));
-
-            using (var dataProvider = fixture.Create<MyDataProvider>())
+            using (IDataProviderBase sut = CreateSut())
             {
-                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                dataProvider.Delete(fixture.Create<MyDataProxy>());
+                sut.Delete(_fixture.Create<MyDataProxy>());
             }
+        }
+
+        /// <summary>
+        /// Creates an instance of the data provider for unit testning.
+        /// </summary>
+        /// <returns>Instance of the data provider for unit testning.</returns>
+        private IDataProviderBase CreateSut()
+        {
+            return new MyDataProvider(_fixture);
         }
     }
 }
