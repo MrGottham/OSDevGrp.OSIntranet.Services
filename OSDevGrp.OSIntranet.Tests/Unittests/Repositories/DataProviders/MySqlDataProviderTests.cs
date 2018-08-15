@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
 using System.Linq;
+using AutoFixture;
+using MySql.Data.MySqlClient;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
-using MySql.Data.MySqlClient;
-using NUnit.Framework;
-using AutoFixture;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 {
@@ -27,8 +29,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// <summary>
         /// Egen data proxy til test af data provider, som benytter MySql.
         /// </summary>
-        private class MyDataProxy : IMySqlDataProxy<MyDataProxy>
+        private sealed class MyDataProxy : IMySqlDataProxy<MyDataProxy>
         {
+            #region Private variables
+
+            private readonly Fixture _fixture;
+
+            #endregion
+
+            #region Constructors
+
+            /// <summary>
+            /// Creates an instance of a data proxy which can be used for unit testing a MySql data provider.
+            /// </summary>
+            public MyDataProxy()
+            {
+                _fixture = new Fixture();
+            }
+
+            #endregion
+
             #region Properties
 
             /// <summary>
@@ -105,7 +125,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
             public void MapData(object dataReader, IDataProviderBase dataProvider)
             {
-                var mySqlReader = (MySqlDataReader) dataReader;
+                MySqlDataReader mySqlReader = (MySqlDataReader) dataReader;
 
                 SystemNo = mySqlReader.GetInt32("SystemNo");
                 Title = mySqlReader.GetString("Title");
@@ -129,7 +149,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
             /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-            public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+            public void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 
@@ -141,7 +161,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Sletter relationer.
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
-            public virtual void DeleteRelations(IDataProviderBase dataProvider)
+            public void DeleteRelations(IDataProviderBase dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 
@@ -155,13 +175,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <summary>
             /// Returnerer den unikke identifikation for data proxy.
             /// </summary>
-            public string UniqueId
-            {
-                get
-                {
-                    return SystemNo.ToString(CultureInfo.InvariantCulture);
-                }
-            }
+            public string UniqueId => SystemNo.ToString(CultureInfo.InvariantCulture);
 
             /// <summary>
             /// Returnerer SQL foresprøgelse til søgning efter en given data proxy på MySql.
@@ -170,7 +184,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>SQL foresprøgelse.</returns>
             public string GetSqlQueryForId(MyDataProxy queryForDataProxy)
             {
-                return string.Format("SELECT SystemNo,Title FROM Systems WHERE SystemNo={0}", queryForDataProxy.SystemNo);
+                return $"SELECT SystemNo,Title FROM Systems WHERE SystemNo={queryForDataProxy.SystemNo}";
             }
 
             /// <summary>
@@ -179,9 +193,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>SQL kommando til oprettelse.</returns>
             public string GetSqlCommandForInsert()
             {
-                var fixture = new Fixture();
-                var dateTime = DateTime.Now;
-                return string.Format("INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,'{0}','{1}','{2}','{3}')", dateTime.ToString("yyyy-MM-dd"), dateTime.ToString("HH:mm:ss"), dateTime.AddMinutes(15).ToString("HH:mm:ss"), fixture.Create<string>());
+                DateTime now = DateTime.Now;
+                return $"INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,'{now:yyyy-MM-dd}','{now:HH:mm:ss}','{now.AddMinutes(15):HH:mm:ss}','{_fixture.Create<string>()}')";
             }
 
             /// <summary>
@@ -190,8 +203,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>SQL kommando til opdatering.</returns>
             public string GetSqlCommandForUpdate()
             {
-                var fixture = new Fixture();
-                return string.Format("UPDATE Calapps SET Subject='{0}' WHERE SystemNo=1 AND CalId=77777", fixture.Create<string>());
+                return $"UPDATE Calapps SET Subject='{_fixture.Create<string>()}' WHERE SystemNo=1 AND CalId=77777";
             }
 
             /// <summary>
@@ -200,10 +212,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// <returns>SQL kommando til sletning.</returns>
             public string GetSqlCommandForDelete()
             {
-                return string.Format("DELETE FROM Calapps WHERE SystemNo=1 AND CalId=77777");
+                return "DELETE FROM Calapps WHERE SystemNo=1 AND CalId=77777";
             }
 
             #endregion
+        }
+
+        #region Private variables
+
+        private Fixture _fixture;
+        private Random _random;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each unit test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _random = new Random(_fixture.Create<int>());
         }
 
         /// <summary>
@@ -212,9 +241,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtConstructorInitiererMySqlDataProvider()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
             }
         }
 
@@ -224,12 +253,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisConnectionStringSettingsErNull()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new MySqlDataProvider(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("connectionStringSettings"));
-            Assert.That(exception.InnerException, Is.Null);
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new MySqlDataProvider(null));
+            // ReSharper restore ObjectCreationAsStatement
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "connectionStringSettings");
         }
 
         /// <summary>
@@ -238,11 +266,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtCloneInitiererNyMySqlDataProvider()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                using (var clonedMySqlDataProvider = mySqlDataProvider.Clone() as IMySqlDataProvider)
+                using (IMySqlDataProvider clonedMySqlDataProvider = sut.Clone() as IMySqlDataProvider)
                 {
                     Assert.That(clonedMySqlDataProvider, Is.Not.Null);
                 }
@@ -250,16 +278,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         }
 
         /// <summary>
-        /// Tester, at GetCollection kaster en ArgumentNullException, hvis query er null.
+        /// Tester, at GetCollection kaster en ArgumentNullException, hvis query er null, tom eller white space.
         /// </summary>
         [Test]
-        public void TestAtGetCollectionKasterArgumenutNullExceptionHvisQueryErNull()
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("   ")]
+        public void TestAtGetCollectionKasterArgumenutNullExceptionHvisQueryErNullTomEllerWhitespace(string query)
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.GetCollection<MyDataProxy>(null));
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetCollection<MyDataProxy>(query));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "query");
             }
         }
 
@@ -269,14 +304,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetCollectionHenterDataProxies()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var result = mySqlDataProvider.GetCollection<MyDataProxy>("SELECT SystemNo,Title FROM Systems ORDER BY SystemNo");
+                IEnumerable<MyDataProxy> result = sut.GetCollection<MyDataProxy>("SELECT SystemNo,Title FROM Systems ORDER BY SystemNo");
+                // ReSharper disable PossibleMultipleEnumeration
                 Assert.That(result, Is.Not.Null);
+                // ReSharper restore PossibleMultipleEnumeration
 
-                var proxyCollection = result.ToList();
+                // ReSharper disable PossibleMultipleEnumeration
+                List<MyDataProxy> proxyCollection = result.ToList();
+                // ReSharper restore PossibleMultipleEnumeration
                 Assert.That(proxyCollection, Is.Not.Null);
                 Assert.That(proxyCollection.Count, Is.GreaterThan(0));
 
@@ -289,32 +328,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         }
 
         /// <summary>
-        /// Tester, at GetCollection kaster en ArgumentNullException, hvis query er tom.
-        /// </summary>
-        [Test]
-        public void TestAtGetCollectionKasterArgumenutNullExceptionHvisQueryErEmpty()
-        {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
-            {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
-
-                Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.GetCollection<MyDataProxy>(string.Empty));
-            }
-        }
-
-        /// <summary>
         /// Tester, at GetCollection kaster en MySqlException, hvis query ikke kan udføres.
         /// </summary>
         [Test]
         public void TestAtGetCollectionKasterMySqlExceptionHvisQueryIkkeKanUdføres()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<MySqlException>(() => mySqlDataProvider.GetCollection<MyDataProxy>(fixture.Create<string>()));
+                Assert.Throws<MySqlException>(() => sut.GetCollection<MyDataProxy>(_fixture.Create<string>()));
             }
         }
 
@@ -324,14 +347,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetHenterDataProxy()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var result = mySqlDataProvider.Get(new MyDataProxy
-                                                       {
-                                                           SystemNo = 1
-                                                       });
+                MyDataProxy result = sut.Get(new MyDataProxy {SystemNo = 1});
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.SystemNo, Is.EqualTo(1));
                 Assert.That(result.Title, Is.Not.Null);
@@ -348,11 +368,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetKasterArgumenutNullExceptionHvisQueryForDataProxyErNull()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.Get<MyDataProxy>(null));
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Get<MyDataProxy>(null));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "queryForDataProxy");
             }
         }
 
@@ -362,14 +384,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetKasterIntranetRepositoryExceptionHvisIdIkkeFindes()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<IntranetRepositoryException>(() => mySqlDataProvider.Get(new MyDataProxy
-                                                                                           {
-                                                                                               SystemNo = -1
-                                                                                           }));
+                int systemNo = _random.Next(100, 200) * -1;
+                MyDataProxy queryForDataProxy = new MyDataProxy {SystemNo = systemNo};
+                IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Get(queryForDataProxy));
+
+                TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.CantFindObjectById, queryForDataProxy.GetType().Name, systemNo);
             }
         }
 
@@ -379,22 +402,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtAddTilføjerDataProxy()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.Create<MyDataProxy>();
+                int systemNo = _random.Next(100, 200);
+                MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
+                    .With(m => m.SystemNo, systemNo)
+                    .Create();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
                 Assert.That(mySqlDataProxy.SaveRelationsIsCalled, Is.False);
 
-                var result = mySqlDataProvider.Add(mySqlDataProxy);
+                MyDataProxy result = sut.Add(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.SaveRelationsIsCalled, Is.True);
                 Assert.That(result.IsInserting, Is.True);
 
-                mySqlDataProvider.Delete(result);
+                sut.Delete(result);
             }
         }
 
@@ -404,11 +428,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtAddKasterArgumenutNullExceptionHvisDataProxyErNull()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.Add<MyDataProxy>(null));
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Add<MyDataProxy>(null));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProxy");
             }
         }
 
@@ -418,21 +444,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtAddKasterMySqlExceptionHvisDataProxyFindes()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.Create<MyDataProxy>();
+                int systemNo = _random.Next(100, 200);
+                MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
+                    .With(m => m.SystemNo, systemNo)
+                    .Create();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
 
-                var result = mySqlDataProvider.Add(mySqlDataProxy);
+                MyDataProxy result = sut.Add(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
 
-                Assert.Throws<MySqlException>(() => mySqlDataProvider.Add(mySqlDataProxy));
+                Assert.Throws<MySqlException>(() => sut.Add(mySqlDataProxy));
 
-                mySqlDataProvider.Delete(result);
+                sut.Delete(result);
             }
         }
 
@@ -442,27 +469,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtSaveGemmerDataProxy()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.Create<MyDataProxy>();
+                int systemNo = _random.Next(100, 200);
+                MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
+                    .With(m => m.SystemNo, systemNo)
+                    .Create();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
                 Assert.That(mySqlDataProxy.SaveRelationsIsCalled, Is.False);
 
-                var result = mySqlDataProvider.Add(mySqlDataProxy);
+                MyDataProxy result = sut.Add(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.SaveRelationsIsCalled, Is.True);
                 Assert.That(result.IsInserting, Is.True);
 
-                result = mySqlDataProvider.Save(mySqlDataProxy);
+                result = sut.Save(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.SaveRelationsIsCalled, Is.True);
                 Assert.That(result.IsInserting, Is.False);
 
-                mySqlDataProvider.Delete(result);
+                sut.Delete(result);
             }
         }
 
@@ -472,11 +500,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtSaveKasterArgumenutNullExceptionHvisDataProxyErNull()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.Save<MyDataProxy>(null));
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Save<MyDataProxy>(null));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProxy");
             }
         }
 
@@ -486,21 +516,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtDeleteSletterDataProxy()
         {
-            var fixture = new Fixture();
-
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                var mySqlDataProxy = fixture.Create<MyDataProxy>();
+                int systemNo = _random.Next(100, 200);
+                MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
+                    .With(m => m.SystemNo, systemNo)
+                    .Create();
                 Assert.That(mySqlDataProxy, Is.Not.Null);
                 Assert.That(mySqlDataProxy.DeleteRelationsIsCalled, Is.False);
 
-                var result = mySqlDataProvider.Add(mySqlDataProxy);
+                MyDataProxy result = sut.Add(mySqlDataProxy);
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.DeleteRelationsIsCalled, Is.False);
 
-                mySqlDataProvider.Delete(result);
+                sut.Delete(result);
 
                 Assert.That(result.DeleteRelationsIsCalled, Is.True);
             }
@@ -512,12 +543,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtDeleteKasterArgumenutNullExceptionHvisDataProxyErNull()
         {
-            using (var mySqlDataProvider = new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]))
+            using (IMySqlDataProvider sut = CreateSut())
             {
-                Assert.That(mySqlDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<ArgumentNullException>(() => mySqlDataProvider.Delete<MyDataProxy>(null));
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Delete<MyDataProxy>(null));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProxy");
             }
+        }
+
+        /// <summary>
+        /// Creates an instance of the MySql data provider for unit testing.
+        /// </summary>
+        /// <returns>Instance of the MySql data provider for unit testing.</returns>
+        private IMySqlDataProvider CreateSut()
+        {
+            return new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName]);
         }
     }
 }
