@@ -2,6 +2,7 @@
 using System.Configuration;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 {
@@ -23,9 +24,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestThatConstructorInitializeFoodWasteDataProvider()
         {
-            using (var foodWasteDataProvider = new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteDataProviderConnectionStringSettingsName]))
+            using (IFoodWasteDataProvider sut = CreateSut())
             {
-                Assert.That(foodWasteDataProvider, Is.Not.Null);
+                Assert.That(sut, Is.Not.Null);
             }
         }
 
@@ -35,13 +36,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestThatConstructorThrowsArgumentNullExceptionIfConnectionStringSettingsIsNull()
         {
-            var exception = Assert.Throws<ArgumentNullException>(() => new FoodWasteDataProvider(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("connectionStringSettings"));
-            Assert.That(exception.InnerException, Is.Null);
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new FoodWasteDataProvider(null));
+            // ReSharper restore ObjectCreationAsStatement
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "connectionStringSettings");
         }
 
+        /// <summary>
+        /// Creates an instance of the data provider which can access data in the food waste repository.
+        /// </summary>
+        /// <returns>Instance of the data provider which can access data in the food waste repository.</returns>
+        private IFoodWasteDataProvider CreateSut()
+        {
+            return new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteDataProviderConnectionStringSettingsName]);
+        }
     }
 }
