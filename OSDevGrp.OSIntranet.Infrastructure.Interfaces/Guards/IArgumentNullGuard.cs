@@ -1,4 +1,4 @@
-﻿namespace OSDevGrp.OSIntranet.Infrastructure.Interfaces
+﻿namespace OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards
 {
     /// <summary>
     /// Interface for the Argument Null Guard.

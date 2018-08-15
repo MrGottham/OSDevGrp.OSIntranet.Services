@@ -1,10 +1,9 @@
 ﻿using System;
-using NUnit.Framework;
-using OSDevGrp.OSIntranet.Infrastructure;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using AutoFixture;
+using NUnit.Framework;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
-namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
+namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure.Guards
 {
     /// <summary>
     /// Tests the Argument Null Guard.
