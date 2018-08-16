@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -49,7 +51,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<StorageTypeProxy>("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder").Build();
+                return DataProvider.GetCollection<StorageTypeProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -69,7 +72,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<FoodItemProxy>("SELECT FoodItemIdentifier,IsActive FROM FoodItems");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT FoodItemIdentifier,IsActive FROM FoodItems").Build();
+                return DataProvider.GetCollection<FoodItemProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -96,7 +100,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (foodGroup.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<FoodItemProxy>($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{foodGroup.Identifier.Value.ToString("D").ToUpper()}'");
+                    MySqlCommand command = new FoodWasteCommandBuilder($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{foodGroup.Identifier.Value.ToString("D").ToUpper()}'").Build();
+                    return DataProvider.GetCollection<FoodItemProxy>(command);
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroup.Identifier, "Identifier"));
             }
@@ -130,7 +135,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (dataProvider.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<FoodItemProxy>($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{dataProvider.Identifier.Value.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodItem).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'").FirstOrDefault();
+                    MySqlCommand command = new FoodWasteCommandBuilder($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{dataProvider.Identifier.Value.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodItem).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'").Build();
+                    return DataProvider.GetCollection<FoodItemProxy>(command).FirstOrDefault();
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
             }
@@ -152,7 +158,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<FoodGroupProxy>("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups").Build();
+                return DataProvider.GetCollection<FoodGroupProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -172,7 +179,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<FoodGroupProxy>("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier IS NULL");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier IS NULL").Build();
+                return DataProvider.GetCollection<FoodGroupProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -204,7 +212,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (dataProvider.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<FoodGroupProxy>($"SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{dataProvider.Identifier.Value.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodGroup).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'").FirstOrDefault();
+                    MySqlCommand command = new FoodWasteCommandBuilder($"SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{dataProvider.Identifier.Value.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodGroup).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'").Build();
+                    return DataProvider.GetCollection<FoodGroupProxy>(command).FirstOrDefault();
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
             }
@@ -233,7 +242,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(identifiableDomainObject.Identifier.Value));
+                    MySqlCommand command = new FoodWasteCommandBuilder(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(identifiableDomainObject.Identifier.Value)).Build();
+                    return DataProvider.GetCollection<ForeignKeyProxy>(command);
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }
@@ -256,7 +266,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                var staticText = DataProvider.GetCollection<StaticTextProxy>($"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int) staticTextType}").SingleOrDefault(m => m.Type == staticTextType);
+                MySqlCommand command = new FoodWasteCommandBuilder($"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int)staticTextType}").Build();
+                var staticText = DataProvider.GetCollection<StaticTextProxy>(command).SingleOrDefault(m => m.Type == staticTextType);
                 if (staticText == null)
                 {
                     throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (IStaticText).Name, staticTextType));
@@ -281,7 +292,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<StaticTextProxy>("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType").Build();
+                return DataProvider.GetCollection<StaticTextProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -349,7 +361,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<DataProviderProxy>("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name").Build();
+                return DataProvider.GetCollection<DataProviderProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -369,7 +382,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<DataProviderProxy>("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name").Build();
+                return DataProvider.GetCollection<DataProviderProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -396,7 +410,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(identifiableDomainObject.Identifier.Value));
+                    MySqlCommand command = new FoodWasteCommandBuilder(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(identifiableDomainObject.Identifier.Value)).Build();
+                    return DataProvider.GetCollection<TranslationProxy>(command);
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }
@@ -418,7 +433,8 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                return DataProvider.GetCollection<TranslationInfoProxy>("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName");
+                MySqlCommand command = new FoodWasteCommandBuilder("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName").Build();
+                return DataProvider.GetCollection<TranslationInfoProxy>(command);
             }
             catch (IntranetRepositoryException)
             {

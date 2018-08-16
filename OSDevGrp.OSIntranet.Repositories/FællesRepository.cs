@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.ServiceModel;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
@@ -14,6 +15,7 @@ using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Resources;
+using MySqlCommandBuilder = OSDevGrp.OSIntranet.Repositories.DataProxies.MySqlCommandBuilder;
 
 namespace OSDevGrp.OSIntranet.Repositories
 {
@@ -108,7 +110,8 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                return _mySqlDataProvider.GetCollection<SystemProxy>("SELECT SystemNo,Title,Properties FROM Systems ORDER BY SystemNo");
+                MySqlCommand command = new MySqlCommandBuilder("SELECT SystemNo,Title,Properties FROM Systems ORDER BY SystemNo").Build();
+                return _mySqlDataProvider.GetCollection<SystemProxy>(command);
             }
             catch (IntranetRepositoryException)
             {

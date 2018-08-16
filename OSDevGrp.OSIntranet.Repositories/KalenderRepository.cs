@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Resources;
+using MySqlCommandBuilder = OSDevGrp.OSIntranet.Repositories.DataProxies.MySqlCommandBuilder;
 
 namespace OSDevGrp.OSIntranet.Repositories
 {
@@ -50,7 +52,8 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                return _mySqlDataProvider.GetCollection<AftaleProxy>(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND Date>='{1}' ORDER BY Date DESC,FromTime DESC,ToTime DESC,CalId DESC", system, fromDate.ToString("yyyy-MM-dd")));
+                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND Date>='{1}' ORDER BY Date DESC,FromTime DESC,ToTime DESC,CalId DESC", system, fromDate.ToString("yyyy-MM-dd"))).Build();
+                return _mySqlDataProvider.GetCollection<AftaleProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -98,7 +101,8 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                return _mySqlDataProvider.GetCollection<BrugerProxy>(string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} ORDER BY Name,Initials,UserId", system));
+                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} ORDER BY Name,Initials,UserId", system)).Build();
+                return _mySqlDataProvider.GetCollection<BrugerProxy>(command);
             }
             catch (IntranetRepositoryException)
             {

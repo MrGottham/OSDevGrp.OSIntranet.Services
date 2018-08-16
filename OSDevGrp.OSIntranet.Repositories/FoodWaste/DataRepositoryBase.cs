@@ -395,7 +395,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <typeparam name="TDataProxy">Type of the data proxy for the identifiable domain object.</typeparam>
         /// <param name="identifier">Identifier for the domain object to get.</param>
         /// <returns>The identifiable domain object.</returns>
-        protected virtual TIdentifiable Get<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        protected virtual TIdentifiable Get<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy, new()
         {
             try
             {
@@ -422,7 +422,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <typeparam name="TDataProxy">Type of the data proxy for the identifiable domain object.</typeparam>
         /// <param name="identifiable">Identifiable domain object to insert.</param>
         /// <returns>The inserted identifiable domain object.</returns>
-        protected virtual TIdentifiable Insert<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        protected virtual TIdentifiable Insert<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         {
             if (Equals(identifiable, null))
             {
@@ -454,7 +454,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <typeparam name="TDataProxy">Type of the data proxy for the identifiable domain object.</typeparam>
         /// <param name="identifiable">Identifiable domain object to update.</param>
         /// <returns>The updated identifiable domain object.</returns>
-        protected virtual TIdentifiable Update<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        protected virtual TIdentifiable Update<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         {
             if (Equals(identifiable, null))
             {
@@ -481,7 +481,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <typeparam name="TIdentifiable">Type of the identifiable domain object.</typeparam>
         /// <typeparam name="TDataProxy">Type of the data proxy for the identifiable domain object.</typeparam>
         /// <param name="identifiable">Identifiable domain object to delete.</param>
-        protected virtual void Delete<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        protected virtual void Delete<TIdentifiable, TDataProxy>(TIdentifiable identifiable) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         {
             if (Equals(identifiable, null))
             {

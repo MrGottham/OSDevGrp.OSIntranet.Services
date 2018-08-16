@@ -14,6 +14,7 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using NUnit.Framework;
 using AutoFixture;
+using MySql.Data.MySqlClient;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
@@ -208,7 +209,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Return(fixture.CreateMany<SystemProxy>(3));
             fixture.Inject(mySqlDataProvider);
 
@@ -219,7 +220,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(systemer, Is.Not.Null);
             Assert.That(systemer.Count(), Is.EqualTo(3));
 
-            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull));
+            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<SystemProxy>(Arg<MySqlCommand>.Is.NotNull));
         }
 
         /// <summary>
@@ -233,7 +234,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(mySqlDataProvider);
 
@@ -254,7 +255,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(MockRepository.GenerateMock<IDomainObjectBuilder>());
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<SystemProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Throw(fixture.Create<Exception>());
             fixture.Inject(mySqlDataProvider);
 

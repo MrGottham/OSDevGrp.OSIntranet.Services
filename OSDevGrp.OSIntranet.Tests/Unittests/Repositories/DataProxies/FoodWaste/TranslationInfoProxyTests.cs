@@ -194,12 +194,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var translationInfoProxy = new TranslationInfoProxy();
             Assert.That(translationInfoProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationInfoProxy.MapData(null, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => translationInfoProxy.MapData(null, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -234,14 +234,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataReader = MockRepository.GenerateMock<IDataReader>();
 
             var translationInfoProxy = new TranslationInfoProxy();
             Assert.That(translationInfoProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => translationInfoProxy.MapData(dataReader, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => translationInfoProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -256,7 +256,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("TranslationInfoIdentifier")))
@@ -273,8 +273,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationInfoProxy.CultureName, Is.Null);
             Assert.That(translationInfoProxy.CultureInfo, Is.Null);
 
-            translationInfoProxy.MapData(dataReader, fixture.Create<IDataProviderBase>());
-            translationInfoProxy.MapRelations(fixture.Create<IDataProviderBase>());
+            translationInfoProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>());
+            translationInfoProxy.MapRelations(fixture.Create<IDataProviderBase<MySqlCommand>>());
             Assert.That(translationInfoProxy.Identifier, Is.Not.Null);
             Assert.That(translationInfoProxy.Identifier.HasValue, Is.True);
             // ReSharper disable PossibleInvalidOperationException
@@ -332,12 +332,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var translationInfoProxy = new TranslationInfoProxy();
             Assert.That(translationInfoProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.SaveRelations(fixture.Create<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }
@@ -363,12 +363,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var translationInfoProxy = new TranslationInfoProxy();
             Assert.That(translationInfoProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.DeleteRelations(fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }

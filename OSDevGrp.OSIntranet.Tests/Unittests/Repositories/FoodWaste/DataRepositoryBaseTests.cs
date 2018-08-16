@@ -728,7 +728,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Creates an instanse of the private class for testing the basic functionality used by repositories in the food waste domain.
         /// </summary>
         /// <returns>Instanse of the private class for testing the basic functionality used by repositories in the food waste domain.</returns>
-        private MyDataRepository CreateSutForGettingData<TIdentifiable, TDataProxy>(TDataProxy dataProxy = null, Exception exceptionToThrow = null) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        private MyDataRepository CreateSutForGettingData<TIdentifiable, TDataProxy>(TDataProxy dataProxy = null, Exception exceptionToThrow = null) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy, new()
         {
             _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             if (exceptionToThrow != null)
@@ -753,7 +753,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Creates an instanse of the private class for testing the basic functionality used by repositories in the food waste domain.
         /// </summary>
         /// <returns>Instanse of the private class for testing the basic functionality used by repositories in the food waste domain.</returns>
-        private MyDataRepository CreateSutForModifyingData<TIdentifiable, TDataProxy>(TDataProxy dataProxy, Exception exceptionToThrow = null) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private MyDataRepository CreateSutForModifyingData<TIdentifiable, TDataProxy>(TDataProxy dataProxy, Exception exceptionToThrow = null) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         {
             _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             if (exceptionToThrow != null)
@@ -790,7 +790,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Get calls Get on the data provider which can access data in the food waste repository.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatGetCallsGetOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        private void TestThatGetCallsGetOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy, new()
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForGettingData<TIdentifiable, TDataProxy>();
@@ -805,7 +805,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Get returns the received data proxy from the food waste repository.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatGetReturnsReceivedDataProxy<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        private void TestThatGetReturnsReceivedDataProxy<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy, new()
         // ReSharper restore UnusedMember.Local
         {
             TDataProxy dataProxy = new TDataProxy();
@@ -822,7 +822,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Get throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        private void TestThatGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy, new()
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();
@@ -840,7 +840,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Get throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>, new()
+        private void TestThatGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(Guid identifier) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy, new()
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();
@@ -858,7 +858,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Insert calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatInsertCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatInsertCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -873,7 +873,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Insert calls Add on the data provider which can access data in the food waste repository.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatInsertCallsAddOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatInsertCallsAddOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -888,7 +888,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Insert returns the inserted data proxy.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatInsertReturnsInsertedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatInsertReturnsInsertedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -905,7 +905,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Insert throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatInsertThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();
@@ -923,7 +923,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Insert throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatInsertThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();
@@ -941,7 +941,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Update calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatUpdateCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatUpdateCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -956,7 +956,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Update calls Save on the data provider which can access data in the food waste repository.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatUpdateCallsSaveOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatUpdateCallsSaveOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -971,7 +971,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Update returns the updated data proxy.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatUpdateReturnsUpdatedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatUpdateReturnsUpdatedDataProxy<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -986,7 +986,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Update throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatUpdateThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();
@@ -1004,7 +1004,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Update throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatUpdateThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();
@@ -1022,7 +1022,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Delete calls Map on the object mapper which can map objects in the food waste domain.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatDeleteCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatDeleteCallsMapOnFoodWasteObjectMapper<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -1037,7 +1037,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Delete calls Delete on the data provider which can access data in the food waste repository.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatDeleteCallsDeleteOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatDeleteCallsDeleteOnFoodWasteDataProvider<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             MyDataRepository sut = CreateSutForModifyingData<TIdentifiable, TDataProxy>(dataProxyMock);
@@ -1052,7 +1052,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Delete throws an IntranetRepositoryException when an IntranetRepositoryException occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatDeleteThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();
@@ -1070,7 +1070,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// Tests that Delete throws an IntranetRepositoryException when an Exception occurs.
         /// </summary>
         // ReSharper disable UnusedMember.Local
-        private void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy<TIdentifiable>
+        private void TestThatDeleteThrowsIntranetRepositoryExceptionWhenExceptionOccurs<TIdentifiable, TDataProxy>(TIdentifiable identifiable, TDataProxy dataProxyMock) where TIdentifiable : IIdentifiable where TDataProxy : class, TIdentifiable, IMySqlDataProxy
         // ReSharper restore UnusedMember.Local
         {
             Fixture fixture = new Fixture();

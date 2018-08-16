@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
     /// <summary>
     /// Interface for a data proxy to a given food group.
     /// </summary>
-    public interface IFoodGroupProxy : IFoodGroup, IMySqlDataProxy<IFoodGroup>
+    public interface IFoodGroupProxy : IFoodGroup, IMySqlDataProxy
     {
     }
 }

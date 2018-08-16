@@ -12,6 +12,7 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using AutoFixture;
+using MySql.Data.MySqlClient;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
@@ -80,7 +81,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.StorageTypeGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StorageTypeProxy>(Arg<string>.Is.Equal("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StorageTypeProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder")));
         }
 
         /// <summary>
@@ -149,7 +150,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodItemGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Equal("SELECT FoodItemIdentifier,IsActive FROM FoodItems")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT FoodItemIdentifier,IsActive FROM FoodItems")));
         }
 
         /// <summary>
@@ -249,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodItemGetAllForFoodGroup(foodGroupMock);
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Equal($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{identifier.ToString("D").ToUpper()}'")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{identifier.ToString("D").ToUpper()}'")));
         }
 
         /// <summary>
@@ -381,7 +382,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodItemGetByForeignKey(dataProviderMock, foreignKeyValue);
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Equal($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{identifer.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodItem).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{identifer.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodItem).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'")));
         }
 
         /// <summary>
@@ -470,7 +471,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodGroupGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups")));
         }
 
         /// <summary>
@@ -539,7 +540,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodGroupGetAllOnRoot();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier IS NULL")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier IS NULL")));
         }
 
         /// <summary>
@@ -667,7 +668,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodGroupGetByForeignKey(dataProviderMock, foreignKeyValue);
             
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal($"SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{identifier.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodGroup).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{identifier.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodGroup).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'")));
         }
 
         /// <summary>
@@ -791,7 +792,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock);
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Equal($"SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{identifier.ToString("D").ToUpper()}' ORDER BY DataProviderIdentifier,ForeignKeyValue")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{identifier.ToString("D").ToUpper()}' ORDER BY DataProviderIdentifier,ForeignKeyValue")));
         }
 
         /// <summary>
@@ -871,7 +872,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
                 sut.StaticTextGetByStaticTextType(staticTextTypeToTest);
 
-                _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Equal($"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int) staticTextTypeToTest}")));
+                _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int) staticTextTypeToTest}")));
             }
         }
 
@@ -959,7 +960,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.StaticTextGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Equal("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType")));
         }
 
         /// <summary>
@@ -1170,7 +1171,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.DataProviderGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Equal("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name")));
         }
 
         /// <summary>
@@ -1239,7 +1240,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.DataProviderWhoHandlesPaymentsGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Equal("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name")));
         }
 
         /// <summary>
@@ -1341,7 +1342,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.TranslationsForDomainObjectGet(identifiableDomainObjectMock);
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal($"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{identifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{identifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
         }
 
         /// <summary>
@@ -1416,7 +1417,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.TranslationInfoGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationInfoProxy>(Arg<string>.Is.Equal("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName")));
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationInfoProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName")));
         }
 
         /// <summary>
@@ -1483,28 +1484,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             if (exceptionToThrow != null)
             {
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StorageTypeProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StorageTypeProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationInfoProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationInfoProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Throw(exceptionToThrow)
                     .Repeat.Any();
                 _foodWasteDataProviderMock.Stub(m => m.Get(Arg<DataProviderProxy>.Is.Anything))
@@ -1513,28 +1514,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             }
             else
             {
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StorageTypeProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StorageTypeProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(storageTypeProxyCollection ?? new List<StorageTypeProxy>(0))
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodItemProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(foodItemProxyCollection ?? new List<FoodItemProxy>(0))
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(foodGroupProxyCollection ?? new List<FoodGroupProxy>(0))
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(foreignKeyProxyCollection ?? new List<ForeignKeyProxy>(0))
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(staticTextProxyCollection ?? new List<StaticTextProxy>(0))
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(dataProviderProxyCollection ?? new List<DataProviderProxy>(0))
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(translationProxyCollection ?? new List<TranslationProxy>(0))
                     .Repeat.Any();
-                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationInfoProxy>(Arg<string>.Is.Anything))
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<TranslationInfoProxy>(Arg<MySqlCommand>.Is.Anything))
                     .Return(translationInfoProxyCollection ?? new List<TranslationInfoProxy>(0))
                     .Repeat.Any();
                 _foodWasteDataProviderMock.Stub(m => m.Get(Arg<DataProviderProxy>.Is.Anything))

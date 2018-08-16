@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -61,7 +62,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy<IForeignKey>
+        #region IMySqlDataProxy
 
         /// <summary>
         /// Gets the unique identification for the foreign key.
@@ -134,7 +135,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
+        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -184,14 +185,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProvider");
             }
 
-            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
             {
                 var dataProviderProxy = new DataProviderProxy
                 {
@@ -206,7 +207,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
-        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -222,7 +223,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -235,20 +236,57 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Creates the SQL statement for getting this foreign key to a domain object in the food waste domain.
+        /// </summary>
+        /// <returns>SQL statement for getting this foreign key to a domain object in the food waste domain.</returns>
+        public virtual MySqlCommand CreateGetCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for inserting this foreign key to a domain object in the food waste domain.
+        /// </summary>
+        /// <returns>SQL statement for inserting this foreign key to a domain object in the food waste domain.</returns>
+        public virtual MySqlCommand CreateInsertCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for updating this foreign key to a domain object in the food waste domain.
+        /// </summary>
+        /// <returns>SQL statement for updating this foreign key to a domain object in the food waste domain.</returns>
+        public virtual MySqlCommand CreateUpdateCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for deleting this foreign key to a domain object in the food waste domain.
+        /// </summary>
+        /// <returns>SQL statement for deleting this foreign key to a domain object in the food waste domain.</returns>
+        public virtual MySqlCommand CreateDeleteCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+        }
+
+        /// <summary>
         /// Gets foreign keys for a domain object in the food waste domain.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="foreignKeyForIdentifier">Identifier for the given domain object on which to get the foreign keys.</param>
         /// <returns>Foreign keys for a domain object in the food waste domain.</returns>
-        internal static IEnumerable<ForeignKeyProxy> GetDomainObjectForeignKeys(IDataProviderBase dataProvider, Guid foreignKeyForIdentifier)
+        internal static IEnumerable<ForeignKeyProxy> GetDomainObjectForeignKeys(IDataProviderBase<MySqlCommand> dataProvider, Guid foreignKeyForIdentifier)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProvider");
             }
-            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(foreignKeyForIdentifier));
+                MySqlCommand command = new FoodWasteCommandBuilder(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(foreignKeyForIdentifier)).Build();
+                return subDataProvider.GetCollection<ForeignKeyProxy>(command);
             }
         }
 
@@ -257,7 +295,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="foreignKeyForIdentifier">Identifier for the given domain object on which to get the foreign keys.</param>
-        internal static void DeleteDomainObjectForeignKeys(IDataProviderBase dataProvider, Guid foreignKeyForIdentifier)
+        internal static void DeleteDomainObjectForeignKeys(IDataProviderBase<MySqlCommand> dataProvider, Guid foreignKeyForIdentifier)
         {
             if (dataProvider == null)
             {
@@ -265,7 +303,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             foreach (var foreignKeyProxy in GetDomainObjectForeignKeys(dataProvider, foreignKeyForIdentifier))
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     subDataProvider.Delete(foreignKeyProxy);
                 }

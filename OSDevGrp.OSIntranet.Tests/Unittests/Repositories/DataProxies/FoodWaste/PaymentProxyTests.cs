@@ -239,7 +239,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var paymentProxy = new PaymentProxy();
             Assert.That(paymentProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.MapData(null, MockRepository.GenerateMock<IDataProviderBase>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.MapData(null, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -275,7 +275,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var paymentProxy = new PaymentProxy();
             Assert.That(paymentProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -294,7 +294,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
             
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
+            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
                 .Repeat.Any();
@@ -463,7 +463,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(paymentProxy.Identifier, Is.Null);
             Assert.That(paymentProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.SaveRelations(MockRepository.GenerateStub<IDataProviderBase>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.SaveRelations(MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -502,7 +502,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(paymentProxy.Identifier, Is.Null);
             Assert.That(paymentProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.DeleteRelations(MockRepository.GenerateStub<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.DeleteRelations(MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);

@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -22,7 +23,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         private bool _foodGroupsIsLoading;
         private bool _translationsIsLoaded;
         private bool _foreignKeysIsLoaded;
-        private IDataProviderBase _dataProvider;
+        private IDataProviderBase<MySqlCommand> _dataProvider;
 
         #endregion
 
@@ -141,7 +142,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy<IFoodItem>
+        #region IMySqlDataProxy
 
         /// <summary>
         /// Gets the unique identification for the food item.
@@ -212,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
+        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -242,7 +243,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -255,7 +256,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
-        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -283,7 +284,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var foodItemGroups = FoodItemGroupProxy.GetFoodItemGroups(dataProvider, this).ToList();
             if (PrimaryFoodGroup != null && PrimaryFoodGroup.Identifier.HasValue && foodItemGroups.SingleOrDefault(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value == PrimaryFoodGroup.Identifier.Value) == null)
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     var foodItemGroupProxy = new FoodItemGroupProxy
                     {
@@ -298,7 +299,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var missingfoodItemGroup = FoodGroups.FirstOrDefault(foodGroup => foodGroup.Identifier.HasValue && foodItemGroups.Any(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value == foodGroup.Identifier.Value) == false);
             while (missingfoodItemGroup != null)
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     var foodItemGroupProxy = new FoodItemGroupProxy
                     {
@@ -314,7 +315,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var noLongerExistingFoodItemGroup = foodItemGroups.FirstOrDefault(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && FoodGroups.Any(foodGroup => foodGroup.Identifier.HasValue && foodGroup.Identifier.Value == foodItemGroup.FoodGroupIdentifier.Value) == false);
             while (noLongerExistingFoodItemGroup != null)
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     subDataProvider.Delete(noLongerExistingFoodItemGroup);
                     foodItemGroups.Remove(noLongerExistingFoodItemGroup);
@@ -329,7 +330,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var primaryFoodItemGroup = foodItemGroups.SingleOrDefault(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value == PrimaryFoodGroup.Identifier.Value);
             if (primaryFoodItemGroup != null && primaryFoodItemGroup.IsPrimary == false)
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     primaryFoodItemGroup.IsPrimary = true;
                     foodItemGroups.Remove(primaryFoodItemGroup);
@@ -339,7 +340,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var nonPrimaryFoodItemGroup = foodItemGroups.Where(foodItemGroup => foodItemGroup.FoodGroupIdentifier.HasValue && foodItemGroup.FoodGroupIdentifier.Value != PrimaryFoodGroup.Identifier.Value).SingleOrDefault(foodItemGroup => foodItemGroup.IsPrimary);
             while (nonPrimaryFoodItemGroup != null)
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     nonPrimaryFoodItemGroup.IsPrimary = false;
                     foodItemGroups.Remove(nonPrimaryFoodItemGroup);
@@ -353,7 +354,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -372,6 +373,42 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             FoodItemGroupProxy.DeleteFoodItemGroups(dataProvider, this);
             TranslationProxy.DeleteDomainObjectTranslations(dataProvider, Identifier.Value);
             ForeignKeyProxy.DeleteDomainObjectForeignKeys(dataProvider, Identifier.Value);
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for getting this food item.
+        /// </summary>
+        /// <returns>SQL statement for getting this food item.</returns>
+        public virtual MySqlCommand CreateGetCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for inserting this food item.
+        /// </summary>
+        /// <returns>SQL statement for inserting this food item.</returns>
+        public virtual MySqlCommand CreateInsertCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for updating this food item.
+        /// </summary>
+        /// <returns>SQL statement for updating this food item.</returns>
+        public virtual MySqlCommand CreateUpdateCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for deleting this food item.
+        /// </summary>
+        /// <returns>SQL statement for deleting this food item.</returns>
+        public virtual MySqlCommand CreateDeleteCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
         }
 
         #endregion

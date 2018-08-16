@@ -7,6 +7,7 @@ using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -24,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         private Guid? _stakeholderIdentifier;
         private StakeholderType? _stakeholderType;
         private Guid? _dataProviderIdentifier;
-        private IDataProviderBase _dataProvider;
+        private IDataProviderBase<MySqlCommand> _dataProvider;
 
         #endregion
 
@@ -66,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.Stakeholder;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
                 {
                     switch (_stakeholderType.Value)
                     {
@@ -97,7 +98,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.DataProvider;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
                 {
                     var dataProviderProxy = new DataProviderProxy
                     {
@@ -111,7 +112,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy<IPayment>
+        #region IMySqlDataProxy
 
         /// <summary>
         /// Gets the unique identification for the payment from a stakeholder.
@@ -190,7 +191,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
+        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -244,7 +245,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -257,7 +258,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
-        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -278,7 +279,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -296,20 +297,57 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Creates the SQL statement for getting this payment from a stakeholder.
+        /// </summary>
+        /// <returns>SQL statement for getting this payment from a stakeholder.</returns>
+        public virtual MySqlCommand CreateGetCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for inserting this payment from a stakeholder.
+        /// </summary>
+        /// <returns>SQL statement for inserting this payment from a stakeholder.</returns>
+        public virtual MySqlCommand CreateInsertCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for updating this payment from a stakeholder.
+        /// </summary>
+        /// <returns>SQL statement for updating this payment from a stakeholder.</returns>
+        public virtual MySqlCommand CreateUpdateCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for deleting this payment from a stakeholder.
+        /// </summary>
+        /// <returns>SQL statement for deleting this payment from a stakeholder.</returns>
+        public virtual MySqlCommand CreateDeleteCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+        }
+
+        /// <summary>
         /// Gets all the payments made by a given stakeholder.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="stakeholderIdentifier">Identifier for the stakeholder on which to get payments.</param>
         /// <returns>All the payments made by the given stakeholder.</returns>
-        internal static IEnumerable<PaymentProxy> GetPayments(IDataProviderBase dataProvider, Guid stakeholderIdentifier)
+        internal static IEnumerable<PaymentProxy> GetPayments(IDataProviderBase<MySqlCommand> dataProvider, Guid stakeholderIdentifier)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProvider");
             }
-            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<PaymentProxy>(string.Format("SELECT PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime FROM Payments WHERE StakeholderIdentifier='{0}' ORDER BY PaymentTime DESC", stakeholderIdentifier.ToString("D").ToUpper()));
+                MySqlCommand command = new FoodWasteCommandBuilder(string.Format("SELECT PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime FROM Payments WHERE StakeholderIdentifier='{0}' ORDER BY PaymentTime DESC", stakeholderIdentifier.ToString("D").ToUpper())).Build();
+                return subDataProvider.GetCollection<PaymentProxy>(command);
             }
         }
 
@@ -318,7 +356,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="stakeholderIdentifier">Identifier for the stakeholder on which to delete payments.</param>
-        internal static void DeletePayments(IDataProviderBase dataProvider, Guid stakeholderIdentifier)
+        internal static void DeletePayments(IDataProviderBase<MySqlCommand> dataProvider, Guid stakeholderIdentifier)
         {
             if (dataProvider == null)
             {
@@ -326,7 +364,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             foreach (var paymentProxy in GetPayments(dataProvider, stakeholderIdentifier))
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     subDataProvider.Delete(paymentProxy);
                 }

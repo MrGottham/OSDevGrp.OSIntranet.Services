@@ -88,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetSqlQueryForId(null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => ((StorageProxy) sut).GetSqlQueryForId(null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "storage");
         }
@@ -107,7 +107,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.GetSqlQueryForId(storageMock));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => ((StorageProxy) sut).GetSqlQueryForId(storageMock));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, storageMock.Identifier, "Identifier");
         }
@@ -128,7 +128,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlQueryForId(storageMock);
+            string result = ((StorageProxy) sut).GetSqlQueryForId(storageMock);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"SELECT StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime FROM Storages WHERE StorageIdentifier='{identifier.ToString("D").ToUpper()}'"));
@@ -158,7 +158,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut(identifier, householdMock, sortOrder, storageTypeMock, temperatur, creationTime, description);
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlCommandForInsert();
+            string result = ((StorageProxy) sut).GetSqlCommandForInsert();
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) VALUES('{identifier.ToString("D").ToUpper()}','{householdIdentifier.ToString("D").ToUpper()}',{sortOrder},'{storageTypeIdentifier.ToString("D").ToUpper()}',{descritionAsSql},{temperatur},{DataRepositoryHelper.GetSqlValueForDateTime(creationTime)})"));
@@ -188,7 +188,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut(identifier, householdMock, sortOrder, storageTypeMock, temperatur, creationTime, description);
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlCommandForUpdate();
+            string result = ((StorageProxy) sut).GetSqlCommandForUpdate();
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"UPDATE Storages SET HouseholdIdentifier='{householdIdentifier.ToString("D").ToUpper()}',SortOrder={sortOrder},StorageTypeIdentifier='{storageTypeIdentifier.ToString("D").ToUpper()}',Descr={descritionAsSql},Temperature={temperatur},CreationTime={DataRepositoryHelper.GetSqlValueForDateTime(creationTime)} WHERE StorageIdentifier='{identifier.ToString("D").ToUpper()}'"));
@@ -205,7 +205,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut(identifier);
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlCommandForDelete();
+            string result = ((StorageProxy) sut).GetSqlCommandForDelete();
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"DELETE FROM Storages WHERE StorageIdentifier='{identifier.ToString("D").ToUpper()}'"));
@@ -220,7 +220,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IDataProviderBase>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -250,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase>()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name);
         }
@@ -278,7 +278,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             HouseholdProxy householdProxy = fixture.Create<HouseholdProxy>();
             StorageTypeProxy storageTypeProxy = fixture.Create<StorageTypeProxy>();
 
-            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture, householdProxy, storageTypeProxy);
+            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture, householdProxy, storageTypeProxy);
 
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
@@ -430,14 +430,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private static IDataProviderBase CreateDataProviderMock(Fixture fixture, HouseholdProxy householdProxy = null, StorageTypeProxy storageTypeProxy = null)
+        private static IDataProviderBase<MySqlCommand> CreateDataProviderMock(Fixture fixture, HouseholdProxy householdProxy = null, StorageTypeProxy storageTypeProxy = null)
         {
             if (fixture == null)
             {
                 throw new ArgumentNullException(nameof(fixture));
             }
 
-            IDataProviderBase dataProviderMock = MockRepository.GenerateMock<IDataProviderBase>();
+            IDataProviderBase<MySqlCommand> dataProviderMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();

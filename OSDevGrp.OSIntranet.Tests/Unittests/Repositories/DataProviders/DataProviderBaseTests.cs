@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using AutoFixture;
 using NUnit.Framework;
@@ -6,6 +7,7 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 {
@@ -18,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// <summary>
         /// Egen klasse for en data proxy til test af basis data provider.
         /// </summary>
-        private class MyDataProxy : IDataProxyBase
+        private class MyDataProxy : IDataProxyBase<IDbCommand>
         {
             #region IDataProxyBase Members
 
@@ -27,7 +29,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataReader">Data reader for data provideren.</param>
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
-            public void MapData(object dataReader, IDataProviderBase dataProvider)
+            public void MapData(object dataReader, IDataProviderBase<IDbCommand> dataProvider)
             {
                 Assert.That(dataReader, Is.Not.Null);
                 Assert.That(dataProvider, Is.Not.Null);
@@ -37,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Mapper relationer.
             /// </summary>
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
-            public void MapRelations(IDataProviderBase dataProvider)
+            public void MapRelations(IDataProviderBase<IDbCommand> dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
             }
@@ -47,7 +49,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
             /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-            public void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+            public void SaveRelations(IDataProviderBase<IDbCommand> dataProvider, bool isInserting)
             {
                 Assert.That(dataProvider, Is.Not.Null);
             }
@@ -56,9 +58,45 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Sletter relationer.
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
-            public void DeleteRelations(IDataProviderBase dataProvider)
+            public void DeleteRelations(IDataProviderBase<IDbCommand> dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
+            }
+
+            /// <summary>
+            /// Creates the SQL statement for getting this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for getting this data proxy.</returns>
+            public IDbCommand CreateGetCommand()
+            {
+                return MockRepository.GenerateMock<IDbCommand>();
+            }
+
+            /// <summary>
+            /// Creates the SQL statement for inserting this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for inserting this data proxy.</returns>
+            public IDbCommand CreateInsertCommand()
+            {
+                return MockRepository.GenerateMock<IDbCommand>();
+            }
+
+            /// <summary>
+            /// Creates the SQL statement for updating this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for updating this data proxy.</returns>
+            public IDbCommand CreateUpdateCommand()
+            {
+                return MockRepository.GenerateMock<IDbCommand>();
+            }
+
+            /// <summary>
+            /// Creates the SQL statement for deleting this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for deleting this data proxy.</returns>
+            public IDbCommand CreateDeleteCommand()
+            {
+                return MockRepository.GenerateMock<IDbCommand>();
             }
 
             #endregion
@@ -67,7 +105,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// <summary>
         /// Egen klasse til test af basis data provider.
         /// </summary>
-        private class MyDataProvider : DataProviderBase
+        private class MyDataProvider : DataProviderBase<IDbCommand>
         {
             #region Private variables
 
@@ -112,9 +150,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Henter og returnerer data fra data provideren.
             /// </summary>
             /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
-            /// <param name="query">Foresprøgelse efter data.</param>
+            /// <param name="queryCommand">Database command for the SQL query statement.</param>
             /// <returns>Collection indeholdende data.</returns>
-            public override IEnumerable<TDataProxy> GetCollection<TDataProxy>(string query)
+            public override IEnumerable<TDataProxy> GetCollection<TDataProxy>(IDbCommand queryCommand)
             {
                 IEnumerable<TDataProxy> dataProxies = _fixture.CreateMany<TDataProxy>(3).ToList();
                 foreach (var dataProxy in dataProxies)
@@ -128,13 +166,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Henter data for en given data proxy i data provideren.
             /// </summary>
             /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
-            /// <param name="queryForDataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning.</param>
+            /// <param name="dataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning.</param>
             /// <returns>Data proxy.</returns>
-            public override TDataProxy Get<TDataProxy>(TDataProxy queryForDataProxy)
+            public override TDataProxy Get<TDataProxy>(TDataProxy dataProxy)
             {
-                TDataProxy dataProxy = _fixture.Create<TDataProxy>();
-                dataProxy.MapData(_fixture, this);
-                return dataProxy;
+                TDataProxy result = _fixture.Create<TDataProxy>();
+                result.MapData(_fixture, this);
+                return result;
             }
 
             /// <summary>
@@ -192,7 +230,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtConstructorInitiererDataProviderBase()
         {
-            using (IDataProviderBase sut = CreateSut())
+            using (IDataProviderBase<IDbCommand> sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
             }
@@ -204,11 +242,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtCloneInitiererNyDataProviderBase()
         {
-            using (IDataProviderBase sut = CreateSut())
+            using (IDataProviderBase<IDbCommand> sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
 
-                using (IDataProviderBase clonedDataProvider = sut.Clone() as IDataProviderBase)
+                using (IDataProviderBase<IDbCommand> clonedDataProvider = sut.Clone() as IDataProviderBase<IDbCommand>)
                 {
                     Assert.That(clonedDataProvider, Is.Not.Null);
                 }
@@ -221,11 +259,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetCollectionHenterData()
         {
-            using (IDataProviderBase sut = CreateSut())
+            using (IDataProviderBase<IDbCommand> sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
 
-                IEnumerable<MyDataProxy> result = sut.GetCollection<MyDataProxy>(_fixture.Create<string>());
+                IEnumerable<MyDataProxy> result = sut.GetCollection<MyDataProxy>(MockRepository.GenerateMock<IDbCommand>());
                 // ReSharper disable PossibleMultipleEnumeration
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Count(), Is.EqualTo(3));
@@ -239,7 +277,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtGetHenterData()
         {
-            using (IDataProviderBase sut = CreateSut())
+            using (IDataProviderBase<IDbCommand> sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
 
@@ -254,7 +292,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtAddTilføjerData()
         {
-            using (IDataProviderBase sut = CreateSut())
+            using (IDataProviderBase<IDbCommand> sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
 
@@ -269,7 +307,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtSaveGemmerData()
         {
-            using (IDataProviderBase sut = CreateSut())
+            using (IDataProviderBase<IDbCommand> sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
 
@@ -284,7 +322,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         [Test]
         public void TestAtDeleteSletterData()
         {
-            using (IDataProviderBase sut = CreateSut())
+            using (IDataProviderBase<IDbCommand> sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
 
@@ -296,7 +334,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// Creates an instance of the data provider for unit testning.
         /// </summary>
         /// <returns>Instance of the data provider for unit testning.</returns>
-        private IDataProviderBase CreateSut()
+        private IDataProviderBase<IDbCommand> CreateSut()
         {
             return new MyDataProvider(_fixture);
         }

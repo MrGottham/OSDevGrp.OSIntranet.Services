@@ -92,7 +92,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetSqlQueryForId(null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => ((StorageTypeProxy) sut).GetSqlQueryForId(null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "storageType");
         }
@@ -111,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.GetSqlQueryForId(storageTypeMock));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => ((StorageTypeProxy) sut).GetSqlQueryForId(storageTypeMock));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, storageTypeMock.Identifier, "Identifier");
         }
@@ -132,7 +132,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlQueryForId(storageTypeMock);
+            string result = ((StorageTypeProxy) sut).GetSqlQueryForId(storageTypeMock);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
@@ -157,7 +157,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlCommandForInsert();
+            string result = ((StorageTypeProxy) sut).GetSqlCommandForInsert();
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"INSERT INTO StorageTypes (StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('{identifier.ToString("D").ToUpper()}',{sortOrder},{temperatur},{temperaturRange.StartValue},{temperaturRange.EndValue},{Convert.ToInt32(creatable)},{Convert.ToInt32(editable)},{Convert.ToInt32(deletable)})"));
@@ -182,7 +182,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlCommandForUpdate();
+            string result = ((StorageTypeProxy) sut).GetSqlCommandForUpdate();
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"UPDATE StorageTypes SET SortOrder={sortOrder},Temperature={temperatur},TemperatureRangeStartValue={temperaturRange.StartValue},TemperatureRangeEndValue={temperaturRange.EndValue},Creatable={Convert.ToInt32(creatable)},Editable={Convert.ToInt32(editable)},Deletable={Convert.ToInt32(deletable)} WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
@@ -199,7 +199,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut(identifier);
             Assert.That(sut, Is.Not.Null);
 
-            string result = sut.GetSqlCommandForDelete();
+            string result = ((StorageTypeProxy) sut).GetSqlCommandForDelete();
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.Not.Empty);
             Assert.That(result, Is.EqualTo($"DELETE FROM StorageTypes WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
@@ -214,7 +214,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IDataProviderBase>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -244,7 +244,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase>()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name);
         }
@@ -267,7 +267,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
 
-            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture);
 
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
@@ -325,7 +325,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             Fixture fixture = new Fixture();
 
-            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture);
 
             IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: Guid.NewGuid());
             Assert.That(sut, Is.Not.Null);
@@ -349,7 +349,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             Guid storageTypeIdentifier = Guid.NewGuid();
 
-            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture);
+            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture);
 
             IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
             Assert.That(sut, Is.Not.Null);
@@ -363,7 +363,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             sut.MapRelations(dataProviderMock);
 
-            dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal($"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{storageTypeIdentifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{storageTypeIdentifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
         }
 
         /// <summary>
@@ -380,7 +380,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationProxyCollection, Is.Not.Null);
             Assert.That(translationProxyCollection, Is.Not.Empty);
 
-            IDataProviderBase dataProviderMock = CreateDataProviderMock(fixture, translationProxyCollection: translationProxyCollection);
+            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture, translationProxyCollection: translationProxyCollection);
 
             IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
             Assert.That(sut, Is.Not.Null);
@@ -529,18 +529,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private static IDataProviderBase CreateDataProviderMock(Fixture fixture, IEnumerable<TranslationProxy> translationProxyCollection = null)
+        private static IDataProviderBase<MySqlCommand> CreateDataProviderMock(Fixture fixture, IEnumerable<TranslationProxy> translationProxyCollection = null)
         {
             if (fixture == null)
             {
                 throw new ArgumentNullException(nameof(fixture));
             }
 
-            IDataProviderBase dataProviderMock = MockRepository.GenerateMock<IDataProviderBase>();
+            IDataProviderBase<MySqlCommand> dataProviderMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(translationProxyCollection ?? fixture.CreateMany<TranslationProxy>().ToList())
                 .Repeat.Any();
             return dataProviderMock;

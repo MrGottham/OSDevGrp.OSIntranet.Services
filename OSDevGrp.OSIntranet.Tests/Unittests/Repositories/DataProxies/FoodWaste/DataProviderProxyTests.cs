@@ -214,12 +214,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataProviderProxy = new DataProviderProxy();
             Assert.That(dataProviderProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => dataProviderProxy.MapData(null, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => dataProviderProxy.MapData(null, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -254,14 +254,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataReader = MockRepository.GenerateMock<IDataReader>();
 
             var dataProviderProxy = new DataProviderProxy();
             Assert.That(dataProviderProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => dataProviderProxy.MapData(dataReader, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => dataProviderProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -281,11 +281,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             fixture.Customize<TranslationProxy>(e => e.FromFactory(() => new TranslationProxy(new Guid("1AFF5DC2-26B4-4E0B-ACFF-71E669B5CDCB"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>())));
 
             var translationProxyCollection = fixture.CreateMany<TranslationProxy>(2).ToList();
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
+            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
                 .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.NotNull))
+            dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Return(translationProxyCollection)
                 .Repeat.Any();
 
@@ -339,7 +339,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(dataProviderProxy.DataSourceStatements, Is.EqualTo(translationProxyCollection));
             
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
-            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("DataSourceStatementIdentifier")))));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("DataSourceStatementIdentifier")))));
         }
 
         /// <summary>
@@ -385,12 +385,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataProviderProxy = new DataProviderProxy();
             Assert.That(dataProviderProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.SaveRelations(fixture.Create<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }
@@ -416,12 +416,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataProviderProxy = new DataProviderProxy();
             Assert.That(dataProviderProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.DeleteRelations(fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }

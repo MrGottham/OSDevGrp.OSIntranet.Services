@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
     /// <summary>
     /// Interface for a data proxy to a given translation for a domain object.
     /// </summary>
-    public interface ITranslationProxy : ITranslation, IMySqlDataProxy<ITranslation>
+    public interface ITranslationProxy : ITranslation, IMySqlDataProxy
     {
     }
 }

@@ -209,12 +209,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var foreignKeyProxy = new ForeignKeyProxy();
             Assert.That(foreignKeyProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyProxy.MapData(null, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => foreignKeyProxy.MapData(null, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -249,14 +249,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataReader = MockRepository.GenerateMock<IDataReader>();
 
             var foreignKeyProxy = new ForeignKeyProxy();
             Assert.That(foreignKeyProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.MapData(dataReader, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -273,7 +273,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
 
             var dataProviderProxyMock = fixture.Create<DataProviderProxy>();
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
+            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
                 .Repeat.Any();
@@ -387,7 +387,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
 
             var foreignKeyProxy = new ForeignKeyProxy
             {
@@ -397,7 +397,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foreignKeyProxy.Identifier, Is.Null);
             Assert.That(foreignKeyProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.SaveRelations(fixture.Create<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -429,7 +429,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
 
             var foreignKeyProxy = new ForeignKeyProxy
             {
@@ -439,7 +439,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foreignKeyProxy.Identifier, Is.Null);
             Assert.That(foreignKeyProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foreignKeyProxy.DeleteRelations(fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);

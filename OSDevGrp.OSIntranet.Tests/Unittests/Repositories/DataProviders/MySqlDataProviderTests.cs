@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using AutoFixture;
@@ -29,7 +30,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// <summary>
         /// Egen data proxy til test af data provider, som benytter MySql.
         /// </summary>
-        private sealed class MyDataProxy : IMySqlDataProxy<MyDataProxy>
+        private sealed class MyDataProxy : IMySqlDataProxy
         {
             #region Private variables
 
@@ -123,7 +124,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataReader">Data reader for data provideren.</param>
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
-            public void MapData(object dataReader, IDataProviderBase dataProvider)
+            public void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
             {
                 MySqlDataReader mySqlReader = (MySqlDataReader) dataReader;
 
@@ -137,7 +138,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Mapper releationer.
             /// </summary>
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
-            public void MapRelations(IDataProviderBase dataProvider)
+            public void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 
@@ -149,7 +150,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
             /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-            public void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+            public void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 
@@ -161,59 +162,102 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Sletter relationer.
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
-            public void DeleteRelations(IDataProviderBase dataProvider)
+            public void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 
                 DeleteRelationsIsCalled = true;
             }
 
+            /// <summary>
+            /// Creates the SQL statement for getting this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for getting this data proxy.</returns>
+            public MySqlCommand CreateGetCommand()
+            {
+                MySqlCommand command = new MySqlCommand("SELECT SystemNo,Title FROM Systems WHERE SystemNo=@systemNo")
+                {
+                    CommandType = CommandType.Text
+                };
+
+                MySqlParameter systemNoParameter = command.Parameters.AddWithValue("@systemNo", SystemNo);
+                systemNoParameter.MySqlDbType = MySqlDbType.Int16;
+                systemNoParameter.IsNullable = false;
+
+                return command;
+            }
+
+            /// <summary>
+            /// Creates the SQL statement for inserting this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for inserting this data proxy.</returns>
+            public MySqlCommand CreateInsertCommand()
+            {
+                DateTime now = DateTime.Now;
+                MySqlCommand command = new MySqlCommand("INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,@date,@fromTime,@toTime,@subject)")
+                {
+                    CommandType = CommandType.Text
+                };
+
+                MySqlParameter dateParameter = command.Parameters.AddWithValue("@date", now.Date);
+                dateParameter.MySqlDbType = MySqlDbType.Date;
+                dateParameter.IsNullable = false;
+
+                MySqlParameter fromTimeParameter = command.Parameters.AddWithValue("@fromTime", now.TimeOfDay);
+                fromTimeParameter.MySqlDbType = MySqlDbType.Time;
+                fromTimeParameter.IsNullable = false;
+
+                MySqlParameter toTime = command.Parameters.AddWithValue("@toTime", now.AddMinutes(15).TimeOfDay);
+                toTime.MySqlDbType = MySqlDbType.Time;
+                toTime.IsNullable = false;
+
+                MySqlParameter subjectParameter = command.Parameters.AddWithValue("@subject", _fixture.Create<string>());
+                subjectParameter.MySqlDbType = MySqlDbType.VarChar;
+                subjectParameter.Size = 255;
+                subjectParameter.IsNullable = true;
+
+                return command;
+            }
+
+            /// <summary>
+            /// Creates the SQL statement for updating this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for updating this data proxy.</returns>
+            public MySqlCommand CreateUpdateCommand()
+            {
+                MySqlCommand command = new MySqlCommand("UPDATE Calapps SET Subject=@subject WHERE SystemNo=1 AND CalId=77777")
+                {
+                    CommandType = CommandType.Text
+                };
+
+                MySqlParameter subjectParameter = command.Parameters.AddWithValue("@subject", _fixture.Create<string>());
+                subjectParameter.MySqlDbType = MySqlDbType.VarChar;
+                subjectParameter.Size = 255;
+                subjectParameter.IsNullable = true;
+
+                return command;
+            }
+
+            /// <summary>
+            /// Creates the SQL statement for deleting this data proxy.
+            /// </summary>
+            /// <returns>SQL statement for deleting this data proxy.</returns>
+            public MySqlCommand CreateDeleteCommand()
+            {
+                return new MySqlCommand("DELETE FROM Calapps WHERE SystemNo=1 AND CalId=77777")
+                {
+                    CommandType = CommandType.Text
+                };
+            }
+
             #endregion
 
-            #region IMySqlDataProxy<MyDataProxy> Members
+            #region IMySqlDataProxy Members
 
             /// <summary>
             /// Returnerer den unikke identifikation for data proxy.
             /// </summary>
             public string UniqueId => SystemNo.ToString(CultureInfo.InvariantCulture);
-
-            /// <summary>
-            /// Returnerer SQL foresprøgelse til søgning efter en given data proxy på MySql.
-            /// </summary>
-            /// <param name="queryForDataProxy">Data proxy indeholdende de nødvendige værdier til fremsøgning på MySql.</param>
-            /// <returns>SQL foresprøgelse.</returns>
-            public string GetSqlQueryForId(MyDataProxy queryForDataProxy)
-            {
-                return $"SELECT SystemNo,Title FROM Systems WHERE SystemNo={queryForDataProxy.SystemNo}";
-            }
-
-            /// <summary>
-            /// Returnerer SQL kommando til oprettelse af data proxy på MySQL.
-            /// </summary>
-            /// <returns>SQL kommando til oprettelse.</returns>
-            public string GetSqlCommandForInsert()
-            {
-                DateTime now = DateTime.Now;
-                return $"INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Subject) VALUES(1,77777,'{now:yyyy-MM-dd}','{now:HH:mm:ss}','{now.AddMinutes(15):HH:mm:ss}','{_fixture.Create<string>()}')";
-            }
-
-            /// <summary>
-            /// Returnerer SQL kommando til opdatering af data proxy på MySQL.
-            /// </summary>
-            /// <returns>SQL kommando til opdatering.</returns>
-            public string GetSqlCommandForUpdate()
-            {
-                return $"UPDATE Calapps SET Subject='{_fixture.Create<string>()}' WHERE SystemNo=1 AND CalId=77777";
-            }
-
-            /// <summary>
-            /// Returnerer SQL kommando til slening af data proxy fra MySQL.
-            /// </summary>
-            /// <returns>SQL kommando til sletning.</returns>
-            public string GetSqlCommandForDelete()
-            {
-                return "DELETE FROM Calapps WHERE SystemNo=1 AND CalId=77777";
-            }
 
             #endregion
         }
@@ -278,23 +322,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         }
 
         /// <summary>
-        /// Tester, at GetCollection kaster en ArgumentNullException, hvis query er null, tom eller white space.
+        /// Tester, at GetCollection kaster en ArgumentNullException, hvis query command er null, tom eller white space.
         /// </summary>
         [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase(" ")]
-        [TestCase("  ")]
-        [TestCase("   ")]
-        public void TestAtGetCollectionKasterArgumenutNullExceptionHvisQueryErNullTomEllerWhitespace(string query)
+        public void TestAtGetCollectionKasterArgumenutNullExceptionHvisQueryCommandErNull()
         {
             using (IMySqlDataProvider sut = CreateSut())
             {
                 Assert.That(sut, Is.Not.Null);
 
-                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetCollection<MyDataProxy>(query));
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetCollection<MyDataProxy>(null));
 
-                TestHelper.AssertArgumentNullExceptionIsValid(result, "query");
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "queryCommand");
             }
         }
 
@@ -308,7 +347,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 Assert.That(sut, Is.Not.Null);
 
-                IEnumerable<MyDataProxy> result = sut.GetCollection<MyDataProxy>("SELECT SystemNo,Title FROM Systems ORDER BY SystemNo");
+                MySqlCommand queryCommand = new MySqlCommand("SELECT SystemNo,Title FROM Systems ORDER BY SystemNo")
+                {
+                    CommandType = CommandType.Text
+                };
+                IEnumerable<MyDataProxy> result = sut.GetCollection<MyDataProxy>(queryCommand);
                 // ReSharper disable PossibleMultipleEnumeration
                 Assert.That(result, Is.Not.Null);
                 // ReSharper restore PossibleMultipleEnumeration
@@ -337,7 +380,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 Assert.That(sut, Is.Not.Null);
 
-                Assert.Throws<MySqlException>(() => sut.GetCollection<MyDataProxy>(_fixture.Create<string>()));
+                MySqlCommand queryCommand = new MySqlCommand("SELECT SystemNo,Title FROM XYZSystems WHERE SystemNo=@systemNo ORDER BY SystemNo")
+                {
+                    CommandType = CommandType.Text
+                };
+                MySqlParameter systemNoParameter = queryCommand.Parameters.AddWithValue("@systemNo", _random.Next(90, 99));
+                systemNoParameter.MySqlDbType = MySqlDbType.Int16;
+                systemNoParameter.IsNullable = false;
+
+                Assert.Throws<MySqlException>(() => sut.GetCollection<MyDataProxy>(queryCommand));
             }
         }
 
@@ -366,7 +417,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// Tester, at Get kaster en ArgumentNullException, hvis den data proxy, der foresprøges efter, er null.
         /// </summary>
         [Test]
-        public void TestAtGetKasterArgumenutNullExceptionHvisQueryForDataProxyErNull()
+        public void TestAtGetKasterArgumenutNullExceptionHvisDataProxyErNull()
         {
             using (IMySqlDataProvider sut = CreateSut())
             {
@@ -374,7 +425,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
 
                 ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Get<MyDataProxy>(null));
 
-                TestHelper.AssertArgumentNullExceptionIsValid(result, "queryForDataProxy");
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProxy");
             }
         }
 
@@ -388,7 +439,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 Assert.That(sut, Is.Not.Null);
 
-                int systemNo = _random.Next(100, 200) * -1;
+                int systemNo = _random.Next(1, 9) * -1;
                 MyDataProxy queryForDataProxy = new MyDataProxy {SystemNo = systemNo};
                 IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.Get(queryForDataProxy));
 
@@ -406,7 +457,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 Assert.That(sut, Is.Not.Null);
 
-                int systemNo = _random.Next(100, 200);
+                int systemNo = _random.Next(90, 99);
                 MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
                     .With(m => m.SystemNo, systemNo)
                     .Create();
@@ -448,7 +499,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 Assert.That(sut, Is.Not.Null);
 
-                int systemNo = _random.Next(100, 200);
+                int systemNo = _random.Next(90, 99);
                 MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
                     .With(m => m.SystemNo, systemNo)
                     .Create();
@@ -473,7 +524,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 Assert.That(sut, Is.Not.Null);
 
-                int systemNo = _random.Next(100, 200);
+                int systemNo = _random.Next(90, 99);
                 MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
                     .With(m => m.SystemNo, systemNo)
                     .Create();
@@ -520,7 +571,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             {
                 Assert.That(sut, Is.Not.Null);
 
-                int systemNo = _random.Next(100, 200);
+                int systemNo = _random.Next(90, 99);
                 MyDataProxy mySqlDataProxy = _fixture.Build<MyDataProxy>()
                     .With(m => m.SystemNo, systemNo)
                     .Create();

@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -24,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         private IHousehold _household;
         private Guid? _householdIdentifier;
         private DateTime _creationTime;
-        private IDataProviderBase _dataProvider;
+        private IDataProviderBase<MySqlCommand> _dataProvider;
 
         #endregion
 
@@ -89,7 +90,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return null;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
                 {
                     var householdMemberProxy = new HouseholdMemberProxy
                     {
@@ -132,7 +133,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return null;
                 }
-                using (var subDataProvider = (IDataProviderBase) _dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
                 {
                     var householdProxy = new HouseholdProxy
                     {
@@ -177,7 +178,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy<IMemberOfHouseholdProxy>
+        #region IMySqlDataProxy
 
         /// <summary>
         /// Gets the unique identification for the binding of a given household member to a given household.
@@ -252,7 +253,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
+        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -284,7 +285,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -297,7 +298,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
-        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -318,7 +319,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -336,20 +337,57 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Creates the SQL statement for getting this binding between a given household member and a given household.
+        /// </summary>
+        /// <returns>SQL statement for getting this binding between a given household member and a given household.</returns>
+        public virtual MySqlCommand CreateGetCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for inserting this binding between a given household member and a given household.
+        /// </summary>
+        /// <returns>SQL statement for inserting this binding between a given household member and a given household.</returns>
+        public virtual MySqlCommand CreateInsertCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for updating this binding between a given household member and a given household.
+        /// </summary>
+        /// <returns>SQL statement for updating this binding between a given household member and a given household.</returns>
+        public virtual MySqlCommand CreateUpdateCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for deleting this binding between a given household member and a given household.
+        /// </summary>
+        /// <returns>SQL statement for deleting this binding between a given household member and a given household.</returns>
+        public virtual MySqlCommand CreateDeleteCommand()
+        {
+            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+        }
+
+        /// <summary>
         /// Gets the bindings which bind a given household member to all the households on which there is a membership.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdMemberProxy">Data proxy for the household member on which to get the bindings.</param>
         /// <returns>Bindings which bind a given household member to all the households on which there is a membership.</returns>
-        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IDataProviderBase dataProvider, IHouseholdMemberProxy householdMemberProxy)
+        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IDataProviderBase<MySqlCommand> dataProvider, IHouseholdMemberProxy householdMemberProxy)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProvider");
             }
-            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<MemberOfHouseholdProxy>(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdMemberIdentifier='{0}' ORDER BY CreationTime DESC", householdMemberProxy.UniqueId));
+                MySqlCommand command = new FoodWasteCommandBuilder(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdMemberIdentifier='{0}' ORDER BY CreationTime DESC", householdMemberProxy.UniqueId)).Build();
+                return subDataProvider.GetCollection<MemberOfHouseholdProxy>(command);
             }
         }
 
@@ -359,7 +397,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdMemberProxy">Data proxy for the household member on which to delete the bindings.</param>
         /// <returns>Affected households.</returns>
-        internal static IEnumerable<IHouseholdProxy> DeleteMemberOfHouseholds(IDataProviderBase dataProvider, IHouseholdMemberProxy householdMemberProxy)
+        internal static IEnumerable<IHouseholdProxy> DeleteMemberOfHouseholds(IDataProviderBase<MySqlCommand> dataProvider, IHouseholdMemberProxy householdMemberProxy)
         {
             if (dataProvider == null)
             {
@@ -369,7 +407,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var memberOfHouseholdProxyCollection = GetMemberOfHouseholds(dataProvider, householdMemberProxy).ToArray();
             foreach (var memberOfHouseholdProxy in memberOfHouseholdProxyCollection)
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     subDataProvider.Delete(memberOfHouseholdProxy);
                 }
@@ -383,7 +421,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                     {
                         return (IHouseholdProxy) m.Household;
                     }
-                    using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                    using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                     {
                         return subDataProvider.Get(new HouseholdProxy {Identifier = m.HouseholdIdentifier});
                     }
@@ -397,15 +435,16 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdProxy">Data proxy for the household on which to get the bindings.</param>
         /// <returns>Bindings which bind a given household to all the household members who has membership.</returns>
-        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IDataProviderBase dataProvider, IHouseholdProxy householdProxy)
+        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IDataProviderBase<MySqlCommand> dataProvider, IHouseholdProxy householdProxy)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProviderBase");
             }
-            using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<MemberOfHouseholdProxy>(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdIdentifier='{0}' ORDER BY CreationTime DESC", householdProxy.UniqueId));
+                MySqlCommand command = new FoodWasteCommandBuilder(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdIdentifier='{0}' ORDER BY CreationTime DESC", householdProxy.UniqueId)).Build();
+                return subDataProvider.GetCollection<MemberOfHouseholdProxy>(command);
             }
         }
 
@@ -415,7 +454,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdProxy">Data proxy for the household on which to delete the bindings.</param>
         /// <returns>Affected household members.</returns>
-        internal static IEnumerable<IHouseholdMemberProxy> DeleteMemberOfHouseholds(IDataProviderBase dataProvider, IHouseholdProxy householdProxy)
+        internal static IEnumerable<IHouseholdMemberProxy> DeleteMemberOfHouseholds(IDataProviderBase<MySqlCommand> dataProvider, IHouseholdProxy householdProxy)
         {
             if (dataProvider == null)
             {
@@ -425,7 +464,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             var memberOfHouseholdProxyCollection = GetMemberOfHouseholds(dataProvider, householdProxy).ToArray();
             foreach (var memberOfHouseholdProxy in memberOfHouseholdProxyCollection)
             {
-                using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                 {
                     subDataProvider.Delete(memberOfHouseholdProxy);
                 }
@@ -439,7 +478,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                     {
                         return (IHouseholdMemberProxy) m.HouseholdMember;
                     }
-                    using (var subDataProvider = (IDataProviderBase) dataProvider.Clone())
+                    using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
                     {
                         return subDataProvider.Get(new HouseholdMemberProxy {Identifier = m.HouseholdMemberIdentifier});
                     }

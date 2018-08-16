@@ -14,7 +14,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
     /// <summary>
     /// Data provider, som benytter MySql.
     /// </summary>
-    public class MySqlDataProvider : DataProviderBase, IMySqlDataProvider
+    public class MySqlDataProvider : DataProviderBase<MySqlCommand>, IMySqlDataProvider
     {
         #region Private variables
 
@@ -81,21 +81,20 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// Henter og returnerer data fra MySql.
         /// </summary>
         /// <typeparam name="TDataProxy">Typen på data proxy med data fra MySql.</typeparam>
-        /// <param name="query">SQL foresprøgelse efter data.</param>
+        /// <param name="queryCommand">Database command for the SQL query statement.</param>
         /// <returns>Collection indeholdende data proxies.</returns>
-        /// <exception cref="System.ArgumentNullException">Thrown when the <paramref name="query"/> is null, empty or white space.</exception>
-        public override IEnumerable<TDataProxy> GetCollection<TDataProxy>(string query)
+        /// <exception cref="System.ArgumentNullException">Thrown when the <paramref name="queryCommand"/> is null.</exception>
+        public override IEnumerable<TDataProxy> GetCollection<TDataProxy>(MySqlCommand queryCommand)
         {
-            ArgumentNullGuard.NotNullOrWhiteSpace(query, nameof(query));
+            ArgumentNullGuard.NotNull(queryCommand, nameof(queryCommand));
 
             Open();
             try
             {
                 List<TDataProxy> collection = new List<TDataProxy>();
-                using (MySqlCommand command = _mySqlConnection.CreateCommand())
+                using (MySqlCommand command = queryCommand)
                 {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = query;
+                    command.Connection = _mySqlConnection;
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.HasRows == false)
@@ -125,44 +124,46 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// Henter og returnerer en given data proxy fra MySql.
         /// </summary>
         /// <typeparam name="TDataProxy">Typen på data proxy med data fra MySql.</typeparam>
-        /// <param name="queryForDataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning i MySql.</param>
+        /// <param name="dataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning i MySql.</param>
         /// <returns>Data proxy med data fra MySql.</returns>
-        /// <exception cref="System.ArgumentNullException">Thrown when the <paramref name="queryForDataProxy"/> is null.</exception>
-        public override TDataProxy Get<TDataProxy>(TDataProxy queryForDataProxy)
+        /// <exception cref="System.ArgumentNullException">Thrown when the <paramref name="dataProxy"/> is null.</exception>
+        public override TDataProxy Get<TDataProxy>(TDataProxy dataProxy)
         {
-            ArgumentNullGuard.NotNull(queryForDataProxy, nameof(queryForDataProxy));
+            ArgumentNullGuard.NotNull(dataProxy, nameof(dataProxy));
 
             Open();
             try
             {
-                string sqlQuery = ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).GetSqlQueryForId(queryForDataProxy);
-                using (MySqlCommand command = _mySqlConnection.CreateCommand())
+                using (MySqlCommand command = dataProxy.CreateGetCommand())
                 {
+                    command.Connection = _mySqlConnection;
+
                     bool dataHasBeenReaded = false;
-                    TDataProxy dataProxy = new TDataProxy();
+                    TDataProxy result = new TDataProxy();
+                    
                     // Execute the command and read the data.
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = sqlQuery;
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.HasRows == false)
                         {
                             reader.Close();
-                            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, queryForDataProxy.GetType().Name, ((IMySqlDataProxy<TDataProxy>) queryForDataProxy).UniqueId));
+                            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, dataProxy.GetType().Name, ((IMySqlDataProxy) dataProxy).UniqueId));
                         }
                         if (reader.Read())
                         {
-                            dataProxy.MapData(reader, this);
+                            result.MapData(reader, this);
                             dataHasBeenReaded = true;
                         }
                         reader.Close();
                     }
+                    
                     // When data has been readed then map the relations.
                     if (dataHasBeenReaded)
                     {
-                        dataProxy.MapRelations(this);
+                        result.MapRelations(this);
                     }
-                    return dataProxy;
+
+                    return result;
                 }
             }
             finally
@@ -185,11 +186,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             Open();
             try
             {
-                string sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForInsert();
-                using (MySqlCommand command = _mySqlConnection.CreateCommand())
+                using (MySqlCommand command = dataProxy.CreateInsertCommand())
                 {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = sqlCommand;
+                    command.Connection = _mySqlConnection;
                     command.ExecuteNonQuery();
                 }
                 dataProxy.SaveRelations(this, true);
@@ -215,11 +214,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             Open();
             try
             {
-                string sqlCommand = ((IMySqlDataProxy<TDataProxy>) dataProxy).GetSqlCommandForUpdate();
-                using (MySqlCommand command = _mySqlConnection.CreateCommand())
+                using (MySqlCommand command = dataProxy.CreateUpdateCommand())
                 {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = sqlCommand;
+                    command.Connection = _mySqlConnection;
                     command.ExecuteNonQuery();
                 }
                 dataProxy.SaveRelations(this, false);
@@ -245,11 +242,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             try
             {
                 dataProxy.DeleteRelations(this);
-                string sqlCommand = ((IMySqlDataProxy<TDataProxy>)dataProxy).GetSqlCommandForDelete();
-                using (MySqlCommand command = _mySqlConnection.CreateCommand())
+                using (MySqlCommand command = dataProxy.CreateDeleteCommand())
                 {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = sqlCommand;
+                    command.Connection = _mySqlConnection;
                     command.ExecuteNonQuery();
                 }
             }

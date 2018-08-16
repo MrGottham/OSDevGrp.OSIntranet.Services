@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Resources;
 using AutoFixture;
+using MySql.Data.MySqlClient;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
@@ -95,7 +96,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Anything))
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<HouseholdMemberProxy>(0))
                 .Repeat.Any();
 
@@ -105,7 +106,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var mailAddress = fixture.Create<string>();
             householdDataRepository.HouseholdMemberGetByMailAddress(mailAddress);
 
-            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Equal(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress))));
+            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress))));
         }
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             var householdMemberProxy = new HouseholdMemberProxy();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Anything))
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<HouseholdMemberProxy> {householdMemberProxy})
                 .Repeat.Any();
 
@@ -141,7 +142,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Anything))
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<HouseholdMemberProxy>(0))
                 .Repeat.Any();
 
@@ -163,7 +164,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Anything))
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 
@@ -187,7 +188,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             var exceptionToThrow = fixture.Create<Exception>();
             var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<string>.Is.Anything))
+            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Throw(exceptionToThrow)
                 .Repeat.Any();
 

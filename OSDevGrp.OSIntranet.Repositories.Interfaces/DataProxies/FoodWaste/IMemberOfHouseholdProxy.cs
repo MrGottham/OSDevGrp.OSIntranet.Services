@@ -6,7 +6,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
     /// <summary>
     /// Interface for a data proxy which bind a given household member to a given household.
     /// </summary>
-    public interface IMemberOfHouseholdProxy : IIdentifiable, IMySqlDataProxy<IMemberOfHouseholdProxy>
+    public interface IMemberOfHouseholdProxy : IIdentifiable, IMySqlDataProxy
     {
         /// <summary>
         /// Household member which are member of the household.

@@ -6,6 +6,7 @@ using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using NUnit.Framework;
 using AutoFixture;
+using MySql.Data.MySqlClient;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
@@ -39,7 +40,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(new AftaleProxy());
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Return(fixture.CreateMany<AftaleProxy>(25));
             fixture.Inject(mySqlDataProvider);
 
@@ -51,7 +52,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(aftaler, Is.Not.Null);
             Assert.That(aftaler.Count(), Is.EqualTo(25));
 
-            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<AftaleProxy>(Arg<string>.Is.NotNull));
+            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<AftaleProxy>(Arg<MySqlCommand>.Is.NotNull));
         }
 
         /// <summary>
@@ -64,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(new AftaleProxy());
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(mySqlDataProvider);
 
@@ -86,7 +87,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             fixture.Inject(new AftaleProxy());
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<AftaleProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Throw(fixture.Create<Exception>());
             fixture.Inject(mySqlDataProvider);
 
@@ -173,7 +174,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Return(fixture.CreateMany<BrugerProxy>(3));
             fixture.Inject(mySqlDataProvider);
 
@@ -184,7 +185,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.That(brugere, Is.Not.Null);
             Assert.That(brugere.Count(), Is.EqualTo(3));
 
-            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull));
+            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<MySqlCommand>.Is.NotNull));
         }
 
         /// <summary>
@@ -196,7 +197,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(mySqlDataProvider);
 
@@ -206,7 +207,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.Throws<IntranetRepositoryException>(
                 () => repository.BrugerGetAllBySystem(fixture.Create<int>()));
 
-            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull));
+            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<MySqlCommand>.Is.NotNull));
         }
 
         /// <summary>
@@ -218,7 +219,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             var fixture = new Fixture();
 
             var mySqlDataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull))
+            mySqlDataProvider.Expect(m => m.GetCollection<BrugerProxy>(Arg<MySqlCommand>.Is.NotNull))
                 .Throw(fixture.Create<Exception>());
             fixture.Inject(mySqlDataProvider);
 
@@ -228,7 +229,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories
             Assert.Throws<IntranetRepositoryException>(
                 () => repository.BrugerGetAllBySystem(fixture.Create<int>()));
 
-            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<string>.Is.NotNull));
+            mySqlDataProvider.AssertWasCalled(m => m.GetCollection<BrugerProxy>(Arg<MySqlCommand>.Is.NotNull));
         }
     }
 }

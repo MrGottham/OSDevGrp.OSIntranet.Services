@@ -224,7 +224,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var staticTextProxy = new StaticTextProxy();
             Assert.That(staticTextProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => staticTextProxy.MapData(null, MockRepository.GenerateMock<IDataProviderBase>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => staticTextProxy.MapData(null, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -260,7 +260,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var staticTextProxy = new StaticTextProxy();
             Assert.That(staticTextProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => staticTextProxy.MapData(dataReaderMock, MockRepository.GenerateMock<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => staticTextProxy.MapData(dataReaderMock, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -284,14 +284,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 var bodyTranslation1Proxy = new TranslationProxy(new Guid("DB8E4201-5E79-4075-9020-5C72E989F399"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
                 var bodyTranslation2Proxy = new TranslationProxy(new Guid("DB8E4201-5E79-4075-9020-5C72E989F399"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
 
-                var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
+                var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
                 dataProviderBaseMock.Stub(m => m.Clone())
                     .Return(dataProviderBaseMock)
                     .Repeat.Any();
-                dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.NotNull))
+                dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull))
                     .WhenCalled(e =>
                     {
-                        var sqlQuery = (string) e.Arguments.ElementAt(0);
+                        var sqlQuery = ((MySqlCommand) e.Arguments.ElementAt(0)).CommandText;
                         Assert.That(sqlQuery, Is.Not.Null);
                         Assert.That(sqlQuery, Is.Not.Empty);
                         if (sqlQuery.Contains("2F5E2130-2176-483C-80EF-DFC871186A6D"))
@@ -404,14 +404,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
 
                 dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1 + Convert.ToInt32(withBodyTranslation)));
-                dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString("SubjectTranslationIdentifier")))));
+                dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString("SubjectTranslationIdentifier")))));
                 if (withBodyTranslation)
                 {
-                    dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString(3)))));
+                    dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString(3)))));
                 }
                 else
                 {
-                    dataProviderBaseMock.AssertWasNotCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString(3)))));
+                    dataProviderBaseMock.AssertWasNotCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString(3)))));
                 }
             }
         }
@@ -460,7 +460,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var staticTextProxy = new StaticTextProxy();
             Assert.That(staticTextProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(MockRepository.GenerateMock<IDataProviderBase>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }
@@ -488,7 +488,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var staticTextProxy = new StaticTextProxy();
             Assert.That(staticTextProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(MockRepository.GenerateMock<IDataProviderBase>()));
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }

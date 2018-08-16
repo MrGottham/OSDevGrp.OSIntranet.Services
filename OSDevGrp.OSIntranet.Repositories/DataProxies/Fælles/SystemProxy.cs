@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
 
         #endregion
 
-        #region IMySqlDataProxy<ISystem> Members
+        #region IMySqlDataProxy Members
 
         /// <summary>
         /// Returnerer den unikke identifikation af systemet under OSWEBDB.
@@ -109,7 +109,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// </summary>
         /// <param name="dataReader">Datareader.</param>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
+        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -137,7 +137,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// Mappper relationer til et system under OSWEBDB.
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void MapRelations(IDataProviderBase dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
         }
 
@@ -146,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
         /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
         {
         }
 
@@ -154,8 +154,44 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// Sletter relationer til et system under OSWEBDB.
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for getting this system within OSWEBDB.
+        /// </summary>
+        /// <returns>SQL statement for getting this system within OSWEBDB.</returns>
+        public virtual MySqlCommand CreateGetCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlQueryForId(this)).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for inserting this system within OSWEBDB.
+        /// </summary>
+        /// <returns>SQL statement for inserting this system within OSWEBDB.</returns>
+        public virtual MySqlCommand CreateInsertCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlCommandForInsert()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for updating this system within OSWEBDB.
+        /// </summary>
+        /// <returns>SQL statement for updating this system within OSWEBDB.</returns>
+        public virtual MySqlCommand CreateUpdateCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlCommandForUpdate()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for deleting this system within OSWEBDB.
+        /// </summary>
+        /// <returns>SQL statement for deleting this system within OSWEBDB.</returns>
+        public virtual MySqlCommand CreateDeleteCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlCommandForDelete()).Build();
         }
 
         #endregion

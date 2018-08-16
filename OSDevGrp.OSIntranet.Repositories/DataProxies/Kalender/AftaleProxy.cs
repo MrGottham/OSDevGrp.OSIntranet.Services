@@ -21,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
     {
         #region Private variables
 
-        private IDataProviderBase _dataProvider;
+        private IDataProviderBase<MySqlCommand> _dataProvider;
 
         #endregion
 
@@ -83,7 +83,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
 
         #endregion
 
-        #region IMySqlDataProxy<IAftale> Members
+        #region IMySqlDataProxy Members
 
         /// <summary>
         /// Returnerer unik identifikation af kalenderaftalen.
@@ -146,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// </summary>
         /// <param name="dataReader">Datareader.</param>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase dataProvider)
+        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -177,9 +177,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
             Emne = mySqlDataReader.GetString("Subject");
             Notat = mySqlDataReader.GetString("Note");
             var deltagere = new List<IBrugeraftale>();
-            using (var clonedDataProvider = (IDataProviderBase)dataProvider.Clone())
+            using (var clonedDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
             {
-                deltagere.AddRange(clonedDataProvider.GetCollection<BrugeraftaleProxy>(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))));
+                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))).Build();
+                deltagere.AddRange(clonedDataProvider.GetCollection<BrugeraftaleProxy>(command));
             }
             this.SetFieldValue("_deltagere", deltagere);
             DataIsLoaded = true;
@@ -191,7 +192,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// Mapper relationer til en kalenderaftale.
         /// </summary>
         /// <param name="dataProviderBase">Dataprovider.</param>
-        public virtual void MapRelations(IDataProviderBase dataProviderBase)
+        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProviderBase)
         {
         }
 
@@ -200,7 +201,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
         /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-        public virtual void SaveRelations(IDataProviderBase dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
         {
         }
 
@@ -208,8 +209,44 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// Sletter relationer til en kalenderaftale.
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void DeleteRelations(IDataProviderBase dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
         {
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for getting this appointment.
+        /// </summary>
+        /// <returns>SQL statement for getting this appointment.</returns>
+        public virtual MySqlCommand CreateGetCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlQueryForId(this)).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for inserting this appointment.
+        /// </summary>
+        /// <returns>SQL statement for inserting this appointment.</returns>
+        public virtual MySqlCommand CreateInsertCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlCommandForInsert()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for updating this appointment.
+        /// </summary>
+        /// <returns>SQL statement for updating this appointment.</returns>
+        public virtual MySqlCommand CreateUpdateCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlCommandForUpdate()).Build();
+        }
+
+        /// <summary>
+        /// Creates the SQL statement for deleting this appointment.
+        /// </summary>
+        /// <returns>SQL statement for deleting this appointment.</returns>
+        public virtual MySqlCommand CreateDeleteCommand()
+        {
+            return new MySqlCommandBuilder(GetSqlCommandForDelete()).Build();
         }
 
         #endregion

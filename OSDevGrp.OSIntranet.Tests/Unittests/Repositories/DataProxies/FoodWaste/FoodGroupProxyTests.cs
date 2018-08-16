@@ -214,12 +214,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var foodGroupProxy = new FoodGroupProxy();
             Assert.That(foodGroupProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupProxy.MapData(null, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupProxy.MapData(null, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -254,14 +254,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
 
             var dataReader = MockRepository.GenerateMock<IDataReader>();
 
             var foodGroupProxy = new FoodGroupProxy();
             Assert.That(foodGroupProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.MapData(dataReader, fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -295,7 +295,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var translationProxyCollection = fixture.CreateMany<TranslationProxy>(3).ToList();
             var foreignKeyProxyCollection = fixture.CreateMany<ForeignKeyProxy>(5).ToList();
 
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase>();
+            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
                 .Repeat.Any();
@@ -311,13 +311,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 })
                 .Return(parentFoodGroupProxy)
                 .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderBaseMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(childrenFoodGroupProxyCollection)
                 .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(translationProxyCollection)
                 .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderBaseMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(foreignKeyProxyCollection)
                 .Repeat.Any();
 
@@ -388,9 +388,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(4));
             dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<FoodGroupProxy>.Is.NotNull));
-            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", dataReader.GetString("FoodGroupIdentifier")))));
-            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("FoodGroupIdentifier")))));
-            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", dataReader.GetString("FoodGroupIdentifier"))));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", dataReader.GetString("FoodGroupIdentifier")))));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("FoodGroupIdentifier")))));
+            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", dataReader.GetString("FoodGroupIdentifier")))));
         }
 
         /// <summary>
@@ -439,7 +439,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
 
             var foodGroupProxy = new FoodGroupProxy
             {
@@ -449,7 +449,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.Identifier, Is.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.SaveRelations(fixture.Create<IDataProviderBase>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.SaveRelations(fixture.Create<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -481,7 +481,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase>()));
+            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
 
             var foodGroupProxy = new FoodGroupProxy
             {
@@ -491,7 +491,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.Identifier, Is.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.DeleteRelations(fixture.Create<IDataProviderBase>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.DeleteRelations(fixture.Create<IDataProviderBase<MySqlCommand>>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -505,20 +505,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsCloneOnDataProvider4Times()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
 
@@ -541,20 +541,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetChildren()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
 
@@ -569,7 +569,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             foodGroupProxy.DeleteRelations(dataProviderMock);
 
             // ReSharper disable PossibleInvalidOperationException
-            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier='{0}'", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -593,20 +593,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                     .With(m => m.Parent, null)
                     .Create()
             };
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(childrenFoodGroupProxyCollection)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.Delete(Arg<FoodGroupProxy>.Is.NotNull))
@@ -637,20 +637,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetFoodItemGroups()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
 
@@ -665,7 +665,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             foodGroupProxy.DeleteRelations(dataProviderMock);
 
             // ReSharper disable PossibleInvalidOperationException
-            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Equal(string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodGroupIdentifier='{0}'", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -678,20 +678,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
 
             var foodItemGroupProxyCollection = fixture.CreateMany<FoodItemGroupProxy>(7).ToList();
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(foodItemGroupProxyCollection)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.Delete(Arg<FoodItemGroupProxy>.Is.NotNull))
@@ -722,20 +722,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetTranslations()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
 
@@ -750,7 +750,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             foodGroupProxy.DeleteRelations(dataProviderMock);
 
             // ReSharper disable PossibleInvalidOperationException
-            dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Equal(string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -763,20 +763,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
 
             var translationProxyCollection = fixture.CreateMany<TranslationProxy>(7).ToList();
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(translationProxyCollection)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.Delete(Arg<TranslationProxy>.Is.NotNull))
@@ -807,20 +807,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetForeignKeys()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<ForeignKeyProxy>())
                 .Repeat.Any();
 
@@ -835,7 +835,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             foodGroupProxy.DeleteRelations(dataProviderMock);
 
             // ReSharper disable PossibleInvalidOperationException
-            dataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", foodGroupProxy.Identifier.Value.ToString("D").ToUpper())));
+            dataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", foodGroupProxy.Identifier.Value.ToString("D").ToUpper()))));
             // ReSharper restore PossibleInvalidOperationException
         }
 
@@ -848,20 +848,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
 
             var foreignKeyProxyCollection = fixture.CreateMany<ForeignKeyProxy>(7).ToList();
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase>();
+            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<FoodItemGroupProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(new List<TranslationProxy>())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<string>.Is.Anything))
+            dataProviderMock.Stub(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(foreignKeyProxyCollection)
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.Delete(Arg<ForeignKeyProxy>.Is.NotNull))

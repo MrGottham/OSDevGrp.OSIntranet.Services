@@ -107,7 +107,10 @@
   <ItemGroup>
     <Compile Include="AdresseRepository.cs" />
     <Compile Include="DataProviders\DataProviderBase.cs" />
+    <Compile Include="DataProxies\DbCommandBuilderBase.cs" />
+    <Compile Include="DataProxies\FoodWaste\FoodWasteCommandBuilder.cs" />
     <Compile Include="DataProviders\FoodWasteDataProvider.cs" />
+    <Compile Include="DataProxies\MySqlCommandBuilder.cs" />
     <Compile Include="DataProviders\MySqlDataProvider.cs" />
     <Compile Include="DataProxies\DataProxyHelper.cs" />
     <Compile Include="DataProxies\FoodWaste\DataProviderProxy.cs" />
