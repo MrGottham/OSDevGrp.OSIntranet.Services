@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -10,7 +10,6 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Resources;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -224,7 +223,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var staticTextProxy = new StaticTextProxy();
             Assert.That(staticTextProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => staticTextProxy.MapData(null, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => staticTextProxy.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -250,25 +249,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData throws an IntranetRepositoryException if the data reader is not type of MySqlDataReader.
-        /// </summary>
-        [Test]
-        public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
-        {
-            var dataReaderMock = MockRepository.GenerateMock<IDataReader>();
-
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => staticTextProxy.MapData(dataReaderMock, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReaderMock.GetType().Name)));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
         /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
@@ -284,7 +264,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 var bodyTranslation1Proxy = new TranslationProxy(new Guid("DB8E4201-5E79-4075-9020-5C72E989F399"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
                 var bodyTranslation2Proxy = new TranslationProxy(new Guid("DB8E4201-5E79-4075-9020-5C72E989F399"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
 
-                var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
+                var dataProviderBaseMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
                 dataProviderBaseMock.Stub(m => m.Clone())
                     .Return(dataProviderBaseMock)
                     .Repeat.Any();
@@ -460,7 +440,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var staticTextProxy = new StaticTextProxy();
             Assert.That(staticTextProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(MockRepository.GenerateMock<IMySqlDataProvider>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }
@@ -488,7 +468,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var staticTextProxy = new StaticTextProxy();
             Assert.That(staticTextProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(MockRepository.GenerateMock<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.InnerException, Is.Null);
         }

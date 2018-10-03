@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Globalization;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
@@ -216,12 +215,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
+            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
 
             var translationProxy = new TranslationProxy();
             Assert.That(translationProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationProxy.MapData(null, fixture.Create<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => translationProxy.MapData(null, fixture.Create<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -250,35 +249,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData throws an IntranetRepositoryException if the data reader is not type of MySqlDataReader.
-        /// </summary>
-        [Test]
-        public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
-        {
-            var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
-
-            var dataReader = MockRepository.GenerateMock<IDataReader>();
-
-            var translationProxy = new TranslationProxy();
-            Assert.That(translationProxy, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => translationProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name)));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
         /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
         public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
+            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("TranslationIdentifier")))
@@ -305,8 +282,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationProxy.TranslationInfo, Is.Null);
             Assert.That(translationProxy.Value, Is.Null);
 
-            translationProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>());
-            translationProxy.MapRelations(fixture.Create<IDataProviderBase<MySqlCommand>>());
+            translationProxy.MapData(dataReader, fixture.Create<IMySqlDataProvider>());
+            translationProxy.MapRelations(fixture.Create<IMySqlDataProvider>());
             Assert.That(translationProxy.Identifier, Is.Not.Null);
             Assert.That(translationProxy.Identifier.HasValue, Is.True);
             // ReSharper disable PossibleInvalidOperationException
@@ -374,7 +351,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
+            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateStub<IMySqlDataProvider>()));
 
             var translationProxy = new TranslationProxy
             {
@@ -384,7 +361,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationProxy.Identifier, Is.Null);
             Assert.That(translationProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => translationProxy.SaveRelations(fixture.Create<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => translationProxy.SaveRelations(fixture.Create<IMySqlDataProvider>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -416,7 +393,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
+            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateStub<IMySqlDataProvider>()));
 
             var translationProxy = new TranslationProxy
             {
@@ -426,7 +403,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationProxy.Identifier, Is.Null);
             Assert.That(translationProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => translationProxy.DeleteRelations(fixture.Create<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => translationProxy.DeleteRelations(fixture.Create<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);

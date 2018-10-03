@@ -44,6 +44,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         }
 
         /// <summary>
+        /// Tests that Clone clones the data provider which can access data in the food waste repository.
+        /// </summary>
+        [Test]
+        public void TestThatCloneClonesFoodWasteDataProvider()
+        {
+            using (IFoodWasteDataProvider sut = CreateSut())
+            {
+                Assert.That(sut, Is.Not.Null);
+
+                using (IFoodWasteDataProvider clone = sut.Clone() as IFoodWasteDataProvider)
+                {
+                    Assert.That(clone, Is.Not.Null);
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates an instance of the data provider which can access data in the food waste repository.
         /// </summary>
         /// <returns>Instance of the data provider which can access data in the food waste repository.</returns>

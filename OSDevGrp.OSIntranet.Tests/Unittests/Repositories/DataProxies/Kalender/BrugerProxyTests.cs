@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data;
 using OSDevGrp.OSIntranet.Domain.Kalender;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
@@ -155,15 +153,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         {
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy());
-            fixture.Inject<object>(null);
-            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>());
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
 
             var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                brugerProxy.MapData(fixture.Create<object>(), fixture.Create<IDataProviderBase<MySqlCommand>>()));
+                brugerProxy.MapData(null, fixture.Create<IMySqlDataProvider>()));
 
         }
 
@@ -175,35 +172,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         {
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy());
-            fixture.Inject(new object());
-            fixture.Inject<IDataProviderBase<MySqlCommand>>(null);
+            fixture.Inject<IMySqlDataProvider>(null);
 
             var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                brugerProxy.MapData(fixture.Create<object>(), fixture.Create<IDataProviderBase<MySqlCommand>>()));
-
-        }
-
-        /// <summary>
-        /// Tester, at MapData kaster en IntranetRepositoryException, hvis data reader ikke er af typen MySqlDataReader.
-        /// </summary>
-        [Test]
-        public void TestAtMapDataKasterIntranetRepositoryExceptionHvisDataReaderIkkeErMySqlDataReader()
-        {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugerProxy());
-            fixture.Inject(MockRepository.GenerateMock<IDataReader>());
-            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>());
-
-            var brugerProxy = fixture.Create<BrugerProxy>();
-            Assert.That(brugerProxy, Is.Not.Null);
-
-            Assert.Throws<IntranetRepositoryException>(
-                () =>
-                brugerProxy.MapData(fixture.Create<IDataReader>(), fixture.Create<IDataProviderBase<MySqlCommand>>()));
+                brugerProxy.MapData(MockRepository.GenerateStub<MySqlDataReader>(), fixture.Create<IMySqlDataProvider>()));
         }
 
         /// <summary>
@@ -214,7 +190,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         {
             var fixture = new Fixture();
             fixture.Inject(new BrugerProxy());
-            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>());
+            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
 
             var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
             dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
@@ -232,7 +208,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
-            brugerProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IDataProviderBase<MySqlCommand>>());
+            brugerProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IMySqlDataProvider>());
             Assert.That(brugerProxy.DataIsLoaded, Is.True);
 
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
@@ -264,7 +240,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
                 .Return(fixture.Create<string>());
             fixture.Inject(dataReader);
 
-            var dataProvider = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
+            var dataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
             dataProvider.Expect(m => m.Get(Arg<SystemProxy>.Is.NotNull))
                 .Return(fixture.Create<SystemProxy>());
             fixture.Inject(dataProvider);
@@ -272,7 +248,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
             var brugerProxy = fixture.Create<BrugerProxy>();
             Assert.That(brugerProxy, Is.Not.Null);
 
-            brugerProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IDataProviderBase<MySqlCommand>>());
+            brugerProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IMySqlDataProvider>());
             Assert.That(brugerProxy.DataIsLoaded, Is.True);
 
             Assert.That(brugerProxy.System, Is.Not.Null);

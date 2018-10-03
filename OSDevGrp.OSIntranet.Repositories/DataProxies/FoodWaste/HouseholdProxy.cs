@@ -6,7 +6,6 @@ using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -22,7 +21,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Private variables
 
         private bool _householdMembersIsLoaded;
-        private IDataProviderBase<MySqlCommand> _dataProvider;
+        private IFoodWasteDataProvider _dataProvider;
         private readonly IList<IHouseholdMember> _removedHouseholdMembers = new List<IHouseholdMember>(0);
 
         #endregion
@@ -176,7 +175,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -187,25 +186,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new ArgumentNullException(nameof(dataProvider));
             }
 
-            MySqlDataReader mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
-            }
+            Identifier = Guid.Parse(dataReader.GetString("HouseholdIdentifier"));
+            Name = dataReader.GetString("Name");
+            CreationTime = dataReader.GetDateTime("CreationTime").ToLocalTime();
 
-            Identifier = Guid.Parse(mySqlDataReader.GetString("HouseholdIdentifier"));
-            Name = mySqlDataReader.GetString("Name");
-            CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
-
-            int descriptionColumnNo = mySqlDataReader.GetOrdinal("Descr");
-            if (!mySqlDataReader.IsDBNull(descriptionColumnNo))
+            int descriptionColumnNo = dataReader.GetOrdinal("Descr");
+            if (!dataReader.IsDBNull(descriptionColumnNo))
             {
-                Description = mySqlDataReader.GetString(descriptionColumnNo);
+                Description = dataReader.GetString(descriptionColumnNo);
             }
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -213,7 +206,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -226,7 +219,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -239,7 +232,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
 
             IEnumerable<IHouseholdMember> unsavedHouseholdMembers = base.HouseholdMembers.ToArray(); // This will not force the proxy to reload the household members.
@@ -257,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     continue;
                 }
-                using (IDataProviderBase<MySqlCommand> subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
+                using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
                 {
                     MemberOfHouseholdProxy memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMember, this)
                     {
@@ -282,14 +275,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                     continue;
                 }
 
-                using (IDataProviderBase<MySqlCommand> subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
+                using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
                 {
                     subDataProvider.Delete(memberOfHouseholdToRemove);
                 }
                 IHouseholdMemberProxy householdMemberProxy = memberOfHouseholdToRemove.HouseholdMember as IHouseholdMemberProxy;
                 if (householdMemberProxy == null)
                 {
-                    using (IDataProviderBase<MySqlCommand> subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
+                    using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
                     {
                         householdMemberProxy = subDataProvider.Get(new HouseholdMemberProxy {Identifier = memberOfHouseholdToRemove.HouseholdMemberIdentifier});
                     }
@@ -304,7 +297,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -317,7 +310,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
 
             foreach (IHouseholdMemberProxy affectedHouseholdMember in MemberOfHouseholdProxy.DeleteMemberOfHouseholds(_dataProvider, this))
@@ -367,7 +360,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="affectedHouseholdMember">Implementation of a data proxy to the affected household member.</param>
-        private static void HandleAffectedHouseholdMember(IDataProviderBase<MySqlCommand> dataProvider, IHouseholdMemberProxy affectedHouseholdMember)
+        private static void HandleAffectedHouseholdMember(IFoodWasteDataProvider dataProvider, IHouseholdMemberProxy affectedHouseholdMember)
         {
             if (dataProvider == null)
             {
@@ -385,7 +378,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 return;
             }
-            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
+            using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
                 subDataProvider.Delete(affectedHouseholdMember);
             }

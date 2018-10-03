@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
@@ -214,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -231,22 +230,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(MockRepository.GenerateStub<MySqlDataReader>(), null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
-        }
-
-        /// <summary>
-        /// Tests that MapData throws an IntranetRepositoryException if the data reader is not type of MySqlDataReader.
-        /// </summary>
-        [Test]
-        public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
-        {
-            IDataReader dataReader = MockRepository.GenerateMock<IDataReader>();
-
-            IStorageTypeProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
-
-            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name);
         }
 
         /// <summary>
@@ -267,7 +250,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
 
-            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture);
+            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture);
 
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
@@ -325,7 +308,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             Fixture fixture = new Fixture();
 
-            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture);
+            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture);
 
             IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: Guid.NewGuid());
             Assert.That(sut, Is.Not.Null);
@@ -349,7 +332,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             Guid storageTypeIdentifier = Guid.NewGuid();
 
-            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture);
+            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture);
 
             IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
             Assert.That(sut, Is.Not.Null);
@@ -380,7 +363,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(translationProxyCollection, Is.Not.Null);
             Assert.That(translationProxyCollection, Is.Not.Empty);
 
-            IDataProviderBase<MySqlCommand> dataProviderMock = CreateDataProviderMock(fixture, translationProxyCollection: translationProxyCollection);
+            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture, translationProxyCollection: translationProxyCollection);
 
             IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
             Assert.That(sut, Is.Not.Null);
@@ -529,14 +512,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private static IDataProviderBase<MySqlCommand> CreateDataProviderMock(Fixture fixture, IEnumerable<TranslationProxy> translationProxyCollection = null)
+        private static IFoodWasteDataProvider CreateDataProviderMock(Fixture fixture, IEnumerable<TranslationProxy> translationProxyCollection = null)
         {
             if (fixture == null)
             {
                 throw new ArgumentNullException(nameof(fixture));
             }
 
-            IDataProviderBase<MySqlCommand> dataProviderMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
+            IFoodWasteDataProvider dataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();

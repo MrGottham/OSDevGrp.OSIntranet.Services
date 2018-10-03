@@ -109,7 +109,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -120,23 +120,17 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new ArgumentNullException("dataProvider");
             }
 
-            var mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
-            }
-
-            Identifier = new Guid(mySqlDataReader.GetString("DataProviderIdentifier"));
-            Name = mySqlDataReader.GetString("Name");
-            HandlesPayments = Convert.ToBoolean(mySqlDataReader.GetInt32("HandlesPayments"));
-            DataSourceStatementIdentifier = new Guid(mySqlDataReader.GetString("DataSourceStatementIdentifier"));
+            Identifier = new Guid(dataReader.GetString("DataProviderIdentifier"));
+            Name = dataReader.GetString("Name");
+            HandlesPayments = Convert.ToBoolean(dataReader.GetInt32("HandlesPayments"));
+            DataSourceStatementIdentifier = new Guid(dataReader.GetString("DataSourceStatementIdentifier"));
         }
 
         /// <summary>
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -151,7 +145,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
             throw new NotSupportedException();
         }
@@ -160,7 +154,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             throw new NotSupportedException();
         }

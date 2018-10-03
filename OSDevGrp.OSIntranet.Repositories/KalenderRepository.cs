@@ -52,7 +52,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND Date>='{1}' ORDER BY Date DESC,FromTime DESC,ToTime DESC,CalId DESC", system, fromDate.ToString("yyyy-MM-dd"))).Build();
+                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps FORCE INDEX (IX_Calapps_SystemNo_Date) WHERE SystemNo={0} AND Date>='{1}' ORDER BY Date DESC,FromTime DESC,ToTime DESC,CalId DESC", system, fromDate.ToString("yyyy-MM-dd"))).Build();
                 return _mySqlDataProvider.GetCollection<AftaleProxy>(command);
             }
             catch (IntranetRepositoryException)

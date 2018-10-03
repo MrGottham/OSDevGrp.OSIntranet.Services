@@ -1,10 +1,8 @@
 ﻿using System;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles;
-using OSDevGrp.OSIntranet.Resources;
-using MySql.Data.MySqlClient;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
 {
@@ -109,7 +107,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// </summary>
         /// <param name="dataReader">Datareader.</param>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -120,16 +118,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
                 throw new ArgumentNullException("dataProvider");
             }
 
-            var mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                                   dataReader.GetType(), "dataReader"));
-            }
-
-            this.SetFieldValue("_nummer", mySqlDataReader.GetInt32("SystemNo"));
-            Titel = mySqlDataReader.GetString("Title");
-            Properties = mySqlDataReader.GetInt32("Properties");
+            this.SetFieldValue("_nummer", dataReader.GetInt32("SystemNo"));
+            Titel = dataReader.GetString("Title");
+            Properties = dataReader.GetInt32("Properties");
             DataIsLoaded = true;
         }
 
@@ -137,7 +128,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// Mappper relationer til et system under OSWEBDB.
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
         }
 
@@ -146,7 +137,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
         /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
         }
 
@@ -154,7 +145,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// Sletter relationer til et system under OSWEBDB.
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
         }
 

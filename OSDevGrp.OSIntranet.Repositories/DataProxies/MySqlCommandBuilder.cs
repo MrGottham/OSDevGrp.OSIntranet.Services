@@ -15,14 +15,16 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         /// Creates an instance of the internal builder which can build a MySQL commands for SQL statements. 
         /// </summary>
         /// <param name="sqlStatement">The SQL statement for the MySQL command.</param>
+        /// <param name="timeout">Wait time (in seconds) before terminating the attempt to execute a command and generating an error.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the <paramref name="sqlStatement"/> is null, empty or white space.</exception>
-        internal MySqlCommandBuilder(string sqlStatement)
+        internal MySqlCommandBuilder(string sqlStatement, int timeout = 30)
         {
             ArgumentNullGuard.NotNullOrWhiteSpace(sqlStatement, nameof(sqlStatement));
 
             Command = new MySqlCommand(sqlStatement)
             {
-                CommandType = CommandType.Text
+                CommandType = CommandType.Text,
+                CommandTimeout = timeout
             };
         }
 

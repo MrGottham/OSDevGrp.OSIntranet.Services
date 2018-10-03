@@ -25,7 +25,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         private Guid? _stakeholderIdentifier;
         private StakeholderType? _stakeholderType;
         private Guid? _dataProviderIdentifier;
-        private IDataProviderBase<MySqlCommand> _dataProvider;
+        private IFoodWasteDataProvider _dataProvider;
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.Stakeholder;
                 }
-                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
+                using (var subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
                 {
                     switch (_stakeholderType.Value)
                     {
@@ -98,7 +98,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.DataProvider;
                 }
-                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
+                using (var subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
                 {
                     var dataProviderProxy = new DataProviderProxy
                     {
@@ -191,7 +191,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -202,42 +202,36 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new ArgumentNullException("dataProvider");
             }
 
-            var mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
-            }
+            Identifier = Guid.Parse(dataReader.GetString("PaymentIdentifier"));
+            PaymentTime = dataReader.GetDateTime("PaymentTime").ToLocalTime();
+            PaymentReference = dataReader.GetString("PaymentReference");
+            CreationTime = dataReader.GetDateTime("CreationTime").ToLocalTime();
 
-            Identifier = Guid.Parse(mySqlDataReader.GetString("PaymentIdentifier"));
-            PaymentTime = mySqlDataReader.GetDateTime("PaymentTime").ToLocalTime();
-            PaymentReference = mySqlDataReader.GetString("PaymentReference");
-            CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
-
-            var paymentReceiptColumnNo = mySqlDataReader.GetOrdinal("PaymentReceipt");
-            if (mySqlDataReader.IsDBNull(paymentReceiptColumnNo) == false)
+            var paymentReceiptColumnNo = dataReader.GetOrdinal("PaymentReceipt");
+            if (dataReader.IsDBNull(paymentReceiptColumnNo) == false)
             {
-                using (var columnTextReader = mySqlDataReader.GetTextReader(paymentReceiptColumnNo))
+                using (var columnTextReader = dataReader.GetTextReader(paymentReceiptColumnNo))
                 {
                     PaymentReceipt = Convert.FromBase64String(columnTextReader.ReadToEnd());
                     columnTextReader.Close();
                 }
             }
 
-            _stakeholderIdentifier = Guid.Parse(mySqlDataReader.GetString("StakeholderIdentifier"));
-            switch (mySqlDataReader.GetInt32("StakeholderType"))
+            _stakeholderIdentifier = Guid.Parse(dataReader.GetString("StakeholderIdentifier"));
+            switch (dataReader.GetInt32("StakeholderType"))
             {
                 case (int) StakeholderType.HouseholdMember:
                     _stakeholderType = StakeholderType.HouseholdMember;
                     break;
 
                 default:
-                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, mySqlDataReader.GetInt32("StakeholderType"), "StakeholderType", MethodBase.GetCurrentMethod()));
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, dataReader.GetInt32("StakeholderType"), "StakeholderType", MethodBase.GetCurrentMethod()));
             }
-            _dataProviderIdentifier = Guid.Parse(mySqlDataReader.GetString("DataProviderIdentifier"));
+            _dataProviderIdentifier = Guid.Parse(dataReader.GetString("DataProviderIdentifier"));
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -245,7 +239,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -258,7 +252,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -271,7 +265,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -279,7 +273,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -292,7 +286,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -338,13 +332,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="stakeholderIdentifier">Identifier for the stakeholder on which to get payments.</param>
         /// <returns>All the payments made by the given stakeholder.</returns>
-        internal static IEnumerable<PaymentProxy> GetPayments(IDataProviderBase<MySqlCommand> dataProvider, Guid stakeholderIdentifier)
+        internal static IEnumerable<PaymentProxy> GetPayments(IFoodWasteDataProvider dataProvider, Guid stakeholderIdentifier)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProvider");
             }
-            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
+            using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
                 MySqlCommand command = new FoodWasteCommandBuilder(string.Format("SELECT PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime FROM Payments WHERE StakeholderIdentifier='{0}' ORDER BY PaymentTime DESC", stakeholderIdentifier.ToString("D").ToUpper())).Build();
                 return subDataProvider.GetCollection<PaymentProxy>(command);
@@ -356,7 +350,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="stakeholderIdentifier">Identifier for the stakeholder on which to delete payments.</param>
-        internal static void DeletePayments(IDataProviderBase<MySqlCommand> dataProvider, Guid stakeholderIdentifier)
+        internal static void DeletePayments(IFoodWasteDataProvider dataProvider, Guid stakeholderIdentifier)
         {
             if (dataProvider == null)
             {
@@ -364,7 +358,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             foreach (var paymentProxy in GetPayments(dataProvider, stakeholderIdentifier))
             {
-                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
+                using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
                 {
                     subDataProvider.Delete(paymentProxy);
                 }

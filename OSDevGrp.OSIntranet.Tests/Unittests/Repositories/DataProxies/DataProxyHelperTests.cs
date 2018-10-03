@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         /// <summary>
         /// Egen klasse til test af hjælpeklasse til en data proxy.
         /// </summary>
-        private class MyDataProxy : IDataProxyBase<IDbCommand>
+        private class MyDataProxy : IDataProxyBase<IDataReader, IDbCommand>
         {
             #region Private variables
 
@@ -57,7 +57,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             /// </summary>
             /// <param name="dataReader">Data reader.</param>
             /// <param name="dataProvider">Data provider.</param>
-            public void MapData(object dataReader, IDataProviderBase<IDbCommand> dataProvider)
+            public void MapData(IDataReader dataReader, IDataProviderBase<IDataReader, IDbCommand> dataProvider)
             {
             }
 
@@ -65,7 +65,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             /// Mapper relationer til en data proxy.
             /// </summary>
             /// <param name="dataProvider">Data provider.</param>
-            public void MapRelations(IDataProviderBase<IDbCommand> dataProvider)
+            public void MapRelations(IDataProviderBase<IDataReader, IDbCommand> dataProvider)
             {
             }
 
@@ -74,7 +74,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
             /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-            public virtual void SaveRelations(IDataProviderBase<IDbCommand> dataProvider, bool isInserting)
+            public virtual void SaveRelations(IDataProviderBase<IDataReader, IDbCommand> dataProvider, bool isInserting)
             {
             }
 
@@ -82,7 +82,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             /// Sletter relationer til en data proxy.
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
-            public virtual void DeleteRelations(IDataProviderBase<IDbCommand> dataProvider)
+            public virtual void DeleteRelations(IDataProviderBase<IDataReader, IDbCommand> dataProvider)
             {
             }
 
@@ -143,7 +143,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                DataProxyHelper.SetFieldValue<int, IDbCommand>(null, fixture.Create<string>(), fixture.Create<int>()));
+                DataProxyHelper.SetFieldValue<int, IDataReader, IDbCommand>(null, fixture.Create<string>(), fixture.Create<int>()));
         }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             var fixture = new Fixture();
 
             Assert.Throws<ArgumentNullException>(
-                () => DataProxyHelper.GetNullableSqlString<IDbCommand>(null, fixture.Create<string>()));
+                () => DataProxyHelper.GetNullableSqlString<IDataReader, IDbCommand>(null, fixture.Create<string>()));
         }
 
         /// <summary>
@@ -301,11 +301,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         public void TestAtGetKasterArgumentNullExceptionHvisDataProxyErNull()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDbCommand>>());
+            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDataReader, IDbCommand>>());
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                DataProxyHelper.Get(null, fixture.Create<IDataProviderBase<IDbCommand>>(),
+                DataProxyHelper.Get(null, fixture.Create<IDataProviderBase<IDataReader,IDbCommand>>(),
                                     fixture.Create<MyDataProxy>(), MethodBase.GetCurrentMethod().Name));
         }
 
@@ -316,14 +316,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         public void TestAtGetKasterArgumentNullExceptionHvisDataProviderErNull()
         {
             var fixture = new Fixture();
-            fixture.Inject<IDataProviderBase<IDbCommand>>(null);
+            fixture.Inject<IDataProviderBase<IDataReader, IDbCommand>>(null);
 
             var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.Create<IDataProviderBase<IDbCommand>>(), fixture.Create<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase<IDataReader, IDbCommand>>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
         }
 
@@ -334,7 +334,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         public void TestAtGetKasterArgumentNullExceptionHvisQueryForDataProxyErNull()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDbCommand>>());
+            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDataReader, IDbCommand>>());
 
             var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
@@ -342,7 +342,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             fixture.Inject<MyDataProxy>(null);
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.Create<IDataProviderBase<IDbCommand>>(), fixture.Create<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase<IDataReader, IDbCommand>>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
         }
 
@@ -353,14 +353,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         public void TestAtGetKasterArgumentNullExceptionHvisCallerNameNull()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDbCommand>>());
+            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDataReader, IDbCommand>>());
 
             var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.Create<IDataProviderBase<IDbCommand>>(), fixture.Create<MyDataProxy>(), null));
+                dataProxy.Get(fixture.Create<IDataProviderBase<IDataReader, IDbCommand>>(), fixture.Create<MyDataProxy>(), null));
         }
 
         /// <summary>
@@ -370,14 +370,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         public void TestAtGetKasterArgumentNullExceptionHvisCallerNameEmpty()
         {
             var fixture = new Fixture();
-            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDbCommand>>());
+            fixture.Inject(MockRepository.GenerateMock<IDataProviderBase<IDataReader, IDbCommand>>());
 
             var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
             Assert.Throws<ArgumentNullException>(
                 () =>
-                dataProxy.Get(fixture.Create<IDataProviderBase<IDbCommand>>(), fixture.Create<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase<IDataReader, IDbCommand>>(), fixture.Create<MyDataProxy>(),
                               string.Empty));
         }
 
@@ -389,7 +389,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         {
             var fixture = new Fixture();
 
-            var dataProvider = MockRepository.GenerateMock<IDataProviderBase<IDbCommand>>();
+            var dataProvider = MockRepository.GenerateMock<IDataProviderBase<IDataReader, IDbCommand>>();
             dataProvider.Expect(m => m.Get(Arg<MyDataProxy>.Is.NotNull))
                 .Return(fixture.Create<MyDataProxy>());
             fixture.Inject(dataProvider);
@@ -397,7 +397,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
             var dataProxy = fixture.Create<MyDataProxy>();
             Assert.That(dataProxy, Is.Not.Null);
 
-            var loadDataProxy = dataProxy.Get(fixture.Create<IDataProviderBase<IDbCommand>>(),
+            var loadDataProxy = dataProxy.Get(fixture.Create<IDataProviderBase<IDataReader, IDbCommand>>(),
                                               fixture.Create<MyDataProxy>(), MethodBase.GetCurrentMethod().Name);
             Assert.That(loadDataProxy, Is.Not.Null);
 
@@ -412,7 +412,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         {
             var fixture = new Fixture();
 
-            var dataProvider = MockRepository.GenerateMock<IDataProviderBase<IDbCommand>>();
+            var dataProvider = MockRepository.GenerateMock<IDataProviderBase<IDataReader, IDbCommand>>();
             dataProvider.Expect(m => m.Get(Arg<MyDataProxy>.Is.NotNull))
                 .Throw(fixture.Create<IntranetRepositoryException>());
             fixture.Inject(dataProvider);
@@ -422,7 +422,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                dataProxy.Get(fixture.Create<IDataProviderBase<IDbCommand>>(), fixture.Create<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase<IDataReader, IDbCommand>>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
 
             dataProvider.AssertWasCalled(m => m.Get(Arg<MyDataProxy>.Is.NotNull));
@@ -436,7 +436,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         {
             var fixture = new Fixture();
 
-            var dataProvider = MockRepository.GenerateMock<IDataProviderBase<IDbCommand>>();
+            var dataProvider = MockRepository.GenerateMock<IDataProviderBase<IDataReader, IDbCommand>>();
             dataProvider.Expect(m => m.Get(Arg<MyDataProxy>.Is.NotNull))
                 .Throw(fixture.Create<Exception>());
             fixture.Inject(dataProvider);
@@ -446,7 +446,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
 
             Assert.Throws<IntranetRepositoryException>(
                 () =>
-                dataProxy.Get(fixture.Create<IDataProviderBase<IDbCommand>>(), fixture.Create<MyDataProxy>(),
+                dataProxy.Get(fixture.Create<IDataProviderBase<IDataReader, IDbCommand>>(), fixture.Create<MyDataProxy>(),
                               MethodBase.GetCurrentMethod().Name));
 
             dataProvider.AssertWasCalled(m => m.Get(Arg<MyDataProxy>.Is.NotNull));

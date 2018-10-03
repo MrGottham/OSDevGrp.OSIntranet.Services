@@ -8,8 +8,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
     /// <summary>
     /// Basis data provider.
     /// </summary>
-    /// <typeparam name="T">Type of the database command for SQL statements which the data provider should use.</typeparam>
-    public abstract class DataProviderBase<T> : IDataProviderBase<T> where T : IDbCommand
+    /// <typeparam name="TDataReader">Type of the data reader which the data provider should use.</typeparam>
+    /// <typeparam name="TDbCommand">Type of the database command for SQL statements which the data provider should use.</typeparam>
+    public abstract class DataProviderBase<TDataReader, TDbCommand> : IDataProviderBase<TDataReader, TDbCommand> where TDataReader : IDataReader where TDbCommand : IDbCommand
     {
         #region IDisposable Members
 
@@ -38,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
         /// <param name="queryCommand">Database command for the SQL query statement.</param>
         /// <returns>Collection indeholdende data.</returns>
-        public abstract IEnumerable<TDataProxy> GetCollection<TDataProxy>(T queryCommand) where TDataProxy : class, IDataProxyBase<T>, new();
+        public abstract IEnumerable<TDataProxy> GetCollection<TDataProxy>(TDbCommand queryCommand) where TDataProxy : class, IDataProxyBase<TDataReader, TDbCommand>, new();
 
         /// <summary>
         /// Henter data for en given data proxy i data provideren.
@@ -46,7 +47,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
         /// <param name="dataProxy">Data proxy, som indeholder nødvendige værdier til fremsøgning.</param>
         /// <returns>Data proxy.</returns>
-        public abstract TDataProxy Get<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<T>, new();
+        public abstract TDataProxy Get<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<TDataReader, TDbCommand>, new();
 
         /// <summary>
         /// Tilføjer data til data provideren.
@@ -54,7 +55,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
         /// <param name="dataProxy">Data proxy med data, som skal tilføjes data provideren.</param>
         /// <returns>Data proxy med tilføjede data.</returns>
-        public abstract TDataProxy Add<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<T>;
+        public abstract TDataProxy Add<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<TDataReader, TDbCommand>;
 
         /// <summary>
         /// Gemmer data i data provideren.
@@ -62,14 +63,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
         /// <param name="dataProxy">Data proxy med data, som skal gemmes i data provideren.</param>
         /// <returns>Data proxy med gemte data.</returns>
-        public abstract TDataProxy Save<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<T>;
+        public abstract TDataProxy Save<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<TDataReader, TDbCommand>;
 
         /// <summary>
         /// Sletter data fra data provideren.
         /// </summary>
         /// <typeparam name="TDataProxy">Typen for data proxy til data provideren.</typeparam>
         /// <param name="dataProxy">Data proxy med data, som skal slettes fra data provideren.</param>
-        public abstract void Delete<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<T>;
+        public abstract void Delete<TDataProxy>(TDataProxy dataProxy) where TDataProxy : class, IDataProxyBase<TDataReader, TDbCommand>;
 
         #endregion
     }

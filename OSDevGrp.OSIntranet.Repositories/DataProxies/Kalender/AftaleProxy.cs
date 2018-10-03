@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
-using OSDevGrp.OSIntranet.Resources;
-using MySql.Data.MySqlClient;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
 {
@@ -21,7 +19,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
     {
         #region Private variables
 
-        private IDataProviderBase<MySqlCommand> _dataProvider;
+        private IMySqlDataProvider _dataProvider;
 
         #endregion
 
@@ -146,7 +144,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// </summary>
         /// <param name="dataReader">Datareader.</param>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -157,42 +155,35 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
                 throw new ArgumentNullException("dataProvider");
             }
 
-            var mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                                   dataReader.GetType(), "dataReader"));
-            }
-
-            this.SetFieldValue("_system", new SystemProxy(mySqlDataReader.GetInt32("SystemNo")));
-            this.SetFieldValue("_id", mySqlDataReader.GetInt32("CalId"));
-            var mySqlDateTime = mySqlDataReader.GetMySqlDateTime("Date");
-            var mySqlFromTime = mySqlDataReader.GetTimeSpan("FromTime");
-            var mySqlToTime = mySqlDataReader.GetTimeSpan("ToTime");
+            this.SetFieldValue("_system", new SystemProxy(dataReader.GetInt32("SystemNo")));
+            this.SetFieldValue("_id", dataReader.GetInt32("CalId"));
+            var mySqlDateTime = dataReader.GetMySqlDateTime("Date");
+            var mySqlFromTime = dataReader.GetTimeSpan("FromTime");
+            var mySqlToTime = dataReader.GetTimeSpan("ToTime");
             FraTidspunkt = new DateTime(mySqlDateTime.Year, mySqlDateTime.Month, mySqlDateTime.Day, mySqlFromTime.Hours,
                                         mySqlFromTime.Minutes, mySqlFromTime.Seconds);
             TilTidspunkt = new DateTime(mySqlDateTime.Year, mySqlDateTime.Month, mySqlDateTime.Day, mySqlToTime.Hours,
                                         mySqlToTime.Minutes, mySqlToTime.Seconds);
-            Properties = mySqlDataReader.GetInt32("Properties");
-            Emne = mySqlDataReader.GetString("Subject");
-            Notat = mySqlDataReader.GetString("Note");
+            Properties = dataReader.GetInt32("Properties");
+            Emne = dataReader.GetString("Subject");
+            Notat = dataReader.GetString("Note");
             var deltagere = new List<IBrugeraftale>();
-            using (var clonedDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
+            using (var clonedDataProvider = (IMySqlDataProvider) dataProvider.Clone())
             {
-                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", mySqlDataReader.GetInt32("SystemNo"), mySqlDataReader.GetInt32("CalId"))).Build();
+                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", dataReader.GetInt32("SystemNo"), dataReader.GetInt32("CalId"))).Build();
                 deltagere.AddRange(clonedDataProvider.GetCollection<BrugeraftaleProxy>(command));
             }
             this.SetFieldValue("_deltagere", deltagere);
             DataIsLoaded = true;
 
-            _dataProvider = dataProvider;
+            _dataProvider = (IMySqlDataProvider) dataProvider;
         }
 
         /// <summary>
         /// Mapper relationer til en kalenderaftale.
         /// </summary>
         /// <param name="dataProviderBase">Dataprovider.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProviderBase)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProviderBase)
         {
         }
 
@@ -201,7 +192,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
         /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
         }
 
@@ -209,7 +200,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// Sletter relationer til en kalenderaftale.
         /// </summary>
         /// <param name="dataProvider">Dataprovider.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
         }
 

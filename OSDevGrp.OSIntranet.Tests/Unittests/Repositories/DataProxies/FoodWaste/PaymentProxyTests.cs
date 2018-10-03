@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.IO;
 using System.Linq;
 using MySql.Data.MySqlClient;
@@ -239,7 +238,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var paymentProxy = new PaymentProxy();
             Assert.That(paymentProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.MapData(null, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -265,25 +264,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData throws an IntranetRepositoryException if the data reader is not type of MySqlDataReader.
-        /// </summary>
-        [Test]
-        public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
-        {
-            var dataReader = MockRepository.GenerateMock<IDataReader>();
-
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.MapData(dataReader, MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name)));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
         /// Tests that the constructor initialize a data proxy to a payment from a stakeholder.
         /// </summary>
         [Test]
@@ -294,7 +274,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
             var random = new Random(fixture.Create<int>());
             
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
+            var dataProviderBaseMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
                 .Repeat.Any();
@@ -463,7 +443,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(paymentProxy.Identifier, Is.Null);
             Assert.That(paymentProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.SaveRelations(MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.SaveRelations(MockRepository.GenerateStub<IMySqlDataProvider>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -502,7 +482,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(paymentProxy.Identifier, Is.Null);
             Assert.That(paymentProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.DeleteRelations(MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.DeleteRelations(MockRepository.GenerateStub<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);

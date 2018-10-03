@@ -20,7 +20,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         private Guid? _householdIdentifier;
         private Guid? _storageTypeIdentifier;
-        private IDataProviderBase<MySqlCommand> _dataProvider;
+        private IFoodWasteDataProvider _dataProvider;
 
         #endregion
 
@@ -62,7 +62,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.Household;
                 }
-                using (IDataProviderBase<MySqlCommand> subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
+                using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
                 {
                     HouseholdProxy householdProxy = new HouseholdProxy
                     {
@@ -85,7 +85,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 {
                     return base.StorageType;
                 }
-                using (IDataProviderBase<MySqlCommand> subDataProvider = (IDataProviderBase<MySqlCommand>) _dataProvider.Clone())
+                using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
                 {
                     StorageTypeProxy storageTypeProxy = new StorageTypeProxy
                     {
@@ -178,7 +178,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -189,29 +189,23 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new ArgumentNullException(nameof(dataProvider));
             }
 
-            MySqlDataReader mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
+            Identifier = new Guid(dataReader.GetString("StorageIdentifier"));
+            SortOrder = dataReader.GetInt16("SortOrder");
+            Temperature = dataReader.GetInt16("Temperature");
+            CreationTime = dataReader.GetDateTime("CreationTime").ToLocalTime();
+
+            int descriptionColumnNo = dataReader.GetOrdinal("Descr");
+            if (dataReader.IsDBNull(descriptionColumnNo) == false)
             {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
+                Description = dataReader.GetString(descriptionColumnNo);
             }
 
-            Identifier = new Guid(mySqlDataReader.GetString("StorageIdentifier"));
-            SortOrder = mySqlDataReader.GetInt16("SortOrder");
-            Temperature = mySqlDataReader.GetInt16("Temperature");
-            CreationTime = mySqlDataReader.GetDateTime("CreationTime").ToLocalTime();
-
-            int descriptionColumnNo = mySqlDataReader.GetOrdinal("Descr");
-            if (mySqlDataReader.IsDBNull(descriptionColumnNo) == false)
-            {
-                Description = mySqlDataReader.GetString(descriptionColumnNo);
-            }
-
-            _householdIdentifier = new Guid(mySqlDataReader.GetString("HouseholdIdentifier"));
-            _storageTypeIdentifier = new Guid(mySqlDataReader.GetString("StorageTypeIdentifier"));
+            _householdIdentifier = new Guid(dataReader.GetString("HouseholdIdentifier"));
+            _storageTypeIdentifier = new Guid(dataReader.GetString("StorageTypeIdentifier"));
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -219,7 +213,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -228,7 +222,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -237,7 +231,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -246,7 +240,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -254,7 +248,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -263,7 +257,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             if (_dataProvider == null)
             {
-                _dataProvider = dataProvider;
+                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 

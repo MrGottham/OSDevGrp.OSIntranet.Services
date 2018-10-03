@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
@@ -214,12 +213,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
+            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
 
             var foodGroupProxy = new FoodGroupProxy();
             Assert.That(foodGroupProxy, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupProxy.MapData(null, fixture.Create<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<ArgumentNullException>(() => foodGroupProxy.MapData(null, fixture.Create<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
@@ -244,28 +243,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(exception.ParamName, Is.Not.Null);
             Assert.That(exception.ParamName, Is.Not.Empty);
             Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that MapData throws an IntranetRepositoryException if the data reader is not type of MySqlDataReader.
-        /// </summary>
-        [Test]
-        public void TestThatMapDataThrowsIntranetRepositoryExceptionIfDataReaderIsNotTypeOfMySqlDataReader()
-        {
-            var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>()));
-
-            var dataReader = MockRepository.GenerateMock<IDataReader>();
-
-            var foodGroupProxy = new FoodGroupProxy();
-            Assert.That(foodGroupProxy, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.MapData(dataReader, fixture.Create<IDataProviderBase<MySqlCommand>>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name)));
             Assert.That(exception.InnerException, Is.Null);
         }
 
@@ -295,7 +272,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var translationProxyCollection = fixture.CreateMany<TranslationProxy>(3).ToList();
             var foreignKeyProxyCollection = fixture.CreateMany<ForeignKeyProxy>(5).ToList();
 
-            var dataProviderBaseMock = MockRepository.GenerateMock<IDataProviderBase<MySqlCommand>>();
+            var dataProviderBaseMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             dataProviderBaseMock.Stub(m => m.Clone())
                 .Return(dataProviderBaseMock)
                 .Repeat.Any();
@@ -439,7 +416,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
+            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateStub<IMySqlDataProvider>()));
 
             var foodGroupProxy = new FoodGroupProxy
             {
@@ -449,7 +426,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.Identifier, Is.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.SaveRelations(fixture.Create<IDataProviderBase<MySqlCommand>>(), fixture.Create<bool>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.SaveRelations(fixture.Create<IMySqlDataProvider>(), fixture.Create<bool>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -481,7 +458,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             var fixture = new Fixture();
-            fixture.Customize<IDataProviderBase<MySqlCommand>>(e => e.FromFactory(() => MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>()));
+            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateStub<IMySqlDataProvider>()));
 
             var foodGroupProxy = new FoodGroupProxy
             {
@@ -491,7 +468,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(foodGroupProxy.Identifier, Is.Null);
             Assert.That(foodGroupProxy.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.DeleteRelations(fixture.Create<IDataProviderBase<MySqlCommand>>()));
+            var exception = Assert.Throws<IntranetRepositoryException>(() => foodGroupProxy.DeleteRelations(fixture.Create<IMySqlDataProvider>()));
             Assert.That(exception, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Null);
             Assert.That(exception.Message, Is.Not.Empty);
@@ -505,7 +482,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsCloneOnDataProvider4Times()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -541,7 +518,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetChildren()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -593,7 +570,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                     .With(m => m.Parent, null)
                     .Create()
             };
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -637,7 +614,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetFoodItemGroups()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -678,7 +655,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
 
             var foodItemGroupProxyCollection = fixture.CreateMany<FoodItemGroupProxy>(7).ToList();
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -722,7 +699,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetTranslations()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -763,7 +740,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
 
             var translationProxyCollection = fixture.CreateMany<TranslationProxy>(7).ToList();
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -807,7 +784,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetForeignKeys()
         {
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
@@ -848,7 +825,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             var fixture = new Fixture();
 
             var foreignKeyProxyCollection = fixture.CreateMany<ForeignKeyProxy>(7).ToList();
-            var dataProviderMock = MockRepository.GenerateStub<IDataProviderBase<MySqlCommand>>();
+            var dataProviderMock = MockRepository.GenerateStub<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();

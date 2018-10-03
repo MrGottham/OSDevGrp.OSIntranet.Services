@@ -4,7 +4,6 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -112,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -123,28 +122,22 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new ArgumentNullException(nameof(dataProvider));
             }
 
-            MySqlDataReader mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
-            }
-
-            Identifier = Guid.Parse(mySqlDataReader.GetString("StorageTypeIdentifier"));
-            SortOrder = mySqlDataReader.GetInt16("SortOrder");
-            Temperature = mySqlDataReader.GetInt16("Temperature");
+            Identifier = Guid.Parse(dataReader.GetString("StorageTypeIdentifier"));
+            SortOrder = dataReader.GetInt16("SortOrder");
+            Temperature = dataReader.GetInt16("Temperature");
             TemperatureRange = new Range<int>(
-                mySqlDataReader.GetInt16("TemperatureRangeStartValue"),
-                mySqlDataReader.GetInt16("TemperatureRangeEndValue"));
-            Creatable = Convert.ToBoolean(mySqlDataReader.GetInt32("Creatable"));
-            Editable = Convert.ToBoolean(mySqlDataReader.GetInt32("Editable"));
-            Deletable = Convert.ToBoolean(mySqlDataReader.GetInt32("Deletable"));
+                dataReader.GetInt16("TemperatureRangeStartValue"),
+                dataReader.GetInt16("TemperatureRangeEndValue"));
+            Creatable = Convert.ToBoolean(dataReader.GetInt32("Creatable"));
+            Editable = Convert.ToBoolean(dataReader.GetInt32("Editable"));
+            Deletable = Convert.ToBoolean(dataReader.GetInt32("Deletable"));
         }
 
         /// <summary>
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -159,7 +152,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
             throw new NotSupportedException();
         }
@@ -168,7 +161,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             throw new NotSupportedException();
         }

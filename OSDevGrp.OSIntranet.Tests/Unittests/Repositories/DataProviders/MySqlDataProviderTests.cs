@@ -124,12 +124,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataReader">Data reader for data provideren.</param>
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
-            public void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+            public void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
             {
-                MySqlDataReader mySqlReader = (MySqlDataReader) dataReader;
-
-                SystemNo = mySqlReader.GetInt32("SystemNo");
-                Title = mySqlReader.GetString("Title");
+                SystemNo = dataReader.GetInt32("SystemNo");
+                Title = dataReader.GetString("Title");
 
                 MapDataIsCalled = true;
             }
@@ -138,7 +136,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Mapper releationer.
             /// </summary>
             /// <param name="dataProvider">Data provider, hvorfra data mappes.</param>
-            public void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+            public void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 
@@ -150,7 +148,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
             /// <param name="isInserting">Angivelse af, om der indsættes eller opdateres.</param>
-            public void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+            public void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 
@@ -162,7 +160,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             /// Sletter relationer.
             /// </summary>
             /// <param name="dataProvider">Dataprovider.</param>
-            public void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+            public void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
             {
                 Assert.That(dataProvider, Is.Not.Null);
 

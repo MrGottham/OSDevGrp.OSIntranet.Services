@@ -4,7 +4,6 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -112,7 +111,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataReader">Data reader.</param>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapData(object dataReader, IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataReader == null)
             {
@@ -123,26 +122,20 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 throw new ArgumentNullException("dataProvider");
             }
 
-            var mySqlDataReader = dataReader as MySqlDataReader;
-            if (mySqlDataReader == null)
+            Identifier = new Guid(dataReader.GetString("TranslationIdentifier"));
+            TranslationOfIdentifier = new Guid(dataReader.GetString("OfIdentifier"));
+            TranslationInfo = new TranslationInfoProxy(dataReader.GetString("CultureName"))
             {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, "dataReader", dataReader.GetType().Name));
-            }
-
-            Identifier = new Guid(mySqlDataReader.GetString("TranslationIdentifier"));
-            TranslationOfIdentifier = new Guid(mySqlDataReader.GetString("OfIdentifier"));
-            TranslationInfo = new TranslationInfoProxy(mySqlDataReader.GetString("CultureName"))
-            {
-                Identifier = new Guid(mySqlDataReader.GetString("InfoIdentifier"))
+                Identifier = new Guid(dataReader.GetString("InfoIdentifier"))
             };
-            Value = mySqlDataReader.GetString("Value");
+            Value = dataReader.GetString("Value");
         }
 
         /// <summary>
         /// Maps relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -155,7 +148,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
-        public virtual void SaveRelations(IDataProviderBase<MySqlCommand> dataProvider, bool isInserting)
+        public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
             if (dataProvider == null)
             {
@@ -171,7 +164,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Delete relations.
         /// </summary>
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
-        public virtual void DeleteRelations(IDataProviderBase<MySqlCommand> dataProvider)
+        public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             if (dataProvider == null)
             {
@@ -225,13 +218,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="translationOfIdentifier">Identifier for the given domain object on which to get the translations.</param>
         /// <returns>Translations for a given translatable domain object in the food waste domain.</returns>
-        internal static IEnumerable<TranslationProxy> GetDomainObjectTranslations(IDataProviderBase<MySqlCommand> dataProvider, Guid translationOfIdentifier)
+        internal static IEnumerable<TranslationProxy> GetDomainObjectTranslations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, Guid translationOfIdentifier)
         {
             if (dataProvider == null)
             {
                 throw new ArgumentNullException("dataProvider");
             }
-            using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
+            using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
                 MySqlCommand command = new FoodWasteCommandBuilder(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(translationOfIdentifier)).Build();
                 return subDataProvider.GetCollection<TranslationProxy>(command);
@@ -243,7 +236,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="translationOfIdentifier">Identifier for the given domain object on which to delete the translations.</param>
-        internal static void DeleteDomainObjectTranslations(IDataProviderBase<MySqlCommand> dataProvider, Guid translationOfIdentifier)
+        internal static void DeleteDomainObjectTranslations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, Guid translationOfIdentifier)
         {
             if (dataProvider == null)
             {
@@ -251,7 +244,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
             foreach (var translationProxy in GetDomainObjectTranslations(dataProvider, translationOfIdentifier))
             {
-                using (var subDataProvider = (IDataProviderBase<MySqlCommand>) dataProvider.Clone())
+                using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
                 {
                     subDataProvider.Delete(translationProxy);
                 }
