@@ -286,7 +286,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         /// </summary>
         [Test]
         [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens")]
-        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens")]
+        [TestCase("http://services.osdevgrp.local", "CN=OSDevGrp.OSIntranet.Tokens")]
         public void TestThatIssueRetursIfAppliesToInRequestSecurityTokenContainsTrustedRelyingParty(string trustedUri, string identityCertificate)
         {
             var fixture = new Fixture();
@@ -325,8 +325,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Security.Services
         [Test]
         [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 3)]
         [TestCase("http://localhost", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 2)]
-        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 3)]
-        [TestCase("http://mother", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 2)]
+        [TestCase("http://services.osdevgrp.local", "CN=OSDevGrp.OSIntranet.Tokens", "mrgottham@gmail.com", 3)]
+        [TestCase("http://services.osdevgrp.local", "CN=OSDevGrp.OSIntranet.Tokens", "ole.sorensen@osdevgrp.dk", 2)]
         public void TestThatIssueAppendsClaimsToCallingClaimsPrincipal(string trustedUri, string identityCertificate, string mailAddress, int expectedAppendedClaims)
         {
             var fixture = new Fixture();
