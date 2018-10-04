@@ -1,6 +1,6 @@
 ﻿using System;
 using MySql.Data.MySqlClient;
-using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles;
 
@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// </summary>
         /// <param name="nummer">Unik identifikation af systemet under OSWEBDB.</param>
         public SystemProxy(int nummer)
-            : this(nummer, typeof(Domain.Fælles.System).ToString())
+            : this(nummer, typeof(Domain.Fælles.System).Name)
         {
         }
 
@@ -39,7 +39,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         public SystemProxy(int nummer, string title, int properties = 0)
             : base(nummer, title, properties)
         {
-            DataIsLoaded = false;
         }
 
         #endregion
@@ -49,58 +48,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <summary>
         /// Returnerer den unikke identifikation af systemet under OSWEBDB.
         /// </summary>
-        public virtual string UniqueId
-        {
-            get
-            {
-                return Nummer.ToString();
-            }
-        }
-
-        /// <summary>
-        /// Returnerer SQL forespørgelse til foresprøgelse efter systemet under OSWEBDB.
-        /// </summary>
-        /// <param name="queryForDataProxy">Data proxy indeholdende nødvendige data til forespørgelsen.</param>
-        /// <returns>SQL forespørgelse.</returns>
-        public virtual string GetSqlQueryForId(ISystem queryForDataProxy)
-        {
-            if (queryForDataProxy == null)
-            {
-                throw new ArgumentNullException("queryForDataProxy");
-            }
-            return string.Format("SELECT SystemNo,Title,Properties FROM Systems WHERE SystemNo={0}", queryForDataProxy.Nummer);
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til indsættelse af systemet under OSWEBDB.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            return string.Format("INSERT INTO Systems (SystemNo,Title,Properties) VALUES({0},{1},{2})", Nummer, this.GetNullableSqlString(Titel), Properties);
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til opdatering af systemet under OSWEBDB.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            return string.Format("UPDATE Systems SET Title={1},Properties={2} WHERE SystemNo={0}", Nummer, this.GetNullableSqlString(Titel), Properties);
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til sletning af systemet under OSWEBDB.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM Systems WHERE SystemNo={0}", Nummer);
-        }
+        public virtual string UniqueId => Convert.ToString(Nummer);
 
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Mapper data for et system under OSWEBDB.
@@ -109,19 +61,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <param name="dataProvider">Dataprovider.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
-            this.SetFieldValue("_nummer", dataReader.GetInt32("SystemNo"));
+            Nummer = dataReader.GetInt32("SystemNo");
             Titel = dataReader.GetString("Title");
             Properties = dataReader.GetInt32("Properties");
-            DataIsLoaded = true;
         }
 
         /// <summary>
@@ -155,7 +100,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL statement for getting this system within OSWEBDB.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new MySqlCommandBuilder(GetSqlQueryForId(this)).Build();
+            return new CommonCommandBuilder("SELECT SystemNo,Title,Properties FROM Systems WHERE SystemNo=@systemNo")
+                .AddSystemNoParameter(Nummer)
+                .Build();
         }
 
         /// <summary>
@@ -164,7 +111,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL statement for inserting this system within OSWEBDB.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new CommonCommandBuilder("INSERT INTO Systems (SystemNo,Title,Properties) VALUES(@systemNo,@title,@properties)")
+                .AddSystemNoParameter(Nummer)
+                .AddTitleParameter(Titel)
+                .AddPropertiesParameter(Properties)
+                .Build();
         }
 
         /// <summary>
@@ -173,7 +124,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL statement for updating this system within OSWEBDB.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new CommonCommandBuilder("UPDATE Systems SET Title=@title,Properties=@properties WHERE SystemNo=@systemNo")
+                .AddSystemNoParameter(Nummer)
+                .AddTitleParameter(Titel)
+                .AddPropertiesParameter(Properties)
+                .Build();
         }
 
         /// <summary>
@@ -182,20 +137,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
         /// <returns>SQL statement for deleting this system within OSWEBDB.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForDelete()).Build();
-        }
-
-        #endregion
-
-        #region ILazyLoadable Members
-
-        /// <summary>
-        /// Angivelse af, om data er loaded.
-        /// </summary>
-        public bool DataIsLoaded
-        {
-            get;
-            protected set;
+            return new CommonCommandBuilder("DELETE FROM Systems WHERE SystemNo=@systemNo")
+                .AddSystemNoParameter(Nummer)
+                .Build();
         }
 
         #endregion

@@ -11,11 +11,11 @@ using OSDevGrp.OSIntranet.DataAccess.Contracts.Services;
 using OSDevGrp.OSIntranet.DataAccess.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Resources;
-using MySqlCommandBuilder = OSDevGrp.OSIntranet.Repositories.DataProxies.MySqlCommandBuilder;
 
 namespace OSDevGrp.OSIntranet.Repositories
 {
@@ -48,18 +48,10 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="domainObjectBuilder">Implementering af domæneobjekt bygger.</param>
         public FællesRepository(IChannelFactory channelFactory, IMySqlDataProvider mySqlDataProvider, IDomainObjectBuilder domainObjectBuilder)
         {
-            if (channelFactory == null)
-            {
-                throw new ArgumentNullException("channelFactory");
-            }
-            if (mySqlDataProvider == null)
-            {
-                throw new ArgumentNullException("mySqlDataProvider");
-            }
-            if (domainObjectBuilder == null)
-            {
-                throw new ArgumentNullException("channelFactory");
-            }
+            ArgumentNullGuard.NotNull(channelFactory, nameof(channelFactory))
+                .NotNull(mySqlDataProvider, nameof(mySqlDataProvider))
+                .NotNull(domainObjectBuilder, nameof(domainObjectBuilder));
+
             _channelFactory = channelFactory;
             _mySqlDataProvider = mySqlDataProvider;
             _domainObjectBuilder = domainObjectBuilder;
@@ -75,11 +67,11 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <returns>Liste af brevhoveder.</returns>
         public IEnumerable<Brevhoved> BrevhovedGetAll()
         {
-            var channel = _channelFactory.CreateChannel<IFællesRepositoryService>(EndpointConfigurationName);
+            IFællesRepositoryService channel = _channelFactory.CreateChannel<IFællesRepositoryService>(EndpointConfigurationName);
             try
             {
-                var query = new BrevhovedGetAllQuery();
-                var brevhovedViews = channel.BrevhovedGetAll(query);
+                BrevhovedGetAllQuery query = new BrevhovedGetAllQuery();
+                IEnumerable<BrevhovedView> brevhovedViews = channel.BrevhovedGetAll(query);
                 return _domainObjectBuilder.BuildMany<BrevhovedView, Brevhoved>(brevhovedViews);
             }
             catch (IntranetRepositoryException)
@@ -92,9 +84,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
             finally
             {
@@ -110,7 +100,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                MySqlCommand command = new MySqlCommandBuilder("SELECT SystemNo,Title,Properties FROM Systems ORDER BY SystemNo").Build();
+                MySqlCommand command = new CommonCommandBuilder("SELECT SystemNo,Title,Properties FROM Systems ORDER BY SystemNo").Build();
                 return _mySqlDataProvider.GetCollection<SystemProxy>(command);
             }
             catch (IntranetRepositoryException)
@@ -119,9 +109,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
         }
 

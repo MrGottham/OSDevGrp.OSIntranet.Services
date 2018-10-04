@@ -1,5 +1,5 @@
-﻿using System;
-using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+﻿using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
 namespace OSDevGrp.OSIntranet.Domain.Fælles
 {
@@ -16,7 +16,7 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
 
         #region Private variables
 
-        private readonly int _nummer;
+        private int _nummer;
         private string _titel;
         private int _properties;
 
@@ -32,10 +32,8 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
         /// <param name="properties">Egenskaber for systemet.</param>
         public System(int nummer, string titel, int properties = 0)
         {
-            if (string.IsNullOrEmpty(titel))
-            {
-                throw new ArgumentNullException("titel");
-            }
+            ArgumentNullGuard.NotNullOrWhiteSpace(titel, nameof(titel));
+
             _nummer = nummer;
             _titel = titel;
             _properties = properties;
@@ -50,10 +48,8 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
         /// </summary>
         public virtual int Nummer
         {
-            get
-            {
-                return _nummer;
-            }
+            get => _nummer;
+            protected set => _nummer = value;
         }
 
         /// <summary>
@@ -61,16 +57,11 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
         /// </summary>
         public virtual string Titel
         {
-            get
-            {
-                return _titel;
-            }
+            get => _titel;
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException("value");
-                }
+                ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
                 _titel = value;
             }
         }
@@ -80,25 +71,16 @@ namespace OSDevGrp.OSIntranet.Domain.Fælles
         /// </summary>
         public virtual int Properties
         {
-            get
-            {
-                return _properties;
-            }
-            protected set
-            {
-                _properties = value;
-            }
+            get => _properties;
+            protected set => _properties = value;
         }
 
-            /// <summary>
+        /// <summary>
         /// Angivelse af, om systemet benytter kalenderen under OSWEBDB.
         /// </summary>
         public virtual bool Kalender
         {
-            get
-            {
-                return (Properties & CalenderValue) != 0;
-            }
+            get => (Properties & CalenderValue) != 0;
             set
             {
                 if (value)

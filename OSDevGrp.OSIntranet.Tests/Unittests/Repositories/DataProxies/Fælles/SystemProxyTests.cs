@@ -4,6 +4,7 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using AutoFixture;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
@@ -14,23 +15,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
     [TestFixture]
     public class SystemProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Sætter hver test op.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tester, at konstruktøren initierer en data proxy for et system under OSWEBDB.
         /// </summary>
         [Test]
         public void TestAtConstructorInitiererSystemProxy()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new SystemProxy());
-
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
-            Assert.That(systemProxy.Nummer, Is.EqualTo(0));
-            Assert.That(systemProxy.Titel, Is.Not.Null);
-            Assert.That(systemProxy.Titel, Is.EqualTo(typeof(OSIntranet.Domain.Fælles.System).ToString()));
-            Assert.That(systemProxy.Properties, Is.EqualTo(0));
-            Assert.That(systemProxy.Kalender, Is.False);
-            Assert.That(systemProxy.DataIsLoaded, Is.False);
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Nummer, Is.EqualTo(0));
+            Assert.That(sut.Titel, Is.Not.Null);
+            Assert.That(sut.Titel, Is.Not.Empty);
+            Assert.That(sut.Titel, Is.EqualTo(typeof(OSIntranet.Domain.Fælles.System).Name));
+            Assert.That(sut.Properties, Is.EqualTo(0));
+            Assert.That(sut.Kalender, Is.False);
         }
 
         /// <summary>
@@ -39,102 +52,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         [Test]
         public void TestAtUniqueIdReturnererIdentifikation()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new SystemProxy());
+            int nummer = _fixture.Create<int>();
 
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
+            ISystemProxy sut = CreateSut(nummer);
+            Assert.That(sut, Is.Not.Null);
 
-            Assert.That(systemProxy.UniqueId, Is.Not.Null);
-            Assert.That(systemProxy.UniqueId, Is.EqualTo("0"));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlQueryForId returnerer SQL foresprøgelse efter systemet under OSWEBDB.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlQueryForIdReturnererSqlQuery()
-        {
-            var fixture = new Fixture();
-            fixture.Inject(new SystemProxy(1));
-
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
-
-            var sqlQuery = systemProxy.GetSqlQueryForId(systemProxy);
-            Assert.That(sqlQuery, Is.Not.Null);
-            Assert.That(sqlQuery, Is.EqualTo("SELECT SystemNo,Title,Properties FROM Systems WHERE SystemNo=1"));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlQueryForId kaster ArgumentNullException, hvis data proxy, der skal forespørges efter, er null.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlQueryForIdKasterArgumentNullExceptionHvisQueryForDataProxyErNull()
-        {
-            var fixture = new Fixture();
-            fixture.Inject(new SystemProxy(1));
-
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
-
-            Assert.Throws<ArgumentNullException>(() => systemProxy.GetSqlQueryForId(null));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlCommandForInsert returnerer SQL kommando til oprettelse af systemet under OSWEBDB.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlCommandForInsertReturnererSqlCommand()
-        {
-            var fixture = new Fixture();
-            var title = fixture.Create<string>();
-            var properties = fixture.Create<int>();
-            fixture.Inject(new SystemProxy(1, title, properties));
-
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
-
-            var sqlCommand = systemProxy.GetSqlCommandForInsert();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Systems (SystemNo,Title,Properties) VALUES(1,'{0}',{1})", title, properties)));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlCommandForUpdate returnerer SQL kommando til opdatering af systemet under OSWEBDB.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlCommandForUpdateReturnererSqlCommand()
-        {
-            var fixture = new Fixture();
-            var title = fixture.Create<string>();
-            var properties = fixture.Create<int>();
-            fixture.Inject(new SystemProxy(1, title, properties));
-
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
-
-            var sqlCommand = systemProxy.GetSqlCommandForUpdate();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Systems SET Title='{0}',Properties={1} WHERE SystemNo=1", title, properties)));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlCommandForDelete returnerer SQL kommando til sletning af systemet under OSWEBDB.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlCommandForDeleteReturnererSqlCommand()
-        {
-            var fixture = new Fixture();
-            var title = fixture.Create<string>();
-            fixture.Inject(new SystemProxy(1, title));
-
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
-
-            var sqlCommand = systemProxy.GetSqlCommandForDelete();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo("DELETE FROM Systems WHERE SystemNo=1"));
+            Assert.That(sut.UniqueId, Is.Not.Null);
+            Assert.That(sut.UniqueId, Is.Not.Null);
+            Assert.That(sut.UniqueId, Is.EqualTo(Convert.ToString(nummer)));
         }
 
         /// <summary>
@@ -143,16 +68,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         [Test]
         public void TestAtMapDataKasterArgumentNullExceptionHvisDataReaderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new SystemProxy());
-            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateMySqlDataProvider()));
 
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                systemProxy.MapData(null, fixture.Create<IMySqlDataProvider>()));
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
 
         /// <summary>
@@ -161,16 +82,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         [Test]
         public void TestAtMapDataKasterArgumentNullExceptionHvisDataProviderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new SystemProxy());
-            fixture.Inject<IMySqlDataProvider>(null);
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
 
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                systemProxy.MapData(MockRepository.GenerateStub<MySqlDataReader>(), fixture.Create<IMySqlDataProvider>()));
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
@@ -179,28 +96,158 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         [Test]
         public void TestAtMapDataMapperSystemProxy()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new SystemProxy());
-            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetString(Arg<string>.Is.Equal("Title")))
-                .Return(fixture.Create<string>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
-                .Return(fixture.Create<int>());
-            fixture.Inject(dataReader);
+            int number = _fixture.Create<int>();
+            string title = _fixture.Create<string>();
+            int properties = _fixture.Create<int>();
+            MySqlDataReader dataReader = CreateMySqlDataReader(number, title, properties);
 
-            var systemProxy = fixture.Create<SystemProxy>();
-            Assert.That(systemProxy, Is.Not.Null);
+            sut.MapData(dataReader, CreateMySqlDataProvider());
 
-            systemProxy.MapData(fixture.Create<MySqlDataReader>(), fixture.Create<IMySqlDataProvider>());
-            Assert.That(systemProxy.DataIsLoaded, Is.True);
+            Assert.That(sut.Nummer, Is.EqualTo(number));
+            Assert.That(sut.Titel, Is.EqualTo(title));
+            Assert.That(sut.Properties, Is.EqualTo(properties));
 
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")));
-            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Title")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Title")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tester, at CreateGetCommand returnerer SQL kommando med foresprøgelse efter systemet under OSWEBDB.
+        /// </summary>
+        [Test]
+        public void TestAtCreateGetCommandReturnererSqlCommand()
+        {
+            int nummer = _fixture.Create<int>();
+
+            ISystemProxy sut = CreateSut(nummer);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("SELECT SystemNo,Title,Properties FROM Systems WHERE SystemNo=@systemNo")
+                .AddSmallIntDataParameter("@systemNo", nummer, 2)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tester, at CreateInsertCommand returnerer SQL kommando til oprettelse af systemet under OSWEBDB.
+        /// </summary>
+        [Test]
+        public void TestAtCreateInsertCommandReturnererSqlCommand()
+        {
+            int nummer = _fixture.Create<int>();
+            string title = _fixture.Create<string>();
+            int properties = _fixture.Create<int>();
+
+            ISystemProxy sut = CreateSut(nummer, title, properties);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("INSERT INTO Systems (SystemNo,Title,Properties) VALUES(@systemNo,@title,@properties)")
+                .AddSmallIntDataParameter("@systemNo", nummer, 2)
+                .AddVarCharDataParameter("@title", title, 50)
+                .AddSmallIntDataParameter("@properties", properties, 5)
+                .Build()
+                .Run(sut.CreateInsertCommand());
+        }
+
+        /// <summary>
+        /// Tester, at CreateUpdateCommand returnerer SQL kommando til opdatering af systemet under OSWEBDB.
+        /// </summary>
+        [Test]
+        public void TestAtCreateUpdateCommandReturnererSqlCommand()
+        {
+            int nummer = _fixture.Create<int>();
+            string title = _fixture.Create<string>();
+            int properties = _fixture.Create<int>();
+
+            ISystemProxy sut = CreateSut(nummer, title, properties);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("UPDATE Systems SET Title=@title,Properties=@properties WHERE SystemNo=@systemNo")
+                .AddSmallIntDataParameter("@systemNo", nummer, 2)
+                .AddVarCharDataParameter("@title", title, 50)
+                .AddSmallIntDataParameter("@properties", properties, 5)
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tester, at CreateDeleteCommand returnerer SQL kommando til sletning af systemet under OSWEBDB.
+        /// </summary>
+        [Test]
+        public void TestAtCreateDeleteCommandReturnererSqlCommand()
+        {
+            int nummer = _fixture.Create<int>();
+
+            ISystemProxy sut = CreateSut(nummer);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("DELETE FROM Systems WHERE SystemNo=@systemNo")
+                .AddSmallIntDataParameter("@systemNo", nummer, 2)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Danner en instans af en data proxy for et system under OSWEBDB til brug for unit testing. 
+        /// </summary>
+        /// <returns>Instans af en data proxy for et system under OSWEBDB til brug for unit testing.</returns>
+        private ISystemProxy CreateSut()
+        {
+            return new SystemProxy();
+        }
+
+        /// <summary>
+        /// Danner en instans af en data proxy for et system under OSWEBDB til brug for unit testing. 
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af systemet under OSWEBDB.</param>
+        /// <returns>Instans af en data proxy for et system under OSWEBDB til brug for unit testing.</returns>
+        private ISystemProxy CreateSut(int nummer)
+        {
+            return new SystemProxy(nummer);
+        }
+
+        /// <summary>
+        /// Danner en instans af en data proxy for et system under OSWEBDB til brug for unit testing. 
+        /// </summary>
+        /// <param name="nummer">Unik identifikation af systemet under OSWEBDB.</param>
+        /// <param name="title">Titel for systemet under OSWEBDB.</param>
+        /// <param name="properties">Egenskaber for systemet under OSWEBDB.</param>
+        /// <returns>Instans af en data proxy for et system under OSWEBDB til brug for unit testing.</returns>
+        private ISystemProxy CreateSut(int nummer, string title, int properties)
+        {
+            return new SystemProxy(nummer, title, properties);
+        }
+
+        /// <summary>
+        /// Creates a stub for the MySQL data reader.
+        /// </summary>
+        /// <returns>Stub for the MySQL data reader.</returns>
+        private MySqlDataReader CreateMySqlDataReader(int? number = null, string title = null, int? properties = null)
+        {
+            MySqlDataReader mySqlDataReaderMock = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderMock.Stub(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
+                .Return(number ?? _fixture.Create<int>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("Title")))
+                .Return(title ?? _fixture.Create<string>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
+                .Return(properties ?? _fixture.Create<int>())
+                .Repeat.Any();
+            return mySqlDataReaderMock;
+        }
+
+        /// <summary>
+        /// Creates a mockup for the data provider which uses MySQL.
+        /// </summary>
+        /// <returns>Mockup for the data provider which uses MySQL.</returns>
+        private IMySqlDataProvider CreateMySqlDataProvider()
+        {
+            return MockRepository.GenerateMock<IMySqlDataProvider>();
         }
     }
 }
