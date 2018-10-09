@@ -110,6 +110,7 @@
     <Compile Include="DataProxies\DbCommandBuilderBase.cs" />
     <Compile Include="DataProxies\FoodWaste\FoodWasteCommandBuilder.cs" />
     <Compile Include="DataProviders\FoodWasteDataProvider.cs" />
+    <Compile Include="DataProxies\FoodWaste\SystemDataCommandBuilder.cs" />
     <Compile Include="DataProxies\Fælles\CommonCommandBuilder.cs" />
     <Compile Include="DataProxies\Kalender\CalenderCommandBuilder.cs" />
     <Compile Include="DataProxies\MySqlCommandBuilderBase.cs" />

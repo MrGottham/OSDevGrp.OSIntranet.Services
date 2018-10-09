@@ -1,4 +1,6 @@
 ﻿using System;
+using MySql.Data.MySqlClient;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 
 namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
 {
@@ -13,13 +15,15 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         public const string MySqlDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
         /// <summary>
-        /// Gets the SQL statement for selecting the translations to a given domain object in the food waste domain.
+        /// Gets the SQL command for selecting the translations to a given domain object in the food waste domain.
         /// </summary>
         /// <param name="translationOfIdentifier">Identifier for the given domain object on which to get the translations.</param>
-        /// <returns>SQL statement for selecting the translations to a given domain object in the food waste domain.</returns>
-        public static string GetSqlStatementForSelectingTranslations(Guid translationOfIdentifier)
+        /// <returns>SQL command for selecting the translations to a given domain object in the food waste domain.</returns>
+        public static MySqlCommand GetSqlStatementForSelectingTranslations(Guid translationOfIdentifier)
         {
-            return string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", translationOfIdentifier.ToString("D").ToUpper());
+            return new SystemDataCommandBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddTranslationOfIdentifierParameter(translationOfIdentifier)
+                .Build();
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
@@ -38,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy
+        #region IMySqlDataProxy Members
 
         /// <summary>
         /// Gets the unique identification for the translation.
@@ -55,56 +56,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
-        /// <summary>
-        /// Gets the SQL statement for selecting a given translation.
-        /// </summary>
-        /// <param name="translation">Translation for which to get the SQL statement for selecting.</param>
-        /// <returns>SQL statement for selecting a given translation.</returns>
-        public virtual string GetSqlQueryForId(ITranslation translation)
-        {
-            if (translation == null)
-            {
-                throw new ArgumentNullException("translation");
-            }
-            if (translation.Identifier.HasValue)
-            {
-                return string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.TranslationIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier", translation.Identifier.Value.ToString("D").ToUpper());
-            }
-            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translation.Identifier, "Identifier"));
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to insert this translation.
-        /// </summary>
-        /// <returns>SQL statement to insert this translation.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            var infoIdentifier = TranslationInfo.Identifier.HasValue ? TranslationInfo.Identifier.Value : Guid.Empty;
-            return string.Format("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES('{0}','{1}','{2}','{3}')", UniqueId, TranslationOfIdentifier.ToString("D").ToUpper(), infoIdentifier.ToString("D").ToUpper(), Value);
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to update this translation.
-        /// </summary>
-        /// <returns>SQL statement to update this translation.</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            var infoIdentifier = TranslationInfo.Identifier.HasValue ? TranslationInfo.Identifier.Value : Guid.Empty;
-            return string.Format("UPDATE Translations SET OfIdentifier='{1}',InfoIdentifier='{2}',Value='{3}' WHERE TranslationIdentifier='{0}'", UniqueId, TranslationOfIdentifier.ToString("D").ToUpper(), infoIdentifier.ToString("D").ToUpper(), Value);
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to delete this translation.
-        /// </summary>
-        /// <returns>SQL statement to delete this translation.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM Translations WHERE TranslationIdentifier='{0}'", UniqueId);
-        }
-
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Maps data from the data reader.
@@ -113,21 +67,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
             Identifier = new Guid(dataReader.GetString("TranslationIdentifier"));
             TranslationOfIdentifier = new Guid(dataReader.GetString("OfIdentifier"));
-            TranslationInfo = new TranslationInfoProxy(dataReader.GetString("CultureName"))
-            {
-                Identifier = new Guid(dataReader.GetString("InfoIdentifier"))
-            };
+            TranslationInfo = dataProvider.Create(new TranslationInfoProxy(), dataReader, "InfoIdentifier", "CultureName");
             Value = dataReader.GetString("Value");
         }
 
@@ -137,10 +82,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
         }
 
         /// <summary>
@@ -150,10 +92,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating</param>
         public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
             if (Identifier.HasValue == false)
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
@@ -166,10 +106,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
             if (Identifier.HasValue == false)
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
@@ -182,7 +120,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for getting this translation of a domain object.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+            return new SystemDataCommandBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.TranslationIdentifier=@translationIdentifier")
+                .AddTranslationIdentifierParameter(Identifier)
+                .Build();
         }
 
         /// <summary>
@@ -191,7 +131,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for inserting this translation of a domain object.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new SystemDataCommandBuilder("INSERT INTO Translations (TranslationIdentifier,OfIdentifier,InfoIdentifier,Value) VALUES(@translationIdentifier,@ofIdentifier,@translationInfoIdentifier,@value)")
+                .AddTranslationIdentifierParameter(Identifier)
+                .AddTranslationOfIdentifierParameter(TranslationOfIdentifier)
+                .AddTranslationInfoIdentifierParameter(TranslationInfo.Identifier)
+                .AddTranslationValueParameter(Value)
+                .Build();
         }
 
         /// <summary>
@@ -200,7 +145,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for updating this translation of a domain object.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new SystemDataCommandBuilder("UPDATE Translations SET OfIdentifier=@ofIdentifier,InfoIdentifier=@translationInfoIdentifier,Value=@value WHERE TranslationIdentifier=@translationIdentifier")
+                .AddTranslationIdentifierParameter(Identifier)
+                .AddTranslationOfIdentifierParameter(TranslationOfIdentifier)
+                .AddTranslationInfoIdentifierParameter(TranslationInfo.Identifier)
+                .AddTranslationValueParameter(Value)
+                .Build();
         }
 
         /// <summary>
@@ -209,8 +159,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for deleting this translation of a domain object.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+            return new SystemDataCommandBuilder("DELETE FROM Translations WHERE TranslationIdentifier=@translationIdentifier")
+                .AddTranslationIdentifierParameter(Identifier)
+                .Build();
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Gets the translations for a given translatable domain object in the food waste domain.
@@ -220,14 +176,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>Translations for a given translatable domain object in the food waste domain.</returns>
         internal static IEnumerable<TranslationProxy> GetDomainObjectTranslations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, Guid translationOfIdentifier)
         {
-            if (dataProvider == null)
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
+            using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                throw new ArgumentNullException("dataProvider");
-            }
-            using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
-            {
-                MySqlCommand command = new FoodWasteCommandBuilder(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(translationOfIdentifier)).Build();
-                return subDataProvider.GetCollection<TranslationProxy>(command);
+                return subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(translationOfIdentifier));
             }
         }
 
@@ -238,10 +191,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="translationOfIdentifier">Identifier for the given domain object on which to delete the translations.</param>
         internal static void DeleteDomainObjectTranslations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, Guid translationOfIdentifier)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
             foreach (var translationProxy in GetDomainObjectTranslations(dataProvider, translationOfIdentifier))
             {
                 using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())

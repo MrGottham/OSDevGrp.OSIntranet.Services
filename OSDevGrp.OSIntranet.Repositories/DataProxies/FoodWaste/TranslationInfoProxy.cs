@@ -2,8 +2,8 @@
 using System.Globalization;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
-using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -52,54 +52,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
-        /// <summary>
-        /// Gets the SQL statement for selecting a given translation information.
-        /// </summary>
-        /// <param name="translationInfo">Translation information for which to get the SQL statement for selecting.</param>
-        /// <returns>SQL statement for selecting a given translation information.</returns>
-        public virtual string GetSqlQueryForId(ITranslationInfo translationInfo)
-        {
-            if (translationInfo == null)
-            {
-                throw new ArgumentNullException("translationInfo");
-            }
-            if (translationInfo.Identifier.HasValue)
-            {
-                return string.Format("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfo.Identifier.Value.ToString("D").ToUpper());
-            }
-            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translationInfo.Identifier, "Identifier"));
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to insert this translation information.
-        /// </summary>
-        /// <returns>SQL statement to insert this translation information.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            return string.Format("INSERT INTO TranslationInfos (TranslationInfoIdentifier,CultureName) VALUES('{0}','{1}')", UniqueId, CultureName);
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to update this translation information.
-        /// </summary>
-        /// <returns>SQL statement to update this translation information.</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            return string.Format("UPDATE TranslationInfos SET CultureName='{1}' WHERE TranslationInfoIdentifier='{0}'", UniqueId, CultureName);
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to delete this translation information.
-        /// </summary>
-        /// <returns>SQL statement to delete this translation information.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", UniqueId);
-        }
-
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Maps data from the data reader.
@@ -108,17 +63,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
-            Identifier = new Guid(dataReader.GetString("TranslationInfoIdentifier"));
-            CultureName = dataReader.GetString("CultureName");
+            Identifier = GetTranslationInfoIdentifier(dataReader, "TranslationInfoIdentifier");
+            CultureName = GetCultureName(dataReader, "CultureName");
             CultureInfo = new CultureInfo(CultureName);
         }
 
@@ -128,10 +77,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
         }
 
         /// <summary>
@@ -159,7 +105,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for getting this translation information which are used for translation.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+            return new SystemDataCommandBuilder("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier=@translationInfoIdentifier")
+                .AddTranslationInfoIdentifierParameter(Identifier)
+                .Build();
         }
 
         /// <summary>
@@ -168,7 +116,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for inserting this translation information which are used for translation.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new SystemDataCommandBuilder("INSERT INTO TranslationInfos (TranslationInfoIdentifier,CultureName) VALUES(@translationInfoIdentifier,@cultureName)")
+                .AddTranslationInfoIdentifierParameter(Identifier)
+                .AddCultureNameParameter(CultureName)
+                .Build();
         }
 
         /// <summary>
@@ -177,7 +128,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for updating this translation information which are used for translation.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new SystemDataCommandBuilder("UPDATE TranslationInfos SET CultureName=@cultureName WHERE TranslationInfoIdentifier=@translationInfoIdentifier")
+                .AddTranslationInfoIdentifierParameter(Identifier)
+                .AddCultureNameParameter(CultureName)
+                .Build();
         }
 
         /// <summary>
@@ -186,7 +140,66 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for deleting this translation information which are used for translation.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+            return new SystemDataCommandBuilder("DELETE FROM TranslationInfos WHERE TranslationInfoIdentifier=@translationInfoIdentifier")
+                .AddTranslationInfoIdentifierParameter(Identifier)
+                .Build();
+        }
+
+        #endregion
+
+        #region IMySqlDataProxyCreator<ITranslationInfoProxy> Members
+
+        /// <summary>
+        /// Creates an instance of the translation information data proxy with values from the data reader.
+        /// </summary>
+        /// <param name="dataReader">Data reader from which column values should be read.</param>
+        /// <param name="dataProvider">Data provider which supports the data reader.</param>
+        /// <param name="columnNameCollection">Collection of column names which should be read from the data reader.</param>
+        /// <returns>Instance of the translation information data proxy with values from the data reader.</returns>
+        public virtual ITranslationInfoProxy Create(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, params string[] columnNameCollection)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(columnNameCollection, nameof(columnNameCollection));
+
+            return new TranslationInfoProxy(GetCultureName(dataReader, columnNameCollection[1]))
+            {
+                Identifier = GetTranslationInfoIdentifier(dataReader, columnNameCollection[0])
+            };
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the translation information identifier from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader from which to read.</param>
+        /// <param name="columnName">The column name for value to read.</param>
+        /// <returns>The translation information identifier.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or <paramref name="columnName"/> is null, empty or white space.</exception>
+        private static Guid GetTranslationInfoIdentifier(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return new Guid(dataReader.GetString(columnName));
+        }
+
+        /// <summary>
+        /// Gets the culture name from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader from which to read.</param>
+        /// <param name="columnName">The column name for value to read.</param>
+        /// <returns>The culture name.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or <paramref name="columnName"/> is null, empty or white space.</exception>
+        private static string GetCultureName(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.GetString(columnName);
         }
 
         #endregion

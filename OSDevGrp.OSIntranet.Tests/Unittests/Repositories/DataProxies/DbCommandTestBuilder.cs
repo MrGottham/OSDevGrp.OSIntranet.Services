@@ -104,6 +104,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         }
 
         /// <summary>
+        /// Adds a char data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="size">The size for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddCharDataParameter(string parameterName, string value, int size, bool isNullable = false)
+        {
+            AddDataParameter(parameterName, value, DbType.StringFixedLength, size, isNullable);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a char data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddCharDataParameter(string parameterName, Guid value, bool isNullable = false)
+        {
+            AddCharDataParameter(parameterName, value.ToString("D").ToUpper(), 36, isNullable);
+            return this;
+        }
+
+        /// <summary>
         /// Adds a text data parameter.
         /// </summary>
         /// <param name="parameterName">The name of the data parameter.</param>

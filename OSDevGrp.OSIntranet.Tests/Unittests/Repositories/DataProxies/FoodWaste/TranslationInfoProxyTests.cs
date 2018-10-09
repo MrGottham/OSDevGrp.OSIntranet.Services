@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -19,18 +19,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class TranslationInfoProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a data proxy for translation information which are used for translation.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializeTranslationInfoProxy()
         {
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
-            Assert.That(translationInfoProxy.Identifier, Is.Null);
-            Assert.That(translationInfoProxy.Identifier.HasValue, Is.False);
-            Assert.That(translationInfoProxy.CultureName, Is.Null);
-            Assert.That(translationInfoProxy.CultureInfo, Is.Null);
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.CultureName, Is.Null);
+            Assert.That(sut.CultureInfo, Is.Null);
         }
 
         /// <summary>
@@ -39,19 +54,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenTranslationInfoHasNoIdentifier()
         {
-            var translationInfoProxy = new TranslationInfoProxy
-            {
-                Identifier = null
-            };
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            sut.Identifier = null;
 
             // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var uniqueId = translationInfoProxy.UniqueId; });
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => {var uniqueId = sut.UniqueId;});
             // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translationInfoProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -60,150 +72,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterGetsUniqueIdentificationForTranslationInfoProxy()
         {
-            var translationInfoProxy = new TranslationInfoProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
+            Guid identifier = Guid.NewGuid();
 
-            var uniqueId = translationInfoProxy.UniqueId;
+            ITranslationInfoProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(uniqueId, Is.EqualTo(translationInfoProxy.Identifier.Value.ToString("D").ToUpper()));
-            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(uniqueId, Is.EqualTo(identifier.ToString("D").ToUpper()));
         }
 
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given translation information is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenTranslationInfoIsNull()
-        {
-            var translationInfoProxy = new TranslationInfoProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<ArgumentNullException>(() => { var sqlQueryForId = translationInfoProxy.GetSqlQueryForId(null); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("translationInfo"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given translation information has no value.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnTranslationInfoHasNoValue()
-        {
-            var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
-            translationInfoMock.Expect(m => m.Identifier)
-                .Return(null)
-                .Repeat.Any();
-
-            var translationInfoProxy = new TranslationInfoProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var sqlQueryForId = translationInfoProxy.GetSqlQueryForId(translationInfoMock); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, translationInfoMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given translation information.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
-        {
-            var translationInfoMock = MockRepository.GenerateMock<ITranslationInfo>();
-            translationInfoMock.Expect(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var translationInfoProxy = new TranslationInfoProxy();
-
-            var sqlQueryForId = translationInfoProxy.GetSqlQueryForId(translationInfoMock);
-            Assert.That(sqlQueryForId, Is.Not.Null);
-            Assert.That(sqlQueryForId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfoMock.Identifier.Value.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert this translation information.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert()
-        {
-            var translationInfoProxy = new TranslationInfoProxy(Thread.CurrentThread.CurrentUICulture.Name)
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = translationInfoProxy.GetSqlCommandForInsert();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO TranslationInfos (TranslationInfoIdentifier,CultureName) VALUES('{0}','{1}')", translationInfoProxy.UniqueId, translationInfoProxy.CultureName)));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update this translation information.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
-        {
-            var translationInfoProxy = new TranslationInfoProxy(Thread.CurrentThread.CurrentUICulture.Name)
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = translationInfoProxy.GetSqlCommandForUpdate();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE TranslationInfos SET CultureName='{1}' WHERE TranslationInfoIdentifier='{0}'", translationInfoProxy.UniqueId, translationInfoProxy.CultureName)));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete this translation information.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
-        {
-            var translationInfoProxy = new TranslationInfoProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = translationInfoProxy.GetSqlCommandForDelete();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("DELETE FROM TranslationInfos WHERE TranslationInfoIdentifier='{0}'", translationInfoProxy.UniqueId)));
-        }
-
-        /// <summary>
-        /// Tests that MapData throws an ArgumentNullException if the data reader is null.
-        /// </summary>
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateMySqlDataProvider()));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationInfoProxy.MapData(null, fixture.Create<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataReader"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
 
         /// <summary>
@@ -212,58 +100,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationInfoProxy.MapData(fixture.Create<MySqlDataReader>(), null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
         /// Tests that MapData and MapRelations maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
+        public void TestThatMapDataMapsDataIntoProxy()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("TranslationInfoIdentifier")))
-                .Return("1D120312-3694-4ADA-9272-A44E791460E6")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("CultureName")))
-                .Return(CultureInfo.CurrentCulture.Name)
-                .Repeat.Any();
+            Guid translationInfoIdentifier = Guid.NewGuid();
+            string cultureName = CultureInfo.CurrentCulture.Name;
+            MySqlDataReader dataReader = CreateMySqlDataReader(translationInfoIdentifier, cultureName);
 
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
-            Assert.That(translationInfoProxy.Identifier, Is.Null);
-            Assert.That(translationInfoProxy.Identifier.HasValue, Is.False);
-            Assert.That(translationInfoProxy.CultureName, Is.Null);
-            Assert.That(translationInfoProxy.CultureInfo, Is.Null);
+            sut.MapData(dataReader, CreateMySqlDataProvider());
 
-            translationInfoProxy.MapData(dataReader, fixture.Create<IMySqlDataProvider>());
-            translationInfoProxy.MapRelations(fixture.Create<IMySqlDataProvider>());
-            Assert.That(translationInfoProxy.Identifier, Is.Not.Null);
-            Assert.That(translationInfoProxy.Identifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(translationInfoProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("TranslationInfoIdentifier")));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(translationInfoProxy.CultureName, Is.Not.Null);
-            Assert.That(translationInfoProxy.CultureName, Is.Not.Empty);
-            Assert.That(translationInfoProxy.CultureName, Is.EqualTo(dataReader.GetString("CultureName")));
-            Assert.That(translationInfoProxy.CultureInfo, Is.Not.Null);
-            Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Null);
-            Assert.That(translationInfoProxy.CultureInfo.Name, Is.Not.Empty);
-            Assert.That(translationInfoProxy.CultureInfo.Name, Is.EqualTo(dataReader.GetString("CultureName")));
+            Assert.That(sut.Identifier, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.EqualTo(translationInfoIdentifier));
+            Assert.That(sut.CultureName, Is.Not.Null);
+            Assert.That(sut.CultureName, Is.Not.Empty);
+            Assert.That(sut.CultureName, Is.EqualTo(cultureName));
+            Assert.That(sut.CultureInfo, Is.Not.Null);
+            Assert.That(sut.CultureInfo.Name, Is.Not.Null);
+            Assert.That(sut.CultureInfo.Name, Is.Not.Empty);
+            Assert.That(sut.CultureInfo.Name, Is.EqualTo(cultureName));
+
+            dataReader.AssertWasCalled(m => m.GetString("TranslationInfoIdentifier"), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString("CultureName"), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -272,18 +143,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapRelations(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => translationInfoProxy.MapRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
@@ -292,14 +157,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
         {
-            var fixture = new Fixture();
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(null, _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.SaveRelations(null, fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -308,15 +171,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateMySqlDataProvider(), _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.SaveRelations(fixture.Create<IMySqlDataProvider>(), fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -325,12 +185,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
         {
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.DeleteRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(null));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -339,15 +199,213 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoProxy = new TranslationInfoProxy();
-            Assert.That(translationInfoProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateMySqlDataProvider()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => translationInfoProxy.DeleteRelations(fixture.Create<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
+        }
+
+        /// <summary>
+        /// Tests that CreateGetCommand returns the SQL command for selecting the given translation information.
+        /// </summary>
+        [Test]
+        public void TestThatCreateGetCommandReturnsSqlCommand()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            ITranslationInfoProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos WHERE TranslationInfoIdentifier=@translationInfoIdentifier")
+                .AddCharDataParameter("@translationInfoIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateInsertCommand returns the SQL command to insert this translation information.
+        /// </summary>
+        [Test]
+        public void TestThatCreateInsertCommandReturnsSqlCommandForInsert()
+        {
+            Guid identifier = Guid.NewGuid();
+            string cultureName = Thread.CurrentThread.CurrentUICulture.Name;
+
+            ITranslationInfoProxy sut = CreateSut(identifier, cultureName);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("INSERT INTO TranslationInfos (TranslationInfoIdentifier,CultureName) VALUES(@translationInfoIdentifier,@cultureName)")
+                .AddCharDataParameter("@translationInfoIdentifier", identifier)
+                .AddCharDataParameter("@cultureName", cultureName, 5)
+                .Build()
+                .Run(sut.CreateInsertCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateUpdateCommand returns the SQL command to update this translation information.
+        /// </summary>
+        [Test]
+        public void TestThatCreateUpdateCommandReturnsSqlCommandForUpdate()
+        {
+            Guid identifier = Guid.NewGuid();
+            string cultureName = Thread.CurrentThread.CurrentUICulture.Name;
+
+            ITranslationInfoProxy sut = CreateSut(identifier, cultureName);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("UPDATE TranslationInfos SET CultureName=@cultureName WHERE TranslationInfoIdentifier=@translationInfoIdentifier")
+                .AddCharDataParameter("@translationInfoIdentifier", identifier)
+                .AddCharDataParameter("@cultureName", cultureName, 5)
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateDeleteCommand returns the SQL command to delete this translation information.
+        /// </summary>
+        [Test]
+        public void TestThatCreateDeleteCommandReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            ITranslationInfoProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("DELETE FROM TranslationInfos WHERE TranslationInfoIdentifier=@translationInfoIdentifier")
+                .AddCharDataParameter("@translationInfoIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data reader is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataReaderIsNull()
+        {
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(null, CreateMySqlDataProvider(), _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), null, _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the column name collection is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfColumnNameCollectionIsNull()
+        {
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), CreateMySqlDataProvider(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "columnNameCollection");
+        }
+
+        /// <summary>
+        /// Tests that Creates creates a new translation information data proxy from the data reader.
+        /// </summary>
+        [Test]
+        public void TestThatCreateCreatesTranslationInfoProxy()
+        {
+            ITranslationInfoProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid translationInfoIdentifier = Guid.NewGuid();
+            string cultureName = CultureInfo.CurrentCulture.Name;
+            MySqlDataReader dataReader = CreateMySqlDataReader(translationInfoIdentifier, cultureName);
+
+            ITranslationInfoProxy result = sut.Create(dataReader, CreateMySqlDataProvider(), "TranslationInfoIdentifier", "CultureName");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Identifier, Is.Not.Null);
+            Assert.That(result.Identifier, Is.EqualTo(translationInfoIdentifier));
+            Assert.That(result.CultureName, Is.Not.Null);
+            Assert.That(result.CultureName, Is.Not.Empty);
+            Assert.That(result.CultureName, Is.EqualTo(cultureName));
+            Assert.That(result.CultureInfo, Is.Not.Null);
+            Assert.That(result.CultureInfo.Name, Is.Not.Null);
+            Assert.That(result.CultureInfo.Name, Is.Not.Empty);
+            Assert.That(result.CultureInfo.Name, Is.EqualTo(cultureName));
+
+            dataReader.AssertWasCalled(m => m.GetString("TranslationInfoIdentifier"), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString("CultureName"), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy to translation information which are used for translation.
+        /// </summary>
+        /// <returns>Instance of the data proxy to translation information which are used for translation.</returns>
+        private ITranslationInfoProxy CreateSut()
+        {
+            return new TranslationInfoProxy();
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy to translation information which are used for translation.
+        /// </summary>
+        /// <returns>Instance of the data proxy to translation information which are used for translation.</returns>
+        private ITranslationInfoProxy CreateSut(Guid identifier)
+        {
+            return new TranslationInfoProxy
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy to translation information which are used for translation.
+        /// </summary>
+        /// <returns>Instance of the data proxy to translation information which are used for translation.</returns>
+        private ITranslationInfoProxy CreateSut(Guid identifier, string cultureName)
+        {
+            return new TranslationInfoProxy(cultureName)
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates a stub for the MySQL data reader.
+        /// </summary>
+        /// <returns>Stub for the MySQL data reader.</returns>
+        private MySqlDataReader CreateMySqlDataReader(Guid? translationInfoIdentifier = null, string cultureName = null)
+        {
+            MySqlDataReader mySqlDataReaderMock = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("TranslationInfoIdentifier")))
+                .Return(translationInfoIdentifier.HasValue ? translationInfoIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("CultureName")))
+                .Return(cultureName ?? CultureInfo.CurrentCulture.Name)
+                .Repeat.Any();
+            return mySqlDataReaderMock;
+        }
+
+        /// <summary>
+        /// Creates a mockup for the data provider which uses MySQL.
+        /// </summary>
+        /// <returns>Mockup for the data provider which uses MySQL.</returns>
+        private IMySqlDataProvider CreateMySqlDataProvider()
+        {
+            return MockRepository.GenerateMock<IMySqlDataProvider>();
         }
     }
 }

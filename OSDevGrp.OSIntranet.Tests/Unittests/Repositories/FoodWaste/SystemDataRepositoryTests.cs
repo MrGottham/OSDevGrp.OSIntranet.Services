@@ -13,6 +13,8 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using AutoFixture;
 using MySql.Data.MySqlClient;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
+using OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
@@ -25,10 +27,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
     {
         #region Private variables
 
+        private Fixture _fixture;
         private IFoodWasteDataProvider _foodWasteDataProviderMock;
         private IFoodWasteObjectMapper _foodWasteObjectMapperMock;
 
         #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            _foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+        }
 
         /// <summary>
         /// Tests that the constructor initialize a repository which can access system data for the food waste domain.
@@ -862,14 +876,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeCallsGetCollectionOnFoodWasteDataProvider()
         {
+            IEnumerable<StaticTextProxy> staticTextProxyCollection = Enum.GetValues(typeof(StaticTextType))
+                .Cast<StaticTextType>()
+                .Select(staticTextType => new StaticTextProxy(staticTextType, Guid.NewGuid()))
+                .ToList();
+
+            ISystemDataRepository sut = CreateSut(staticTextProxyCollection: staticTextProxyCollection);
+            Assert.That(sut, Is.Not.Null);
+
             foreach (StaticTextType staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
             {
-                StaticTextProxy staticText = new StaticTextProxy(staticTextTypeToTest, Guid.NewGuid());
-                IEnumerable<StaticTextProxy> staticTextProxyCollection = new List<StaticTextProxy> { staticText };
-
-                ISystemDataRepository sut = CreateSut(staticTextProxyCollection: staticTextProxyCollection);
-                Assert.That(sut, Is.Not.Null);
-
                 sut.StaticTextGetByStaticTextType(staticTextTypeToTest);
 
                 _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int) staticTextTypeToTest}")));
@@ -1342,7 +1358,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.TranslationsForDomainObjectGet(identifiableDomainObjectMock);
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{identifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", identifier)
+                .Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1351,11 +1370,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatTranslationsForDomainObjectGetReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
             IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
-            IEnumerable<TranslationProxy> translationProxyCollection = BuildTranslationProxyCollection(fixture);
+            IEnumerable<TranslationProxy> translationProxyCollection = BuildTranslationProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(translationProxyCollection: translationProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -1374,8 +1391,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatTranslationsForDomainObjectGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
@@ -1393,8 +1409,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatTranslationsForDomainObjectGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
@@ -1417,7 +1432,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.TranslationInfoGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationInfoProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName").Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationInfoProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1426,9 +1442,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatTranslationInfoGetAllReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
-            IEnumerable<TranslationInfoProxy> translationInfoProxyCollection = BuildTranslationInfoProxyCollection(fixture);
+            IEnumerable<TranslationInfoProxy> translationInfoProxyCollection = BuildTranslationInfoProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(translationInfoProxyCollection: translationInfoProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -1447,8 +1461,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatTranslationInfoGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1464,8 +1477,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatTranslationInfoGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1481,7 +1493,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Instance of the repository which can access system data for the food waste domain.</returns>
         private ISystemDataRepository CreateSut(IEnumerable<StorageTypeProxy> storageTypeProxyCollection = null, IEnumerable<FoodItemProxy> foodItemProxyCollection = null, IEnumerable<FoodGroupProxy> foodGroupProxyCollection = null, IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = null, IEnumerable<StaticTextProxy> staticTextProxyCollection = null, IEnumerable<DataProviderProxy> dataProviderProxyCollection = null, IEnumerable<TranslationProxy> translationProxyCollection = null, IEnumerable<TranslationInfoProxy> translationInfoProxyCollection = null, DataProviderProxy dataProviderProxy = null, Exception exceptionToThrow = null)
         {
-            _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             if (exceptionToThrow != null)
             {
                 _foodWasteDataProviderMock.Stub(m => m.GetCollection<StorageTypeProxy>(Arg<MySqlCommand>.Is.Anything))
@@ -1543,8 +1554,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
                     .Repeat.Any();
             }
 
-            _foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
             return new SystemDataRepository(_foodWasteDataProviderMock, _foodWasteObjectMapperMock);
         }
 
@@ -1554,10 +1563,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Collection of storage type proxies which can be used for unit testing</returns>
         private static IEnumerable<StorageTypeProxy> BuildStorageTypeProxyCollection(Fixture fixture)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+            ArgumentNullGuard.NotNull(fixture, nameof(fixture));
 
             return fixture.CreateMany<StorageTypeProxy>(5);
         }
@@ -1582,10 +1588,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Collection of food groups proxies which can be used for unit testing</returns>
         private static IEnumerable<FoodGroupProxy> BuildFoodGroupProxyCollection(Fixture fixture)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+            ArgumentNullGuard.NotNull(fixture, nameof(fixture));
 
             return new List<FoodGroupProxy>
             {
@@ -1607,10 +1610,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Collection of foreign key proxies which can be used for unit testing</returns>
         private static IEnumerable<ForeignKeyProxy> BuildForeignKeyProxyCollection(Fixture fixture)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+            ArgumentNullGuard.NotNull(fixture, nameof(fixture));
 
             return fixture.CreateMany<ForeignKeyProxy>(25).ToList();
         }
@@ -1621,10 +1621,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Collection of static text proxies which can be used for unit testing</returns>
         private static IEnumerable<StaticTextProxy> BuildStaticTextProxyCollection(Fixture fixture)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+            ArgumentNullGuard.NotNull(fixture, nameof(fixture));
 
             return new List<StaticTextProxy>
             {
@@ -1642,10 +1639,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Collection of data provider proxies which can be used for unit testing</returns>
         private static IEnumerable<DataProviderProxy> BuildDataProviderProxyCollection(Fixture fixture)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+            ArgumentNullGuard.NotNull(fixture, nameof(fixture));
 
             return fixture.CreateMany<DataProviderProxy>(7).ToList();
         }
@@ -1656,10 +1650,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Collection of translation proxies which can be used for unit testing</returns>
         private static IEnumerable<TranslationProxy> BuildTranslationProxyCollection(Fixture fixture)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+            ArgumentNullGuard.NotNull(fixture, nameof(fixture));
 
             return fixture.CreateMany<TranslationProxy>(15).ToList();
         }
@@ -1670,10 +1661,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         /// <returns>Collection of translation proxies which can be used for unit testing</returns>
         private static IEnumerable<TranslationInfoProxy> BuildTranslationInfoProxyCollection(Fixture fixture)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+            ArgumentNullGuard.NotNull(fixture, nameof(fixture));
 
             return fixture.CreateMany<TranslationInfoProxy>(3).ToList();
         }

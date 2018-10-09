@@ -6,14 +6,14 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies
 {
     /// <summary>
-    /// Internal builder which can build a MySQL commands for SQL statements.
+    /// Internal builder which can build a MySQL command for SQL statements.
     /// </summary>
     internal abstract class MySqlCommandBuilderBase : DbCommandBuilderBase<MySqlCommand>
     {
         #region Constructor
 
         /// <summary>
-        /// Creates an instance of the internal builder which can build a MySQL commands for SQL statements. 
+        /// Creates an instance of the internal builder which can build a MySQL command for SQL statements. 
         /// </summary>
         /// <param name="sqlStatement">The SQL statement for the MySQL command.</param>
         /// <param name="timeout">Wait time (in seconds) before terminating the attempt to execute a command and generating an error.</param>
@@ -88,6 +88,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         protected void AddVarCharParameter(string parameterName, string value, int size = 0, bool isNullable = false)
         {
             AddParameter(parameterName, value, MySqlDbType.VarChar, size, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a char parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="size">The size for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddCharParameter(string parameterName, string value, int size = 0, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.String, size, isNullable);
         }
 
         /// <summary>

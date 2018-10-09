@@ -7,7 +7,7 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.DataProviders;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -402,16 +402,13 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>All translations for the given domain object.</returns>
         public virtual IEnumerable<ITranslation> TranslationsForDomainObjectGet(IIdentifiable identifiableDomainObject)
         {
-            if (identifiableDomainObject == null)
-            {
-                throw new ArgumentNullException(nameof(identifiableDomainObject));
-            }
+            ArgumentNullGuard.NotNull(identifiableDomainObject, nameof(identifiableDomainObject));
+
             try
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    MySqlCommand command = new FoodWasteCommandBuilder(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(identifiableDomainObject.Identifier.Value)).Build();
-                    return DataProvider.GetCollection<TranslationProxy>(command);
+                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(identifiableDomainObject.Identifier.Value));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }
