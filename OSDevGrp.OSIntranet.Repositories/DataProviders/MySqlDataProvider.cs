@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Transactions;
@@ -18,8 +19,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
     {
         #region Private variables
 
-        protected readonly MySqlConnection MySqlConnection;
-        private readonly bool _clonedWithinTransaction;
+        private readonly MySqlConnection _mySqlConnection;
+        private readonly bool _clonedWithReusableConnection;
 
         #endregion
 
@@ -34,22 +35,22 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         {
             ArgumentNullGuard.NotNull(connectionStringSettings, nameof(connectionStringSettings));
 
-            MySqlConnection = new MySqlConnection(connectionStringSettings.ConnectionString);
-            _clonedWithinTransaction = false;
+            _mySqlConnection = new MySqlConnection(connectionStringSettings.ConnectionString);
+            _clonedWithReusableConnection = false;
         }
 
         /// <summary>
         /// Danner en data provider, som benytter MySql.
         /// </summary>
         /// <param name="mySqlConnection">Eksisterende MySql connection.</param>
-        /// <param name="clonedWithinTransaction">True, ved en igangværende transaktion ellers false.</param>
+        /// <param name="clonedWithReusableConnection">True, ved en genbrugelig conntion ellers false.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="mySqlConnection"/> is null.</exception>
-        protected MySqlDataProvider(MySqlConnection mySqlConnection, bool clonedWithinTransaction)
+        protected MySqlDataProvider(MySqlConnection mySqlConnection, bool clonedWithReusableConnection)
         {
             ArgumentNullGuard.NotNull(mySqlConnection, nameof(mySqlConnection));
 
-            MySqlConnection = mySqlConnection;
-            _clonedWithinTransaction = clonedWithinTransaction;
+            _mySqlConnection = mySqlConnection;
+            _clonedWithReusableConnection = clonedWithReusableConnection;
         }
 
         #endregion
@@ -61,20 +62,43 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// </summary>
         public override void Dispose()
         {
-            if (_clonedWithinTransaction)
+            if (_clonedWithReusableConnection)
             {
                 return;
             }
-            MySqlConnection.Dispose();
+            _mySqlConnection.Dispose();
         }
 
         /// <summary>
         /// Danner ny instans af data provideren til MySql.
         /// </summary>
-        /// <returns>Ny instans af data provideren til MSql.</returns>
-        public override object Clone()
+        /// <returns>Ny instans af data provideren til MySql.</returns>
+        public sealed override object Clone()
         {
-            return Transaction.Current == null ? new MySqlDataProvider((MySqlConnection) MySqlConnection.Clone(), false) : new MySqlDataProvider(MySqlConnection, true);
+            if (Transaction.Current != null)
+            {
+                return Clone(_mySqlConnection, true);
+            }
+
+            if (_mySqlConnection.State == ConnectionState.Open)
+            {
+                return Clone(_mySqlConnection, true);
+            }
+
+            return Clone((MySqlConnection) _mySqlConnection.Clone(), false);
+        }
+
+        /// <summary>
+        /// Danner ny instans af data provideren til MySql.
+        /// </summary>
+        /// <param name="mySqlConnection">Connection, som skal bruges i den nye data provider.</param>
+        /// <param name="clonedWithReusableConnection">Angiver, om data provideren skal klones med samme connection.</param>
+        /// <returns>Ny instans af data provideren til MySql.</returns>
+        protected virtual object Clone(MySqlConnection mySqlConnection, bool clonedWithReusableConnection)
+        {
+            ArgumentNullGuard.NotNull(mySqlConnection, nameof(mySqlConnection));
+
+            return new MySqlDataProvider(mySqlConnection, clonedWithReusableConnection);
         }
 
         /// <summary>
@@ -94,7 +118,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 List<TDataProxy> collection = new List<TDataProxy>();
                 using (MySqlCommand command = queryCommand)
                 {
-                    command.Connection = MySqlConnection;
+                    command.Connection = _mySqlConnection;
                     using (MySqlDataReader reader = command.ExecuteReader())
                     {
                         if (reader.HasRows == false)
@@ -136,7 +160,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             {
                 using (MySqlCommand command = dataProxy.CreateGetCommand())
                 {
-                    command.Connection = MySqlConnection;
+                    command.Connection = _mySqlConnection;
 
                     bool dataHasBeenReaded = false;
                     TDataProxy result = new TDataProxy();
@@ -186,9 +210,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             Open();
             try
             {
+                if (Transaction.Current != null)
+                {
+                    _mySqlConnection.EnlistTransaction(Transaction.Current);
+                }
                 using (MySqlCommand command = dataProxy.CreateInsertCommand())
                 {
-                    command.Connection = MySqlConnection;
+                    command.Connection = _mySqlConnection;
                     command.ExecuteNonQuery();
                 }
                 dataProxy.SaveRelations(this, true);
@@ -214,9 +242,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             Open();
             try
             {
+                if (Transaction.Current != null)
+                {
+                    _mySqlConnection.EnlistTransaction(Transaction.Current);
+                }
                 using (MySqlCommand command = dataProxy.CreateUpdateCommand())
                 {
-                    command.Connection = MySqlConnection;
+                    command.Connection = _mySqlConnection;
                     command.ExecuteNonQuery();
                 }
                 dataProxy.SaveRelations(this, false);
@@ -241,10 +273,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
             Open();
             try
             {
+                if (Transaction.Current != null)
+                {
+                    _mySqlConnection.EnlistTransaction(Transaction.Current);
+                }
                 dataProxy.DeleteRelations(this);
                 using (MySqlCommand command = dataProxy.CreateDeleteCommand())
                 {
-                    command.Connection = MySqlConnection;
+                    command.Connection = _mySqlConnection;
                     command.ExecuteNonQuery();
                 }
             }
@@ -259,15 +295,21 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// </summary>
         private void Open()
         {
-            if (_clonedWithinTransaction && MySqlConnection.State == ConnectionState.Open)
+            if (_clonedWithReusableConnection)
+            {
+                if (_mySqlConnection.State == ConnectionState.Open)
+                {
+                    return;
+                }
+                throw new NotSupportedException();
+            }
+
+            if (_mySqlConnection.State == ConnectionState.Open)
             {
                 return;
             }
-            if (MySqlConnection.State == ConnectionState.Open)
-            {
-                return;
-            }
-            MySqlConnection.Open();
+
+            _mySqlConnection.Open();
         }
 
         /// <summary>
@@ -275,11 +317,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// </summary>
         private void Close()
         {
-            if (_clonedWithinTransaction)
+            if (_clonedWithReusableConnection)
             {
                 return;
             }
-            MySqlConnection.Close();
+            _mySqlConnection.Close();
         }
 
         #endregion

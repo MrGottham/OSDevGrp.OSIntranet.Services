@@ -64,9 +64,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
             ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
                 .NotNull(dataProvider, nameof(dataProvider));
 
-            Nummer = dataReader.GetInt32("SystemNo");
-            Titel = dataReader.GetString("Title");
-            Properties = dataReader.GetInt32("Properties");
+            Nummer = GetSystemNo(dataReader, "SystemNo");
+            Titel = GetTitle(dataReader, "Title");
+            Properties = GetProperties(dataReader, "Properties");
         }
 
         /// <summary>
@@ -140,6 +140,79 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
             return new CommonCommandBuilder("DELETE FROM Systems WHERE SystemNo=@systemNo")
                 .AddSystemNoParameter(Nummer)
                 .Build();
+        }
+
+        #endregion
+
+        #region IMySqlDataProxyCreator<ISystemProxy> Members
+
+        /// <summary>
+        /// Creates an instance of the system data proxy with values from the data reader.
+        /// </summary>
+        /// <param name="dataReader">Data reader from which column values should be read.</param>
+        /// <param name="dataProvider">Data provider which supports the data reader.</param>>
+        /// <param name="columnNameCollection">Collection of column names which should be read from the data reader.</param>
+        /// <returns>Instance of the system data proxy with values from the data reader.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="dataReader"/>, <paramref name="dataProvider"/> or <paramref name="columnNameCollection"/> is null.</exception>
+        public virtual ISystemProxy Create(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, params string[] columnNameCollection)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(columnNameCollection, nameof(columnNameCollection));
+
+            return new SystemProxy(
+                GetSystemNo(dataReader, columnNameCollection[0]),
+                GetTitle(dataReader, columnNameCollection[1]),
+                GetProperties(dataReader, columnNameCollection[2]));
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the system number from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>System number.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or when <paramref name="columnName"/> is null, empty or whitespace.</exception>
+        private static int GetSystemNo(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.GetInt32(columnName);
+        }
+
+        /// <summary>
+        /// Gets the title from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Title.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or when <paramref name="columnName"/> is null, empty or whitespace.</exception>
+        private static string GetTitle(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.GetString(columnName);
+        }
+
+        /// <summary>
+        /// Gets the properties from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Properties.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or when <paramref name="columnName"/> is null, empty or whitespace.</exception>
+        private static int GetProperties(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.IsDBNull(dataReader.GetOrdinal(columnName)) ? 0 : dataReader.GetInt32(columnName);
         }
 
         #endregion

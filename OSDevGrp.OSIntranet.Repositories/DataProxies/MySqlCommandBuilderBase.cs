@@ -8,7 +8,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
     /// <summary>
     /// Internal builder which can build a MySQL commands for SQL statements.
     /// </summary>
-    internal class MySqlCommandBuilder : DbCommandBuilderBase<MySqlCommand>
+    internal abstract class MySqlCommandBuilderBase : DbCommandBuilderBase<MySqlCommand>
     {
         #region Constructor
 
@@ -18,7 +18,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         /// <param name="sqlStatement">The SQL statement for the MySQL command.</param>
         /// <param name="timeout">Wait time (in seconds) before terminating the attempt to execute a command and generating an error.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="sqlStatement"/> is null, empty or white space.</exception>
-        internal MySqlCommandBuilder(string sqlStatement, int timeout = 30)
+        protected MySqlCommandBuilderBase(string sqlStatement, int timeout = 30)
         {
             ArgumentNullGuard.NotNullOrWhiteSpace(sqlStatement, nameof(sqlStatement));
 
@@ -59,9 +59,22 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         /// <param name="size">The size for the parameter.</param>
         /// <param name="isNullable">Indicates whether the parameter can be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
-        protected void AddSmallIntParameter(string parameterName, object value, int size = 0, bool isNullable = false)
+        protected void AddSmallIntParameter(string parameterName, int? value, int size = 0, bool isNullable = false)
         {
             AddParameter(parameterName, value, MySqlDbType.Int16, size, isNullable);
+        }
+
+        /// <summary>
+        /// Adds an int parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="size">The size for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddIntParameter(string parameterName, int? value, int size = 0, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.Int32, size, isNullable);
         }
 
         /// <summary>
@@ -72,9 +85,57 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         /// <param name="size">The size for the parameter.</param>
         /// <param name="isNullable">Indicates whether the parameter can be null.</param>
         /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
-        protected void AddVarCharParameter(string parameterName, object value, int size = 0, bool isNullable = false)
+        protected void AddVarCharParameter(string parameterName, string value, int size = 0, bool isNullable = false)
         {
             AddParameter(parameterName, value, MySqlDbType.VarChar, size, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a varchar text to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddTextParameter(string parameterName, string value, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.Text, 0, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a date parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddDateParameter(string parameterName, DateTime? value, bool isNullable = false)
+        {
+            AddParameter(parameterName, value?.Date, MySqlDbType.Date, isNullable: isNullable);
+        }
+
+        /// <summary>
+        /// Adds a time parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddTimeParameter(string parameterName, DateTime? value, bool isNullable = false)
+        {
+            AddTimeParameter(parameterName, value?.TimeOfDay, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a time parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddTimeParameter(string parameterName, TimeSpan? value, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.Time, isNullable: isNullable);
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
-﻿using System;
-using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+﻿using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
 namespace OSDevGrp.OSIntranet.Domain.Kalender
 {
@@ -11,8 +11,8 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
     {
         #region Private variables
 
-        private readonly ISystem _system;
-        private readonly int _id;
+        private ISystem _system;
+        private int _id;
         private string _initialer;
         private string _navn;
 
@@ -29,18 +29,10 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// <param name="navn">Navn på brugeren.</param>
         public Bruger(ISystem system, int id, string initialer, string navn)
         {
-            if (system == null)
-            {
-                throw new ArgumentNullException("system");
-            }
-            if (string.IsNullOrEmpty(initialer))
-            {
-                throw new ArgumentNullException("initialer");
-            }
-            if (string.IsNullOrEmpty(navn))
-            {
-                throw new ArgumentNullException("navn");
-            }
+            ArgumentNullGuard.NotNull(system, nameof(system))
+                .NotNullOrWhiteSpace(initialer, nameof(initialer))
+                .NotNullOrWhiteSpace(navn, nameof(navn));
+
             _system = system;
             _id = id;
             _initialer = initialer;
@@ -56,9 +48,12 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual ISystem System
         {
-            get
+            get => _system;
+            protected set
             {
-                return _system;
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _system = value;
             }
         }
 
@@ -67,10 +62,8 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual int Id
         {
-            get
-            {
-                return _id;
-            }
+            get => _id;
+            protected set => _id = value;
         }
 
         /// <summary>
@@ -78,16 +71,11 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual string Initialer
         {
-            get
-            {
-                return _initialer;
-            }
+            get => _initialer;
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException("value");
-                }
+                ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
                 _initialer = value;
             }
         }
@@ -97,16 +85,11 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual string Navn
         {
-            get
-            {
-                return _navn;
-            }
+            get => _navn;
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException("value");
-                }
+                ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
                 _navn = value;
             }
         }

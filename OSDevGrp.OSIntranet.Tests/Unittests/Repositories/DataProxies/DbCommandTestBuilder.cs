@@ -76,6 +76,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         }
 
         /// <summary>
+        /// Adds an int data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="size">The size for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddIntDataParameter(string parameterName, int? value, int size, bool isNullable = false)
+        {
+            AddDataParameter(parameterName, value, DbType.Int32, size, isNullable);
+            return this;
+        }
+
+        /// <summary>
         /// Adds a varchar data parameter.
         /// </summary>
         /// <param name="parameterName">The name of the data parameter.</param>
@@ -86,6 +100,57 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         public IDbCommandTestBuilder AddVarCharDataParameter(string parameterName, string value, int size, bool isNullable = false)
         {
             AddDataParameter(parameterName, value, DbType.String, size, isNullable);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a text data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddTextDataParameter(string parameterName, string value, bool isNullable = false)
+        {
+            AddDataParameter(parameterName, value, value == null ? DbType.AnsiString : DbType.String, isNullable: isNullable);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a date data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddDateParameter(string parameterName, DateTime? value, bool isNullable = false)
+        {
+            AddDataParameter(parameterName, value?.Date, DbType.Date, isNullable: isNullable);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a time data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddTimeParameter(string parameterName, DateTime? value, bool isNullable = false)
+        {
+            return AddTimeParameter(parameterName, value?.TimeOfDay, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a time data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddTimeParameter(string parameterName, TimeSpan? value, bool isNullable = false)
+        {
+            AddDataParameter(parameterName, value, DbType.Time, isNullable: isNullable);
             return this;
         }
 

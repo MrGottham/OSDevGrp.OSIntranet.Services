@@ -3,7 +3,7 @@
     /// <summary>
     /// Internal builder which can build a MySQL commands for SQL statements used by the <see cref="DataProviders.FoodWasteDataProvider"/>.
     /// </summary>
-    internal class FoodWasteCommandBuilder : MySqlCommandBuilder
+    internal class FoodWasteCommandBuilder : MySqlCommandBuilderBase
     {
         #region Constructor
 

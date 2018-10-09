@@ -1,9 +1,9 @@
 ﻿using System;
-using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
-using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using AutoFixture;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles;
 using Rhino.Mocks;
 
@@ -94,25 +94,43 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         /// Tester, at MapData mapper data proxy for et system under OSWEBDB.
         /// </summary>
         [Test]
-        public void TestAtMapDataMapperSystemProxy()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestAtMapDataMapperSystemProxy(bool hasProperties)
         {
             ISystemProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
             int number = _fixture.Create<int>();
             string title = _fixture.Create<string>();
-            int properties = _fixture.Create<int>();
+            int? properties = hasProperties ? _fixture.Create<int>() : (int?) null;
             MySqlDataReader dataReader = CreateMySqlDataReader(number, title, properties);
 
             sut.MapData(dataReader, CreateMySqlDataProvider());
 
             Assert.That(sut.Nummer, Is.EqualTo(number));
             Assert.That(sut.Titel, Is.EqualTo(title));
-            Assert.That(sut.Properties, Is.EqualTo(properties));
+            if (hasProperties)
+            {
+                Assert.That(sut.Properties, Is.EqualTo(properties));
+            }
+            else
+            {
+                Assert.That(sut.Properties, Is.EqualTo(0));
+            }
 
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Title")), opt => opt.Repeat.Once());
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(2)), opt => opt.Repeat.Once());
+            if (hasProperties)
+            {
+                dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+            }
+            else
+            {
+                dataReader.AssertWasNotCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
+            }
         }
 
         /// <summary>
@@ -192,6 +210,91 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
         }
 
         /// <summary>
+        /// Tests that Create throws ArgumentNullException when the data reader is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionWhenDataReaderIsNull()
+        {
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(null, CreateMySqlDataProvider(), "SystemNo", "Title", "Properties"));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
+        }
+
+        /// <summary>
+        /// Tests that Create throws ArgumentNullException when the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionWhenDataProviderIsNull()
+        {
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), null, "SystemNo", "Title", "Properties"));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that Create throws ArgumentNullException when the collection of column names is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionWhenColumnNameCollectionIsNull()
+        {
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), CreateMySqlDataProvider(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "columnNameCollection");
+        }
+
+        /// <summary>
+        /// Tester, at Create crates a system data proxy for a system within OSWEBDB.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateCreatesSystemProxy(bool hasProperties)
+        {
+            ISystemProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            int number = _fixture.Create<int>();
+            string title = _fixture.Create<string>();
+            int? properties = hasProperties ? _fixture.Create<int>() : (int?) null;
+            MySqlDataReader dataReader = CreateMySqlDataReader(number, title, properties);
+
+            ISystemProxy result = sut.Create(dataReader, CreateMySqlDataProvider(), "SystemNo", "Title", "Properties");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Nummer, Is.EqualTo(number));
+            Assert.That(result.Titel, Is.EqualTo(title));
+            if (hasProperties)
+            {
+                Assert.That(result.Properties, Is.EqualTo(properties));
+            }
+            else
+            {
+                Assert.That(result.Properties, Is.EqualTo(0));
+            }
+
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Title")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(2)), opt => opt.Repeat.Once());
+            if (hasProperties)
+            {
+                dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+            }
+            else
+            {
+                dataReader.AssertWasNotCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
+            }
+        }
+
+        /// <summary>
         /// Danner en instans af en data proxy for et system under OSWEBDB til brug for unit testing. 
         /// </summary>
         /// <returns>Instans af en data proxy for et system under OSWEBDB til brug for unit testing.</returns>
@@ -234,6 +337,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Fælles
                 .Repeat.Any();
             mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("Title")))
                 .Return(title ?? _fixture.Create<string>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("Properties")))
+                .Return(2)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(2)))
+                .Return(properties.HasValue == false)
                 .Repeat.Any();
             mySqlDataReaderMock.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
                 .Return(properties ?? _fixture.Create<int>())

@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles
     /// <summary>
     /// Command builder which can build command to the common repository.
     /// </summary>
-    internal class CommonCommandBuilder : MySqlCommandBuilder
+    internal class CommonCommandBuilder : MySqlCommandBuilderBase
     {
         #region Constructor
 

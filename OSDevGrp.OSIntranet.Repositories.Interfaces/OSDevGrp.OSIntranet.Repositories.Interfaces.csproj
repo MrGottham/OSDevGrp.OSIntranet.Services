@@ -91,7 +91,6 @@
     <Compile Include="DataProxies\FoodWaste\ITranslationProxy.cs" />
     <Compile Include="DataProxies\Fælles\ISystemProxy.cs" />
     <Compile Include="DataProxies\IDataProxyBase.cs" />
-    <Compile Include="DataProxies\ILazyLoadable.cs" />
     <Compile Include="DataProxies\IMySqlDataProxy.cs" />
     <Compile Include="DataProxies\Kalender\IAftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\IBrugeraftaleProxy.cs" />
@@ -103,11 +102,13 @@
     <Compile Include="FoodWaste\ISystemDataRepository.cs" />
     <Compile Include="IAdresseRepository.cs" />
     <Compile Include="DataProviders\IDataProviderBase.cs" />
+    <Compile Include="DataProxies\IDataProxyCreatorBase.cs" />
     <Compile Include="IDomainObjectBuilder.cs" />
     <Compile Include="IFællesRepository.cs" />
     <Compile Include="IKalenderRepository.cs" />
     <Compile Include="IKonfigurationRepository.cs" />
     <Compile Include="IFinansstyringRepository.cs" />
+    <Compile Include="DataProxies\IMySqlDataProxyCreator.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

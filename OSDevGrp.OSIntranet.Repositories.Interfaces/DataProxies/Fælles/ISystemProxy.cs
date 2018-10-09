@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles
     /// <summary>
     /// Interface til en data proxy for et system under OSWEBDB.
     /// </summary>
-    public interface ISystemProxy : ISystem, IMySqlDataProxy
+    public interface ISystemProxy : ISystem, IMySqlDataProxy, IMySqlDataProxyCreator<ISystemProxy>
     {
         /// <summary>
         /// Egenskaber for systemet.

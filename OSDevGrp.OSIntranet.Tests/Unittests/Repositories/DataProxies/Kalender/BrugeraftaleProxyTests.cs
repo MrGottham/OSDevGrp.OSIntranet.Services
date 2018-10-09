@@ -1,10 +1,11 @@
 ﻿using System;
-using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
-using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
-using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using AutoFixture;
+using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
@@ -15,24 +16,36 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
     [TestFixture]
     public class BrugeraftaleProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Sætter hver test op.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tester, at konstruktøren initierer en data proxy for en brugeraftale.
         /// </summary>
         [Test]
         public void TestAtConstructorInitiererBrugeraftaleProxy()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy());
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-            Assert.That(brugeraftaleProxy.System, Is.Not.Null);
-            Assert.That(brugeraftaleProxy.System.Nummer, Is.EqualTo(0));
-            Assert.That(brugeraftaleProxy.Aftale, Is.Not.Null);
-            Assert.That(brugeraftaleProxy.Aftale.Id, Is.EqualTo(0));
-            Assert.That(brugeraftaleProxy.Bruger, Is.Not.Null);
-            Assert.That(brugeraftaleProxy.Bruger.Id, Is.EqualTo(0));
-            Assert.That(brugeraftaleProxy.DataIsLoaded, Is.False);
+            IBrugeraftaleProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.System, Is.Not.Null);
+            Assert.That(sut.System.Nummer, Is.EqualTo(0));
+            Assert.That(sut.Aftale, Is.Not.Null);
+            Assert.That(sut.Aftale.Id, Is.EqualTo(0));
+            Assert.That(sut.Bruger, Is.Not.Null);
+            Assert.That(sut.Bruger.Id, Is.EqualTo(0));
+            Assert.That(sut.Properties, Is.EqualTo(0));
         }
 
         /// <summary>
@@ -41,100 +54,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         [Test]
         public void TestAtUniqueIdReturnererIdentifikation()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy(1, 2, 3));
+            int systemNo = _fixture.Create<int>();
+            int calId = _fixture.Create<int>();
+            int userId = _fixture.Create<int>();
 
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
+            IBrugeraftaleProxy sut = CreateSut(systemNo, calId, userId);
+            Assert.That(sut, Is.Not.Null);
 
-            var uniqueId = brugeraftaleProxy.UniqueId;
+            string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
-            Assert.That(uniqueId, Is.EqualTo("1-2-3"));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlQueryForId returnerer SQL foresprøgelse efter brugeraftalen.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlQueryForIdReturnererSqlQuery()
-        {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy(1, 2, 3));
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            var sqlQuery = brugeraftaleProxy.GetSqlQueryForId(brugeraftaleProxy);
-            Assert.That(sqlQuery, Is.Not.Null);
-            Assert.That(sqlQuery, Is.EqualTo("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo=1 AND CalId=2 AND UserId=3"));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlQueryForId kaster ArgumentNullException, hvis data proxy, der skal forespørges efter, er null.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlQueryForIdKasterArgumentNullExceptionHvisQueryForDataProxyErNull()
-        {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy(1, 2, 3));
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            Assert.Throws<ArgumentNullException>(() => brugeraftaleProxy.GetSqlQueryForId(null));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlCommandForInsert returnerer SQL kommando til oprettelse af brugeraftalen.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlCommandForInsertReturnererSqlCommand()
-        {
-            var fixture = new Fixture();
-            var properties = fixture.Create<int>();
-            fixture.Inject(new BrugeraftaleProxy(1, 2, 3, properties));
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            var sqlCommand = brugeraftaleProxy.GetSqlCommandForInsert();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Calmerge (SystemNo,CalId,UserId,Properties) VALUES(1,2,3,{0})", properties)));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlCommandForUpdate returnerer SQL kommando til opdatering af brugeraftalen.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlCommandForUpdateReturnererSqlCommand()
-        {
-            var fixture = new Fixture();
-            var properties = fixture.Create<int>();
-            fixture.Inject(new BrugeraftaleProxy(1, 2, 3, properties));
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            var sqlCommand = brugeraftaleProxy.GetSqlCommandForUpdate();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Calmerge SET Properties={0} WHERE SystemNo=1 AND CalId=2 AND UserId=3", properties)));
-        }
-
-        /// <summary>
-        /// Tester, at GetSqlCommandForDelete returnerer SQL kommando til sletning af brugeraftalen.
-        /// </summary>
-        [Test]
-        public void TestAtGetSqlCommandForDeleteReturnererSqlCommand()
-        {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy(1, 2, 3));
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            var sqlCommand = brugeraftaleProxy.GetSqlCommandForDelete();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.EqualTo("DELETE FROM Calmerge WHERE SystemNo=1 AND CalId=2 AND UserId=3"));
+            Assert.That(uniqueId, Is.EqualTo($"{Convert.ToString(systemNo)}-{Convert.ToString(calId)}-{Convert.ToString(userId)}"));
         }
 
         /// <summary>
@@ -143,17 +72,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         [Test]
         public void TestAtMapDataKasterArgumentNullExceptionHvisDataReaderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy());
-            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            IBrugeraftaleProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateMySqlDataProvider()));
 
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                brugeraftaleProxy.MapData(null,
-                                          fixture.Create<IMySqlDataProvider>()));
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
 
         /// <summary>
@@ -162,186 +86,261 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.Kalender
         [Test]
         public void TestAtMapDataKasterArgumentNullExceptionHvisDataProviderErNull()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy());
-            fixture.Inject(MockRepository.GenerateMock<MySqlDataReader>());
-            fixture.Inject<IMySqlDataProvider>(null);
+            IBrugeraftaleProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
 
-            Assert.Throws<ArgumentNullException>(
-                () =>
-                brugeraftaleProxy.MapData(fixture.Create<MySqlDataReader>(),
-                                          fixture.Create<IMySqlDataProvider>()));
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
         /// Tester, at MapData mapper data proxy for en brugeraftale.
         /// </summary>
         [Test]
-        public void TestAtMapDataMapperBrugeraftaleProxy()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestAtMapDataMapperBrugeraftaleProxy(bool hasProperties)
         {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy());
-            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            IBrugeraftaleProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
-                .Return(fixture.Create<int>())
-                .Repeat.Any();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("CalId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
-                .Return(fixture.Create<int>());
-            fixture.Inject(dataReader);
+            int systemNo = _fixture.Create<int>();
+            int calId = _fixture.Create<int>();
+            int userId = _fixture.Create<int>();
+            int? properties = hasProperties ? _fixture.Create<int>() : (int?) null;
+            MySqlDataReader dataReader = CreateMySqlDataReader(systemNo, calId, userId, properties);
 
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
+            ISystemProxy systemProxy = MockRepository.GenerateMock<ISystemProxy>();
+            IAftaleProxy appointmentProxy = MockRepository.GenerateMock<IAftaleProxy>();
+            IBrugerProxy calenderUserProxy = MockRepository.GenerateMock<IBrugerProxy>();
+            IMySqlDataProvider dataProvider = CreateMySqlDataProvider(systemProxy, appointmentProxy, calenderUserProxy);
 
-            brugeraftaleProxy.MapData(fixture.Create<MySqlDataReader>(),
-                                      fixture.Create<IMySqlDataProvider>());
-            Assert.That(brugeraftaleProxy.DataIsLoaded, Is.True);
+            sut.MapData(dataReader, dataProvider);
 
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Times(3));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("CalId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("UserId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
+            Assert.That(sut.System, Is.Not.Null);
+            Assert.That(sut.System, Is.EqualTo(systemProxy));
+            Assert.That(sut.Aftale, Is.Not.Null);
+            Assert.That(sut.Aftale, Is.EqualTo(appointmentProxy));
+            Assert.That(sut.Bruger, Is.Not.Null);
+            Assert.That(sut.Bruger, Is.EqualTo(calenderUserProxy));
+            if (hasProperties)
+            {
+                Assert.That(sut.Properties, Is.EqualTo(properties));
+            }
+            else
+            {
+                Assert.That(sut.Properties, Is.EqualTo(0));
+            }
+
+            dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
+            if (hasProperties)
+            {
+                dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")), opt => opt.Repeat.Once());
+            }
+            else
+            {
+                dataReader.AssertWasNotCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
+            }
+
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<ISystemProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 3 &&
+                                               e[0] == "SystemNo" &&
+                                               e[1] == "SystemTitle" &&
+                                               e[2] == "SystemProperties")),
+                opt => opt.Repeat.Once());
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IAftaleProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 10 &&
+                                               e[0] == "CalId" &&
+                                               e[1] == "Date" &&
+                                               e[2] == "FromTime" &&
+                                               e[3] == "ToTime" &&
+                                               e[4] == "AppointmentProperties" &&
+                                               e[5] == "Subject" &&
+                                               e[6] == "Note" &&
+                                               e[7] == "SystemNo" &&
+                                               e[8] == "SystemTitle" &&
+                                               e[9] == "SystemProperties")),
+                opt => opt.Repeat.Once());
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IBrugerProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 7 &&
+                                               e[0] == "UserId" &&
+                                               e[1] == "UserInitials" &&
+                                               e[2] == "UserFullname" &&
+                                               e[3] == "UserName" &&
+                                               e[4] == "SystemNo" &&
+                                               e[5] == "SystemTitle" &&
+                                               e[6] == "SystemProperties")),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
-        /// Tester, at System lazy loades.
+        /// Tester, at CreateGetCommand returnerer SQL kommando til foresprøgelse efter brugeraftalen.
         /// </summary>
         [Test]
-        public void TestAtSystemLazyLoades()
+        public void TestAtCreateGetCommandReturnererSqlCommand()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy());
-            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            int systemNo = _fixture.Create<int>();
+            int calId = _fixture.Create<int>();
+            int userId = _fixture.Create<int>();
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
-                .Return(fixture.Create<int>())
-                .Repeat.Any();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("CalId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
-                .Return(fixture.Create<int>());
-            fixture.Inject(dataReader);
+            IBrugeraftaleProxy sut = CreateSut(systemNo, calId, userId);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            dataProvider.Expect(m => m.Get(Arg<SystemProxy>.Is.NotNull))
-                .Return(fixture.Create<SystemProxy>());
-            fixture.Inject(dataProvider);
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            brugeraftaleProxy.MapData(fixture.Create<MySqlDataReader>(),
-                                      fixture.Create<IMySqlDataProvider>());
-            Assert.That(brugeraftaleProxy.DataIsLoaded, Is.True);
-
-            Assert.That(brugeraftaleProxy.System, Is.Not.Null);
-
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Times(3));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("CalId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("UserId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
-
-            dataProvider.AssertWasCalled(m => m.Get(Arg<SystemProxy>.Is.NotNull));
+            new DbCommandTestBuilder("SELECT cm.SystemNo,cm.CalId,cm.UserId,cm.Properties,ca.Date,ca.FromTime,ca.ToTime,ca.Properties AS AppointmentProperties,ca.Subject,ca.Note,cu.UserName,cu.Name AS UserFullname,cu.Initials AS UserInitials,s.Title AS SystemTitle,s.Properties AS SystemProperties FROM Calmerge AS cm INNER JOIN Calapps AS ca ON ca.SystemNo=cm.SystemNo AND ca.CalId=cm.CalId INNER JOIN Calusers AS cu ON cu.SystemNo=cm.SystemNo AND cu.UserId=cm.UserId INNER JOIN Systems AS s ON s.SystemNo=cm.SystemNo WHERE cm.SystemNo=@systemNo AND cm.CalId=@calId AND cm.UserId=@userId")
+                .AddSmallIntDataParameter("@systemNo", systemNo, 2)
+                .AddIntDataParameter("@calId", calId, 8)
+                .AddIntDataParameter("@userId", userId, 8)
+                .Build()
+                .Run(sut.CreateGetCommand());
         }
 
         /// <summary>
-        /// Tester, at Aftale lazy loades.
+        /// Tester, at CreateInsertCommand returnerer SQL kommando til oprettelse af brugeraftalen.
         /// </summary>
         [Test]
-        public void TestAtAftaleLazyLoades()
+        public void TestAtCreateInsertCommandReturnererSqlCommand()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new AftaleProxy());
-            fixture.Inject(new BrugeraftaleProxy());
-            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            int systemNo = _fixture.Create<int>();
+            int calId = _fixture.Create<int>();
+            int userId = _fixture.Create<int>();
+            int properties = _fixture.Create<int>();
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
-                .Return(fixture.Create<int>())
-                .Repeat.Any();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("CalId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
-                .Return(fixture.Create<int>());
-            fixture.Inject(dataReader);
+            IBrugeraftaleProxy sut = CreateSut(systemNo, calId, userId, properties);
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            dataProvider.Expect(m => m.Get(Arg<AftaleProxy>.Is.NotNull))
-                .Return(fixture.Create<AftaleProxy>());
-            fixture.Inject(dataProvider);
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            brugeraftaleProxy.MapData(fixture.Create<MySqlDataReader>(),
-                                      fixture.Create<IMySqlDataProvider>());
-            Assert.That(brugeraftaleProxy.DataIsLoaded, Is.True);
-
-            Assert.That(brugeraftaleProxy.Aftale, Is.Not.Null);
-
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Times(3));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("CalId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("UserId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
-
-            dataProvider.AssertWasCalled(m => m.Get(Arg<AftaleProxy>.Is.NotNull));
+            new DbCommandTestBuilder("INSERT INTO Calmerge (SystemNo,CalId,UserId,Properties) VALUES(@systemNo,@calId,@userId,@properties)")
+                .AddSmallIntDataParameter("@systemNo", systemNo, 2)
+                .AddIntDataParameter("@calId", calId, 8)
+                .AddIntDataParameter("@userId", userId, 8)
+                .AddSmallIntDataParameter("@properties", properties, 3, true)
+                .Build()
+                .Run(sut.CreateInsertCommand());
         }
 
         /// <summary>
-        /// Tester, at Bruger lazy loades.
+        /// Tester, at CreateUpdateCommand returnerer SQL kommando til opdatering af brugeraftalen.
         /// </summary>
         [Test]
-        public void TestAtBrugerLazyLoades()
+        public void TestAtCreateUpdateCommandReturnererSqlCommand()
         {
-            var fixture = new Fixture();
-            fixture.Inject(new BrugeraftaleProxy());
-            fixture.Inject(MockRepository.GenerateMock<IMySqlDataProvider>());
+            int systemNo = _fixture.Create<int>();
+            int calId = _fixture.Create<int>();
+            int userId = _fixture.Create<int>();
+            int properties = _fixture.Create<int>();
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")))
-                .Return(fixture.Create<int>())
+            IBrugeraftaleProxy sut = CreateSut(systemNo, calId, userId, properties);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("UPDATE Calmerge SET Properties=@properties WHERE SystemNo=@systemNo AND CalId=@calId AND UserId=@userId")
+                .AddSmallIntDataParameter("@systemNo", systemNo, 2)
+                .AddIntDataParameter("@calId", calId, 8)
+                .AddIntDataParameter("@userId", userId, 8)
+                .AddSmallIntDataParameter("@properties", properties, 3, true)
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tester, at CreateDeleteCommand returnerer SQL kommando til sletning af brugeraftalen.
+        /// </summary>
+        [Test]
+        public void TestAtCreateDeleteCommandReturnererSqlCommand()
+        {
+            int systemNo = _fixture.Create<int>();
+            int calId = _fixture.Create<int>();
+            int userId = _fixture.Create<int>();
+
+            IBrugeraftaleProxy sut = CreateSut(systemNo, calId, userId);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("DELETE FROM Calmerge WHERE SystemNo=@systemNo AND CalId=@calId AND UserId=@userId")
+                .AddSmallIntDataParameter("@systemNo", systemNo, 2)
+                .AddIntDataParameter("@calId", calId, 8)
+                .AddIntDataParameter("@userId", userId, 8)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy for a binding between an appointment and a calender user.
+        /// </summary>
+        /// <returns>Instance of the data proxy for a binding between an appointment and a calender user.</returns>
+        private IBrugeraftaleProxy CreateSut()
+        {
+            return new BrugeraftaleProxy();
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy for a binding between an appointment and a calender user.
+        /// </summary>
+        /// <returns>Instance of the data proxy for a binding between an appointment and a calender user.</returns>
+        private IBrugeraftaleProxy CreateSut(int systemNo, int calId, int userId)
+        {
+            return new BrugeraftaleProxy(systemNo, calId, userId);
+        }
+
+        /// <summary>
+        /// Creates an instance of the data proxy for a binding between an appointment and a calender user.
+        /// </summary>
+        /// <returns>Instance of the data proxy for a binding between an appointment and a calender user.</returns>
+        private IBrugeraftaleProxy CreateSut(int systemNo, int calId, int userId, int properties)
+        {
+            return new BrugeraftaleProxy(systemNo, calId, userId, properties);
+        }
+
+        /// <summary>
+        /// Creates a stub for the MySQL data reader.
+        /// </summary>
+        /// <returns>Stub for the MySQL data reader.</returns>
+        private MySqlDataReader CreateMySqlDataReader(int? systemNo = null, int? calId = null, int? userId = null, int? properties = null)
+        {
+            MySqlDataReader mySqlDataReaderMock = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderMock.Stub(m => m.GetInt32("SystemNo"))
+                .Return(systemNo ?? _fixture.Create<int>())
                 .Repeat.Any();
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("CalId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("UserId")))
-                .Return(fixture.Create<int>());
-            dataReader.Expect(m => m.GetInt32(Arg<string>.Is.Equal("Properties")))
-                .Return(fixture.Create<int>());
-            fixture.Inject(dataReader);
+            mySqlDataReaderMock.Stub(m => m.GetInt32("CalId"))
+                .Return(calId ?? _fixture.Create<int>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetInt32("UserId"))
+                .Return(userId ?? _fixture.Create<int>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("Properties")))
+                .Return(3)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.IsDBNull(3))
+                .Return(properties.HasValue == false)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetInt32("Properties"))
+                .Return(properties ?? _fixture.Create<int>())
+                .Repeat.Any();
+            return mySqlDataReaderMock;
+        }
 
-            var dataProvider = MockRepository.GenerateMock<IMySqlDataProvider>();
-            dataProvider.Expect(m => m.Get(Arg<BrugerProxy>.Is.NotNull))
-                .Return(fixture.Create<BrugerProxy>());
-            fixture.Inject(dataProvider);
-
-            var brugeraftaleProxy = fixture.Create<BrugeraftaleProxy>();
-            Assert.That(brugeraftaleProxy, Is.Not.Null);
-
-            brugeraftaleProxy.MapData(fixture.Create<MySqlDataReader>(),
-                                      fixture.Create<IMySqlDataProvider>());
-            Assert.That(brugeraftaleProxy.DataIsLoaded, Is.True);
-
-            Assert.That(brugeraftaleProxy.Bruger, Is.Not.Null);
-
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("SystemNo")), opt => opt.Repeat.Times(3));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("CalId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("UserId")));
-            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Properties")));
-
-            dataProvider.AssertWasCalled(m => m.Get(Arg<BrugerProxy>.Is.NotNull));
+        /// <summary>
+        /// Creates a mockup for the data provider which uses MySQL.
+        /// </summary>
+        /// <returns>Mockup for the data provider which uses MySQL.</returns>
+        private IMySqlDataProvider CreateMySqlDataProvider(ISystemProxy systemProxy = null, IAftaleProxy appointmentProxy = null, IBrugerProxy calenderUserProxy = null)
+        {
+            IMySqlDataProvider dataProviderMock = MockRepository.GenerateMock<IMySqlDataProvider>();
+            dataProviderMock.Stub(m => m.Create(Arg<ISystemProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(systemProxy ?? MockRepository.GenerateMock<ISystemProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Create(Arg<IAftaleProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(appointmentProxy ?? MockRepository.GenerateMock<IAftaleProxy>())
+                .Repeat.Any();
+            dataProviderMock.Stub(m => m.Create(Arg<IBrugerProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(calenderUserProxy ?? MockRepository.GenerateMock<IBrugerProxy>())
+                .Repeat.Any();
+            return dataProviderMock;
         }
     }
 }

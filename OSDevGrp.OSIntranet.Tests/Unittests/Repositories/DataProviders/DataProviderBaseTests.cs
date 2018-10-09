@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using AutoFixture;
@@ -20,9 +21,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
         /// <summary>
         /// Egen klasse for en data proxy til test af basis data provider.
         /// </summary>
-        private class MyDataProxy : IDataProxyBase<IDataReader, IDbCommand>
+        private class MyDataProxy : IDataProxyBase<IDataReader, IDbCommand>, IDataProxyCreatorBase<MyDataProxy, IDataReader, IDbCommand>
         {
-            #region IDataProxyBase Members
+            #region Properties
+
+            /// <summary>
+            /// Gets whether the Create method has been called.
+            /// </summary>
+            public bool CreateHasBeenCalled { get; private set; }
+            
+            #endregion
+            
+            #region IDataProxyBase<IDataReader, IDbCommand> Members
 
             /// <summary>
             /// Mapper data fra en data reader.
@@ -97,6 +107,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
             public IDbCommand CreateDeleteCommand()
             {
                 return MockRepository.GenerateMock<IDbCommand>();
+            }
+
+            #endregion
+
+            #region IDataProxyCreatorBase<MyDataProxy, IDataReader, IDbCommand> Members
+
+            /// <summary>
+            /// Creates an instance of the data proxy with values from the data reader.
+            /// </summary>
+            /// <param name="dataReader">Data reader from which column values should be read.</param>
+            /// <param name="dataProvider">Data provider which supports the data reader.</param>
+            /// <param name="columnNameCollection">Collection of column names which should be read from the data reader.</param>
+            /// <returns>Instance of the data proxy with values from the data reader.</returns>
+            public MyDataProxy Create(IDataReader dataReader, IDataProviderBase<IDataReader, IDbCommand> dataProvider, params string[] columnNameCollection)
+            {
+                Assert.That(dataReader, Is.Not.Null);
+                Assert.That(dataProvider, Is.Not.Null);
+                Assert.That(columnNameCollection, Is.Not.Null);
+
+                CreateHasBeenCalled = true;
+
+                return new MyDataProxy();
             }
 
             #endregion
@@ -327,6 +359,89 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProviders
                 Assert.That(sut, Is.Not.Null);
 
                 sut.Delete(_fixture.Create<MyDataProxy>());
+            }
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException when the data proxy creator is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionWhenDataProxyCreatorIsNull()
+        {
+            using (IDataProviderBase<IDataReader, IDbCommand> sut = CreateSut())
+            {
+                Assert.That(sut, Is.Not.Null);
+
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create<MyDataProxy>(null, MockRepository.GenerateMock<IDataReader>(), "XYZ"));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProxyCreator");
+            }
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException when the data reader is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionWhenDataReaderIsNull()
+        {
+            using (IDataProviderBase<IDataReader, IDbCommand> sut = CreateSut())
+            {
+                Assert.That(sut, Is.Not.Null);
+
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(new MyDataProxy(), null, "XYZ"));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
+            }
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException when the collection of column names is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionWhenColumnNameCollectionIsNull()
+        {
+            using (IDataProviderBase<IDataReader, IDbCommand> sut = CreateSut())
+            {
+                Assert.That(sut, Is.Not.Null);
+
+                ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(new MyDataProxy(), MockRepository.GenerateMock<IDataReader>(), null));
+
+                TestHelper.AssertArgumentNullExceptionIsValid(result, "columnNameCollection");
+            }
+        }
+
+        /// <summary>
+        /// Tests that Create calls Create on the data proxy creator.
+        /// </summary>
+        [Test]
+        public void TestThatCreateCallsCreateOnDataProxyCreator()
+        {
+            using (IDataProviderBase<IDataReader, IDbCommand> sut = CreateSut())
+            {
+                Assert.That(sut, Is.Not.Null);
+
+                MyDataProxy dataProxyCreator = new MyDataProxy();
+                Assert.That(dataProxyCreator, Is.Not.Null);
+                Assert.That(dataProxyCreator.CreateHasBeenCalled, Is.False);
+
+                sut.Create(dataProxyCreator, MockRepository.GenerateMock<IDataReader>(), "XYZ");
+
+                Assert.That(dataProxyCreator.CreateHasBeenCalled, Is.True);
+            }
+        }
+
+        /// <summary>
+        /// Tests that Create creates a data proxy.
+        /// </summary>
+        [Test]
+        public void TestThatCreateCreatesDataProxy()
+        {
+            using (IDataProviderBase<IDataReader, IDbCommand> sut = CreateSut())
+            {
+                Assert.That(sut, Is.Not.Null);
+
+                MyDataProxy result = sut.Create(new MyDataProxy(), MockRepository.GenerateMock<IDataReader>(), "XYZ");
+                Assert.That(result, Is.Not.Null);
             }
         }
 

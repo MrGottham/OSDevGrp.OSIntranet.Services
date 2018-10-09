@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
-using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
-using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
@@ -16,12 +14,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
     /// </summary>
     public class BrugeraftaleProxy : Brugeraftale, IBrugeraftaleProxy
     {
-        #region Private variables
-
-        private IMySqlDataProvider _dataProvider;
-
-        #endregion
-
         #region Constructors
 
         /// <summary>
@@ -42,65 +34,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         public BrugeraftaleProxy(int system, int aftale, int bruger, int properties = 0)
             : base(new SystemProxy(system), new AftaleProxy(system, aftale), new BrugerProxy(system, bruger), properties)
         {
-            DataIsLoaded = false;
-        }
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// System under OSWEBDB, som brugeraftalen er tilknyttet.
-        /// </summary>
-        public override ISystem System
-        {
-            get
-            {
-                if (base.System is ILazyLoadable)
-                {
-                    if (((ILazyLoadable)base.System).DataIsLoaded == false && _dataProvider != null)
-                    {
-                        this.SetFieldValue("_system", this.Get(_dataProvider, base.System as SystemProxy, MethodBase.GetCurrentMethod().Name));
-                    }
-                }
-                return base.System;
-            }
-        }
-
-        /// <summary>
-        /// Aftale, som brugeraftalen er tilknyttet.
-        /// </summary>
-        public override IAftale Aftale
-        {
-            get
-            {
-                if (base.Aftale is ILazyLoadable)
-                {
-                    if (((ILazyLoadable)base.Aftale).DataIsLoaded == false && _dataProvider != null)
-                    {
-                        this.SetFieldValue("_aftale", this.Get(_dataProvider, base.Aftale as AftaleProxy, MethodBase.GetCurrentMethod().Name));
-                    }
-                }
-                return base.Aftale;
-            }
-        }
-
-        /// <summary>
-        /// Bruger, som brugeraftalen er tilknyttet.
-        /// </summary>
-        public override IBruger Bruger
-        {
-            get
-            {
-                if (base.Bruger is ILazyLoadable)
-                {
-                    if (((ILazyLoadable)base.Bruger).DataIsLoaded == false && _dataProvider != null)
-                    {
-                        this.SetFieldValue("_bruger", this.Get(_dataProvider, base.Bruger as BrugerProxy, MethodBase.GetCurrentMethod().Name));
-                    }
-                }
-                return base.Bruger;
-            }
         }
 
         #endregion
@@ -110,58 +43,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <summary>
         /// Returnerer unik identifikation af brugerens kalenderaftale.
         /// </summary>
-        public virtual string UniqueId
-        {
-            get
-            {
-                return string.Format("{0}-{1}-{2}", System.Nummer, Aftale.Id, Bruger.Id);
-            }
-        }
-
-        /// <summary>
-        /// Returnerer SQL forespørgelse til fremsøgning af en given brugers kalenderaftale.
-        /// </summary>
-        /// <param name="queryForDataProxy">Data proxy indeholdende nødvendige værdier til fremsøgning af den givne brugers kalenderaftale.</param>
-        /// <returns>SQL forespørgelse.</returns>
-        public virtual string GetSqlQueryForId(IBrugeraftale queryForDataProxy)
-        {
-            if (queryForDataProxy == null)
-            {
-                throw new ArgumentNullException("queryForDataProxy");
-            }
-            return string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} AND UserId={2}", queryForDataProxy.System.Nummer, queryForDataProxy.Aftale.Id, queryForDataProxy.Bruger.Id);
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til oprettelse af brugerens kalenderaftalen.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            return string.Format("INSERT INTO Calmerge (SystemNo,CalId,UserId,Properties) VALUES({0},{1},{2},{3})", System.Nummer, Aftale.Id, Bruger.Id, Properties);
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til opdatering af brugerens kalenderaftalen.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            return string.Format("UPDATE Calmerge SET Properties={3} WHERE SystemNo={0} AND CalId={1} AND UserId={2}", System.Nummer, Aftale.Id, Bruger.Id, Properties);
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til sletning af brugerens kalenderaftalen.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM Calmerge WHERE SystemNo={0} AND CalId={1} AND UserId={2}", System.Nummer, Aftale.Id, Bruger.Id);
-        }
+        public virtual string UniqueId => $"{System.Nummer}-{Aftale.Id}-{Bruger.Id}";
 
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Mapning af data for en brugers kalenderaftale.
@@ -170,22 +56,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="dataProvider">Dataprovider.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
-            this.SetFieldValue("_system", new SystemProxy(dataReader.GetInt32("SystemNo")));
-            this.SetFieldValue("_aftale", new AftaleProxy(dataReader.GetInt32("SystemNo"), dataReader.GetInt32("CalId")));
-            this.SetFieldValue("_bruger", new BrugerProxy(dataReader.GetInt32("SystemNo"), dataReader.GetInt32("UserId")));
-            Properties = dataReader.GetInt32("Properties");
-            DataIsLoaded = true;
-
-            _dataProvider = (IMySqlDataProvider) dataProvider;
+            System = dataProvider.Create(new SystemProxy(), dataReader, "SystemNo", "SystemTitle", "SystemProperties");
+            Aftale = dataProvider.Create(new AftaleProxy(), dataReader, "CalId", "Date", "FromTime", "ToTime", "AppointmentProperties", "Subject", "Note", "SystemNo", "SystemTitle", "SystemProperties");
+            Bruger = dataProvider.Create(new BrugerProxy(), dataReader, "UserId", "UserInitials", "UserFullname", "UserName", "SystemNo", "SystemTitle", "SystemProperties");
+            Properties = dataReader.IsDBNull(dataReader.GetOrdinal("Properties")) ? 0 : dataReader.GetInt32("Properties");
         }
 
         /// <summary>
@@ -219,7 +96,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for getting this binding between an user and an appointment.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new MySqlCommandBuilder(GetSqlQueryForId(this)).Build();
+            return new CalenderCommandBuilder("SELECT cm.SystemNo,cm.CalId,cm.UserId,cm.Properties,ca.Date,ca.FromTime,ca.ToTime,ca.Properties AS AppointmentProperties,ca.Subject,ca.Note,cu.UserName,cu.Name AS UserFullname,cu.Initials AS UserInitials,s.Title AS SystemTitle,s.Properties AS SystemProperties FROM Calmerge AS cm INNER JOIN Calapps AS ca ON ca.SystemNo=cm.SystemNo AND ca.CalId=cm.CalId INNER JOIN Calusers AS cu ON cu.SystemNo=cm.SystemNo AND cu.UserId=cm.UserId INNER JOIN Systems AS s ON s.SystemNo=cm.SystemNo WHERE cm.SystemNo=@systemNo AND cm.CalId=@calId AND cm.UserId=@userId")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Aftale.Id)
+                .AddUserIdParameter(Bruger.Id)
+                .Build();
         }
 
         /// <summary>
@@ -228,7 +109,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for inserting this binding between an user and an appointment.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new CalenderCommandBuilder("INSERT INTO Calmerge (SystemNo,CalId,UserId,Properties) VALUES(@systemNo,@calId,@userId,@properties)")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Aftale.Id)
+                .AddUserIdParameter(Bruger.Id)
+                .AddPropertiesParameter(Properties)
+                .Build();
         }
 
         /// <summary>
@@ -237,7 +123,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for updating this binding between an user and an appointment.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new CalenderCommandBuilder("UPDATE Calmerge SET Properties=@properties WHERE SystemNo=@systemNo AND CalId=@calId AND UserId=@userId")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Aftale.Id)
+                .AddUserIdParameter(Bruger.Id)
+                .AddPropertiesParameter(Properties)
+                .Build();
         }
 
         /// <summary>
@@ -246,20 +137,37 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for deleting this binding between an user and an appointment.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForDelete()).Build();
+            return new CalenderCommandBuilder("DELETE FROM Calmerge WHERE SystemNo=@systemNo AND CalId=@calId AND UserId=@userId")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Aftale.Id)
+                .AddUserIdParameter(Bruger.Id)
+                .Build();
         }
 
         #endregion
 
-        #region ILazyLoadable Members
+        #region Methods
 
         /// <summary>
-        /// Angivelse af, om data er loaded.
+        /// Gets the appointment users for a given appointment.
         /// </summary>
-        public bool DataIsLoaded
+        /// <param name="appointment">The appointment for which to get the appointment users.</param>
+        /// <param name="dataProvider">The data provider which should be used to get the appointment users.</param>
+        /// <returns>The appointment users.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="appointment"/> or <paramref name="dataProvider"/>is null.</exception>
+        internal static IEnumerable<IBrugeraftaleProxy> GetAppointmentUsers(IAftaleProxy appointment, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            get;
-            protected set;
+            ArgumentNullGuard.NotNull(appointment, nameof(appointment))
+                .NotNull(dataProvider, nameof(dataProvider));
+
+            using (IMySqlDataProvider subDataProvider = (IMySqlDataProvider) dataProvider.Clone())
+            {
+                MySqlCommand command = new CalenderCommandBuilder("SELECT cm.SystemNo,cm.CalId,cm.UserId,cm.Properties,ca.Date,ca.FromTime,ca.ToTime,ca.Properties AS AppointmentProperties,ca.Subject,ca.Note,cu.UserName,cu.Name AS UserFullname,cu.Initials AS UserInitials,s.Title AS SystemTitle,s.Properties AS SystemProperties FROM Calmerge AS cm INNER JOIN Calapps AS ca ON ca.SystemNo=cm.SystemNo AND ca.CalId=cm.CalId INNER JOIN Calusers AS cu ON cu.SystemNo=cm.SystemNo AND cu.UserId=cm.UserId INNER JOIN Systems AS s ON s.SystemNo=cm.SystemNo WHERE cm.SystemNo=@systemNo AND cm.CalId=@calId")
+                    .AddSystemNoParameter(appointment.System.Nummer)
+                    .AddAppointmentIdParameter(appointment.Id)
+                    .Build();
+                return subDataProvider.GetCollection<BrugeraftaleProxy>(command);
+            }
         }
 
         #endregion

@@ -1,5 +1,4 @@
 ﻿using System.Configuration;
-using System.Transactions;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 
@@ -26,9 +25,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// Creates a data provider which can access data in the food waste repository.
         /// </summary>
         /// <param name="mySqlConnection">The MySQL connection to use within the data provider.</param>
-        /// <param name="clonedWithinTransaction">True when the MySQL connection has been cloned within a transaction; otherwise false.</param>
-        private FoodWasteDataProvider(MySqlConnection mySqlConnection, bool clonedWithinTransaction)
-            : base(mySqlConnection, clonedWithinTransaction)
+        /// <param name="clonedWithReusableConnection">True when the MySQL connection has been cloned with a reusable connection; otherwise false.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="mySqlConnection"/> is null.</exception>
+        private FoodWasteDataProvider(MySqlConnection mySqlConnection, bool clonedWithReusableConnection)
+            : base(mySqlConnection, clonedWithReusableConnection)
         {
         }
 
@@ -39,10 +39,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
         /// <summary>
         /// Clone the data provider which can access data in the food waste repository.
         /// </summary>
+        /// <param name="mySqlConnection">The connection which should be used in the clone.</param>
+        /// <param name="clonedWithReusableConnection">True when the MySQL connection has been cloned with a reusable connection; otherwise false.</param>
         /// <returns>Cloned data provider which can access data in the food waste repository.</returns>
-        public override object Clone()
+        /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="mySqlConnection"/> is null.</exception>
+        protected override object Clone(MySqlConnection mySqlConnection, bool clonedWithReusableConnection)
         {
-            return Transaction.Current == null ? new FoodWasteDataProvider((MySqlConnection) MySqlConnection.Clone(), false) : new FoodWasteDataProvider(MySqlConnection, true);
+            return new FoodWasteDataProvider(mySqlConnection, clonedWithReusableConnection);
         }
 
         #endregion

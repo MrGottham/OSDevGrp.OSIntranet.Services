@@ -4,11 +4,11 @@ using System.Reflection;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Resources;
-using MySqlCommandBuilder = OSDevGrp.OSIntranet.Repositories.DataProxies.MySqlCommandBuilder;
 
 namespace OSDevGrp.OSIntranet.Repositories
 {
@@ -31,10 +31,8 @@ namespace OSDevGrp.OSIntranet.Repositories
         /// <param name="mySqlDataProvider">Data provider til MySql.</param>
         public KalenderRepository(IMySqlDataProvider mySqlDataProvider)
         {
-            if (mySqlDataProvider == null)
-            {
-                throw new ArgumentNullException("mySqlDataProvider");
-            }
+            ArgumentNullGuard.NotNull(mySqlDataProvider, nameof(mySqlDataProvider));
+
             _mySqlDataProvider = mySqlDataProvider;
         }
 
@@ -52,7 +50,10 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps FORCE INDEX (IX_Calapps_SystemNo_Date) WHERE SystemNo={0} AND Date>='{1}' ORDER BY Date DESC,FromTime DESC,ToTime DESC,CalId DESC", system, fromDate.ToString("yyyy-MM-dd"))).Build();
+                MySqlCommand command = new CalenderCommandBuilder("SELECT ca.SystemNo,ca.CalId,ca.Date,ca.FromTime,ca.ToTime,ca.Properties,ca.Subject,ca.Note,s.Title AS SystemTitle,s.Properties AS SystemProperties FROM Calapps AS ca FORCE INDEX(IX_Calapps_SystemNo_Date) INNER JOIN Systems AS s ON s.SystemNo=ca.SystemNo WHERE ca.SystemNo=@systemNo AND ca.Date>=@date ORDER BY ca.Date DESC,ca.FromTime DESC,ca.ToTime DESC,ca.CalId DESC")
+                    .AddSystemNoParameter(system)
+                    .AddAppointmentDateParameter(fromDate)
+                    .Build();
                 return _mySqlDataProvider.GetCollection<AftaleProxy>(command);
             }
             catch (IntranetRepositoryException)
@@ -61,9 +62,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
         }
 
@@ -77,7 +76,7 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                var queryForAftale = new AftaleProxy(system, id);
+                AftaleProxy queryForAftale = new AftaleProxy(system, id);
                 return _mySqlDataProvider.Get(queryForAftale);
             }
             catch (IntranetRepositoryException)
@@ -86,9 +85,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
         }
 
@@ -101,7 +98,9 @@ namespace OSDevGrp.OSIntranet.Repositories
         {
             try
             {
-                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,UserId,UserName,Name,Initials FROM Calusers WHERE SystemNo={0} ORDER BY Name,Initials,UserId", system)).Build();
+                MySqlCommand command = new CalenderCommandBuilder("SELECT cu.SystemNo,cu.UserId,cu.UserName,cu.Name,cu.Initials,s.Title,s.Properties FROM Calusers AS cu INNER JOIN Systems AS s ON s.SystemNo=cu.SystemNo WHERE cu.SystemNo=@systemNo ORDER BY cu.Name,cu.Initials,cu.UserId")
+                    .AddSystemNoParameter(system)
+                    .Build();
                 return _mySqlDataProvider.GetCollection<BrugerProxy>(command);
             }
             catch (IntranetRepositoryException)
@@ -110,9 +109,7 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             catch (Exception ex)
             {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, ex.Message), ex);
             }
         }
 

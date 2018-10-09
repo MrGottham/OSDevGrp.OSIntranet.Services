@@ -111,9 +111,9 @@
     <Compile Include="DataProxies\FoodWaste\FoodWasteCommandBuilder.cs" />
     <Compile Include="DataProviders\FoodWasteDataProvider.cs" />
     <Compile Include="DataProxies\Fælles\CommonCommandBuilder.cs" />
-    <Compile Include="DataProxies\MySqlCommandBuilder.cs" />
+    <Compile Include="DataProxies\Kalender\CalenderCommandBuilder.cs" />
+    <Compile Include="DataProxies\MySqlCommandBuilderBase.cs" />
     <Compile Include="DataProviders\MySqlDataProvider.cs" />
-    <Compile Include="DataProxies\DataProxyHelper.cs" />
     <Compile Include="DataProxies\FoodWaste\DataProviderProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\FoodItemGroupProxy.cs" />
     <Compile Include="DataProxies\FoodWaste\FoodItemProxy.cs" />

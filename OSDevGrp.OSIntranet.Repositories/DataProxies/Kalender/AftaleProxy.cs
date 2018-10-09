@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Domain.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
-using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.Kalender;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
@@ -19,6 +19,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
     {
         #region Private variables
 
+        private bool _appointmentUserCollectionHasBeenLoaded;
         private IMySqlDataProvider _dataProvider;
 
         #endregion
@@ -28,7 +29,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <summary>
         /// Danner en data proxy for en kalenderaftale.
         /// </summary>
-        public AftaleProxy() : this(0, 0)
+        public AftaleProxy()
+            : this(0, 0)
         {
         }
 
@@ -38,7 +40,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="system">Unik identifikation af systemet for kalenderaftalen.</param>
         /// <param name="id">Unik identifikation af kalenderaftalen.</param>
         public AftaleProxy(int system, int id)
-            : this(system, id, DateTime.MinValue, DateTime.MaxValue, typeof(Aftale).ToString())
+            : this(system, id, DateTime.MinValue, DateTime.MaxValue, typeof(Aftale).Name)
         {
         }
 
@@ -52,9 +54,22 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="emne">Emne.</param>
         /// <param name="properties">Værdi for kalenderaftalens properties.</param>
         public AftaleProxy(int system, int id, DateTime fraTidspunkt, DateTime tilTidspunkt, string emne, int properties = 0)
-            : base(new SystemProxy(system), id, fraTidspunkt, tilTidspunkt, emne, properties)
+            : this(new SystemProxy(system), id, fraTidspunkt, tilTidspunkt, emne, properties)
         {
-            DataIsLoaded = false;
+        }
+
+        /// <summary>
+        /// Creates an instance of the appointment data proxy.
+        /// </summary>
+        /// <param name="system">The system for the appointment.</param>
+        /// <param name="id">The appointment identifier.</param>
+        /// <param name="fromDateTime">The start date and time for the appointment.</param>
+        /// <param name="toDateTime">The end date and time for the appointment.</param>
+        /// <param name="subject">The subject for the appointment.</param>
+        /// <param name="properties">The note for the appointment.</param>
+        private AftaleProxy(ISystem system, int id, DateTime fromDateTime, DateTime toDateTime, string subject, int properties = 0) 
+            : base(system, id, fromDateTime, toDateTime, subject, properties)
+        {
         }
 
         #endregion
@@ -62,20 +77,21 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         #region Properties
 
         /// <summary>
-        /// System under OSWEBDB, som aftalen er tilknyttet.
+        /// Gets the appointment users.
         /// </summary>
-        public override ISystem System
+        public override IEnumerable<IBrugeraftale> Deltagere
         {
             get
             {
-                if (base.System is ILazyLoadable)
+                if (_appointmentUserCollectionHasBeenLoaded || _dataProvider == null)
                 {
-                    if (((ILazyLoadable)base.System).DataIsLoaded == false && _dataProvider != null)
-                    {
-                        this.SetFieldValue("_system", this.Get(_dataProvider, base.System as SystemProxy, MethodBase.GetCurrentMethod().Name));
-                    }
+                    return base.Deltagere;
                 }
-                return base.System;
+
+                Deltagere = BrugeraftaleProxy.GetAppointmentUsers(this, _dataProvider);
+                _appointmentUserCollectionHasBeenLoaded = true;
+
+                return base.Deltagere;
             }
         }
 
@@ -86,58 +102,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <summary>
         /// Returnerer unik identifikation af kalenderaftalen.
         /// </summary>
-        public virtual string UniqueId
-        {
-            get
-            {
-                return string.Format("{0}-{1}", System.Nummer, Id);
-            }
-        }
-
-        /// <summary>
-        /// Returnerer SQL forespørgelse til fremsøgning af en given kalenderaftale.
-        /// </summary>
-        /// <param name="queryForDataProxy">Data proxy indeholdende nødvendige værdier til fremsøgning af den givne kalenderaftale.</param>
-        /// <returns>SQL forespørgelse.</returns>
-        public virtual string GetSqlQueryForId(IAftale queryForDataProxy)
-        {
-            if (queryForDataProxy == null)
-            {
-                throw new ArgumentNullException("queryForDataProxy");
-            }
-            return string.Format("SELECT SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note FROM Calapps WHERE SystemNo={0} AND CalId={1}", queryForDataProxy.System.Nummer, queryForDataProxy.Id);
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til oprettelse af kalenderaftalen.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            return string.Format("INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note) VALUES({0},{1},{2},{3},{4},{5},{6},{7})", System.Nummer, Id, this.GetNullableSqlString(FraTidspunkt.ToString("yyyy-MM-dd")), this.GetNullableSqlString(FraTidspunkt.ToString("HH:mm:ss")), this.GetNullableSqlString(TilTidspunkt.ToString("HH:mm:ss")), Properties, this.GetNullableSqlString(Emne), this.GetNullableSqlString(Notat));
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til opdatering af kalenderaftalen.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            return string.Format("UPDATE Calapps SET Date={2},FromTime={3},ToTime={4},Properties={5},Subject={6},Note={7} WHERE SystemNo={0} AND CalId={1}", System.Nummer, Id, this.GetNullableSqlString(FraTidspunkt.ToString("yyyy-MM-dd")), this.GetNullableSqlString(FraTidspunkt.ToString("HH:mm:ss")), this.GetNullableSqlString(TilTidspunkt.ToString("HH:mm:ss")), Properties, this.GetNullableSqlString(Emne), this.GetNullableSqlString(Notat));
-        }
-
-        /// <summary>
-        /// Returnerer SQL kommando til sletning af kalenderaftalen.
-        /// </summary>
-        /// <returns>SQL kommando.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM Calapps WHERE SystemNo={0} AND CalId={1}", System.Nummer, Id);
-        }
+        public virtual string UniqueId => $"{System.Nummer}-{Id}";
 
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Mapper data for en kalenderaftale.
@@ -146,45 +115,35 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="dataProvider">Dataprovider.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
-            this.SetFieldValue("_system", new SystemProxy(dataReader.GetInt32("SystemNo")));
-            this.SetFieldValue("_id", dataReader.GetInt32("CalId"));
-            var mySqlDateTime = dataReader.GetMySqlDateTime("Date");
-            var mySqlFromTime = dataReader.GetTimeSpan("FromTime");
-            var mySqlToTime = dataReader.GetTimeSpan("ToTime");
-            FraTidspunkt = new DateTime(mySqlDateTime.Year, mySqlDateTime.Month, mySqlDateTime.Day, mySqlFromTime.Hours,
-                                        mySqlFromTime.Minutes, mySqlFromTime.Seconds);
-            TilTidspunkt = new DateTime(mySqlDateTime.Year, mySqlDateTime.Month, mySqlDateTime.Day, mySqlToTime.Hours,
-                                        mySqlToTime.Minutes, mySqlToTime.Seconds);
-            Properties = dataReader.GetInt32("Properties");
-            Emne = dataReader.GetString("Subject");
-            Notat = dataReader.GetString("Note");
-            var deltagere = new List<IBrugeraftale>();
-            using (var clonedDataProvider = (IMySqlDataProvider) dataProvider.Clone())
-            {
-                MySqlCommand command = new MySqlCommandBuilder(string.Format("SELECT SystemNo,CalId,UserId,Properties FROM Calmerge WHERE SystemNo={0} AND CalId={1} ORDER BY UserId", dataReader.GetInt32("SystemNo"), dataReader.GetInt32("CalId"))).Build();
-                deltagere.AddRange(clonedDataProvider.GetCollection<BrugeraftaleProxy>(command));
-            }
-            this.SetFieldValue("_deltagere", deltagere);
-            DataIsLoaded = true;
+            DateTime fromDate = GetAppointmentDate(dataReader, "Date");
 
+            System = dataProvider.Create(new SystemProxy(), dataReader, "SystemNo", "SystemTitle", "SystemProperties");
+            Id = GetAppointmentIdentifier(dataReader, "CalId");
+            FraTidspunkt = fromDate.Add(GetAppointmentTime(dataReader, "FromTime"));
+            TilTidspunkt = fromDate.Add(GetAppointmentTime(dataReader, "ToTime"));
+            Properties = GetAppointmentProperties(dataReader, "Properties");
+            Emne = GetAppointmentSubject(dataReader, "Subject");
+            Notat = GetAppointmentNote(dataReader, "Note");
+
+            _appointmentUserCollectionHasBeenLoaded = false;
             _dataProvider = (IMySqlDataProvider) dataProvider;
         }
 
         /// <summary>
         /// Mapper relationer til en kalenderaftale.
         /// </summary>
-        /// <param name="dataProviderBase">Dataprovider.</param>
-        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProviderBase)
+        /// <param name="dataProvider">Dataprovider.</param>
+        public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
+            Deltagere = BrugeraftaleProxy.GetAppointmentUsers(this, dataProvider);
+
+            _appointmentUserCollectionHasBeenLoaded = true;
+            _dataProvider = (IMySqlDataProvider) dataProvider;
         }
 
         /// <summary>
@@ -210,7 +169,10 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for getting this appointment.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new MySqlCommandBuilder(GetSqlQueryForId(this)).Build();
+            return new CalenderCommandBuilder("SELECT ca.SystemNo,ca.CalId,ca.Date,ca.FromTime,ca.ToTime,ca.Properties,ca.Subject,ca.Note,s.Title AS SystemTitle,s.Properties AS SystemProperties FROM Calapps AS ca INNER JOIN Systems AS s ON s.SystemNo=ca.SystemNo WHERE ca.SystemNo=@systemNo AND ca.CalId=@calId")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Id)
+                .Build();
         }
 
         /// <summary>
@@ -219,7 +181,16 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for inserting this appointment.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new CalenderCommandBuilder("INSERT INTO Calapps (SystemNo,CalId,Date,FromTime,ToTime,Properties,Subject,Note) VALUES(@systemNo,@calId,@date,@fromTime,@toTime,@properties,@subject,@note)")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Id)
+                .AddAppointmentDateParameter(FraTidspunkt)
+                .AddAppointmentFromTimeParameter(FraTidspunkt)
+                .AddAppointmentToTimeParameter(TilTidspunkt)
+                .AddPropertiesParameter(Properties)
+                .AddSubject(Emne)
+                .AddNote(Notat)
+                .Build();
         }
 
         /// <summary>
@@ -228,7 +199,16 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for updating this appointment.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new CalenderCommandBuilder("UPDATE Calapps SET Date=@date,FromTime=@fromTime,ToTime=@toTime,Properties=@properties,Subject=@subject,Note=@note WHERE SystemNo=@systemNo AND CalId=@calId")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Id)
+                .AddAppointmentDateParameter(FraTidspunkt)
+                .AddAppointmentFromTimeParameter(FraTidspunkt)
+                .AddAppointmentToTimeParameter(TilTidspunkt)
+                .AddPropertiesParameter(Properties)
+                .AddSubject(Emne)
+                .AddNote(Notat)
+                .Build();
         }
 
         /// <summary>
@@ -237,20 +217,134 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <returns>SQL statement for deleting this appointment.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new MySqlCommandBuilder(GetSqlCommandForDelete()).Build();
+            return new CalenderCommandBuilder("DELETE FROM Calapps WHERE SystemNo=@systemNo AND CalId=@calId")
+                .AddSystemNoParameter(System.Nummer)
+                .AddAppointmentIdParameter(Id)
+                .Build();
         }
 
         #endregion
 
-        #region ILazyLoadable Members
+        #region IMySqlDataProxyCreator<IAftaleProxy> Members
 
         /// <summary>
-        /// Angivelse af, om data er loaded.
+        /// Creates an instance of the appointment data proxy with values from the data reader.
         /// </summary>
-        public bool DataIsLoaded
+        /// <param name="dataReader">Data reader from which column values should be read.</param>
+        /// <param name="dataProvider">Data provider which supports the data reader.</param>>
+        /// <param name="columnNameCollection">Collection of column names which should be read from the data reader.</param>
+        /// <returns>Instance of the appointment proxy with values from the data reader.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="dataReader"/>, <paramref name="dataProvider"/> or <paramref name="columnNameCollection"/> is null.</exception>
+        public virtual IAftaleProxy Create(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, params string[] columnNameCollection)
         {
-            get;
-            protected set;
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(columnNameCollection, nameof(columnNameCollection));
+
+            DateTime fromDate = GetAppointmentDate(dataReader, columnNameCollection[1]);
+
+            ISystemProxy systemProxy = dataProvider.Create(new SystemProxy(), dataReader, columnNameCollection[7], columnNameCollection[8], columnNameCollection[9]);
+            return new AftaleProxy(
+                systemProxy,
+                GetAppointmentIdentifier(dataReader, columnNameCollection[0]),
+                fromDate.Add(GetAppointmentTime(dataReader, columnNameCollection[2])),
+                fromDate.Add(GetAppointmentTime(dataReader, columnNameCollection[3])),
+                GetAppointmentSubject(dataReader, columnNameCollection[5]),
+                GetAppointmentProperties(dataReader, columnNameCollection[4]))
+            {
+                Notat = GetAppointmentNote(dataReader, columnNameCollection[6])
+            };
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the appointment identifier from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Appointment identifier.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or when <paramref name="columnName"/> is null, empty or whitespace.</exception>
+        private static int GetAppointmentIdentifier(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.GetInt32(columnName);
+        }
+
+        /// <summary>
+        /// Gets the appointment date from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Appointment date.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or when <paramref name="columnName"/> is null, empty or whitespace.</exception>
+        private static DateTime GetAppointmentDate(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.GetMySqlDateTime(columnName).GetDateTime().Date;
+        }
+
+        /// <summary>
+        /// Gets an appointment time from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Appointment time.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or when <paramref name="columnName"/> is null, empty or whitespace.</exception>
+        private static TimeSpan GetAppointmentTime(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.GetTimeSpan(columnName);
+        }
+
+        /// <summary>
+        /// Gets the appointment properties from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Appointment properties.</returns>
+        private static int GetAppointmentProperties(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.IsDBNull(dataReader.GetOrdinal(columnName)) ? 0 : dataReader.GetInt32(columnName);
+        }
+
+        /// <summary>
+        /// Gets the appointment subject from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Appointment subject.</returns>
+        private static string GetAppointmentSubject(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.IsDBNull(dataReader.GetOrdinal(columnName)) ? null : dataReader.GetString(columnName);
+        }
+
+        /// <summary>
+        /// Gets the appointment note from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader.</param>
+        /// <param name="columnName">Column name.</param>
+        /// <returns>Appointment note.</returns>
+        private static string GetAppointmentNote(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.IsDBNull(dataReader.GetOrdinal(columnName)) ? null : dataReader.GetString(columnName);
         }
 
         #endregion

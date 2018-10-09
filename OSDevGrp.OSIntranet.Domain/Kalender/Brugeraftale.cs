@@ -1,6 +1,6 @@
-﻿using System;
-using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
+﻿using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
 namespace OSDevGrp.OSIntranet.Domain.Kalender
 {
@@ -11,9 +11,9 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
     {
         #region Private variables
 
-        private readonly ISystem _system;
-        private readonly IAftale _aftale;
-        private readonly IBruger _bruger;
+        private ISystem _system;
+        private IAftale _aftale;
+        private IBruger _bruger;
 
         #endregion
 
@@ -29,18 +29,10 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         public Brugeraftale(ISystem system, IAftale aftale, IBruger bruger, int properties = 0) 
             : base(properties)
         {
-            if (system == null)
-            {
-                throw new ArgumentNullException("system");
-            }
-            if (aftale == null)
-            {
-                throw new ArgumentNullException("aftale");
-            }
-            if (bruger == null)
-            {
-                throw new ArgumentNullException("bruger");
-            }
+            ArgumentNullGuard.NotNull(system, nameof(system))
+                .NotNull(aftale, nameof(aftale))
+                .NotNull(bruger, nameof(bruger));
+
             _system = system;
             _aftale = aftale;
             _bruger = bruger;
@@ -55,9 +47,12 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual ISystem System
         {
-            get
+            get => _system;
+            protected set
             {
-                return _system;
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _system = value;
             }
         }
 
@@ -66,9 +61,12 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual IAftale Aftale
         {
-            get
+            get => _aftale;
+            protected set
             {
-                return _aftale;
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _aftale = value;
             }
         }
 
@@ -77,9 +75,12 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual IBruger Bruger
         {
-            get
+            get => _bruger;
+            protected set
             {
-                return _bruger;
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _bruger = value;
             }
         }
 

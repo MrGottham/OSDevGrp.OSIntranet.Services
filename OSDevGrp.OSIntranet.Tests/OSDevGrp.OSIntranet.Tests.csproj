@@ -425,7 +425,6 @@
     <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\FoodWasteDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
-    <Compile Include="Unittests\Repositories\DataProxies\DataProxyHelperTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\DbCommandTestBuilder.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\DbCommandTestExecutor.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\FoodWaste\DataProviderProxyTests.cs" />

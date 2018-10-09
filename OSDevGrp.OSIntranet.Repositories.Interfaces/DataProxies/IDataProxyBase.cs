@@ -8,7 +8,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies
     /// </summary>
     /// <typeparam name="TDataReader">Type of the data reader which supports this data proxy.</typeparam>
     /// <typeparam name="TDbCommand">Type of the database command for SQL statements which the proxy should create.</typeparam>
-    public interface IDataProxyBase<in TDataReader, out TDbCommand> where TDataReader : IDataReader where TDbCommand : IDbCommand
+    public interface IDataProxyBase<TDataReader, TDbCommand> where TDataReader : IDataReader where TDbCommand : IDbCommand
     {
         /// <summary>
         /// Mapper data fra en data reader.

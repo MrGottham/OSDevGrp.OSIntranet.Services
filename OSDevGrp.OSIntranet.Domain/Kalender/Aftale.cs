@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.Domain.Comparers;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Domain.Kalender
@@ -16,12 +17,12 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
     {
         #region Private variables
 
-        private readonly ISystem _system;
-        private readonly int _id;
+        private ISystem _system;
+        private int _id;
         private DateTime _fraTidspunkt;
         private DateTime _tilTidspunkt;
         private string _emne;
-        private readonly IList<IBrugeraftale> _deltagere = new List<IBrugeraftale>();
+        private IList<IBrugeraftale> _deltagere = new List<IBrugeraftale>();
 
         #endregion
 
@@ -39,19 +40,14 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         public Aftale(ISystem system, int id, DateTime fraTidspunkt, DateTime tilTidspunkt, string emne, int properties = 0)
             : base(properties)
         {
-            if (system == null)
-            {
-                throw new ArgumentNullException("system");
-            }
+            ArgumentNullGuard.NotNull(system, nameof(system))
+                .NotNullOrWhiteSpace(emne, nameof(emne));
+
             if (fraTidspunkt.CompareTo(tilTidspunkt) >= 0)
             {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                               fraTidspunkt, "fraTidspunkt"));
+                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, fraTidspunkt, "fraTidspunkt"));
             }
-            if (string.IsNullOrEmpty(emne))
-            {
-                throw new ArgumentNullException("emne");
-            }
+
             _system = system;
             _id = id;
             _fraTidspunkt = fraTidspunkt;
@@ -68,9 +64,12 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual ISystem System
         {
-            get
+            get => _system;
+            protected set
             {
-                return _system;
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _system = value;
             }
         }
 
@@ -79,10 +78,8 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual int Id
         {
-            get
-            {
-                return _id;
-            }
+            get => _id;
+            protected set => _id = value;
         }
 
         /// <summary>
@@ -90,17 +87,14 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual DateTime FraTidspunkt
         {
-            get
-            {
-                return _fraTidspunkt;
-            }
+            get => _fraTidspunkt;
             set
             {
                 if (value.CompareTo(TilTidspunkt) >= 0)
                 {
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value,
-                                                                                   "value"));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
                 }
+
                 _fraTidspunkt = value;
             }
         }
@@ -110,17 +104,14 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual DateTime TilTidspunkt
         {
-            get
-            {
-                return _tilTidspunkt;
-            }
+            get => _tilTidspunkt;
             set
             {
                 if (value.CompareTo(FraTidspunkt) <= 0)
                 {
-                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value,
-                                                                                   "value"));
+                    throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
                 }
+
                 _tilTidspunkt = value;
             }
         }
@@ -130,16 +121,11 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// </summary>
         public virtual string Emne
         {
-            get
-            {
-                return _emne;
-            }
+            get => _emne;
             set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException("value");
-                }
+                ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
                 _emne = value;
             }
         }
@@ -163,6 +149,12 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
                 var comparer = new BrugeraftaleComparer(new KalenderbrugerComparer());
                 return _deltagere.OrderBy(m => m, comparer).ToList();
             }
+            protected set
+            {
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _deltagere = new List<IBrugeraftale>(value);
+            }
         }
 
         #endregion
@@ -175,38 +167,29 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// <param name="deltager">Brugeraftale for deltageren.</param>
         public virtual void TilføjDeltager(IBrugeraftale deltager)
         {
-            if (deltager == null)
-            {
-                throw new ArgumentNullException("deltager");
-            }
+            ArgumentNullGuard.NotNull(deltager, nameof(deltager));
+
             if (deltager.System.Nummer != System.Nummer)
             {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                               deltager.System.Nummer,
-                                                                               "deltager.System.Nummer"));
+                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, deltager.System.Nummer, "deltager.System.Nummer"));
             }
             if (deltager.Aftale.System.Nummer != System.Nummer)
             {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                               deltager.Aftale.System.Nummer,
-                                                                               "deltager.Aftale.System.Nummer"));
+                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, deltager.Aftale.System.Nummer, "deltager.Aftale.System.Nummer"));
             }
             if (deltager.Aftale.Id != Id)
             {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                               deltager.Aftale.Id, "deltager.Aftale.Id"));
+                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, deltager.Aftale.Id, "deltager.Aftale.Id"));
             }
             if (deltager.Bruger.System.Nummer != System.Nummer)
             {
-                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue,
-                                                                               deltager.Bruger.System.Nummer,
-                                                                               "deltager.Bruger.System.Nummer"));
+                throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, deltager.Bruger.System.Nummer, "deltager.Bruger.System.Nummer"));
             }
             if (Deltagere.SingleOrDefault(m => m.Bruger.System.Nummer == deltager.Bruger.System.Nummer && m.Bruger.Id == deltager.Bruger.Id) != null)
             {
-                throw new IntranetBusinessException(
-                    Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentAlreadyExists));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentAlreadyExists));
             }
+
             _deltagere.Add(deltager);
         }
 
@@ -216,15 +199,13 @@ namespace OSDevGrp.OSIntranet.Domain.Kalender
         /// <param name="deltager">Brugeraftale for deltageren.</param>
         public virtual void FjernDeltager(IBrugeraftale deltager)
         {
-            if (deltager == null)
-            {
-                throw new ArgumentNullException("deltager");
-            }
+            ArgumentNullGuard.NotNull(deltager, nameof(deltager));
+
             if (!_deltagere.Contains(deltager))
             {
-                throw new IntranetBusinessException(
-                    Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentDontExists));
+                throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentDontExists));
             }
+
             _deltagere.Remove(deltager);
         }
 
