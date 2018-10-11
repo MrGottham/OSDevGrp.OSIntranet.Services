@@ -93,7 +93,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             ITranslationProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateMySqlDataProvider()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -127,7 +127,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             MySqlDataReader dataReader = CreateMySqlDataReader(identifier, translationOfIdentifier, value);
 
             ITranslationInfoProxy translationInfoProxy = BuildTranslationInfoProxy(Guid.NewGuid());
-            IMySqlDataProvider dataProvider = CreateMySqlDataProvider(translationInfoProxy);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationInfoProxy);
 
             sut.MapData(dataReader, dataProvider);
 
@@ -193,7 +193,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.SaveRelations(CreateMySqlDataProvider(), _fixture.Create<bool>()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
@@ -224,7 +224,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.DeleteRelations(CreateMySqlDataProvider()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
@@ -367,16 +367,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Creates a mockup for the data provider which uses MySQL.
+        /// Creates a mockup for the data provider which can access data in the food waste repository.
         /// </summary>
-        /// <returns>Mockup for the data provider which uses MySQL.</returns>
-        private IMySqlDataProvider CreateMySqlDataProvider(ITranslationInfoProxy translationInfoProxy = null)
+        /// <returns>Mockup for the data provider which can access data in the food waste repository.</returns>
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(ITranslationInfoProxy translationInfoProxy = null)
         {
-            IMySqlDataProvider mySqlDataProviderMock = MockRepository.GenerateMock<IMySqlDataProvider>();
-            mySqlDataProviderMock.Stub(m => m.Create(Arg<ITranslationInfoProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+            IFoodWasteDataProvider foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProviderMock.Stub(m => m.Create(Arg<ITranslationInfoProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
                 .Return(translationInfoProxy ?? BuildTranslationInfoProxy(Guid.NewGuid()))
                 .Repeat.Any();
-            return mySqlDataProviderMock;
+            return foodWasteDataProviderMock;
         }
 
         /// <summary>

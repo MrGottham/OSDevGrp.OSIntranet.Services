@@ -89,7 +89,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             ITranslationInfoProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateMySqlDataProvider()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -121,7 +121,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             string cultureName = CultureInfo.CurrentCulture.Name;
             MySqlDataReader dataReader = CreateMySqlDataReader(translationInfoIdentifier, cultureName);
 
-            sut.MapData(dataReader, CreateMySqlDataProvider());
+            sut.MapData(dataReader, CreateFoodWasteDataProvider());
 
             Assert.That(sut.Identifier, Is.Not.Null);
             Assert.That(sut.Identifier, Is.EqualTo(translationInfoIdentifier));
@@ -174,7 +174,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             ITranslationInfoProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateMySqlDataProvider(), _fixture.Create<bool>()));
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
 
             TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
@@ -202,7 +202,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             ITranslationInfoProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateMySqlDataProvider()));
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
 
             TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
@@ -288,7 +288,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             ITranslationInfoProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(null, CreateMySqlDataProvider(), _fixture.Create<string>(), _fixture.Create<string>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(null, CreateFoodWasteDataProvider(), _fixture.Create<string>(), _fixture.Create<string>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -316,7 +316,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             ITranslationInfoProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), CreateMySqlDataProvider(), null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), CreateFoodWasteDataProvider(), null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "columnNameCollection");
         }
@@ -334,7 +334,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             string cultureName = CultureInfo.CurrentCulture.Name;
             MySqlDataReader dataReader = CreateMySqlDataReader(translationInfoIdentifier, cultureName);
 
-            ITranslationInfoProxy result = sut.Create(dataReader, CreateMySqlDataProvider(), "TranslationInfoIdentifier", "CultureName");
+            ITranslationInfoProxy result = sut.Create(dataReader, CreateFoodWasteDataProvider(), "TranslationInfoIdentifier", "CultureName");
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Identifier, Is.Not.Null);
             Assert.That(result.Identifier, Is.EqualTo(translationInfoIdentifier));
@@ -400,12 +400,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Creates a mockup for the data provider which uses MySQL.
+        /// Creates a mockup for the data provider which can access data in the food waste repository.
         /// </summary>
-        /// <returns>Mockup for the data provider which uses MySQL.</returns>
-        private IMySqlDataProvider CreateMySqlDataProvider()
+        /// <returns>Mockup for the data provider which can access data in the food waste repository.</returns>
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider()
         {
-            return MockRepository.GenerateMock<IMySqlDataProvider>();
+            return MockRepository.GenerateMock<IFoodWasteDataProvider>();
         }
     }
 }

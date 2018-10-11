@@ -4,7 +4,7 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.DataProviders;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -16,6 +16,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class DataProviderProxy : DataProvider, IDataProviderProxy
     {
+        #region Private variables
+
+        private bool _translationCollectionHasBeenLoaded;
+        private IFoodWasteDataProvider _dataProvider;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -38,7 +45,30 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy
+        #region Properties
+
+        /// <summary>
+        /// Gets the translations for the data provider.
+        /// </summary>
+        public override IEnumerable<ITranslation> Translations
+        {
+            get
+            {
+                if (_translationCollectionHasBeenLoaded || _dataProvider == null)
+                {
+                    return base.Translations;
+                }
+
+                Translations = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(_dataProvider, DataSourceStatementIdentifier));
+                _translationCollectionHasBeenLoaded = true;
+
+                return base.Translations;
+            }
+        }
+
+        #endregion
+
+        #region IMySqlDataProxy Members
 
         /// <summary>
         /// Gets the unique identification for the data provider.
@@ -55,54 +85,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
-        /// <summary>
-        /// Gets the SQL statement for selecting a given data provider.
-        /// </summary>
-        /// <param name="dataProvider">Data provider for which to get the SQL statement for selecting.</param>
-        /// <returns>SQL statement for selection af given data provider.</returns>
-        public virtual string GetSqlQueryForId(IDataProvider dataProvider)
-        {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
-            if (dataProvider.Identifier.HasValue)
-            {
-                return string.Format("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProvider.Identifier.Value.ToString("D").ToUpper());
-            }
-            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to insert this data provider.
-        /// </summary>
-        /// <returns>SQL statement to insert this data provider.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            return string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES('{0}','{1}',{2},'{3}')", UniqueId, Name, Convert.ToInt32(HandlesPayments), DataSourceStatementIdentifier.ToString("D").ToUpper());
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to update this data provider.
-        /// </summary>
-        /// <returns>SQL statement to update this data provider,</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            return string.Format("UPDATE DataProviders SET Name='{1}',HandlesPayments={2},DataSourceStatementIdentifier='{3}' WHERE DataProviderIdentifier='{0}'", UniqueId, Name, Convert.ToInt32(HandlesPayments), DataSourceStatementIdentifier.ToString("D").ToUpper());
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to delete this data provider.
-        /// </summary>
-        /// <returns>SQL statement to delete this data provider.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM DataProviders WHERE DataProviderIdentifier='{0}'", UniqueId);
-        }
-
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Maps data from the data reader.
@@ -111,19 +96,16 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
-            Identifier = new Guid(dataReader.GetString("DataProviderIdentifier"));
-            Name = dataReader.GetString("Name");
-            HandlesPayments = Convert.ToBoolean(dataReader.GetInt32("HandlesPayments"));
-            DataSourceStatementIdentifier = new Guid(dataReader.GetString("DataSourceStatementIdentifier"));
+            Identifier = GetDataProviderIdentifier(dataReader, "DataProviderIdentifier");
+            Name = GetDataProviderName(dataReader, "Name");
+            HandlesPayments = GetHandlesPayments(dataReader, "HandlesPayments");
+            DataSourceStatementIdentifier = GetDataSourceStatementIdentifier(dataReader, "DataSourceStatementIdentifier");
+
+            _translationCollectionHasBeenLoaded = false;
+            _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }
 
         /// <summary>
@@ -132,12 +114,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
 
             Translations = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(dataProvider, DataSourceStatementIdentifier));
+
+            _translationCollectionHasBeenLoaded = true;
+            _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }
 
         /// <summary>
@@ -165,7 +147,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for getting this data provider.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+            return new SystemDataCommandBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier=@dataProviderIdentifier")
+                .AddDataProviderIdentifierParameter(Identifier)
+                .Build();
         }
 
         /// <summary>
@@ -174,7 +158,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for inserting this data provider.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new SystemDataCommandBuilder("INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES(@dataProviderIdentifier,@name,@handlesPayments,@dataSourceStatementIdentifier)")
+                .AddDataProviderIdentifierParameter(Identifier)
+                .AddDataProviderNameParameter(Name)
+                .AddHandlesPaymentsParameter(HandlesPayments)
+                .AddDataSourceStatementIdentifierParameter(DataSourceStatementIdentifier)
+                .Build();
         }
 
         /// <summary>
@@ -183,7 +172,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for updating this data provider.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new SystemDataCommandBuilder("UPDATE DataProviders SET Name=@name,HandlesPayments=@handlesPayments,DataSourceStatementIdentifier=@dataSourceStatementIdentifier WHERE DataProviderIdentifier=@dataProviderIdentifier")
+                .AddDataProviderIdentifierParameter(Identifier)
+                .AddDataProviderNameParameter(Name)
+                .AddHandlesPaymentsParameter(HandlesPayments)
+                .AddDataSourceStatementIdentifierParameter(DataSourceStatementIdentifier)
+                .Build();
         }
 
         /// <summary>
@@ -192,7 +186,99 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for deleting this data provider.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+            return new SystemDataCommandBuilder("DELETE FROM DataProviders WHERE DataProviderIdentifier=@dataProviderIdentifier")
+                .AddDataProviderIdentifierParameter(Identifier)
+                .Build();
+        }
+
+        #endregion
+
+        #region IMySqlDataProxyCreator<IDataProviderProxy> Members
+
+        /// <summary>
+        /// Creates an instance of the data proxy to a given data provider with values from the data reader.
+        /// </summary>
+        /// <param name="dataReader">Data reader from which column values should be read.</param>
+        /// <param name="dataProvider">Data provider which supports the data reader.</param>
+        /// <param name="columnNameCollection">Collection of column names which should be read from the data reader.</param>
+        /// <returns>Instance of the data proxy to a given data provider with values from the data reader.</returns>
+        public virtual IDataProviderProxy Create(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, params string[] columnNameCollection)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(columnNameCollection, nameof(columnNameCollection));
+
+            return new DataProviderProxy(
+                GetDataProviderName(dataReader, columnNameCollection[1]),
+                GetHandlesPayments(dataReader, columnNameCollection[2]),
+                GetDataSourceStatementIdentifier(dataReader, columnNameCollection[3]))
+            {
+                Identifier = GetDataProviderIdentifier(dataReader, columnNameCollection[0])
+            };
+        }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Gets the data provider identifier from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader from which to read.</param>
+        /// <param name="columnName">The column name for value to read.</param>
+        /// <returns>The data provider identifier.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or <paramref name="columnName"/> is null, empty or white space.</exception>
+        private static Guid GetDataProviderIdentifier(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return new Guid(dataReader.GetString(columnName));
+        }
+
+        /// <summary>
+        /// Gets the name of the data provider from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader from which to read.</param>
+        /// <param name="columnName">The column name for value to read.</param>
+        /// <returns>The name of the data provider.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or <paramref name="columnName"/> is null, empty or white space.</exception>
+        private static string GetDataProviderName(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return dataReader.GetString(columnName);
+        }
+
+        /// <summary>
+        /// Gets whether the data provider handles payments from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader from which to read.</param>
+        /// <param name="columnName">The column name for value to read.</param>
+        /// <returns>Whether the data provider handles payments.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or <paramref name="columnName"/> is null, empty or white space.</exception>
+        private static bool GetHandlesPayments(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return Convert.ToBoolean(dataReader.GetInt32(columnName));
+        }
+
+        /// <summary>
+        /// Gets the data source statement identifier from the data reader.
+        /// </summary>
+        /// <param name="dataReader">The data reader from which to read.</param>
+        /// <param name="columnName">The column name for value to read.</param>
+        /// <returns>The data source statement identifier.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataReader"/> is null or <paramref name="columnName"/> is null, empty or white space.</exception>
+        private static Guid GetDataSourceStatementIdentifier(MySqlDataReader dataReader, string columnName)
+        {
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNullOrWhiteSpace(columnName, nameof(columnName));
+
+            return new Guid(dataReader.GetString(columnName));
         }
 
         #endregion

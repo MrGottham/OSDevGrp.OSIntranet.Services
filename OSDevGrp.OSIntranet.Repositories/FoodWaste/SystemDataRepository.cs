@@ -361,7 +361,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name").Build();
+                MySqlCommand command = new SystemDataCommandBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name").Build();
                 return DataProvider.GetCollection<DataProviderProxy>(command);
             }
             catch (IntranetRepositoryException)
@@ -382,7 +382,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name").Build();
+                MySqlCommand command = new SystemDataCommandBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name").Build();
                 return DataProvider.GetCollection<DataProviderProxy>(command);
             }
             catch (IntranetRepositoryException)
@@ -430,7 +430,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName").Build();
+                MySqlCommand command = new SystemDataCommandBuilder("SELECT TranslationInfoIdentifier,CultureName FROM TranslationInfos ORDER BY CultureName").Build();
                 return DataProvider.GetCollection<TranslationInfoProxy>(command);
             }
             catch (IntranetRepositoryException)

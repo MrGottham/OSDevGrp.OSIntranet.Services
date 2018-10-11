@@ -25,6 +25,49 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Adds a data provider identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the data provider identifier.</param>
+        internal SystemDataCommandBuilder AddDataProviderIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@dataProviderIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a data provider name parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the data provider name.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null, empty or white space.</exception>
+        internal SystemDataCommandBuilder AddDataProviderNameParameter(string value)
+        {
+            ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
+            AddVarCharParameter("@name", value, 256);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a handles payments parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the handles payments.</param>
+        internal SystemDataCommandBuilder AddHandlesPaymentsParameter(bool? value)
+        {
+            AddBitParameter("@handlesPayments", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a data source statement identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the data source statement identifier.</param>
+        internal SystemDataCommandBuilder AddDataSourceStatementIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@dataSourceStatementIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
         /// Adds a translation identifier parameter to the command.
         /// </summary>
         /// <param name="value">The value for the translation identifier.</param>

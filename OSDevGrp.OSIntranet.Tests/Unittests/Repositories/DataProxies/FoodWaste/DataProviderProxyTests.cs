@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -18,25 +19,76 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class DataProviderProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+        private Random _random;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _random = new Random(_fixture.Create<int>());
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a data proxy to a given data provider.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializeDataProviderProxy()
         {
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
-            Assert.That(dataProviderProxy.Identifier, Is.Null);
-            Assert.That(dataProviderProxy.Identifier.HasValue, Is.False);
-            Assert.That(dataProviderProxy.Translation, Is.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Empty);
-            Assert.That(dataProviderProxy.Name, Is.Null);
-            Assert.That(dataProviderProxy.HandlesPayments, Is.False);
-            Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(Guid.Empty));
-            Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Empty);
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Empty);
+            Assert.That(sut.Name, Is.Null);
+            Assert.That(sut.HandlesPayments, Is.False);
+            Assert.That(sut.DataSourceStatementIdentifier, Is.EqualTo(Guid.Empty));
+            Assert.That(sut.DataSourceStatement, Is.Null);
+            Assert.That(sut.DataSourceStatements, Is.Not.Null);
+            Assert.That(sut.DataSourceStatements, Is.Empty);
+        }
+
+        /// <summary>
+        /// Tests that Translation maps translations and data source statements into the proxy when MapData has been called and MapRelations has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatTranslationMapTranslationsAndDataSourceStatementsIntoProxyWhenMapDataHasBeenCalledAndMapRelationsHasNotBeenCalled()
+        {
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid dataSourceStatementIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(Guid.NewGuid(), _fixture.Create<string>(), _fixture.Create<bool>(), dataSourceStatementIdentifier);
+
+            IEnumerable<TranslationProxy> translationProxyCollection = BuildTranslationProxyCollection(dataSourceStatementIdentifier);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            sut.MapData(dataReader, dataProvider);
+
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Not.Empty);
+            Assert.That(sut.Translations, Is.EqualTo(translationProxyCollection));
+            Assert.That(sut.DataSourceStatement, Is.Null);
+            Assert.That(sut.DataSourceStatements, Is.Not.Null);
+            Assert.That(sut.DataSourceStatements, Is.Not.Empty);
+            Assert.That(sut.DataSourceStatements, Is.EqualTo(translationProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", dataSourceStatementIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -45,19 +97,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenDataProviderProxyHasNoIdentifier()
         {
-            var dataProviderProxy = new DataProviderProxy
-            {
-                Identifier = null
-            };
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            sut.Identifier = null;
 
             // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var uniqueId = dataProviderProxy.UniqueId; });
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => {var uniqueId = sut.UniqueId;});
             // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProviderProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -66,144 +115,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterGetsUniqueIdentificationForDataProviderProxy()
         {
-            var dataProviderProxy = new DataProviderProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
+            Guid identifier = Guid.NewGuid();
 
-            var uniqueId = dataProviderProxy.UniqueId;
+            IDataProviderProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(uniqueId, Is.EqualTo(dataProviderProxy.Identifier.Value.ToString("D").ToUpper()));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given data provider is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenDataProviderIsNull()
-        {
-            var dataProviderProxy = new DataProviderProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<ArgumentNullException>(() => { var sqlQueryForId = dataProviderProxy.GetSqlQueryForId(null); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given data provider has no value.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnDataProviderHasNoValue()
-        {
-            var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
-            dataProviderMock.Expect(m => m.Identifier)
-                .Return(null)
-                .Repeat.Any();
-
-            var dataProviderProxy = new DataProviderProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var sqlQueryForId = dataProviderProxy.GetSqlQueryForId(dataProviderMock); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProviderMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given data provider.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
-        {
-            var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
-            dataProviderMock.Expect(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var dataProviderProxy = new DataProviderProxy();
-
-            var sqlQueryForId = dataProviderProxy.GetSqlQueryForId(dataProviderMock);
-            Assert.That(sqlQueryForId, Is.Not.Null);
-            Assert.That(sqlQueryForId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProviderMock.Identifier.Value.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a given data provider.
-        /// </summary>
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(bool handlesPayments)
-        {
-            var fixture = new Fixture();
-
-            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), handlesPayments, Guid.NewGuid())
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = dataProviderProxy.GetSqlCommandForInsert();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES('{0}','{1}',{2},'{3}')", dataProviderProxy.UniqueId, dataProviderProxy.Name, Convert.ToInt32(handlesPayments), dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a given data provider.
-        /// </summary>
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(bool handlesPayments)
-        {
-            var fixture = new Fixture();
-
-            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), handlesPayments, Guid.NewGuid())
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = dataProviderProxy.GetSqlCommandForUpdate();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE DataProviders SET Name='{1}',HandlesPayments={2},DataSourceStatementIdentifier='{3}' WHERE DataProviderIdentifier='{0}'", dataProviderProxy.UniqueId, dataProviderProxy.Name, Convert.ToInt32(handlesPayments), dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete a given data provider.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
-        {
-            var fixture = new Fixture();
-
-            var dataProviderProxy = new DataProviderProxy(fixture.Create<string>(), fixture.Create<bool>(), Guid.NewGuid())
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = dataProviderProxy.GetSqlCommandForDelete();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("DELETE FROM DataProviders WHERE DataProviderIdentifier='{0}'", dataProviderProxy.UniqueId)));
+            Assert.That(uniqueId, Is.EqualTo(identifier.ToString("D").ToUpper()));
         }
 
         /// <summary>
@@ -212,18 +132,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => dataProviderProxy.MapData(null, fixture.Create<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataReader"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
 
         /// <summary>
@@ -232,91 +146,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => dataProviderProxy.MapData(fixture.Create<MySqlDataReader>(), null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
-        /// Tests that MapData and MapRelations maps data into the proxy.
+        /// Tests that MapData maps data into the proxy.
         /// </summary>
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(bool handlesPayments)
+        public void TestThatMapDataMapsDataIntoProxy(bool handlesPayments)
         {
-            var fixture = new Fixture();
-            fixture.Customize<TranslationProxy>(e => e.FromFactory(() => new TranslationProxy(new Guid("1AFF5DC2-26B4-4E0B-ACFF-71E669B5CDCB"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>())));
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationProxyCollection = fixture.CreateMany<TranslationProxy>(2).ToList();
-            var dataProviderBaseMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            dataProviderBaseMock.Stub(m => m.Clone())
-                .Return(dataProviderBaseMock)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull))
-                .Return(translationProxyCollection)
-                .Repeat.Any();
+            Guid identifier = Guid.NewGuid();
+            string name = _fixture.Create<string>();
+            Guid dataSourceStatementIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(identifier, name, handlesPayments, dataSourceStatementIdentifier);
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
-                .Return("93660448-B33D-4732-8AC4-9A2FCB51C4BD")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("Name")))
-                .Return(fixture.Create<string>())
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetInt32(Arg<string>.Is.Equal("HandlesPayments")))
-                .Return(Convert.ToInt32(handlesPayments))
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("DataSourceStatementIdentifier")))
-                .Return("1AFF5DC2-26B4-4E0B-ACFF-71E669B5CDCB")
-                .Repeat.Any();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
 
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
-            Assert.That(dataProviderProxy.Identifier, Is.Null);
-            Assert.That(dataProviderProxy.Identifier.HasValue, Is.False);
-            Assert.That(dataProviderProxy.Translation, Is.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Empty);
-            Assert.That(dataProviderProxy.Name, Is.Null);
-            Assert.That(dataProviderProxy.HandlesPayments, Is.False);
-            Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.EqualTo(Guid.Empty));
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Empty);
+            sut.MapData(dataReader, dataProvider);
 
-            dataProviderProxy.MapData(dataReader, dataProviderBaseMock);
-            dataProviderProxy.MapRelations(dataProviderBaseMock);
-            Assert.That(dataProviderProxy.Identifier, Is.Not.Null);
-            Assert.That(dataProviderProxy.Identifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(dataProviderProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("DataProviderIdentifier")));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(dataProviderProxy.Translation, Is.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Not.Null);
-            Assert.That(dataProviderProxy.Translations, Is.Not.Empty);
-            Assert.That(dataProviderProxy.Translations, Is.EqualTo(translationProxyCollection));
-            Assert.That(dataProviderProxy.Name, Is.Not.Null);
-            Assert.That(dataProviderProxy.Name, Is.Not.Empty);
-            Assert.That(dataProviderProxy.Name, Is.EqualTo(dataReader.GetString("Name")));
-            Assert.That(dataProviderProxy.HandlesPayments, Is.EqualTo(handlesPayments));
-            Assert.That(dataProviderProxy.DataSourceStatementIdentifier, Is.Not.EqualTo(Guid.Empty));
-            Assert.That(dataProviderProxy.DataSourceStatementIdentifier.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("DataSourceStatementIdentifier")));
-            Assert.That(dataProviderProxy.DataSourceStatement, Is.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
-            Assert.That(dataProviderProxy.DataSourceStatements, Is.EqualTo(translationProxyCollection));
-            
-            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
-            dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReader.GetString("DataSourceStatementIdentifier")))));
+            Assert.That(sut.Identifier, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.EqualTo(identifier));
+            Assert.That(sut.Name, Is.Not.Null);
+            Assert.That(sut.Name, Is.Not.Empty);
+            Assert.That(sut.Name, Is.EqualTo(name));
+            Assert.That(sut.HandlesPayments, Is.EqualTo(handlesPayments));
+            Assert.That(sut.DataSourceStatementIdentifier, Is.Not.EqualTo(Guid.Empty));
+            Assert.That(sut.DataSourceStatementIdentifier, Is.EqualTo(dataSourceStatementIdentifier));
+
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Name")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("HandlesPayments")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("DataSourceStatementIdentifier")), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
         }
 
         /// <summary>
@@ -325,34 +197,59 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<MySqlDataReader>(e => e.FromFactory(() => MockRepository.GenerateStub<MySqlDataReader>()));
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapRelations(null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => dataProviderProxy.MapRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
-        
+
+        /// <summary>
+        /// Tests that MapRelations maps translations and data source statements into the proxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsMapTranslationsAndDataSourceStatementsIntoProxy()
+        {
+            Guid dataSourceStatementIdentifier = Guid.NewGuid();
+
+            IDataProviderProxy sut = CreateSut(Guid.NewGuid(), _fixture.Create<string>(), _fixture.Create<bool>(), dataSourceStatementIdentifier);
+            Assert.That(sut, Is.Not.Null);
+
+            IEnumerable<TranslationProxy> translationProxyCollection = BuildTranslationProxyCollection(dataSourceStatementIdentifier);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            sut.MapRelations(dataProvider);
+
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Not.Empty);
+            Assert.That(sut.Translations, Is.EqualTo(translationProxyCollection));
+            Assert.That(sut.DataSourceStatement, Is.Null);
+            Assert.That(sut.DataSourceStatements, Is.Not.Null);
+            Assert.That(sut.DataSourceStatements, Is.Not.Empty);
+            Assert.That(sut.DataSourceStatements, Is.EqualTo(translationProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", dataSourceStatementIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
         /// <summary>
         /// Tests that SaveRelations throws an NotSupportedException when the data provider is null.
         /// </summary>
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
         {
-            var fixture = new Fixture();
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(null, _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.SaveRelations(null, fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -361,15 +258,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.SaveRelations(fixture.Create<IMySqlDataProvider>(), fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -378,12 +272,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
         {
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.DeleteRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(null));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -392,15 +286,255 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IMySqlDataProvider>(e => e.FromFactory(() => MockRepository.GenerateMock<IMySqlDataProvider>()));
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderProxy = new DataProviderProxy();
-            Assert.That(dataProviderProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => dataProviderProxy.DeleteRelations(fixture.Create<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
+        }
+
+        /// <summary>
+        /// Tests that CreateGetCommand returns the SQL command for selecting the given data provider.
+        /// </summary>
+        [Test]
+        public void TestThatCreateGetCommandReturnsSqlCommand()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IDataProviderProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE DataProviderIdentifier=@dataProviderIdentifier")
+                .AddCharDataParameter("@dataProviderIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateInsertCommand returns the SQL command to insert a given data provider.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateInsertCommandReturnsSqlCommandForInsert(bool handlesPayments)
+        {
+            Guid identifier = Guid.NewGuid();
+            string name = _fixture.Create<string>();
+            Guid dataSourceStatementIdentifier = Guid.NewGuid();
+
+            IDataProviderProxy sut = CreateSut(identifier, name, handlesPayments, dataSourceStatementIdentifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("INSERT INTO DataProviders (DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier) VALUES(@dataProviderIdentifier,@name,@handlesPayments,@dataSourceStatementIdentifier)")
+                .AddCharDataParameter("@dataProviderIdentifier", identifier)
+                .AddVarCharDataParameter("@name", name, 256)
+                .AddBitDataParameter("@handlesPayments", handlesPayments)
+                .AddCharDataParameter("@dataSourceStatementIdentifier", dataSourceStatementIdentifier)
+                .Build()
+                .Run(sut.CreateInsertCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateUpdateCommand returns the SQL command to update a given data provider.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateUpdateCommandReturnsSqlCommandForUpdate(bool handlesPayments)
+        {
+            Guid identifier = Guid.NewGuid();
+            string name = _fixture.Create<string>();
+            Guid dataSourceStatementIdentifier = Guid.NewGuid();
+
+            IDataProviderProxy sut = CreateSut(identifier, name, handlesPayments, dataSourceStatementIdentifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("UPDATE DataProviders SET Name=@name,HandlesPayments=@handlesPayments,DataSourceStatementIdentifier=@dataSourceStatementIdentifier WHERE DataProviderIdentifier=@dataProviderIdentifier")
+                .AddCharDataParameter("@dataProviderIdentifier", identifier)
+                .AddVarCharDataParameter("@name", name, 256)
+                .AddBitDataParameter("@handlesPayments", handlesPayments)
+                .AddCharDataParameter("@dataSourceStatementIdentifier", dataSourceStatementIdentifier)
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateDeleteCommand returns the SQL command to delete a given data provider.
+        /// </summary>
+        [Test]
+        public void TestThatCreateDeleteCommandReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IDataProviderProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("DELETE FROM DataProviders WHERE DataProviderIdentifier=@dataProviderIdentifier")
+                .AddCharDataParameter("@dataProviderIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data reader is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataReaderIsNull()
+        {
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(null, CreateFoodWasteDataProvider(), _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), null, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the column name collection is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfColumnNameCollectionIsNull()
+        {
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), CreateFoodWasteDataProvider(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "columnNameCollection");
+        }
+
+        /// <summary>
+        /// Tests that MapData creates a data proxy for a given data provider with values from the data reader.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateCreatesProxy(bool handlesPayments)
+        {
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid identifier = Guid.NewGuid();
+            string name = _fixture.Create<string>();
+            Guid dataSourceStatementIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(identifier, name, handlesPayments, dataSourceStatementIdentifier);
+
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
+
+            IDataProviderProxy result = sut.Create(dataReader, dataProvider, "DataProviderIdentifier", "Name", "HandlesPayments", "DataSourceStatementIdentifier");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Identifier, Is.Not.Null);
+            Assert.That(result.Identifier, Is.EqualTo(identifier));
+            Assert.That(result.Name, Is.Not.Null);
+            Assert.That(result.Name, Is.Not.Empty);
+            Assert.That(result.Name, Is.EqualTo(name));
+            Assert.That(result.HandlesPayments, Is.EqualTo(handlesPayments));
+            Assert.That(result.DataSourceStatementIdentifier, Is.Not.EqualTo(Guid.Empty));
+            Assert.That(result.DataSourceStatementIdentifier, Is.EqualTo(dataSourceStatementIdentifier));
+
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Name")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("HandlesPayments")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("DataSourceStatementIdentifier")), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a given data provider.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a given data provider.</returns>
+        private IDataProviderProxy CreateSut()
+        {
+            return new DataProviderProxy();
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a given data provider.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a given data provider.</returns>
+        private IDataProviderProxy CreateSut(Guid identifier)
+        {
+            return new DataProviderProxy
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a given data provider.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a given data provider.</returns>
+        private IDataProviderProxy CreateSut(Guid identifier, string name, bool handlePayments, Guid dataSourceStatementIdentifier)
+        {
+            return new DataProviderProxy(name, handlePayments, dataSourceStatementIdentifier)
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates a stub for the MySQL data reader.
+        /// </summary>
+        /// <returns>Stub for the MySQL data reader.</returns>
+        private MySqlDataReader CreateMySqlDataReader(Guid? dataProviderIdentifier = null, string name = null, bool? handlesPayments = null, Guid? dataSourceStatementIdentifier = null)
+        {
+            MySqlDataReader mySqlDataReaderMock = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
+                .Return(dataProviderIdentifier.HasValue ? dataProviderIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("Name")))
+                .Return(name ?? _fixture.Create<string>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetInt32(Arg<string>.Is.Equal("HandlesPayments")))
+                .Return(Convert.ToInt32(handlesPayments ??_fixture.Create<bool>()))
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("DataSourceStatementIdentifier")))
+                .Return(dataSourceStatementIdentifier.HasValue ? dataSourceStatementIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            return mySqlDataReaderMock;
+        }
+
+        /// <summary>
+        /// Creates a mockup for the data provider which can access data in the food waste repository.
+        /// </summary>
+        /// <returns>Mockup for the data provider which can access data in the food waste repository.</returns>
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(IEnumerable<TranslationProxy> translationProxyCollection = null)
+        {
+            IFoodWasteDataProvider foodWasteDataProvider = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProvider.Stub(m => m.Clone())
+                .Return(foodWasteDataProvider)
+                .Repeat.Any();
+            foodWasteDataProvider.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
+                .Return(translationProxyCollection ?? BuildTranslationProxyCollection(Guid.NewGuid()))
+                .Repeat.Any();
+            return foodWasteDataProvider;
+        }
+
+        /// <summary>
+        /// Build a collection of translation data proxies.
+        /// </summary>
+        /// <returns>Collection of translation data proxies.</returns>
+        private IEnumerable<TranslationProxy> BuildTranslationProxyCollection(Guid dataSourceStatementIdentifier)
+        {
+            _fixture.Customize<TranslationProxy>(composerTransformation => composerTransformation.FromFactory(() => new TranslationProxy(dataSourceStatementIdentifier, _fixture.Create<TranslationInfoProxy>(), _fixture.Create<string>())));
+
+            return _fixture.CreateMany<TranslationProxy>(_random.Next(5, 10)).ToList();
         }
     }
 }

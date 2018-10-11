@@ -78,6 +78,18 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         }
 
         /// <summary>
+        /// Adds an bit parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddBitParameter(string parameterName, bool? value, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.Bit, 1, isNullable);
+        }
+
+        /// <summary>
         /// Adds a varchar parameter to the command.
         /// </summary>
         /// <param name="parameterName">The name of the parameter.</param>

@@ -193,9 +193,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
 
-            foreach (var translationProxy in GetDomainObjectTranslations(dataProvider, translationOfIdentifier))
+            foreach (ITranslationProxy translationProxy in GetDomainObjectTranslations(dataProvider, translationOfIdentifier))
             {
-                using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
+                using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
                 {
                     subDataProvider.Delete(translationProxy);
                 }

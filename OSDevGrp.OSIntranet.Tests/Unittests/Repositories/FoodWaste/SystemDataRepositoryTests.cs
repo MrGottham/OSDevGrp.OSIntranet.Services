@@ -1060,8 +1060,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderForFoodItemsGetReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-            DataProviderProxy dataProviderProxy = fixture.Create<DataProviderProxy>();
+            DataProviderProxy dataProviderProxy = _fixture.Create<DataProviderProxy>();
 
             ISystemDataRepository sut = CreateSut(dataProviderProxy: dataProviderProxy);
             Assert.That(sut, Is.Not.Null);
@@ -1077,8 +1076,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderForFoodItemsGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1094,8 +1092,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderForFoodItemsGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1131,8 +1128,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderForFoodGroupsGetReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-            DataProviderProxy dataProviderProxy = fixture.Create<DataProviderProxy>();
+            DataProviderProxy dataProviderProxy = _fixture.Create<DataProviderProxy>();
 
             ISystemDataRepository sut = CreateSut(dataProviderProxy: dataProviderProxy);
             Assert.That(sut, Is.Not.Null);
@@ -1148,8 +1144,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderForFoodGroupsGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1165,8 +1160,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderForFoodGroupsGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1187,7 +1181,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.DataProviderGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders ORDER BY Name").Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1196,9 +1191,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderGetAllReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
-            IEnumerable<DataProviderProxy> dataProviderProxyCollection = BuildDataProviderProxyCollection(fixture);
+            IEnumerable<DataProviderProxy> dataProviderProxyCollection = BuildDataProviderProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(dataProviderProxyCollection: dataProviderProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -1217,8 +1210,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1234,8 +1226,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1256,7 +1247,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.DataProviderWhoHandlesPaymentsGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT DataProviderIdentifier,Name,HandlesPayments,DataSourceStatementIdentifier FROM DataProviders WHERE HandlesPayments=1 ORDER BY Name").Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<DataProviderProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -1265,9 +1257,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderWhoHandlesPaymentsGetAllReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
-            IEnumerable<DataProviderProxy> dataProviderProxyCollection = BuildDataProviderProxyCollection(fixture);
+            IEnumerable<DataProviderProxy> dataProviderProxyCollection = BuildDataProviderProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(dataProviderProxyCollection: dataProviderProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -1286,8 +1276,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderWhoHandlesPaymentsGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1303,8 +1292,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatDataProviderWhoHandlesPaymentsGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
