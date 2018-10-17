@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
@@ -15,15 +17,62 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// Creates an instance of the internal builder which can build a MySQL command for SQL statements used by the <see cref="DataProviders.FoodWasteDataProvider"/> and the <see cref="Repositories.FoodWaste.SystemDataRepository"/>.
         /// </summary>
         /// <param name="sqlStatement">The SQL statement for the MySQL command.</param>
+        /// <param name="timeout">Wait time (in seconds) before terminating the attempt to execute a command and generating an error.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the <paramref name="sqlStatement"/> is null, empty or white space.</exception>
-        internal SystemDataCommandBuilder(string sqlStatement)
-            : base(sqlStatement)
+        internal SystemDataCommandBuilder(string sqlStatement, int timeout = 30)
+            : base(sqlStatement, timeout)
         {
         }
 
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Adds a foreign key identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the foreign key identifier.</param>
+        internal SystemDataCommandBuilder AddForeignKeyIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@foreignKeyIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a foreign key for identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the foreign key for identifier.</param>
+        internal SystemDataCommandBuilder AddForeignKeyForIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@foreignKeyForIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a foreign key for types parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the foreign key for types.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null.</exception>
+        internal SystemDataCommandBuilder AddForeignKeyForTypesParameter(IEnumerable<Type> value)
+        {
+            ArgumentNullGuard.NotNull(value, nameof(value));
+
+            AddVarCharParameter("@foreignKeyForTypes", string.Join(";", value.Select(m => m.Name)), 128);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a foreign key value parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the foreign key value.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null, empty or white space.</exception>
+        internal SystemDataCommandBuilder AddForeignKeyValueParameter(string value)
+        {
+            ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
+            AddVarCharParameter("@foreignKeyValue", value, 128);
+            return this;
+        }
 
         /// <summary>
         /// Adds a static text identifier parameter to the command.

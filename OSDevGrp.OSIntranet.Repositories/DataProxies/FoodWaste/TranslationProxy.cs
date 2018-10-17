@@ -180,7 +180,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(translationOfIdentifier));
+                return subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlCommandForSelectingTranslations(translationOfIdentifier));
             }
         }
 

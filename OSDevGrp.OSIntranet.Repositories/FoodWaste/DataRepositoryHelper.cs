@@ -19,7 +19,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// </summary>
         /// <param name="translationOfIdentifier">Identifier for the given domain object on which to get the translations.</param>
         /// <returns>SQL command for selecting the translations to a given domain object in the food waste domain.</returns>
-        public static MySqlCommand GetSqlStatementForSelectingTranslations(Guid translationOfIdentifier)
+        public static MySqlCommand GetSqlCommandForSelectingTranslations(Guid translationOfIdentifier)
         {
             return new SystemDataCommandBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
                 .AddTranslationOfIdentifierParameter(translationOfIdentifier)
@@ -27,13 +27,15 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Gets the SQL statement for selecting the foreign keys to a given domain object in the food waste domain.
+        /// Gets the SQL command for selecting the foreign keys to a given domain object in the food waste domain.
         /// </summary>
         /// <param name="foreignKeyForIdentifier">Identifier for the given domain object on which to get the foreign keys.</param>
-        /// <returns>SQL statement for selecting the foreign keys to a given domain object in the food waste domain.</returns>
-        public static string GetSqlStatementForSelectingForeignKeys(Guid foreignKeyForIdentifier)
+        /// <returns>SQL command for selecting the foreign keys to a given domain object in the food waste domain.</returns>
+        public static MySqlCommand GetSqlCommandForSelectingForeignKeys(Guid foreignKeyForIdentifier)
         {
-            return string.Format("SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{0}' ORDER BY DataProviderIdentifier,ForeignKeyValue", foreignKeyForIdentifier.ToString("D").ToUpper());
+            return new SystemDataCommandBuilder("SELECT fk.ForeignKeyIdentifier,fk.DataProviderIdentifier,dp.Name AS DataProviderName,dp.HandlesPayments,dp.DataSourceStatementIdentifier,fk.ForeignKeyForIdentifier,fk.ForeignKeyForTypes,fk.ForeignKeyValue FROM ForeignKeys AS fk INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=fk.DataProviderIdentifier WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier")
+                .AddForeignKeyForIdentifierParameter(foreignKeyForIdentifier)
+                .Build();
         }
 
         /// <summary>

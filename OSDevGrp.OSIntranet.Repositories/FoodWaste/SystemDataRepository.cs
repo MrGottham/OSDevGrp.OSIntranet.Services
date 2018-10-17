@@ -234,16 +234,13 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>All the foreign keys for the given domain object.</returns>
         public virtual IEnumerable<IForeignKey> ForeignKeysForDomainObjectGet(IIdentifiable identifiableDomainObject)
         {
-            if (identifiableDomainObject == null)
-            {
-                throw new ArgumentNullException(nameof(identifiableDomainObject));
-            }
+            ArgumentNullGuard.NotNull(identifiableDomainObject, nameof(identifiableDomainObject));
+
             try
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    MySqlCommand command = new FoodWasteCommandBuilder(DataRepositoryHelper.GetSqlStatementForSelectingForeignKeys(identifiableDomainObject.Identifier.Value)).Build();
-                    return DataProvider.GetCollection<ForeignKeyProxy>(command);
+                    return DataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlCommandForSelectingForeignKeys(identifiableDomainObject.Identifier.Value));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }
@@ -410,7 +407,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlStatementForSelectingTranslations(identifiableDomainObject.Identifier.Value));
+                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlCommandForSelectingTranslations(identifiableDomainObject.Identifier.Value));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }

@@ -189,7 +189,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             ITranslationProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);
 
@@ -219,7 +218,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
             ITranslationProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Null);
             Assert.That(sut.Identifier.HasValue, Is.False);

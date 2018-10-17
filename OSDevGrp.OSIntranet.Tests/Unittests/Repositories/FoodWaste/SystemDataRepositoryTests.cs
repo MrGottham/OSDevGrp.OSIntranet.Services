@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
+using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using AutoFixture;
-using MySql.Data.MySqlClient;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies;
 using Rhino.Mocks;
 
@@ -806,7 +806,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.ForeignKeysForDomainObjectGet(identifiableDomainObjectMock);
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT ForeignKeyIdentifier,DataProviderIdentifier,ForeignKeyForIdentifier,ForeignKeyForTypes,ForeignKeyValue FROM ForeignKeys WHERE ForeignKeyForIdentifier='{identifier.ToString("D").ToUpper()}' ORDER BY DataProviderIdentifier,ForeignKeyValue")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT fk.ForeignKeyIdentifier,fk.DataProviderIdentifier,dp.Name AS DataProviderName,dp.HandlesPayments,dp.DataSourceStatementIdentifier,fk.ForeignKeyForIdentifier,fk.ForeignKeyForTypes,fk.ForeignKeyValue FROM ForeignKeys AS fk INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=fk.DataProviderIdentifier WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier")
+                .AddCharDataParameter("@foreignKeyForIdentifier", identifier)
+                .Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -815,11 +818,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatForeignKeysForDomainObjectGetReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
             IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
-            IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = BuildForeignKeyProxyCollection(fixture);
+            IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = BuildForeignKeyProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(foreignKeyProxyCollection: foreignKeyProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -838,8 +839,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatForeignKeysForDomainObjectGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
@@ -857,8 +857,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatForeignKeysForDomainObjectGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             IIdentifiable identifiableDomainObjectMock = BuildIdentifiableMock();
 
