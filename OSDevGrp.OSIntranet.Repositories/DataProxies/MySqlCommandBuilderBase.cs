@@ -52,6 +52,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         }
 
         /// <summary>
+        /// Adds a tinyint parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="size">The size for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddTinyIntParameter(string parameterName, int? value, int size = 0, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.Int16, size, isNullable);
+        }
+
+        /// <summary>
         /// Adds a smallint parameter to the command.
         /// </summary>
         /// <param name="parameterName">The name of the parameter.</param>

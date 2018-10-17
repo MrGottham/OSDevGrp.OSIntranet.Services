@@ -1,4 +1,5 @@
 ﻿using System;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
@@ -23,6 +24,46 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Adds a static text identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the static text identifier.</param>
+        internal SystemDataCommandBuilder AddStaticTextIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@staticTextIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a static text identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the static text identifier.</param>
+        internal SystemDataCommandBuilder AddStaticTextTypeIdentifierParameter(StaticTextType value)
+        {
+            AddTinyIntParameter("@staticTextType", (int) value, 4);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a subject translation identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the subject translation identifier.</param>
+        internal SystemDataCommandBuilder AddSubjectTranslationIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@subjectTranslationIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a body translation identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the body translation identifier.</param>
+        internal SystemDataCommandBuilder AddBodyTranslationIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@bodyTranslationIdentifier", value, true);
+            return this;
+        }
 
         /// <summary>
         /// Adds a data provider identifier parameter to the command.

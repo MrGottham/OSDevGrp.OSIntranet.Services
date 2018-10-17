@@ -8,6 +8,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
     internal interface IDbCommandTestBuilder
     {
         /// <summary>
+        /// Adds a tinyint data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="size">The size for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        IDbCommandTestBuilder AddTinyIntDataParameter(string parameterName, int? value, int size, bool isNullable = false);
+
+        /// <summary>
         /// Adds a smallint data parameter.
         /// </summary>
         /// <param name="parameterName">The name of the data parameter.</param>
@@ -63,7 +73,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         /// <param name="value">The value for the data parameter.</param>
         /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
         /// <returns>The builder which can build a database command tester.</returns>
-        IDbCommandTestBuilder AddCharDataParameter(string parameterName, Guid value, bool isNullable = false);
+        IDbCommandTestBuilder AddCharDataParameter(string parameterName, Guid? value, bool isNullable = false);
 
         /// <summary>
         /// Adds a text data parameter.

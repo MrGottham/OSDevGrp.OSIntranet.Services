@@ -266,7 +266,9 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder($"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int)staticTextType}").Build();
+                MySqlCommand command = new SystemDataCommandBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType=@staticTextType")
+                    .AddStaticTextTypeIdentifierParameter(staticTextType)
+                    .Build();
                 var staticText = DataProvider.GetCollection<StaticTextProxy>(command).SingleOrDefault(m => m.Type == staticTextType);
                 if (staticText == null)
                 {
@@ -292,7 +294,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType").Build();
+                MySqlCommand command = new SystemDataCommandBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType").Build();
                 return DataProvider.GetCollection<StaticTextProxy>(command);
             }
             catch (IntranetRepositoryException)

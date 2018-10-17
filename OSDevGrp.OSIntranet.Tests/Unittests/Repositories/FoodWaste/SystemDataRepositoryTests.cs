@@ -888,8 +888,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             {
                 sut.StaticTextGetByStaticTextType(staticTextTypeToTest);
 
-                _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType={(int) staticTextTypeToTest}")));
+                MySqlCommand cmd = (MySqlCommand) _foodWasteDataProviderMock.GetArgumentsForCallsMadeOn(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Is.NotNull))
+                    .Last()
+                    .ElementAt(0);
+                new DbCommandTestBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextType=@staticTextType")
+                    .AddTinyIntDataParameter("@staticTextType", (int) staticTextTypeToTest, 4)
+                    .Build()
+                    .Run(cmd);
             }
+
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Is.NotNull), opt => opt.Repeat.Times(staticTextProxyCollection.Count()));
         }
 
         /// <summary>
@@ -898,8 +906,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-            StaticTextType staticTextType = fixture.Create<StaticTextType>();
+            StaticTextType staticTextType = _fixture.Create<StaticTextType>();
 
             StaticTextProxy staticText = new StaticTextProxy(staticTextType, Guid.NewGuid());
             IEnumerable<StaticTextProxy> staticTextProxyCollection = new List<StaticTextProxy> {staticText};
@@ -918,8 +925,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeThrowsIntranetRepositoryExceptionWhenStaticTextTypeWasNotFound()
         {
-            Fixture fixture = new Fixture();
-            StaticTextType staticTextType = fixture.Create<StaticTextType>();
+            StaticTextType staticTextType = _fixture.Create<StaticTextType>();
 
             IEnumerable<StaticTextProxy> staticTextProxyCollection = new List<StaticTextProxy>(0);
 
@@ -937,13 +943,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.StaticTextGetByStaticTextType(fixture.Create<StaticTextType>()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.StaticTextGetByStaticTextType(_fixture.Create<StaticTextType>()));
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
@@ -954,13 +959,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetByStaticTextTypeThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result= Assert.Throws<IntranetRepositoryException>(() => sut.StaticTextGetByStaticTextType(fixture.Create<StaticTextType>()));
+            IntranetRepositoryException result= Assert.Throws<IntranetRepositoryException>(() => sut.StaticTextGetByStaticTextType(_fixture.Create<StaticTextType>()));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "StaticTextGetByStaticTextType", exceptionToThrow.Message);
         }
@@ -976,7 +980,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.StaticTextGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts ORDER BY StaticTextType").Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StaticTextProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -985,9 +990,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetAllReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
-            IEnumerable<StaticTextProxy> staticTextProxyCollection = BuildStaticTextProxyCollection(fixture);
+            IEnumerable<StaticTextProxy> staticTextProxyCollection = BuildStaticTextProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(staticTextProxyCollection: staticTextProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -1006,8 +1009,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -1023,8 +1025,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStaticTextGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);

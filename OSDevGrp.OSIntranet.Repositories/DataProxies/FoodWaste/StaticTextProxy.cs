@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -38,7 +39,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         #endregion
 
-        #region IMySqlDataProxy
+        #region IMySqlDataProxy Members
 
         /// <summary>
         /// Gets the unique identification for the static text.
@@ -55,58 +56,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
-        /// <summary>
-        /// Gets the SQL statement for selecting a given static text.
-        /// </summary>
-        /// <param name="staticText">Static text for which to get the SQL statement for selecting.</param>
-        /// <returns>SQL statement for selecting a given static text.</returns>
-        public virtual string GetSqlQueryForId(IStaticText staticText)
-        {
-            if (staticText == null)
-            {
-                throw new ArgumentNullException("staticText");
-            }
-            if (staticText.Identifier.HasValue)
-            {
-                return string.Format("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextIdentifier='{0}'", staticText.Identifier.Value.ToString("D").ToUpper());
-            }
-            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, staticText.Identifier, "Identifier"));
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to insert this static text.
-        /// </summary>
-        /// <returns>SQL statement to insert this static text.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            var subjectTranslationIdentifierAsSqlValue = SubjectTranslationIdentifier.ToString("D").ToUpper();
-            var bodyTranslationIdentifierAsSqlValue = BodyTranslationIdentifier.HasValue ? string.Format("'{0}'", BodyTranslationIdentifier.Value.ToString("D").ToUpper()) : "NULL";
-            return string.Format("INSERT INTO StaticTexts (StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier) VALUES('{0}',{1},'{2}',{3})", UniqueId, (int)Type, subjectTranslationIdentifierAsSqlValue, bodyTranslationIdentifierAsSqlValue);
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to update this static text.
-        /// </summary>
-        /// <returns>SQL statement to update this static text.</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            var subjectTranslationIdentifierAsSqlValue = SubjectTranslationIdentifier.ToString("D").ToUpper();
-            var bodyTranslationIdentifierAsSqlValue = BodyTranslationIdentifier.HasValue ? string.Format("'{0}'", BodyTranslationIdentifier.Value.ToString("D").ToUpper()) : "NULL";
-            return string.Format("UPDATE StaticTexts SET StaticTextType={1},SubjectTranslationIdentifier='{2}',BodyTranslationIdentifier={3} WHERE StaticTextIdentifier='{0}'", UniqueId, (int)Type, subjectTranslationIdentifierAsSqlValue, bodyTranslationIdentifierAsSqlValue);
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to delete this static text.
-        /// </summary>
-        /// <returns>SQL statement to delete this static text.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM StaticTexts WHERE StaticTextIdentifier='{0}'", UniqueId);
-        }
-
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Maps data from the data reader.
@@ -115,24 +67,18 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
             Identifier = new Guid(dataReader.GetString("StaticTextIdentifier"));
-            Type = (StaticTextType)dataReader.GetInt16("StaticTextType");
+            Type = (StaticTextType) dataReader.GetInt16("StaticTextType");
             SubjectTranslationIdentifier = new Guid(dataReader.GetString("SubjectTranslationIdentifier"));
-            var bodyTranslationIdentifierColumnNo = dataReader.GetOrdinal("BodyTranslationIdentifier");
-            if (dataReader.IsDBNull(bodyTranslationIdentifierColumnNo))
+
+            if (dataReader.IsDBNull(dataReader.GetOrdinal("BodyTranslationIdentifier")))
             {
                 return;
             }
-            BodyTranslationIdentifier = new Guid(dataReader.GetString(bodyTranslationIdentifierColumnNo));
+            BodyTranslationIdentifier = new Guid(dataReader.GetString("BodyTranslationIdentifier"));
         }
 
         /// <summary>
@@ -141,18 +87,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
 
-            var translations = new List<ITranslation>();
-            translations.AddRange(TranslationProxy.GetDomainObjectTranslations(dataProvider, SubjectTranslationIdentifier));
+            List<ITranslation> translationCollection = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(dataProvider, SubjectTranslationIdentifier));
             if (BodyTranslationIdentifier.HasValue)
             {
-                translations.AddRange(TranslationProxy.GetDomainObjectTranslations(dataProvider, BodyTranslationIdentifier.Value));
+                translationCollection.AddRange(TranslationProxy.GetDomainObjectTranslations(dataProvider, BodyTranslationIdentifier.Value));
             }
-            Translations = translations;
+            Translations = translationCollection;
         }
 
         /// <summary>
@@ -180,7 +122,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for getting this static text used by the food waste domain.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+            return new SystemDataCommandBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextIdentifier=@staticTextIdentifier")
+                .AddStaticTextIdentifierParameter(Identifier)
+                .Build();
         }
 
         /// <summary>
@@ -189,7 +133,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for inserting this static text used by the food waste domain.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new SystemDataCommandBuilder("INSERT INTO StaticTexts (StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier) VALUES(@staticTextIdentifier,@staticTextType,@subjectTranslationIdentifier,@bodyTranslationIdentifier)")
+                .AddStaticTextIdentifierParameter(Identifier)
+                .AddStaticTextTypeIdentifierParameter(Type)
+                .AddSubjectTranslationIdentifierParameter(SubjectTranslationIdentifier)
+                .AddBodyTranslationIdentifierParameter(BodyTranslationIdentifier)
+                .Build();
         }
 
         /// <summary>
@@ -198,7 +147,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for updating this static text used by the food waste domain.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new SystemDataCommandBuilder("UPDATE StaticTexts SET StaticTextType=@staticTextType,SubjectTranslationIdentifier=@subjectTranslationIdentifier,BodyTranslationIdentifier=@bodyTranslationIdentifier WHERE StaticTextIdentifier=@staticTextIdentifier")
+                .AddStaticTextIdentifierParameter(Identifier)
+                .AddStaticTextTypeIdentifierParameter(Type)
+                .AddSubjectTranslationIdentifierParameter(SubjectTranslationIdentifier)
+                .AddBodyTranslationIdentifierParameter(BodyTranslationIdentifier)
+                .Build();
         }
 
         /// <summary>
@@ -207,7 +161,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for deleting this static text used by the food waste domain.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+            return new SystemDataCommandBuilder("DELETE FROM StaticTexts WHERE StaticTextIdentifier=@staticTextIdentifier")
+                .AddStaticTextIdentifierParameter(Identifier)
+                .Build();
         }
 
         #endregion

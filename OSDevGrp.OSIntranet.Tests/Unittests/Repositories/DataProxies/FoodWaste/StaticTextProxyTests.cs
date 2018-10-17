@@ -4,11 +4,11 @@ using System.Linq;
 using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using Rhino.Mocks;
 
@@ -20,29 +20,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class StaticTextProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+        private Random _random;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _random = new Random(_fixture.Create<int>());
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a data proxy to a given static text used by the food waste domain.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializeStaticTextProxy()
         {
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
-            Assert.That(staticTextProxy.Identifier, Is.Null);
-            Assert.That(staticTextProxy.Identifier.HasValue, Is.False);
-            Assert.That(staticTextProxy.Type, Is.EqualTo(default(StaticTextType)));
-            Assert.That(staticTextProxy.Translation, Is.Null);
-            Assert.That(staticTextProxy.Translations, Is.Not.Null);
-            Assert.That(staticTextProxy.Translations, Is.Empty);
-            Assert.That(staticTextProxy.SubjectTranslationIdentifier, Is.EqualTo(default(Guid)));
-            Assert.That(staticTextProxy.SubjectTranslation, Is.Null);
-            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
-            Assert.That(staticTextProxy.SubjectTranslations, Is.Empty);
-            Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Null);
-            Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.False);
-            Assert.That(staticTextProxy.SubjectTranslation, Is.Null);
-            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
-            Assert.That(staticTextProxy.SubjectTranslations, Is.Empty);
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Type, Is.EqualTo(default(StaticTextType)));
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Empty);
+            Assert.That(sut.SubjectTranslationIdentifier, Is.EqualTo(default(Guid)));
+            Assert.That(sut.SubjectTranslation, Is.Null);
+            Assert.That(sut.SubjectTranslations, Is.Not.Null);
+            Assert.That(sut.SubjectTranslations, Is.Empty);
+            Assert.That(sut.BodyTranslationIdentifier, Is.Null);
+            Assert.That(sut.BodyTranslationIdentifier.HasValue, Is.False);
+            Assert.That(sut.SubjectTranslation, Is.Null);
+            Assert.That(sut.SubjectTranslations, Is.Not.Null);
+            Assert.That(sut.SubjectTranslations, Is.Empty);
         }
 
         /// <summary>
@@ -51,19 +68,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenStaticTextProxyHasNoIdentifier()
         {
-            var staticTextProxy = new StaticTextProxy
-            {
-                Identifier = null
-            };
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            sut.Identifier = null;
 
             // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var uniqueId = staticTextProxy.UniqueId; });
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => {var uniqueId = sut.UniqueId;});
             // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, staticTextProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -72,146 +86,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterGetsUniqueIdentificationForStaticTextProxy()
         {
-            var staticTextProxy = new StaticTextProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
+            Guid identifier = Guid.NewGuid();
 
-            var uniqueId = staticTextProxy.UniqueId;
+            IStaticTextProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(uniqueId, Is.EqualTo(staticTextProxy.Identifier.Value.ToString("D").ToUpper()));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given static text is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenStaticTextIsNull()
-        {
-            var staticTextProxy = new StaticTextProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<ArgumentNullException>(() => { var sqlQueryForId = staticTextProxy.GetSqlQueryForId(null); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("staticText"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given static text has no value.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnStaticTextHasNoValue()
-        {
-            var staticTextMock = MockRepository.GenerateMock<IStaticText>();
-            staticTextMock.Expect(m => m.Identifier)
-                .Return(null)
-                .Repeat.Any();
-
-            var staticTextProxy = new StaticTextProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var sqlQueryForId = staticTextProxy.GetSqlQueryForId(staticTextMock); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, staticTextMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given static text.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
-        {
-            var staticTextMock = MockRepository.GenerateMock<IStaticText>();
-            staticTextMock.Expect(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var staticTextProxy = new StaticTextProxy();
-
-            var sqlQueryForId = staticTextProxy.GetSqlQueryForId(staticTextMock);
-            Assert.That(sqlQueryForId, Is.Not.Null);
-            Assert.That(sqlQueryForId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextIdentifier='{0}'", staticTextMock.Identifier.Value.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a given static text.
-        /// </summary>
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(bool withBodyTranslation)
-        {
-            foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
-            {
-                var staticTextProxy = new StaticTextProxy(staticTextTypeToTest, Guid.NewGuid(), withBodyTranslation ? (Guid?) Guid.NewGuid() : null)
-                {
-                    Identifier = Guid.NewGuid()
-                };
-
-                var subjectTranslationIdentifierSqlValue = staticTextProxy.SubjectTranslationIdentifier.ToString("D").ToUpper();
-                var bodyTranslationIdentifierSqlValue = staticTextProxy.BodyTranslationIdentifier.HasValue ? string.Format("'{0}'", staticTextProxy.BodyTranslationIdentifier.Value.ToString("D").ToUpper()) : "NULL";
-                var sqlCommand = staticTextProxy.GetSqlCommandForInsert();
-                Assert.That(sqlCommand, Is.Not.Null);
-                Assert.That(sqlCommand, Is.Not.Empty);
-                Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO StaticTexts (StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier) VALUES('{0}',{1},'{2}',{3})", staticTextProxy.UniqueId, (int) staticTextTypeToTest, subjectTranslationIdentifierSqlValue, bodyTranslationIdentifierSqlValue)));
-            }
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a given static text.
-        /// </summary>
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(bool withBodyTranslation)
-        {
-            foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
-            {
-                var staticTextProxy = new StaticTextProxy(staticTextTypeToTest, Guid.NewGuid(), withBodyTranslation ? (Guid?) Guid.NewGuid() : null)
-                {
-                    Identifier = Guid.NewGuid()
-                };
-
-                var subjectTranslationIdentifierSqlValue = staticTextProxy.SubjectTranslationIdentifier.ToString("D").ToUpper();
-                var bodyTranslationIdentifierSqlValue = staticTextProxy.BodyTranslationIdentifier.HasValue ? string.Format("'{0}'", staticTextProxy.BodyTranslationIdentifier.Value.ToString("D").ToUpper()) : "NULL";
-                var sqlCommand = staticTextProxy.GetSqlCommandForUpdate();
-                Assert.That(sqlCommand, Is.Not.Null);
-                Assert.That(sqlCommand, Is.Not.Empty);
-                Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE StaticTexts SET StaticTextType={1},SubjectTranslationIdentifier='{2}',BodyTranslationIdentifier={3} WHERE StaticTextIdentifier='{0}'", staticTextProxy.UniqueId, (int) staticTextTypeToTest, subjectTranslationIdentifierSqlValue, bodyTranslationIdentifierSqlValue)));
-            }
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete a given static text.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
-        {
-            var fixture = new Fixture();
-
-            var staticTextProxy = new StaticTextProxy(fixture.Create<StaticTextType>(), Guid.NewGuid())
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = staticTextProxy.GetSqlCommandForDelete();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("DELETE FROM StaticTexts WHERE StaticTextIdentifier='{0}'", staticTextProxy.UniqueId)));
+            Assert.That(uniqueId, Is.EqualTo(identifier.ToString("D").ToUpper()));
         }
 
         /// <summary>
@@ -220,15 +103,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => staticTextProxy.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataReader"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
 
         /// <summary>
@@ -237,162 +117,65 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => staticTextProxy.MapData(MockRepository.GenerateStub<MySqlDataReader>(), null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
-        /// Tests that MapData and MapRelations maps data into the proxy.
+        /// Tests that MapData maps data into the proxy.
         /// </summary>
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(bool withBodyTranslation)
+        public void TestThatMapDataMapsDataIntoProxy(bool withBodyTranslation)
         {
-            var fixture = new Fixture();
-            foreach (var staticTextTypeToTest in Enum.GetValues(typeof (StaticTextType)).Cast<StaticTextType>())
+            foreach (StaticTextType staticTextTypeToTest in Enum.GetValues(typeof(StaticTextType)).Cast<StaticTextType>())
             {
-                var subjectTranslation1Proxy = new TranslationProxy(new Guid("2F5E2130-2176-483C-80EF-DFC871186A6D"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
-                var subjectTranslation2Proxy = new TranslationProxy(new Guid("2F5E2130-2176-483C-80EF-DFC871186A6D"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
-                var bodyTranslation1Proxy = new TranslationProxy(new Guid("DB8E4201-5E79-4075-9020-5C72E989F399"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
-                var bodyTranslation2Proxy = new TranslationProxy(new Guid("DB8E4201-5E79-4075-9020-5C72E989F399"), MockRepository.GenerateMock<ITranslationInfo>(), fixture.Create<string>());
+                IStaticTextProxy sut = CreateSut();
+                Assert.That(sut, Is.Not.Null);
 
-                var dataProviderBaseMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-                dataProviderBaseMock.Stub(m => m.Clone())
-                    .Return(dataProviderBaseMock)
-                    .Repeat.Any();
-                dataProviderBaseMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull))
-                    .WhenCalled(e =>
-                    {
-                        var sqlQuery = ((MySqlCommand) e.Arguments.ElementAt(0)).CommandText;
-                        Assert.That(sqlQuery, Is.Not.Null);
-                        Assert.That(sqlQuery, Is.Not.Empty);
-                        if (sqlQuery.Contains("2F5E2130-2176-483C-80EF-DFC871186A6D"))
-                        {
-                            e.ReturnValue = new List<TranslationProxy>
-                            {
-                                subjectTranslation1Proxy,
-                                subjectTranslation2Proxy
-                            };
-                            return;
-                        }
-                        if (sqlQuery.Contains("DB8E4201-5E79-4075-9020-5C72E989F399"))
-                        {
-                            e.ReturnValue = new List<TranslationProxy>
-                            {
-                                bodyTranslation1Proxy,
-                                bodyTranslation2Proxy
-                            };
-                            return;
-                        }
-                        e.ReturnValue = new List<TranslationProxy>(0);
-                    })
-                    .Return(null)
-                    .Repeat.Any();
+                Guid staticTextIdentifier = Guid.NewGuid();
+                Guid subjectTranslationIdentifier = Guid.NewGuid();
+                Guid? bodyTranslationIdentifier = withBodyTranslation ? Guid.NewGuid() : (Guid?) null;
+                MySqlDataReader dataReader = CreateMySqlDataReader(staticTextIdentifier, staticTextTypeToTest, subjectTranslationIdentifier, bodyTranslationIdentifier);
 
-                var dataReaderStub = MockRepository.GenerateStub<MySqlDataReader>();
-                dataReaderStub.Stub(m => m.GetString("StaticTextIdentifier"))
-                    .Return("96F878E8-09BA-4836-A22C-5A3B8B1A6AB5")
-                    .Repeat.Any();
-                dataReaderStub.Stub(m => m.GetInt16("StaticTextType"))
-                    .Return((short) staticTextTypeToTest)
-                    .Repeat.Any();
-                dataReaderStub.Stub(m => m.GetString("SubjectTranslationIdentifier"))
-                    .Return("2F5E2130-2176-483C-80EF-DFC871186A6D")
-                    .Repeat.Any();
-                dataReaderStub.Stub(m => m.GetOrdinal("BodyTranslationIdentifier"))
-                    .Return(3)
-                    .Repeat.Any();
-                dataReaderStub.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(3)))
-                    .Return(!withBodyTranslation)
-                    .Repeat.Any();
-                dataReaderStub.Stub(m => m.GetString(Arg<int>.Is.Equal(3)))
-                    .Return("DB8E4201-5E79-4075-9020-5C72E989F399")
-                    .Repeat.Any();
+                IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
 
-                var staticTextProxy = new StaticTextProxy();
-                Assert.That(staticTextProxy, Is.Not.Null);
-                Assert.That(staticTextProxy.Identifier, Is.Null);
-                Assert.That(staticTextProxy.Identifier.HasValue, Is.False);
-                Assert.That(staticTextProxy.Type, Is.EqualTo(default(StaticTextType)));
-                Assert.That(staticTextProxy.Translation, Is.Null);
-                Assert.That(staticTextProxy.Translations, Is.Not.Null);
-                Assert.That(staticTextProxy.Translations, Is.Empty);
-                Assert.That(staticTextProxy.SubjectTranslationIdentifier, Is.EqualTo(default(Guid)));
-                Assert.That(staticTextProxy.SubjectTranslation, Is.Null);
-                Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
-                Assert.That(staticTextProxy.SubjectTranslations, Is.Empty);
-                Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Null);
-                Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.False);
-                Assert.That(staticTextProxy.BodyTranslation, Is.Null);
-                Assert.That(staticTextProxy.BodyTranslations, Is.Not.Null);
-                Assert.That(staticTextProxy.BodyTranslations, Is.Empty);
+                sut.MapData(dataReader, dataProvider);
 
-                staticTextProxy.MapData(dataReaderStub, dataProviderBaseMock);
-                staticTextProxy.MapRelations(dataProviderBaseMock);
-                Assert.That(staticTextProxy.Identifier, Is.Not.Null);
-                Assert.That(staticTextProxy.Identifier.HasValue, Is.True);
-                // ReSharper disable PossibleInvalidOperationException
-                Assert.That(staticTextProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReaderStub.GetString("StaticTextIdentifier")));
-                // ReSharper restore PossibleInvalidOperationException
-                Assert.That(staticTextProxy.Type, Is.EqualTo(staticTextTypeToTest));
-                Assert.That(staticTextProxy.Translation, Is.Null);
-                Assert.That(staticTextProxy.Translations, Is.Not.Null);
-                Assert.That(staticTextProxy.Translations, Is.Not.Empty);
-                Assert.That(staticTextProxy.Translations.Contains(subjectTranslation1Proxy), Is.True);
-                Assert.That(staticTextProxy.Translations.Contains(subjectTranslation2Proxy), Is.True);
-                Assert.That(staticTextProxy.Translations.Contains(bodyTranslation1Proxy), Is.EqualTo(withBodyTranslation));
-                Assert.That(staticTextProxy.Translations.Contains(bodyTranslation2Proxy), Is.EqualTo(withBodyTranslation));
-                Assert.That(staticTextProxy.SubjectTranslationIdentifier.ToString("D").ToUpper(), Is.EqualTo(dataReaderStub.GetString("SubjectTranslationIdentifier")));
-                Assert.That(staticTextProxy.SubjectTranslation, Is.Null);
-                Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
-                Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Empty);
-                Assert.That(staticTextProxy.SubjectTranslations.Contains(subjectTranslation1Proxy), Is.True);
-                Assert.That(staticTextProxy.SubjectTranslations.Contains(subjectTranslation2Proxy), Is.True);
-                Assert.That(staticTextProxy.SubjectTranslations.Contains(bodyTranslation1Proxy), Is.False);
-                Assert.That(staticTextProxy.SubjectTranslations.Contains(bodyTranslation2Proxy), Is.False);
+                Assert.That(sut.Identifier, Is.Not.Null);
+                Assert.That(sut.Identifier, Is.EqualTo(staticTextIdentifier));
+                Assert.That(sut.Type, Is.EqualTo(staticTextTypeToTest));
+                Assert.That(sut.SubjectTranslationIdentifier, Is.EqualTo(subjectTranslationIdentifier));
                 if (withBodyTranslation)
                 {
-                    Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Not.Null);
-                    Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(staticTextProxy.BodyTranslationIdentifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReaderStub.GetString(3)));
-                    // ReSharper restore PossibleInvalidOperationException
-                    Assert.That(staticTextProxy.BodyTranslation, Is.Null);
-                    Assert.That(staticTextProxy.BodyTranslations, Is.Not.Null);
-                    Assert.That(staticTextProxy.BodyTranslations, Is.Not.Empty);
-                    Assert.That(staticTextProxy.BodyTranslations.Contains(subjectTranslation1Proxy), Is.False);
-                    Assert.That(staticTextProxy.BodyTranslations.Contains(subjectTranslation2Proxy), Is.False);
-                    Assert.That(staticTextProxy.BodyTranslations.Contains(bodyTranslation1Proxy), Is.True);
-                    Assert.That(staticTextProxy.BodyTranslations.Contains(bodyTranslation2Proxy), Is.True);
+                    Assert.That(sut.BodyTranslationIdentifier, Is.Not.Null);
+                    Assert.That(sut.BodyTranslationIdentifier, Is.EqualTo(bodyTranslationIdentifier));
                 }
                 else
                 {
-                    Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Null);
-                    Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.False);
-                    Assert.That(staticTextProxy.BodyTranslation, Is.Null);
-                    Assert.That(staticTextProxy.BodyTranslations, Is.Not.Null);
-                    Assert.That(staticTextProxy.BodyTranslations, Is.Empty);
+                    Assert.That(sut.BodyTranslationIdentifier, Is.Null);
                 }
 
-
-                dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1 + Convert.ToInt32(withBodyTranslation)));
-                dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString("SubjectTranslationIdentifier")))));
+                dataReader.AssertWasCalled(m => m.GetString("StaticTextIdentifier"), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetInt16("StaticTextType"), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetString("SubjectTranslationIdentifier"), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetOrdinal("BodyTranslationIdentifier"), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
                 if (withBodyTranslation)
                 {
-                    dataProviderBaseMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString(3)))));
+                    dataReader.AssertWasCalled(m => m.GetString("BodyTranslationIdentifier"), opt => opt.Repeat.Once());
                 }
                 else
                 {
-                    dataProviderBaseMock.AssertWasNotCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{0}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName", dataReaderStub.GetString(3)))));
+                    dataReader.AssertWasNotCalled(m => m.GetString("BodyTranslationIdentifier"));
                 }
+
+                dataProvider.AssertWasNotCalled(m => m.Clone());
             }
         }
 
@@ -402,15 +185,115 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => staticTextProxy.MapRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that MapRelations maps translations of the subject to the static text into the proxy.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsMapsSubjectTranslationsIntoProxy()
+        {
+            Guid subjectTranslationIdentifier = Guid.NewGuid();
+            Guid? bodyTranslationIdentifier = _random.Next(100) > 50 ? Guid.NewGuid() : (Guid?) null;
+
+            IStaticTextProxy sut = CreateSut(Guid.NewGuid(), _fixture.Create<StaticTextType>(), subjectTranslationIdentifier, bodyTranslationIdentifier);
+            Assert.That(sut, Is.Not.Null);
+
+            List<TranslationProxy> translationProxyCollection = new List<TranslationProxy>(BuildTranslationProxyCollection(subjectTranslationIdentifier));
+            if (bodyTranslationIdentifier.HasValue)
+            {
+                translationProxyCollection.AddRange(BuildTranslationProxyCollection(bodyTranslationIdentifier.Value));
+            }
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            sut.MapRelations(dataProvider);
+
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Not.Empty);
+            Assert.That(sut.Translations, Is.EqualTo(translationProxyCollection));
+            Assert.That(sut.SubjectTranslation, Is.Null);
+            Assert.That(sut.SubjectTranslations, Is.Not.Null);
+            Assert.That(sut.SubjectTranslations, Is.Not.Empty);
+            foreach (TranslationProxy translationProxy in translationProxyCollection.Where(m => m.TranslationOfIdentifier == subjectTranslationIdentifier))
+            {
+                Assert.That(sut.SubjectTranslations.Contains(translationProxy), Is.True);
+            }
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1 + Convert.ToInt32(bodyTranslationIdentifier.HasValue)));
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull), opt => opt.Repeat.Times(1 + Convert.ToInt32(bodyTranslationIdentifier.HasValue)));
+
+            MySqlCommand cmd = (MySqlCommand) dataProvider.GetArgumentsForCallsMadeOn(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull))
+                .First()
+                .ElementAt(0);
+            new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", subjectTranslationIdentifier)
+                .Build()
+                .Run(cmd);
+        }
+
+        /// <summary>
+        /// Tests that MapRelations maps translations of the body to the static text into the proxy.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapRelationsMapsBodyTranslationsIntoProxy(bool withBodyTranslation)
+        {
+            Guid subjectTranslationIdentifier = Guid.NewGuid();
+            Guid? bodyTranslationIdentifier = withBodyTranslation ? Guid.NewGuid() : (Guid?) null;
+
+            IStaticTextProxy sut = CreateSut(Guid.NewGuid(), _fixture.Create<StaticTextType>(), subjectTranslationIdentifier, bodyTranslationIdentifier);
+            Assert.That(sut, Is.Not.Null);
+
+            List<TranslationProxy> translationProxyCollection = new List<TranslationProxy>(BuildTranslationProxyCollection(subjectTranslationIdentifier));
+            if (bodyTranslationIdentifier.HasValue)
+            {
+                translationProxyCollection.AddRange(BuildTranslationProxyCollection(bodyTranslationIdentifier.Value));
+            }
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            sut.MapRelations(dataProvider);
+
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Not.Empty);
+            Assert.That(sut.Translations, Is.EqualTo(translationProxyCollection));
+            Assert.That(sut.BodyTranslation, Is.Null);
+            Assert.That(sut.BodyTranslations, Is.Not.Null);
+            if (bodyTranslationIdentifier.HasValue)
+            {
+                Assert.That(sut.BodyTranslations, Is.Not.Empty);
+                foreach (TranslationProxy translationProxy in translationProxyCollection.Where(m => m.TranslationOfIdentifier == bodyTranslationIdentifier.Value))
+                {
+                    Assert.That(sut.BodyTranslations.Contains(translationProxy), Is.True);
+                }
+            }
+            else
+            {
+                Assert.That(sut.BodyTranslations, Is.Empty);
+            }
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1 + Convert.ToInt32(bodyTranslationIdentifier.HasValue)));
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull), opt => opt.Repeat.Times(1 + Convert.ToInt32(bodyTranslationIdentifier.HasValue)));
+
+            if (bodyTranslationIdentifier.HasValue == false)
+            {
+                return;
+            }
+            MySqlCommand cmd = (MySqlCommand) dataProvider.GetArgumentsForCallsMadeOn(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull))
+                .Last()
+                .ElementAt(0);
+            new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", bodyTranslationIdentifier.Value)
+                .Build()
+                .Run(cmd);
         }
 
         /// <summary>
@@ -419,14 +302,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
         {
-            var fixture = new Fixture();
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(null, _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(null, fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -435,14 +316,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            var fixture = new Fixture();
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.SaveRelations(MockRepository.GenerateMock<IMySqlDataProvider>(), fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -451,12 +330,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
         {
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(null));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
 
         /// <summary>
@@ -465,12 +344,193 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            var staticTextProxy = new StaticTextProxy();
-            Assert.That(staticTextProxy, Is.Not.Null);
+            IStaticTextProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<NotSupportedException>(() => staticTextProxy.DeleteRelations(MockRepository.GenerateMock<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.Null);
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertNotSupportedExceptionIsValid(result);
+        }
+
+        /// <summary>
+        /// Tests that CreateGetCommand returns the SQL command for selecting the given static text.
+        /// </summary>
+        [Test]
+        public void TestThatCreateGetCommandReturnsSqlCommand()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStaticTextProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("SELECT StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier FROM StaticTexts WHERE StaticTextIdentifier=@staticTextIdentifier")
+                .AddCharDataParameter("@staticTextIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateInsertCommand returns the SQL command to insert a given static text.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateInsertCommandReturnsSqlCommandForInsert(bool withBodyTranslation)
+        {
+            foreach (StaticTextType staticTextTypeToTest in Enum.GetValues(typeof(StaticTextType)).Cast<StaticTextType>())
+            {
+                Guid identifier = Guid.NewGuid();
+                Guid subjectTranslationIdentifier = Guid.NewGuid();
+                Guid? bodyTranslationIdentifier = withBodyTranslation ? Guid.NewGuid() : (Guid?) null;
+                IStaticTextProxy sut = CreateSut(identifier, staticTextTypeToTest, subjectTranslationIdentifier, bodyTranslationIdentifier);
+
+                new DbCommandTestBuilder("INSERT INTO StaticTexts (StaticTextIdentifier,StaticTextType,SubjectTranslationIdentifier,BodyTranslationIdentifier) VALUES(@staticTextIdentifier,@staticTextType,@subjectTranslationIdentifier,@bodyTranslationIdentifier)")
+                    .AddCharDataParameter("@staticTextIdentifier", identifier)
+                    .AddTinyIntDataParameter("@staticTextType", (int) staticTextTypeToTest, 4)
+                    .AddCharDataParameter("@subjectTranslationIdentifier", subjectTranslationIdentifier)
+                    .AddCharDataParameter("@bodyTranslationIdentifier", bodyTranslationIdentifier, true)
+                    .Build()
+                    .Run(sut.CreateInsertCommand());
+            }
+        }
+
+        /// <summary>
+        /// Tests that CreateUpdateCommand returns the SQL command to update a given static text.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateUpdateCommandReturnsSqlCommandForUpdate(bool withBodyTranslation)
+        {
+            foreach (StaticTextType staticTextTypeToTest in Enum.GetValues(typeof(StaticTextType)).Cast<StaticTextType>())
+            {
+                Guid identifier = Guid.NewGuid();
+                Guid subjectTranslationIdentifier = Guid.NewGuid();
+                Guid? bodyTranslationIdentifier = withBodyTranslation ? Guid.NewGuid() : (Guid?)null;
+                IStaticTextProxy sut = CreateSut(identifier, staticTextTypeToTest, subjectTranslationIdentifier, bodyTranslationIdentifier);
+
+                new DbCommandTestBuilder("UPDATE StaticTexts SET StaticTextType=@staticTextType,SubjectTranslationIdentifier=@subjectTranslationIdentifier,BodyTranslationIdentifier=@bodyTranslationIdentifier WHERE StaticTextIdentifier=@staticTextIdentifier")
+                    .AddCharDataParameter("@staticTextIdentifier", identifier)
+                    .AddTinyIntDataParameter("@staticTextType", (int)staticTextTypeToTest, 4)
+                    .AddCharDataParameter("@subjectTranslationIdentifier", subjectTranslationIdentifier)
+                    .AddCharDataParameter("@bodyTranslationIdentifier", bodyTranslationIdentifier, true)
+                    .Build()
+                    .Run(sut.CreateUpdateCommand());
+            }
+        }
+
+        /// <summary>
+        /// Tests that CreateDeleteCommand returns the SQL command to delete a given static text.
+        /// </summary>
+        [Test]
+        public void TestThatCreateDeleteCommandReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+            IStaticTextProxy sut = CreateSut(identifier);
+
+            new DbCommandTestBuilder("DELETE FROM StaticTexts WHERE StaticTextIdentifier=@staticTextIdentifier")
+                .AddCharDataParameter("@staticTextIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a given static text used by the food waste domain.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a given static text used by the food waste domain.</returns>
+        private IStaticTextProxy CreateSut()
+        {
+            return new StaticTextProxy();
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a given static text used by the food waste domain.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a given static text used by the food waste domain.</returns>
+        private IStaticTextProxy CreateSut(Guid identifier)
+        {
+            return new StaticTextProxy
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a given static text used by the food waste domain.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a given static text used by the food waste domain.</returns>
+        private IStaticTextProxy CreateSut(Guid identifier, StaticTextType staticTextType, Guid subjectTranslationIdentifier, Guid? bodyTranslationIdentifier)
+        {
+            return new StaticTextProxy(staticTextType, subjectTranslationIdentifier, bodyTranslationIdentifier)
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates a stub for the MySQL data reader.
+        /// </summary>
+        /// <returns>Stub for the MySQL data reader.</returns>
+        private MySqlDataReader CreateMySqlDataReader(Guid? staticTextIdentifier = null, StaticTextType? staticTextType = null, Guid? subjectTranslationIdentifier = null, Guid? bodyTranslationIdentifier = null)
+        {
+            MySqlDataReader mySqlDataReaderMock = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderMock.Stub(m => m.GetString("StaticTextIdentifier"))
+                .Return(staticTextIdentifier.HasValue ? staticTextIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetInt16("StaticTextType"))
+                .Return(staticTextType.HasValue ? (short) staticTextType : (short) _fixture.Create<StaticTextType>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString("SubjectTranslationIdentifier"))
+                .Return(subjectTranslationIdentifier.HasValue ? subjectTranslationIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetOrdinal("BodyTranslationIdentifier"))
+                .Return(3)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(3)))
+                .Return(bodyTranslationIdentifier.HasValue == false)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("BodyTranslationIdentifier")))
+                .Return(bodyTranslationIdentifier.HasValue ? bodyTranslationIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            return mySqlDataReaderMock;
+        }
+
+        /// <summary>
+        /// Creates a mockup for the data provider which can access data in the food waste repository.
+        /// </summary>
+        /// <returns>Mockup for the data provider which can access data in the food waste repository.</returns>
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(IEnumerable<TranslationProxy> translationProxyCollection = null)
+        {
+            IFoodWasteDataProvider foodWasteDataProvider = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProvider.Stub(m => m.Clone())
+                .Return(foodWasteDataProvider)
+                .Repeat.Any();
+            foodWasteDataProvider.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
+                .WhenCalled(e =>
+                {
+                    if (translationProxyCollection == null)
+                    {
+                        e.ReturnValue = BuildTranslationProxyCollection(Guid.NewGuid());
+                        return;
+                    }
+
+                    Guid translationOfIdentifier = new Guid((string) ((MySqlCommand) e.Arguments.ElementAt(0)).Parameters["@ofIdentifier"].Value);
+                    e.ReturnValue = translationProxyCollection .Where(m => m.TranslationOfIdentifier == translationOfIdentifier).ToList();
+                })
+                .Return(null)
+                .Repeat.Any();
+            return foodWasteDataProvider;
+        }
+
+        /// <summary>
+        /// Build a collection of translation data proxies.
+        /// </summary>
+        /// <returns>Collection of translation data proxies.</returns>
+        private IEnumerable<TranslationProxy> BuildTranslationProxyCollection(Guid translationOfIdentifier)
+        {
+            _fixture.Customize<TranslationProxy>(composerTransformation => composerTransformation.FromFactory(() => new TranslationProxy(translationOfIdentifier, _fixture.Create<TranslationInfoProxy>(), _fixture.Create<string>())));
+
+            return _fixture.CreateMany<TranslationProxy>(_random.Next(5, 10)).ToList();
         }
     }
 }

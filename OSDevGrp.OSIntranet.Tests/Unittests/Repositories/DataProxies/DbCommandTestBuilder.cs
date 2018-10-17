@@ -62,6 +62,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         #region Methods
 
         /// <summary>
+        /// Adds a tinyint data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="size">The size for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        public IDbCommandTestBuilder AddTinyIntDataParameter(string parameterName, int? value, int size, bool isNullable = false)
+        {
+            AddDataParameter(parameterName, value, DbType.Int16, size, isNullable);
+            return this;
+        }
+
+        /// <summary>
         /// Adds a smallint data parameter.
         /// </summary>
         /// <param name="parameterName">The name of the data parameter.</param>
@@ -137,9 +151,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         /// <param name="value">The value for the data parameter.</param>
         /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
         /// <returns>The builder which can build a database command tester.</returns>
-        public IDbCommandTestBuilder AddCharDataParameter(string parameterName, Guid value, bool isNullable = false)
+        public IDbCommandTestBuilder AddCharDataParameter(string parameterName, Guid? value, bool isNullable = false)
         {
-            AddCharDataParameter(parameterName, value.ToString("D").ToUpper(), 36, isNullable);
+            AddCharDataParameter(parameterName, value?.ToString("D").ToUpper(), 36, isNullable);
             return this;
         }
 
