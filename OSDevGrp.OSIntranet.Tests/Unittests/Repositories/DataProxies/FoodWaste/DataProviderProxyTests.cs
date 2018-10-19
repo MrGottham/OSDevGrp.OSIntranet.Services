@@ -58,10 +58,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that Translation maps translations and data source statements into the proxy when MapData has been called and MapRelations has not been called.
+        /// Tests that Translations maps translations and data source statements into the proxy when MapData has been called and MapRelations has not been called.
         /// </summary>
         [Test]
-        public void TestThatTranslationMapTranslationsAndDataSourceStatementsIntoProxyWhenMapDataHasBeenCalledAndMapRelationsHasNotBeenCalled()
+        public void TestThatTranslationsMapsTranslationsAndDataSourceStatementsIntoProxyWhenMapDataHasBeenCalledAndMapRelationsHasNotBeenCalled()
         {
             IDataProviderProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
@@ -419,7 +419,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that MapData creates a data proxy for a given data provider with values from the data reader.
+        /// Tests that Create creates a data proxy for a given data provider with values from the data reader.
         /// </summary>
         [Test]
         [TestCase(true)]

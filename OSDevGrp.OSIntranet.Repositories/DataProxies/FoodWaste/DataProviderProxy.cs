@@ -39,8 +39,26 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="handlesPayments">Indication of whether the data provider handles payments.</param>
         /// <param name="dataSourceStatementIdentifier">Identifier for the data source statement.</param>
         public DataProviderProxy(string name, bool handlesPayments, Guid dataSourceStatementIdentifier)
+            : this(name, handlesPayments, dataSourceStatementIdentifier, null)
+        {
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a given data provider.
+        /// </summary>
+        /// <param name="name">Name for the data provider.</param>
+        /// <param name="handlesPayments">Indication of whether the data provider handles payments.</param>
+        /// <param name="dataSourceStatementIdentifier">Identifier for the data source statement.</param>
+        /// <param name="dataProvider">The data provider which the created data proxy could use.</param>
+        private DataProviderProxy(string name, bool handlesPayments, Guid dataSourceStatementIdentifier, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
             : base(name, handlesPayments, dataSourceStatementIdentifier)
         {
+            if (dataProvider == null)
+            {
+                return;
+            }
+
+            _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }
 
         #endregion
@@ -60,9 +78,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 }
 
                 Translations = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(_dataProvider, DataSourceStatementIdentifier));
-                _translationCollectionHasBeenLoaded = true;
-
                 return base.Translations;
+            }
+            protected set
+            {
+                base.Translations = value;
+                _translationCollectionHasBeenLoaded = true;
             }
         }
 
@@ -118,7 +139,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             Translations = new List<ITranslation>(TranslationProxy.GetDomainObjectTranslations(dataProvider, DataSourceStatementIdentifier));
 
-            _translationCollectionHasBeenLoaded = true;
             _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }
 
@@ -211,7 +231,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             return new DataProviderProxy(
                 GetDataProviderName(dataReader, columnNameCollection[1]),
                 GetHandlesPayments(dataReader, columnNameCollection[2]),
-                GetDataSourceStatementIdentifier(dataReader, columnNameCollection[3]))
+                GetDataSourceStatementIdentifier(dataReader, columnNameCollection[3]),
+                dataProvider)
             {
                 Identifier = GetDataProviderIdentifier(dataReader, columnNameCollection[0])
             };

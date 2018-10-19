@@ -29,6 +29,36 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Adds a food group identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the food group identifier.</param>
+        internal SystemDataCommandBuilder AddFoodGroupIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@foodGroupIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a food group parent identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the food group parent identifier.</param>
+        internal SystemDataCommandBuilder AddFoodGroupParentIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@parentIdentifier", value, true);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a food group is active parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the food group is active.</param>
+        internal SystemDataCommandBuilder AddFoodGroupIsActiveParameter(bool? value)
+        {
+            AddBitParameter("@isActive", value);
+            return this;
+        }
+
+        /// <summary>
         /// Adds a foreign key identifier parameter to the command.
         /// </summary>
         /// <param name="value">The value for the foreign key identifier.</param>
@@ -58,6 +88,19 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             ArgumentNullGuard.NotNull(value, nameof(value));
 
             AddVarCharParameter("@foreignKeyForTypes", string.Join(";", value.Select(m => m.Name)), 128);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a foreign key for types like parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the foreign key for types.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null.</exception>
+        internal SystemDataCommandBuilder AddForeignKeyForTypesLikeParameter(Type value)
+        {
+            ArgumentNullGuard.NotNull(value, nameof(value));
+
+            AddVarCharParameter("@foreignKeyForTypes", $"%{value.Name}%", 128);
             return this;
         }
 

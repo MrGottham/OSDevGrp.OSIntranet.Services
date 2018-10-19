@@ -485,7 +485,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodGroupGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT fg.FoodGroupIdentifier,fg.ParentIdentifier,fg.IsActive,pfg.ParentIdentifier AS ParentsParentIdentifier,pfg.IsActive AS ParentIsActive FROM FoodGroups AS fg LEFT JOIN FoodGroups AS pfg ON pfg.FoodGroupIdentifier=fg.ParentIdentifier").Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -494,9 +495,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetAllReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
-            IEnumerable<FoodGroupProxy> foodGroupProxyCollection = BuildFoodGroupProxyCollection(fixture);
+            IEnumerable<FoodGroupProxy> foodGroupProxyCollection = BuildFoodGroupProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(foodGroupProxyCollection: foodGroupProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -515,8 +514,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -532,8 +530,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetAllGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -554,7 +551,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.FoodGroupGetAllOnRoot();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT FoodGroupIdentifier,ParentIdentifier,IsActive FROM FoodGroups WHERE ParentIdentifier IS NULL")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT fg.FoodGroupIdentifier,fg.ParentIdentifier,fg.IsActive,pfg.ParentIdentifier AS ParentsParentIdentifier,pfg.IsActive AS ParentIsActive FROM FoodGroups AS fg LEFT JOIN FoodGroups AS pfg ON pfg.FoodGroupIdentifier=fg.ParentIdentifier WHERE fg.ParentIdentifier IS NULL").Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -563,9 +561,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetAllOnRootReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
-            IEnumerable<FoodGroupProxy> foodGroupProxyCollection = BuildFoodGroupProxyCollection(fixture);
+            IEnumerable<FoodGroupProxy> foodGroupProxyCollection = BuildFoodGroupProxyCollection(_fixture);
 
             ISystemDataRepository sut = CreateSut(foodGroupProxyCollection: foodGroupProxyCollection);
             Assert.That(sut, Is.Not.Null);
@@ -584,8 +580,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetAllOnRootThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -601,8 +596,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetAllOnRootGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -618,12 +612,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyThrowsArgumentNullExceptionWhenDataProviderIsNull()
         {
-            Fixture fixture = new Fixture();
-
             ISystemDataRepository sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.FoodGroupGetByForeignKey(null, fixture.Create<string>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.FoodGroupGetByForeignKey(null, _fixture.Create<string>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
@@ -652,14 +644,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyThrowsIntranetRepositoryExceptionWhenIdentifierOnDataProviderHasNoValue()
         {
-            Fixture fixture = new Fixture();
-
             IDataProvider dataProviderMock = BuildDataProviderMock(null);
 
             ISystemDataRepository sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodGroupGetByForeignKey(dataProviderMock, fixture.Create<string>()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodGroupGetByForeignKey(dataProviderMock, _fixture.Create<string>()));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, dataProviderMock.Identifier, "Identifier");
         }
@@ -670,19 +660,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyGetCallsGetCollectionOnFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
-
             Guid identifier = Guid.NewGuid();
             IDataProvider dataProviderMock = BuildDataProviderMock(identifier);
 
-            string foreignKeyValue = fixture.Create<string>();
+            string foreignKeyValue = _fixture.Create<string>();
 
             ISystemDataRepository sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
             sut.FoodGroupGetByForeignKey(dataProviderMock, foreignKeyValue);
-            
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT fg.FoodGroupIdentifier AS FoodGroupIdentifier,fg.ParentIdentifier AS ParentIdentifier,fg.IsActive AS IsActive FROM FoodGroups AS fg, ForeignKeys AS fk WHERE fg.FoodGroupIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{identifier.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodGroup).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'")));
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT fg.FoodGroupIdentifier,fg.ParentIdentifier,fg.IsActive,pfg.ParentIdentifier AS ParentsParentIdentifier,pfg.IsActive AS ParentIsActive FROM FoodGroups AS fg LEFT JOIN FoodGroups AS pfg ON pfg.FoodGroupIdentifier=fg.ParentIdentifier INNER JOIN ForeignKeys AS fk ON fk.ForeignKeyForIdentifier=fg.FoodGroupIdentifier WHERE fk.DataProviderIdentifier=@dataProviderIdentifier AND fk.ForeignKeyForTypes LIKE @foreignKeyForTypes AND fk.ForeignKeyValue=@foreignKeyValue")
+                .AddCharDataParameter("@dataProviderIdentifier", identifier)
+                .AddVarCharDataParameter("@foreignKeyForTypes", $"%{typeof(IFoodGroup).Name}%", 128)
+                .AddVarCharDataParameter("@foreignKeyValue", foreignKeyValue, 128)
+                .Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -691,14 +684,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyGetReturnsNullWhenNoFoodGroupWasFound()
         {
-            Fixture fixture = new Fixture();
-
             IDataProvider dataProviderMock = BuildDataProviderMock();
 
             ISystemDataRepository sut = CreateSut(foodGroupProxyCollection: new List<FoodGroupProxy>(0));
             Assert.That(sut, Is.Not.Null);
 
-            IFoodGroup result = sut.FoodGroupGetByForeignKey(dataProviderMock, fixture.Create<string>());
+            IFoodGroup result = sut.FoodGroupGetByForeignKey(dataProviderMock, _fixture.Create<string>());
             Assert.That(result, Is.Null);
         }
 
@@ -708,9 +699,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyGetReturnsFoodGroupWhenItWasFound()
         {
-            Fixture fixture = new Fixture();
-
-            FoodGroupProxy foodGroupProxy = fixture.Build<FoodGroupProxy>()
+            FoodGroupProxy foodGroupProxy = _fixture.Build<FoodGroupProxy>()
                 .With(m => m.Parent, null)
                 .Create();
 
@@ -719,7 +708,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             ISystemDataRepository sut = CreateSut(foodGroupProxyCollection: new List<FoodGroupProxy> {foodGroupProxy});
             Assert.That(sut, Is.Not.Null);
 
-            IFoodGroup result = sut.FoodGroupGetByForeignKey(dataProviderMock, fixture.Create<string>());
+            IFoodGroup result = sut.FoodGroupGetByForeignKey(dataProviderMock, _fixture.Create<string>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(foodGroupProxy));
         }
@@ -730,15 +719,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyGetThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             IDataProvider dataProviderMock = BuildDataProviderMock();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodGroupGetByForeignKey(dataProviderMock, fixture.Create<string>()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodGroupGetByForeignKey(dataProviderMock, _fixture.Create<string>()));
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
@@ -749,15 +737,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatFoodGroupGetByForeignKeyGetThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             IDataProvider dataProviderMock = BuildDataProviderMock();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
 
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodGroupGetByForeignKey(dataProviderMock, fixture.Create<string>()));
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.FoodGroupGetByForeignKey(dataProviderMock, _fixture.Create<string>()));
 
             TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "FoodGroupGetByForeignKey", exceptionToThrow.Message);
         }

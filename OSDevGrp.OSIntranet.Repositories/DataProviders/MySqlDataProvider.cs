@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Transactions;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Resources;
-using MySql.Data.MySqlClient;
-using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProviders
 {
