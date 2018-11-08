@@ -113,6 +113,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that Children maps foods groups which has this food group as a parent into the proxy when Create has been called and MapData has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatChildrenMapsChildrenIntoProxyWhenCreateHasBeenCalledAndMapDataHasNotBeenCalled()
+        {
+            IFoodGroupProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid foodGroupIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(foodGroupIdentifier);
+
+            IEnumerable<FoodGroupProxy> foodGroupProxyCollection = BuildFoodGroupProxyCollection();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(foodGroupProxyCollection: foodGroupProxyCollection);
+
+            IFoodGroupProxy result = sut.Create(dataReader, dataProvider, "FoodGroupIdentifier", "ParentIdentifier", "IsActive");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Children, Is.Not.Null);
+            Assert.That(result.Children, Is.Not.Empty);
+            Assert.That(result.Children, Is.EqualTo(foodGroupProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT fg.FoodGroupIdentifier,fg.ParentIdentifier,fg.IsActive,pfg.ParentIdentifier AS ParentsParentIdentifier,pfg.IsActive AS ParentIsActive FROM FoodGroups AS fg LEFT JOIN FoodGroups AS pfg ON pfg.FoodGroupIdentifier=fg.ParentIdentifier WHERE fg.ParentIdentifier=@parentIdentifier")
+                .AddCharDataParameter("@parentIdentifier", foodGroupIdentifier, true)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<FoodGroupProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
         /// Tests that Translations maps translations for the food group into the proxy when MapData has been called and MapRelations has not been called.
         /// </summary>
         [Test]
@@ -143,6 +172,36 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that Translations maps translations for the food group into the proxy when Create has been called and MapData has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatTranslationsMapsTranslationsIntoProxyWhenCreateHasBeenCalledAndMapDataHasNotBeenCalled()
+        {
+            IFoodGroupProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid foodGroupIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(foodGroupIdentifier);
+
+            IEnumerable<TranslationProxy> translationProxyCollection = BuildTranslationProxyCollection();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection: translationProxyCollection);
+
+            IFoodGroupProxy result = sut.Create(dataReader, dataProvider, "FoodGroupIdentifier", "ParentIdentifier", "IsActive");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Translation, Is.Null);
+            Assert.That(result.Translations, Is.Not.Null);
+            Assert.That(result.Translations, Is.Not.Empty);
+            Assert.That(result.Translations, Is.EqualTo(translationProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", foodGroupIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
         /// Tests that ForeignKeys maps foreign keys for the food group into the proxy when MapData has been called and MapRelations has not been called.
         /// </summary>
         [Test]
@@ -162,6 +221,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.ForeignKeys, Is.Not.Null);
             Assert.That(sut.ForeignKeys, Is.Not.Empty);
             Assert.That(sut.ForeignKeys, Is.EqualTo(foreignKeyProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT fk.ForeignKeyIdentifier,fk.DataProviderIdentifier,dp.Name AS DataProviderName,dp.HandlesPayments,dp.DataSourceStatementIdentifier,fk.ForeignKeyForIdentifier,fk.ForeignKeyForTypes,fk.ForeignKeyValue FROM ForeignKeys AS fk INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=fk.DataProviderIdentifier WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier")
+                .AddCharDataParameter("@foreignKeyForIdentifier", foodGroupIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that ForeignKeys maps foreign keys for the food group into the proxy when Create has been called and MapData has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatForeignKeysMapsForeignKeysIntoProxyWhenCreateHasBeenCalledAndMapDataHasNotBeenCalled()
+        {
+            IFoodGroupProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid foodGroupIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(foodGroupIdentifier);
+
+            IEnumerable<ForeignKeyProxy> foreignKeyProxyCollection = BuildForeignKeyProxyCollection();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(foreignKeyProxyCollection: foreignKeyProxyCollection);
+
+            IFoodGroupProxy result = sut.Create(dataReader, dataProvider, "FoodGroupIdentifier", "ParentIdentifier", "IsActive");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ForeignKeys, Is.Not.Null);
+            Assert.That(result.ForeignKeys, Is.Not.Empty);
+            Assert.That(result.ForeignKeys, Is.EqualTo(foreignKeyProxyCollection));
 
             dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
 
@@ -570,9 +658,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             sut.DeleteRelations(dataProvider);
 
-            // ReSharper disable PossibleInvalidOperationException
-            dataProvider.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT FoodItemGroupIdentifier,FoodItemIdentifier,FoodGroupIdentifier,IsPrimary FROM FoodItemGroups WHERE FoodGroupIdentifier='{sut.Identifier.Value.ToString("D").ToUpper()}'")), opt => opt.Repeat.Once());
-            // ReSharper restore PossibleInvalidOperationException
+            dataProvider.AssertWasCalled(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.NotNull), opt => opt.Repeat.Once());
+
+            MySqlCommand cmd = (MySqlCommand) dataProvider.GetArgumentsForCallsMadeOn(m => m.GetCollection<FoodItemGroupProxy>(Arg<MySqlCommand>.Is.NotNull)).First().First();
+            new DbCommandTestBuilder("SELECT fig.FoodItemGroupIdentifier,fig.FoodItemIdentifier,fig.FoodGroupIdentifier,fig.IsPrimary,fi.IsActive AS FoodItemIsActive,fg.ParentIdentifier AS FoodGroupParentIdentifier,fg.IsActive AS FoodGroupIsActive,pfg.ParentIdentifier AS FoodGroupParentsParentIdentifier,pfg.IsActive AS FoodGroupParentsParentIsActive FROM FoodItemGroups AS fig INNER JOIN FoodItems AS fi ON fi.FoodItemIdentifier=fig.FoodItemIdentifier INNER JOIN FoodGroups AS fg ON fg.FoodGroupIdentifier=fig.FoodGroupIdentifier LEFT JOIN FoodGroups AS pfg ON pfg.FoodGroupIdentifier=fg.ParentIdentifier WHERE fig.FoodGroupIdentifier=@foodGroupIdentifier")
+                .AddCharDataParameter("@foodGroupIdentifier", identifier)
+                .Build()
+                .Run(cmd);
         }
 
         /// <summary>
@@ -589,7 +681,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             sut.DeleteRelations(dataProvider);
 
-            dataProvider.AssertWasCalled(m => m.Delete(Arg<FoodItemGroupProxy>.Is.NotNull), opt => opt.Repeat.Times(foodItemGroupProxyCollection.Count));
+            dataProvider.AssertWasCalled(m => m.Delete(Arg<IFoodItemGroupProxy>.Is.NotNull), opt => opt.Repeat.Times(foodItemGroupProxyCollection.Count));
         }
 
         /// <summary>
@@ -609,7 +701,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull), opt => opt.Repeat.Once());
 
-            MySqlCommand cmd = (MySqlCommand)dataProvider.GetArgumentsForCallsMadeOn(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull)).First().First();
+            MySqlCommand cmd = (MySqlCommand) dataProvider.GetArgumentsForCallsMadeOn(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.NotNull)).First().First();
             new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
                 .AddCharDataParameter("@ofIdentifier", identifier)
                 .Build()
@@ -650,7 +742,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             dataProvider.AssertWasCalled(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.NotNull), opt => opt.Repeat.Once());
 
-            MySqlCommand cmd = (MySqlCommand)dataProvider.GetArgumentsForCallsMadeOn(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.NotNull)).First().First();
+            MySqlCommand cmd = (MySqlCommand) dataProvider.GetArgumentsForCallsMadeOn(m => m.GetCollection<ForeignKeyProxy>(Arg<MySqlCommand>.Is.NotNull)).First().First();
             new DbCommandTestBuilder("SELECT fk.ForeignKeyIdentifier,fk.DataProviderIdentifier,dp.Name AS DataProviderName,dp.HandlesPayments,dp.DataSourceStatementIdentifier,fk.ForeignKeyForIdentifier,fk.ForeignKeyForTypes,fk.ForeignKeyValue FROM ForeignKeys AS fk INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=fk.DataProviderIdentifier WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier")
                 .AddCharDataParameter("@foreignKeyForIdentifier", identifier)
                 .Build()
@@ -916,7 +1008,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Return(parentIdentifier.HasValue ? parentIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
                 .Repeat.Any();
             mySqlDataReaderMock.Stub(m => m.GetInt32(Arg<string>.Is.Equal("IsActive")))
-                .Return(Convert.ToInt32(isActive == _fixture.Create<bool>()))
+                .Return(Convert.ToInt32(isActive ?? _fixture.Create<bool>()))
                 .Repeat.Any();
             return mySqlDataReaderMock;
         }

@@ -67,9 +67,16 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
         /// <param name="toDateTime">The end date and time for the appointment.</param>
         /// <param name="subject">The subject for the appointment.</param>
         /// <param name="properties">The note for the appointment.</param>
-        private AftaleProxy(ISystem system, int id, DateTime fromDateTime, DateTime toDateTime, string subject, int properties = 0) 
+        /// <param name="dataProvider">The data provider which this data proxy should use.</param>
+        private AftaleProxy(ISystem system, int id, DateTime fromDateTime, DateTime toDateTime, string subject, int properties = 0, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider = null) 
             : base(system, id, fromDateTime, toDateTime, subject, properties)
         {
+            if (dataProvider == null)
+            {
+                return;
+            }
+
+            _dataProvider = (IMySqlDataProvider) dataProvider;
         }
 
         #endregion
@@ -250,7 +257,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.Kalender
                 fromDate.Add(GetAppointmentTime(dataReader, columnNameCollection[2])),
                 fromDate.Add(GetAppointmentTime(dataReader, columnNameCollection[3])),
                 GetAppointmentSubject(dataReader, columnNameCollection[5]),
-                GetAppointmentProperties(dataReader, columnNameCollection[4]))
+                GetAppointmentProperties(dataReader, columnNameCollection[4]),
+                dataProvider)
             {
                 Notat = GetAppointmentNote(dataReader, columnNameCollection[6])
             };

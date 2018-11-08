@@ -92,6 +92,40 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that Translations maps translations and data source statements into the proxy when Create has been called and MapData has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatTranslationsMapsTranslationsAndDataSourceStatementsIntoProxyWhenCreateHasBeenCalledAndMapDataHasNotBeenCalled()
+        {
+            IDataProviderProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid dataSourceStatementIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(Guid.NewGuid(), _fixture.Create<string>(), _fixture.Create<bool>(), dataSourceStatementIdentifier);
+
+            IEnumerable<TranslationProxy> translationProxyCollection = BuildTranslationProxyCollection(dataSourceStatementIdentifier);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            IDataProviderProxy result = sut.Create(dataReader, dataProvider, "DataProviderIdentifier", "Name", "HandlesPayments", "DataSourceStatementIdentifier");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Translation, Is.Null);
+            Assert.That(result.Translations, Is.Not.Null);
+            Assert.That(result.Translations, Is.Not.Empty);
+            Assert.That(result.Translations, Is.EqualTo(translationProxyCollection));
+            Assert.That(result.DataSourceStatement, Is.Null);
+            Assert.That(result.DataSourceStatements, Is.Not.Null);
+            Assert.That(result.DataSourceStatements, Is.Not.Empty);
+            Assert.That(result.DataSourceStatements, Is.EqualTo(translationProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(1));
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", dataSourceStatementIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
         /// Tests that getter for UniqueId throws an IntranetRepositoryException when the data provider has no identifier.
         /// </summary>
         [Test]

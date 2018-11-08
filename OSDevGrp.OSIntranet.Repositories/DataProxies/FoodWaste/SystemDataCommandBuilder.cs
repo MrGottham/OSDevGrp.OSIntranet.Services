@@ -29,12 +29,52 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Adds a food item identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the food item identifier.</param>
+        internal SystemDataCommandBuilder AddFoodItemIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@foodItemIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a food item is active parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the food item is active.</param>
+        internal SystemDataCommandBuilder AddFoodItemIsActiveParameter(bool? value)
+        {
+            AddBitParameter("@isActive", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a food item group identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the food item group identifier.</param>
+        internal SystemDataCommandBuilder AddFoodItemGroupIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@foodItemGroupIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
         /// Adds a food group identifier parameter to the command.
         /// </summary>
         /// <param name="value">The value for the food group identifier.</param>
         internal SystemDataCommandBuilder AddFoodGroupIdentifierParameter(Guid? value)
         {
             AddIdentifierParameter("@foodGroupIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an is primary parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the is primary.</param>
+        internal SystemDataCommandBuilder AddIsPrimaryParameter(bool? value)
+        {
+            AddBitParameter("@isPrimary", value);
             return this;
         }
 

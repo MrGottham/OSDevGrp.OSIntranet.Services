@@ -72,7 +72,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder("SELECT FoodItemIdentifier,IsActive FROM FoodItems").Build();
+                MySqlCommand command = FoodItemProxy.BuildSystemDataCommandForSelecting();
                 return DataProvider.GetCollection<FoodItemProxy>(command);
             }
             catch (IntranetRepositoryException)
@@ -92,18 +92,17 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>All food items which belongs to the given food group.</returns>
         public virtual IEnumerable<IFoodItem> FoodItemGetAllForFoodGroup(IFoodGroup foodGroup)
         {
-            if (foodGroup == null)
-            {
-                throw new ArgumentNullException(nameof(foodGroup));
-            }
+            ArgumentNullGuard.NotNull(foodGroup, nameof(foodGroup));
+
             try
             {
-                if (foodGroup.Identifier.HasValue)
+                if (foodGroup.Identifier.HasValue == false)
                 {
-                    MySqlCommand command = new FoodWasteCommandBuilder($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, FoodItemGroups AS fig WHERE fig.FoodItemIdentifier=fi.FoodItemIdentifier AND fig.FoodGroupIdentifier='{foodGroup.Identifier.Value.ToString("D").ToUpper()}'").Build();
-                    return DataProvider.GetCollection<FoodItemProxy>(command);
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroup.Identifier, "Identifier"));
                 }
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, foodGroup.Identifier, "Identifier"));
+
+                MySqlCommand command = FoodItemProxy.BuildSystemDataCommandForSelecting("INNER JOIN FoodItemGroups AS fig ON fig.FoodItemIdentifier=fi.FoodItemIdentifier WHERE fig.FoodGroupIdentifier=@foodGroupIdentifier", systemCommandBuilder => systemCommandBuilder.AddFoodGroupIdentifierParameter(foodGroup.Identifier));
+                return DataProvider.GetCollection<FoodItemProxy>(command);
             }
             catch (IntranetRepositoryException)
             {
@@ -123,22 +122,23 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>Food item.</returns>
         public virtual IFoodItem FoodItemGetByForeignKey(IDataProvider dataProvider, string foreignKeyValue)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(dataProvider));
-            }
-            if (string.IsNullOrEmpty(foreignKeyValue))
-            {
-                throw new ArgumentNullException(nameof(foreignKeyValue));
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider))
+                .NotNullOrWhiteSpace(foreignKeyValue, nameof(foreignKeyValue));
+
             try
             {
-                if (dataProvider.Identifier.HasValue)
+                if (dataProvider.Identifier.HasValue == false)
                 {
-                    MySqlCommand command = new FoodWasteCommandBuilder($"SELECT fi.FoodItemIdentifier AS FoodItemIdentifier,fi.IsActive AS IsActive FROM FoodItems AS fi, ForeignKeys AS fk WHERE fi.FoodItemIdentifier=fk.ForeignKeyForIdentifier AND fk.DataProviderIdentifier='{dataProvider.Identifier.Value.ToString("D").ToUpper()}' AND fk.ForeignKeyForTypes LIKE '%{typeof(IFoodItem).Name}%' AND fk.ForeignKeyValue='{foreignKeyValue}'").Build();
-                    return DataProvider.GetCollection<FoodItemProxy>(command).FirstOrDefault();
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
                 }
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
+
+                MySqlCommand command = FoodItemProxy.BuildSystemDataCommandForSelecting(
+                    "INNER JOIN ForeignKeys AS fk ON fk.ForeignKeyForIdentifier=fi.FoodItemIdentifier WHERE fk.DataProviderIdentifier=@dataProviderIdentifier AND fk.ForeignKeyForTypes LIKE @foreignKeyForTypes AND fk.ForeignKeyValue=@foreignKeyValue",
+                    systemCommandBuilder => systemCommandBuilder
+                        .AddDataProviderIdentifierParameter(dataProvider.Identifier)
+                        .AddForeignKeyForTypesLikeParameter(typeof(IFoodItem))
+                        .AddForeignKeyValueParameter(foreignKeyValue));
+                return DataProvider.GetCollection<FoodItemProxy>(command).FirstOrDefault();
             }
             catch (IntranetRepositoryException)
             {
@@ -200,27 +200,23 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>Food group.</returns>
         public virtual IFoodGroup FoodGroupGetByForeignKey(IDataProvider dataProvider, string foreignKeyValue)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(dataProvider));
-            }
-            if (string.IsNullOrEmpty(foreignKeyValue))
-            {
-                throw new ArgumentNullException(nameof(foreignKeyValue));
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider))
+                .NotNullOrWhiteSpace(foreignKeyValue, nameof(foreignKeyValue));
+
             try
             {
-                if (dataProvider.Identifier.HasValue)
+                if (dataProvider.Identifier.HasValue == false)
                 {
-                    MySqlCommand command = FoodGroupProxy.BuildSystemDataCommandForSelecting(
-                        "INNER JOIN ForeignKeys AS fk ON fk.ForeignKeyForIdentifier=fg.FoodGroupIdentifier WHERE fk.DataProviderIdentifier=@dataProviderIdentifier AND fk.ForeignKeyForTypes LIKE @foreignKeyForTypes AND fk.ForeignKeyValue=@foreignKeyValue",
-                        systemCommandBuilder => systemCommandBuilder
-                            .AddDataProviderIdentifierParameter(dataProvider.Identifier)
-                            .AddForeignKeyForTypesLikeParameter(typeof(IFoodGroup))
-                            .AddForeignKeyValueParameter(foreignKeyValue));
-                    return DataProvider.GetCollection<FoodGroupProxy>(command).FirstOrDefault();
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
                 }
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, dataProvider.Identifier, "Identifier"));
+
+                MySqlCommand command = FoodGroupProxy.BuildSystemDataCommandForSelecting(
+                    "INNER JOIN ForeignKeys AS fk ON fk.ForeignKeyForIdentifier=fg.FoodGroupIdentifier WHERE fk.DataProviderIdentifier=@dataProviderIdentifier AND fk.ForeignKeyForTypes LIKE @foreignKeyForTypes AND fk.ForeignKeyValue=@foreignKeyValue",
+                    systemCommandBuilder => systemCommandBuilder
+                        .AddDataProviderIdentifierParameter(dataProvider.Identifier)
+                        .AddForeignKeyForTypesLikeParameter(typeof(IFoodGroup))
+                        .AddForeignKeyValueParameter(foreignKeyValue));
+                return DataProvider.GetCollection<FoodGroupProxy>(command).FirstOrDefault();
             }
             catch (IntranetRepositoryException)
             {

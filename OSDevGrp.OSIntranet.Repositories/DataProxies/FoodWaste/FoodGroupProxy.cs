@@ -21,8 +21,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
         private bool _parentHasBeenLoaded;
         private bool _childrenHasBeenLoaded;
-        private bool _translationsHasBeenLoaded;
-        private bool _foreignKeysHasBeenLoaded;
+        private bool _translationCollectionHasBeenLoaded;
+        private bool _foreignKeyCollectionHasBeenLoaded;
         private IFoodWasteDataProvider _dataProvider;
 
         private static bool _callingFromParentSetter;
@@ -147,7 +147,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             get
             {
-                if (_translationsHasBeenLoaded || _dataProvider == null || Identifier.HasValue == false)
+                if (_translationCollectionHasBeenLoaded || _dataProvider == null || Identifier.HasValue == false)
                 {
                     return base.Translations;
                 }
@@ -158,7 +158,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             protected set
             {
                 base.Translations = value;
-                _translationsHasBeenLoaded = true;
+                _translationCollectionHasBeenLoaded = true;
             }
         }
 
@@ -169,7 +169,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             get
             {
-                if (_foreignKeysHasBeenLoaded || _dataProvider == null || Identifier.HasValue == false)
+                if (_foreignKeyCollectionHasBeenLoaded || _dataProvider == null || Identifier.HasValue == false)
                 {
                     return base.ForeignKeys;
                 }
@@ -180,7 +180,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             protected set
             {
                 base.ForeignKeys = value;
-                _foreignKeysHasBeenLoaded = true;
+                _foreignKeyCollectionHasBeenLoaded = true;
             }
         }
 
@@ -222,8 +222,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             IsActive = GetIsActive(dataReader, "IsActive");
 
             _childrenHasBeenLoaded = false;
-            _translationsHasBeenLoaded = false;
-            _foreignKeysHasBeenLoaded = false;
+            _translationCollectionHasBeenLoaded = false;
+            _foreignKeyCollectionHasBeenLoaded = false;
             _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }
 

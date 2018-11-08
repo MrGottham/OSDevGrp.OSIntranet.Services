@@ -16,7 +16,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
         /// <summary>
         /// Gets or sets the identifier for the food item.
         /// </summary>
-        Guid? FoodItemIdentifier { get; set; }
+        Guid? FoodItemIdentifier { get; }
 
         /// <summary>
         /// Gets the food group.
@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
         /// <summary>
         /// Gets or sets the identifier for the food group.
         /// </summary>
-        Guid? FoodGroupIdentifier { get; set; }
+        Guid? FoodGroupIdentifier { get; }
 
         /// <summary>
         /// Gets or sets whether this will be the primary food group for the food item.
