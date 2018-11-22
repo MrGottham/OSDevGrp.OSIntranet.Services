@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
@@ -10,7 +11,6 @@ using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -21,6 +21,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class StorageTypeProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a data proxy to a given storage type.
         /// </summary>
@@ -43,6 +58,66 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that Translations maps the translations for the food item into the proxy when MapData has been called and MapRelations has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatTranslationsMapsTranslationsIntoProxyWhenMapDataHasBeenCalledAndMapRelationsHasNotBeenCalled()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(storageTypeIdentifier);
+
+            IEnumerable<TranslationProxy> translationProxyCollection = _fixture.CreateMany<TranslationProxy>().ToList();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            sut.MapData(dataReader, dataProvider);
+
+            Assert.That(sut.Translation, Is.Null);
+            Assert.That(sut.Translations, Is.Not.Null);
+            Assert.That(sut.Translations, Is.Not.Empty);
+            Assert.That(sut.Translations, Is.EqualTo(translationProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Once());
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", storageTypeIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that Translations maps the translations for the food item into the proxy when Create has been called and MapData has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatTranslationsMapsTranslationsIntoProxyWhenCreateHasBeenCalledAndMapDataHasNotBeenCalled()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(storageTypeIdentifier);
+
+            IEnumerable<TranslationProxy> translationProxyCollection = _fixture.CreateMany<TranslationProxy>().ToList();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            IStorageTypeProxy result = sut.Create(dataReader, dataProvider, "StorageTypeIdentifier", "SortOrder", "Temperature", "TemperatureRangeStartValue", "TemperatureRangeEndValue", "Creatable", "Editable", "Deletable");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Translation, Is.Null);
+            Assert.That(result.Translations, Is.Not.Null);
+            Assert.That(result.Translations, Is.Not.Empty);
+            Assert.That(result.Translations, Is.EqualTo(translationProxyCollection));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Once());
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", storageTypeIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
         /// Tests that getter for UniqueId gets the unique identifier for the storage type.
         /// </summary>
         [Test]
@@ -53,9 +128,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut(identifier);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.Identifier.Value, Is.EqualTo(identifier));
 
             string uniqueId = sut.UniqueId;
@@ -83,128 +155,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given storage type is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenStorageTypeIsNull()
-        {
-            IStorageTypeProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => ((StorageTypeProxy) sut).GetSqlQueryForId(null));
-
-            TestHelper.AssertArgumentNullExceptionIsValid(result, "storageType");
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given storage type has no value.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnStorageTypeHasNoValue()
-        {
-            IStorageType storageTypeMock = MockRepository.GenerateMock<IStorageType>();
-            storageTypeMock.Stub(m => m.Identifier)
-                .Return(null)
-                .Repeat.Any();
-
-            IStorageTypeProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => ((StorageTypeProxy) sut).GetSqlQueryForId(storageTypeMock));
-
-            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, storageTypeMock.Identifier, "Identifier");
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given storage type.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
-        {
-            Guid identifier = Guid.NewGuid();
-
-            IStorageType storageTypeMock = MockRepository.GenerateMock<IStorageType>();
-            storageTypeMock.Stub(m => m.Identifier)
-                .Return(identifier)
-                .Repeat.Any();
-
-            IStorageTypeProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageTypeProxy) sut).GetSqlQueryForId(storageTypeMock);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert this storage type.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert()
-        {
-            Fixture fixture = new Fixture();
-
-            Guid identifier = Guid.NewGuid();
-            int sortOrder = fixture.Create<int>();
-            int temperatur = fixture.Create<int>();
-            IRange<int> temperaturRange = DomainObjectMockBuilder.BuildIntRange();
-            bool creatable = fixture.Create<bool>();
-            bool editable = fixture.Create<bool>();
-            bool deletable = fixture.Create<bool>();
-
-            IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageTypeProxy) sut).GetSqlCommandForInsert();
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"INSERT INTO StorageTypes (StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES('{identifier.ToString("D").ToUpper()}',{sortOrder},{temperatur},{temperaturRange.StartValue},{temperaturRange.EndValue},{Convert.ToInt32(creatable)},{Convert.ToInt32(editable)},{Convert.ToInt32(deletable)})"));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update this storage type.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
-        {
-            Fixture fixture = new Fixture();
-
-            Guid identifier = Guid.NewGuid();
-            int sortOrder = fixture.Create<int>();
-            int temperatur = fixture.Create<int>();
-            IRange<int> temperaturRange = DomainObjectMockBuilder.BuildIntRange();
-            bool creatable = fixture.Create<bool>();
-            bool editable = fixture.Create<bool>();
-            bool deletable = fixture.Create<bool>();
-
-            IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageTypeProxy) sut).GetSqlCommandForUpdate();
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"UPDATE StorageTypes SET SortOrder={sortOrder},Temperature={temperatur},TemperatureRangeStartValue={temperaturRange.StartValue},TemperatureRangeEndValue={temperaturRange.EndValue},Creatable={Convert.ToInt32(creatable)},Editable={Convert.ToInt32(editable)},Deletable={Convert.ToInt32(deletable)} WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete this storage type.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
-        {
-            Guid identifier = Guid.NewGuid();
-
-            IStorageTypeProxy sut = CreateSut(identifier);
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageTypeProxy) sut).GetSqlCommandForDelete();
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"DELETE FROM StorageTypes WHERE StorageTypeIdentifier='{identifier.ToString("D").ToUpper()}'"));
-        }
-
-        /// <summary>
         /// Tests that MapData throws an ArgumentNullException if the data reader is null.
         /// </summary>
         [Test]
@@ -213,7 +163,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -227,7 +177,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(MockRepository.GenerateStub<MySqlDataReader>(), null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
@@ -236,54 +186,50 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Tests that MapData maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataMapsDataIntoProxy()
+        [TestCase(true, true, true)]
+        [TestCase(true, true, false)]
+        [TestCase(true, false, true)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, true)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(false, false, false)]
+        public void TestThatMapDataMapsDataIntoProxy(bool creatable, bool editable, bool deletable)
         {
-            Fixture fixture = new Fixture();
-
-            Guid storageTypeIdentifier = Guid.NewGuid();
-            int sortOrder = fixture.Create<int>();
-            int temperatur = fixture.Create<int>();
-            IRange<int> temperaturRange = DomainObjectMockBuilder.BuildIntRange();
-            bool creatable = fixture.Create<bool>();
-            bool editable = fixture.Create<bool>();
-            bool deletable = fixture.Create<bool>();
-
-            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(storageTypeIdentifier, sortOrder, temperatur, temperaturRange, creatable, editable, deletable);
-
-            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture);
-
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.Identifier, Is.Null);
-            Assert.That(sut.Identifier.HasValue, Is.False);
-            Assert.That(sut.SortOrder, Is.EqualTo(default(int)));
-            Assert.That(sut.Temperature, Is.EqualTo(default(int)));
-            Assert.That(sut.TemperatureRange, Is.Null);
-            Assert.That(sut.Creatable, Is.EqualTo(default(bool)));
-            Assert.That(sut.Editable, Is.EqualTo(default(bool)));
-            Assert.That(sut.Deletable, Is.EqualTo(default(bool)));
-            Assert.That(sut.Translation, Is.Null);
-            Assert.That(sut.Translations, Is.Not.Null);
-            Assert.That(sut.Translations, Is.Empty);
 
-            sut.MapData(mySqlDataReaderStub, dataProviderMock);
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            int sortOrder = _fixture.Create<int>();
+            int temperature = _fixture.Create<int>();
+            IRange<int> temperatureRange = DomainObjectMockBuilder.BuildIntRange();
+            MySqlDataReader dataReader = CreateMySqlDataReader(storageTypeIdentifier, sortOrder, temperature, temperatureRange, creatable, editable, deletable);
+
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
+
+            sut.MapData(dataReader, dataProvider);
 
             Assert.That(sut.Identifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.Value, Is.EqualTo(storageTypeIdentifier));
+            Assert.That(sut.Identifier, Is.EqualTo(storageTypeIdentifier));
             Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
-            Assert.That(sut.Temperature, Is.EqualTo(temperatur));
+            Assert.That(sut.Temperature, Is.EqualTo(temperature));
             Assert.That(sut.TemperatureRange, Is.Not.Null);
-            Assert.That(sut.TemperatureRange.StartValue, Is.EqualTo(temperaturRange.StartValue));
-            Assert.That(sut.TemperatureRange.EndValue, Is.EqualTo(temperaturRange.EndValue));
+            Assert.That(sut.TemperatureRange.StartValue, Is.EqualTo(temperatureRange.StartValue));
+            Assert.That(sut.TemperatureRange.EndValue, Is.EqualTo(temperatureRange.EndValue));
             Assert.That(sut.Creatable, Is.EqualTo(creatable));
             Assert.That(sut.Editable, Is.EqualTo(editable));
             Assert.That(sut.Deletable, Is.EqualTo(deletable));
-            Assert.That(sut.Translation, Is.Null);
-            Assert.That(sut.Translations, Is.Not.Null);
-            Assert.That(sut.Translations, Is.Empty);
+
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("StorageTypeIdentifier")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("TemperatureRangeStartValue")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("TemperatureRangeEndValue")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Creatable")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Editable")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Deletable")), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
         }
 
         /// <summary>
@@ -301,25 +247,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that MapRelations throws an IntranetRepositoryException when the identifier for the food group is null.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.MapRelations(CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
+        }
+
+        /// <summary>
         /// Tests that MapRelations calls Clone on the data provider one time.
         /// </summary>
         [Test]
         public void TestThatMapRelationsCallsCloneOnDataProviderOneTime()
         {
-            Fixture fixture = new Fixture();
-
-            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture);
-
-            IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: Guid.NewGuid());
+            IStorageTypeProxy sut = CreateSut(Guid.NewGuid());
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.Identifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
-            sut.MapRelations(dataProviderMock);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
 
-            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Once());
+            sut.MapRelations(dataProvider);
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -328,25 +284,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapRelationsCallsGetCollectionOnDataProviderToGetTranslations()
         {
-            Fixture fixture = new Fixture();
-
             Guid storageTypeIdentifier = Guid.NewGuid();
 
-            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture);
-
-            IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
+            IStorageTypeProxy sut = CreateSut(storageTypeIdentifier);
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.Identifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sut.Identifier.Value, Is.EqualTo(storageTypeIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
 
-            sut.MapRelations(dataProviderMock);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
 
-            dataProviderMock.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == $"SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t, TranslationInfos AS ti WHERE t.OfIdentifier='{storageTypeIdentifier.ToString("D").ToUpper()}' AND ti.TranslationInfoIdentifier=t.InfoIdentifier ORDER BY CultureName")));
+            sut.MapRelations(dataProvider);
+
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName")
+                .AddCharDataParameter("@ofIdentifier", storageTypeIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -355,27 +305,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapRelationsMapsTranslationsIntoProxy()
         {
-            Fixture fixture = new Fixture();
-
-            Guid storageTypeIdentifier = Guid.NewGuid();
-
-            IEnumerable<TranslationProxy> translationProxyCollection = fixture.CreateMany<TranslationProxy>().ToList();
-            Assert.That(translationProxyCollection, Is.Not.Null);
-            Assert.That(translationProxyCollection, Is.Not.Empty);
-
-            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture, translationProxyCollection: translationProxyCollection);
-
-            IStorageTypeProxy sut = CreateSut(storageTypeIdentifier: storageTypeIdentifier);
+            IStorageTypeProxy sut = CreateSut(Guid.NewGuid());
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.Identifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Translation, Is.Null);
-            Assert.That(sut.Translations, Is.Not.Null);
-            Assert.That(sut.Translations, Is.Empty);
 
-            sut.MapRelations(dataProviderMock);
+            IEnumerable<TranslationProxy> translationProxyCollection = _fixture.CreateMany<TranslationProxy>().ToList();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(translationProxyCollection);
+
+            sut.MapRelations(dataProvider);
 
             Assert.That(sut.Translation, Is.Null);
             Assert.That(sut.Translations, Is.Not.Null);
@@ -389,12 +325,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(null, fixture.Create<bool>()));
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(null, _fixture.Create<bool>()));
 
             TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
@@ -405,12 +339,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            Fixture fixture = new Fixture();
-
-            IStorageTypeProxy sut = CreateSut();
+           IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateDataProviderMock(fixture), fixture.Create<bool>()));
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
 
             TestHelper.AssertNotSupportedExceptionIsValid(result);
         }
@@ -435,21 +367,215 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsNotSupportedExceptionWhenDataProviderIsNotNull()
         {
-            Fixture fixture = new Fixture();
-
             IStorageTypeProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateDataProviderMock(fixture)));
+            NotSupportedException result = Assert.Throws<NotSupportedException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
 
             TestHelper.AssertNotSupportedExceptionIsValid(result);
+        }
+
+        /// <summary>
+        /// Tests that CreateGetCommand returns the SQL command for selecting the given storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCreateGetCommandReturnsSqlCommand()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorageTypeProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes WHERE StorageTypeIdentifier=@storageTypeIdentifier")
+                .AddCharDataParameter("@storageTypeIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateInsertCommand returns the SQL command to insert this storage type.
+        /// </summary>
+        [Test]
+        [TestCase(true, true, true)]
+        [TestCase(true, true, false)]
+        [TestCase(true, false, true)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, true)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(false, false, false)]
+        public void TestThatCreateInsertCommandReturnsSqlCommandForInsert(bool creatable, bool editable, bool deletable)
+        {
+            Guid identifier = Guid.NewGuid();
+            int sortOrder = _fixture.Create<int>();
+            int temperature = _fixture.Create<int>();
+            IRange<int> temperatureRange = DomainObjectMockBuilder.BuildIntRange();
+
+            IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperature, temperatureRange, creatable, editable, deletable);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("INSERT INTO StorageTypes (StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable) VALUES(@storageTypeIdentifier,@sortOrder,@temperature,@temperatureRangeStartValue,@temperatureRangeEndValue,@creatable,@editable,@deletable)")
+                .AddCharDataParameter("@storageTypeIdentifier", identifier)
+                .AddTinyIntDataParameter("@sortOrder", sortOrder, 4)
+                .AddTinyIntDataParameter("@temperature", temperature, 4)
+                .AddTinyIntDataParameter("@temperatureRangeStartValue", temperatureRange.StartValue, 4)
+                .AddTinyIntDataParameter("@temperatureRangeEndValue", temperatureRange.EndValue, 4)
+                .AddBitDataParameter("@creatable", creatable)
+                .AddBitDataParameter("@editable", editable)
+                .AddBitDataParameter("@deletable", deletable)
+                .Build()
+                .Run(sut.CreateInsertCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateUpdateCommand returns the SQL command to update this storage type.
+        /// </summary>
+        [Test]
+        [TestCase(true, true, true)]
+        [TestCase(true, true, false)]
+        [TestCase(true, false, true)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, true)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(false, false, false)]
+        public void TestThatCreateUpdateCommandReturnsSqlCommandForUpdate(bool creatable, bool editable, bool deletable)
+        {
+            Guid identifier = Guid.NewGuid();
+            int sortOrder = _fixture.Create<int>();
+            int temperature = _fixture.Create<int>();
+            IRange<int> temperatureRange = DomainObjectMockBuilder.BuildIntRange();
+
+            IStorageTypeProxy sut = CreateSut(identifier, sortOrder, temperature, temperatureRange, creatable, editable, deletable);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("UPDATE StorageTypes SET SortOrder=@sortOrder,Temperature=@temperature,TemperatureRangeStartValue=@temperatureRangeStartValue,TemperatureRangeEndValue=@temperatureRangeEndValue,Creatable=@creatable,Editable=@editable,Deletable=@deletable WHERE StorageTypeIdentifier=@storageTypeIdentifier")
+                .AddCharDataParameter("@storageTypeIdentifier", identifier)
+                .AddTinyIntDataParameter("@sortOrder", sortOrder, 4)
+                .AddTinyIntDataParameter("@temperature", temperature, 4)
+                .AddTinyIntDataParameter("@temperatureRangeStartValue", temperatureRange.StartValue, 4)
+                .AddTinyIntDataParameter("@temperatureRangeEndValue", temperatureRange.EndValue, 4)
+                .AddBitDataParameter("@creatable", creatable)
+                .AddBitDataParameter("@editable", editable)
+                .AddBitDataParameter("@deletable", deletable)
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateDeleteCommand returns the SQL command to delete this storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCreateDeleteCommandReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorageTypeProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("DELETE FROM StorageTypes WHERE StorageTypeIdentifier=@storageTypeIdentifier")
+                .AddCharDataParameter("@storageTypeIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data reader is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataReaderIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(null, CreateFoodWasteDataProvider(), _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), null, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the column name collection is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfColumnNameCollectionIsNull()
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), CreateFoodWasteDataProvider(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "columnNameCollection");
+        }
+
+        /// <summary>
+        /// Tests that Create creates a data proxy for a given data provider with values from the data reader.
+        /// </summary>
+        [Test]
+        [TestCase(true, true, true)]
+        [TestCase(true, true, false)]
+        [TestCase(true, false, true)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, true)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(false, false, false)]
+        public void TestThatCreateCreatesProxy(bool creatable, bool editable, bool deletable)
+        {
+            IStorageTypeProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            int sortOrder = _fixture.Create<int>();
+            int temperature = _fixture.Create<int>();
+            IRange<int> temperatureRange = DomainObjectMockBuilder.BuildIntRange();
+            MySqlDataReader dataReader = CreateMySqlDataReader(storageTypeIdentifier, sortOrder, temperature, temperatureRange, creatable, editable, deletable);
+
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
+
+            IStorageTypeProxy result = sut.Create(dataReader, dataProvider, "StorageTypeIdentifier", "SortOrder", "Temperature", "TemperatureRangeStartValue", "TemperatureRangeEndValue", "Creatable", "Editable", "Deletable");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Identifier, Is.Not.Null);
+            Assert.That(result.Identifier, Is.EqualTo(storageTypeIdentifier));
+            Assert.That(result.SortOrder, Is.EqualTo(sortOrder));
+            Assert.That(result.Temperature, Is.EqualTo(temperature));
+            Assert.That(result.TemperatureRange, Is.Not.Null);
+            Assert.That(result.TemperatureRange.StartValue, Is.EqualTo(temperatureRange.StartValue));
+            Assert.That(result.TemperatureRange.EndValue, Is.EqualTo(temperatureRange.EndValue));
+            Assert.That(result.Creatable, Is.EqualTo(creatable));
+            Assert.That(result.Editable, Is.EqualTo(editable));
+            Assert.That(result.Deletable, Is.EqualTo(deletable));
+
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("StorageTypeIdentifier")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("TemperatureRangeStartValue")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("TemperatureRangeEndValue")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Creatable")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Editable")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("Deletable")), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
         }
 
         /// <summary>
         /// Creates an instance of the data proxy to a given storage type which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage type which should be used for unit testing.</returns>
-        private static IStorageTypeProxy CreateSut(Guid? storageTypeIdentifier = null)
+        private IStorageTypeProxy CreateSut(Guid? storageTypeIdentifier = null)
         {
             return new StorageTypeProxy
             {
@@ -461,7 +587,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of the data proxy to a given storage type which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage type which should be used for unit testing.</returns>
-        private static IStorageTypeProxy CreateSut(Guid storageTypeIdentifier, int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
+        private IStorageTypeProxy CreateSut(Guid storageTypeIdentifier, int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
         {
             return new StorageTypeProxy(sortOrder, temperature, temperatureRange, creatable, editable, deletable)
             {
@@ -473,37 +599,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a MySQL data reader which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a MySQL data reader which should be used for unit testing.</returns>
-        private static MySqlDataReader CreateMySqlDataReaderStub(Guid storageTypeIdentifier, int sortOrder, int temperature, IRange<int> temperatureRange, bool creatable, bool editable, bool deletable)
+        private MySqlDataReader CreateMySqlDataReader(Guid? storageTypeIdentifier = null, int? sortOrder = null, int? temperature = null, IRange<int> temperatureRange = null, bool? creatable = null, bool? editable = null, bool? deletable = null)
         {
-            if (temperatureRange == null)
-            {
-                throw new ArgumentNullException(nameof(temperatureRange));
-            }
+            IRange<int> range = temperatureRange ?? DomainObjectMockBuilder.BuildIntRange();
 
             MySqlDataReader mySqlDataReaderStub = MockRepository.GenerateStub<MySqlDataReader>();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<string>.Is.Equal("StorageTypeIdentifier")))
-                .Return(storageTypeIdentifier.ToString("D").ToUpper())
+                .Return(storageTypeIdentifier.HasValue ? storageTypeIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")))
-                .Return((short) sortOrder)
+                .Return((short) (sortOrder ?? _fixture.Create<short>()))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")))
-                .Return((short) temperature)
+                .Return((short) (temperature ?? _fixture.Create<short>()))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt16("TemperatureRangeStartValue"))
-                .Return((short) temperatureRange.StartValue)
+                .Return((short) range.StartValue)
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt16("TemperatureRangeEndValue"))
-                .Return((short) temperatureRange.EndValue)
+                .Return((short) range.EndValue)
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Creatable")))
-                .Return(Convert.ToInt32(creatable))
+                .Return(Convert.ToInt32(creatable ?? _fixture.Create<bool>()))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Editable")))
-                .Return(Convert.ToInt32(editable))
+                .Return(Convert.ToInt32(editable ?? _fixture.Create<bool>()))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt32(Arg<string>.Is.Equal("Deletable")))
-                .Return(Convert.ToInt32(deletable))
+                .Return(Convert.ToInt32(deletable ?? _fixture.Create<bool>()))
                 .Repeat.Any();
             return mySqlDataReaderStub;
         }
@@ -512,19 +635,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private static IFoodWasteDataProvider CreateDataProviderMock(Fixture fixture, IEnumerable<TranslationProxy> translationProxyCollection = null)
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(IEnumerable<TranslationProxy> translationProxyCollection = null)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
-
             IFoodWasteDataProvider dataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             dataProviderMock.Stub(m => m.Clone())
                 .Return(dataProviderMock)
                 .Repeat.Any();
             dataProviderMock.Stub(m => m.GetCollection<TranslationProxy>(Arg<MySqlCommand>.Is.Anything))
-                .Return(translationProxyCollection ?? fixture.CreateMany<TranslationProxy>().ToList())
+                .Return(translationProxyCollection ?? _fixture.CreateMany<TranslationProxy>().ToList())
                 .Repeat.Any();
             return dataProviderMock;
         }

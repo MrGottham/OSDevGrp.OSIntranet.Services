@@ -51,7 +51,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         {
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder").Build();
+                MySqlCommand command = new SystemDataCommandBuilder("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder").Build();
                 return DataProvider.GetCollection<StorageTypeProxy>(command);
             }
             catch (IntranetRepositoryException)

@@ -95,7 +95,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
 
             sut.StorageTypeGetAll();
 
-            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StorageTypeProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == "SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder")));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT StorageTypeIdentifier,SortOrder,Temperature,TemperatureRangeStartValue,TemperatureRangeEndValue,Creatable,Editable,Deletable FROM StorageTypes ORDER BY SortOrder").Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<StorageTypeProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -104,11 +105,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStorageTypeGetAllReturnsResultFromFoodWasteDataProvider()
         {
-            Fixture fixture = new Fixture();
+            IEnumerable<StorageTypeProxy> storageTypeProxyCollection = BuildStorageTypeProxyCollection(_fixture);
 
-            IEnumerable<StorageTypeProxy> storageTypeProxyCollection = BuildStorageTypeProxyCollection(fixture);
-
-            ISystemDataRepository sut = CreateSut(storageTypeProxyCollection: storageTypeProxyCollection);
+            ISystemDataRepository sut = CreateSut(storageTypeProxyCollection);
             Assert.That(sut, Is.Not.Null);
 
             IEnumerable<IStorageType> result = sut.StorageTypeGetAll();
@@ -125,8 +124,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStorageTypeGetAllThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            IntranetRepositoryException exceptionToThrow = fixture.Create<IntranetRepositoryException>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);
@@ -142,8 +140,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatStorageTypeGetAllThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            Fixture fixture = new Fixture();
-            Exception exceptionToThrow = fixture.Create<Exception>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
             ISystemDataRepository sut = CreateSut(exceptionToThrow: exceptionToThrow);
             Assert.That(sut, Is.Not.Null);

@@ -24,7 +24,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         #endregion
 
         /// <summary>
-        /// Opsætning af tests.
+        /// Setup tests.
         /// </summary>
         [SetUp]
         public void TestSetUp()
@@ -34,7 +34,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Tests that StorageTypeGetAll returns all the storages types.
+        /// Tests that StorageTypeGetAll returns all the storage types.
         /// </summary>
         [Test]
         public void TestThatStorageTypeGetAllReturnsStorageTypes()
@@ -50,6 +50,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories.FoodWaste
             Assert.That(storageTypes.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == StorageType.IdentifierForShoppingBasket), Is.Not.Null);
             // ReSharper restore PossibleMultipleEnumeration
         }
+
         /// <summary>
         /// Tests that FoodItemGetByForeignKey returns the food item for the given data providers foreign key.
         /// </summary>

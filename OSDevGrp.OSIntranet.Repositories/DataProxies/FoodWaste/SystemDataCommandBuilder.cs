@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
@@ -27,6 +28,80 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Adds a storage type identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage type identifier.</param>
+        internal SystemDataCommandBuilder AddStorageTypeIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@storageTypeIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a storage type sort order parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage type sort order.</param>
+        internal SystemDataCommandBuilder AddStorageTypeSortOrderParameter(int value)
+        {
+            AddTinyIntParameter("@sortOrder", value, 4);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a storage type temperature parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage type temperature.</param>
+        internal SystemDataCommandBuilder AddStorageTypeTemperatureParameter(int value)
+        {
+            AddTinyIntParameter("@temperature", value, 4);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a storage type temperature range parameters to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage type temperature range.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null.</exception>
+        internal SystemDataCommandBuilder AddStorageTypeTemperatureRangeParameter(IRange<int> value)
+        {
+            ArgumentNullGuard.NotNull(value, nameof(value));
+
+            AddTinyIntParameter("@temperatureRangeStartValue", value.StartValue, 4);
+            AddTinyIntParameter("@temperatureRangeEndValue", value.EndValue, 4);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds whether the storage type is creatable parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for whether the storage type is creatable.</param>
+        internal SystemDataCommandBuilder AddStorageTypeCreatableParameter(bool value)
+        {
+            AddBitParameter("@creatable", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds whether the storage type is editable parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for whether the storage type is editable.</param>
+        internal SystemDataCommandBuilder AddStorageTypeEditableParameter(bool value)
+        {
+            AddBitParameter("@editable", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds whether the storage type is deletable parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for whether the storage type is deletable.</param>
+        internal SystemDataCommandBuilder AddStorageTypeDeletableParameter(bool value)
+        {
+            AddBitParameter("@deletable", value);
+            return this;
+        }
 
         /// <summary>
         /// Adds a food item identifier parameter to the command.
