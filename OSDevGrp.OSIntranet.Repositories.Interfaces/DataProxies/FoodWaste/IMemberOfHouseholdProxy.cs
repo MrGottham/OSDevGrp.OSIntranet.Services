@@ -16,7 +16,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
         /// <summary>
         /// Identifier for the household member which are member of the household.
         /// </summary>
-        Guid? HouseholdMemberIdentifier { get; set; }
+        Guid? HouseholdMemberIdentifier { get; }
 
         /// <summary>
         /// Household which the household member are member of.
@@ -26,7 +26,7 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste
         /// <summary>
         /// Identifier for the household which the household member are member of.
         /// </summary>
-        Guid? HouseholdIdentifier { get; set; }
+        Guid? HouseholdIdentifier { get; }
 
         /// <summary>
         /// Date and time for when the membership to the household was created.

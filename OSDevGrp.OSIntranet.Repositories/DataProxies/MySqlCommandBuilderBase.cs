@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 
@@ -138,6 +140,42 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies
         protected void AddTextParameter(string parameterName, string value, bool isNullable = false)
         {
             AddParameter(parameterName, value, MySqlDbType.Text, 0, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a longtext text to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddLongTextParameter(string parameterName, string value, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.LongText, 0, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a longtext text to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected void AddLongTextParameter(string parameterName, IEnumerable<byte> value, bool isNullable = false)
+        {
+            AddLongTextParameter(parameterName, value != null ? Convert.ToBase64String(value.ToArray()) : null, isNullable);
+        }
+
+        /// <summary>
+        /// Adds a date parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected virtual void AddDateTimeParameter(string parameterName, DateTime? value, bool isNullable = false)
+        {
+            AddParameter(parameterName, value, MySqlDbType.DateTime, isNullable: isNullable);
         }
 
         /// <summary>

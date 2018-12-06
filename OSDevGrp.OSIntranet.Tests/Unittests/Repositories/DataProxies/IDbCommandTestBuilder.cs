@@ -85,6 +85,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         IDbCommandTestBuilder AddTextDataParameter(string parameterName, string value, bool isNullable = false);
 
         /// <summary>
+        /// Adds a longtext data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        IDbCommandTestBuilder AddLongTextDataParameter(string parameterName, string value, bool isNullable = false);
+
+        /// <summary>
+        /// Adds a longtext data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        IDbCommandTestBuilder AddLongTextDataParameter(string parameterName, byte[] value, bool isNullable = false);
+
+        /// <summary>
+        /// Adds a datetime data parameter.
+        /// </summary>
+        /// <param name="parameterName">The name of the data parameter.</param>
+        /// <param name="value">The value for the data parameter.</param>
+        /// <param name="isNullable">Indicates whether the data parameter can be null.</param>
+        /// <returns>The builder which can build a database command tester.</returns>
+        IDbCommandTestBuilder AddDateTimeDataParameter(string parameterName, DateTime? value, bool isNullable = false);
+
+        /// <summary>
         /// Adds a date data parameter.
         /// </summary>
         /// <param name="parameterName">The name of the data parameter.</param>

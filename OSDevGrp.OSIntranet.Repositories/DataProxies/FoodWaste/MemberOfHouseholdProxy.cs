@@ -1,14 +1,16 @@
-﻿using MySql.Data.MySqlClient;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 {
@@ -17,17 +19,6 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class MemberOfHouseholdProxy : IdentifiableBase, IMemberOfHouseholdProxy
     {
-        #region Private variables
-
-        private IHouseholdMember _householdMember;
-        private Guid? _householdMemberIdentifier;
-        private IHousehold _household;
-        private Guid? _householdIdentifier;
-        private DateTime _creationTime;
-        private IFoodWasteDataProvider _dataProvider;
-
-        #endregion
-
         #region Constructors
 
         /// <summary>
@@ -55,19 +46,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="creationTime">Date and time for when the membership to the household was created.</param>
         public MemberOfHouseholdProxy(IHouseholdMember householdMember, IHousehold household, DateTime creationTime)
         {
-            if (householdMember == null)
-            {
-                throw new ArgumentNullException("householdMember");
-            }
-            if (household == null)
-            {
-                throw new ArgumentNullException("household");
-            }
-            _householdMember = householdMember;
-            _householdMemberIdentifier = householdMember.Identifier;
-            _household = household;
-            _householdIdentifier = household.Identifier;
-            _creationTime = creationTime;
+            ArgumentNullGuard.NotNull(householdMember, nameof(householdMember))
+                .NotNull(household, nameof(household));
+
+            HouseholdMember = householdMember;
+            Household = household;
+            CreationTime = creationTime;
         }
 
         #endregion
@@ -77,107 +61,31 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <summary>
         /// Household member which are member of the household.
         /// </summary>
-        public virtual IHouseholdMember HouseholdMember
-        {
-            get
-            {
-                if (_householdMember != null && _householdMember.Identifier.HasValue && _householdMemberIdentifier.HasValue && _householdMember.Identifier.Value == _householdMemberIdentifier.Value)
-                {
-                    return _householdMember;
-                }
-                if (_householdMemberIdentifier.HasValue == false || _dataProvider == null)
-                {
-                    return null;
-                }
-                using (var subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
-                {
-                    var householdMemberProxy = new HouseholdMemberProxy
-                    {
-                        Identifier = _householdMemberIdentifier.Value
-                    };
-                    _householdMember = subDataProvider.Get(householdMemberProxy);
-                }
-                return _householdMember;
-            }
-        }
-        
+        public virtual IHouseholdMember HouseholdMember { get; private set; }
+
         /// <summary>
         /// Identifier for the household member which are member of the household.
         /// </summary>
-        public virtual Guid? HouseholdMemberIdentifier
-        {
-            get
-            {
-                return _householdMemberIdentifier;
-            }
-            set
-            {
-                _householdMember = null;
-                _householdMemberIdentifier = value;
-            }
-        }
+        public virtual Guid? HouseholdMemberIdentifier => HouseholdMember?.Identifier;
 
         /// <summary>
         /// Household which the household member are member of.
         /// </summary>
-        public virtual IHousehold Household
-        {
-            get
-            {
-                if (_household != null && _household.Identifier.HasValue && _householdIdentifier.HasValue && _household.Identifier.Value == _householdIdentifier.Value)
-                {
-                    return _household;
-                }
-                if (_householdIdentifier.HasValue == false || _dataProvider == null)
-                {
-                    return null;
-                }
-                using (var subDataProvider = (IFoodWasteDataProvider) _dataProvider.Clone())
-                {
-                    var householdProxy = new HouseholdProxy
-                    {
-                        Identifier = _householdIdentifier.Value
-                    };
-                    _household = subDataProvider.Get(householdProxy);
-                }
-                return _household;
-            }
-        }
+        public virtual IHousehold Household { get; private set; }
 
         /// <summary>
         /// Identifier for the household which the household member are member of.
         /// </summary>
-        public virtual Guid? HouseholdIdentifier
-        {
-            get
-            {
-                return _householdIdentifier;
-            }
-            set
-            {
-                _household = null;
-                _householdIdentifier = value;
-            }
-        }
+        public virtual Guid? HouseholdIdentifier => Household?.Identifier;
 
         /// <summary>
         /// Date and time for when the membership to the household was created.
         /// </summary>
-        public virtual DateTime CreationTime
-        {
-            get
-            {
-                return _creationTime;
-            }
-            protected set
-            {
-                _creationTime = value;
-            }
-        }
+        public virtual DateTime CreationTime { get; private set; }
 
         #endregion
 
-        #region IMySqlDataProxy
+        #region IMySqlDataProxy Members
 
         /// <summary>
         /// Gets the unique identification for the binding of a given household member to a given household.
@@ -194,58 +102,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
-        /// <summary>
-        /// Gets the SQL statement for selecting a binding of a given household member to a given household.
-        /// </summary>
-        /// <param name="memberOfHouseholdProxy">Binding of a given household member to a given household for which to get the SQL statement for selecting.</param>
-        /// <returns>SQL statement for selecting a binding of a given household member to a given household.</returns>
-        public virtual string GetSqlQueryForId(IMemberOfHouseholdProxy memberOfHouseholdProxy)
-        {
-            if (memberOfHouseholdProxy == null)
-            {
-                throw new ArgumentNullException("memberOfHouseholdProxy");
-            }
-            if (memberOfHouseholdProxy.Identifier.HasValue)
-            {
-                return string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE MemberOfHouseholdIdentifier='{0}'", memberOfHouseholdProxy.Identifier.Value.ToString("D").ToUpper());
-            }
-            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, memberOfHouseholdProxy.Identifier, "Identifier"));
-        }
-
-        /// <summary>
-        /// Gets the SQL statement for selecting this binding of a given household member to a given household.
-        /// </summary>
-        /// <returns>SQL statement for selecting this binding of a given household member to a given household.</returns>
-        public virtual string GetSqlCommandForInsert()
-        {
-            var householdMemberIdentifierSqlValue = HouseholdMemberIdentifier.HasValue ? HouseholdMemberIdentifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
-            var householdIdentifierSqlValue = HouseholdIdentifier.HasValue ? HouseholdIdentifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
-            return string.Format("INSERT INTO MemberOfHouseholds (MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime) VALUES('{0}','{1}','{2}',{3})", UniqueId, householdMemberIdentifierSqlValue, householdIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to update this binding of a given household member to a given household.
-        /// </summary>
-        /// <returns>SQL statement to update this binding of a given household member to a given household.</returns>
-        public virtual string GetSqlCommandForUpdate()
-        {
-            var householdMemberIdentifierSqlValue = HouseholdMemberIdentifier.HasValue ? HouseholdMemberIdentifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
-            var householdIdentifierSqlValue = HouseholdIdentifier.HasValue ? HouseholdIdentifier.Value.ToString("D").ToUpper() : default(Guid).ToString("D").ToUpper();
-            return string.Format("UPDATE MemberOfHouseholds SET HouseholdMemberIdentifier='{1}',HouseholdIdentifier='{2}',CreationTime={3} WHERE MemberOfHouseholdIdentifier='{0}'", UniqueId, householdMemberIdentifierSqlValue, householdIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(CreationTime));
-        }
-
-        /// <summary>
-        /// Gets the SQL statement to delete this binding of a given household member to a given household.
-        /// </summary>
-        /// <returns>SQL statement to delete this binding of a given household member to a given household.</returns>
-        public virtual string GetSqlCommandForDelete()
-        {
-            return string.Format("DELETE FROM MemberOfHouseholds WHERE MemberOfHouseholdIdentifier='{0}'", UniqueId);
-        }
-
         #endregion
 
-        #region IDataProxyBase Members
+        #region IDataProxyBase<MySqlDataReader, MySqlCommand> Members
 
         /// <summary>
         /// Maps data from the data reader.
@@ -254,24 +113,13 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapData(MySqlDataReader dataReader, IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataReader == null)
-            {
-                throw new ArgumentNullException("dataReader");
-            }
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
+                .NotNull(dataProvider, nameof(dataProvider));
 
             Identifier = Guid.Parse(dataReader.GetString("MemberOfHouseholdIdentifier"));
-            HouseholdMemberIdentifier = Guid.Parse(dataReader.GetString("HouseholdMemberIdentifier"));
-            HouseholdIdentifier = Guid.Parse(dataReader.GetString("HouseholdIdentifier"));
+            HouseholdMember = dataProvider.Create(new HouseholdMemberProxy(), dataReader, "HouseholdMemberIdentifier", "HouseholdMemberMailAddress", "HouseholdMemberMembership", "HouseholdMemberMembershipExpireTime", "HouseholdMemberActivationCode", "HouseholdMemberActivationTime", "HouseholdMemberPrivacyPolicyAcceptedTime", "HouseholdMemberCreationTime");
+            Household = null;
             CreationTime = dataReader.GetDateTime("CreationTime").ToLocalTime();
-
-            if (_dataProvider == null)
-            {
-                _dataProvider = (IFoodWasteDataProvider) dataProvider;
-            }
         }
 
         /// <summary>
@@ -280,10 +128,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
         }
 
         /// <summary>
@@ -293,18 +138,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="isInserting">Indication of whether we are inserting or updating.</param>
         public virtual void SaveRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, bool isInserting)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
             if (Identifier.HasValue == false)
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
-            }
-
-            if (_dataProvider == null)
-            {
-                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -314,18 +152,11 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         public virtual void DeleteRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProvider");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
             if (Identifier.HasValue == false)
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
-            }
-
-            if (_dataProvider == null)
-            {
-                _dataProvider = (IFoodWasteDataProvider) dataProvider;
             }
         }
 
@@ -335,7 +166,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for getting this binding between a given household member and a given household.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlQueryForId(this)).Build();
+            return BuildHouseholdDataCommandForSelecting("WHERE moh.MemberOfHouseholdIdentifier=@memberOfHouseholdIdentifier", householdDataCommandBuilder => householdDataCommandBuilder.AddMemberOfHouseholdIdentifierParameter(Identifier));
         }
 
         /// <summary>
@@ -344,7 +175,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for inserting this binding between a given household member and a given household.</returns>
         public virtual MySqlCommand CreateInsertCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForInsert()).Build();
+            return new HouseholdDataCommandBuilder("INSERT INTO MemberOfHouseholds (MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime) VALUES(@memberOfHouseholdIdentifier,@householdMemberIdentifier,@householdIdentifier,@creationTime)")
+                .AddMemberOfHouseholdIdentifierParameter(Identifier)
+                .AddHouseholdMemberIdentifierParameter(HouseholdMemberIdentifier)
+                .AddHouseholdIdentifierParameter(HouseholdIdentifier)
+                .AddCreationTimeParameter(CreationTime)
+                .Build();
         }
 
         /// <summary>
@@ -353,7 +189,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for updating this binding between a given household member and a given household.</returns>
         public virtual MySqlCommand CreateUpdateCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForUpdate()).Build();
+            return new HouseholdDataCommandBuilder("UPDATE MemberOfHouseholds SET HouseholdMemberIdentifier=@householdMemberIdentifier,HouseholdIdentifier=@householdIdentifier,CreationTime=@creationTime WHERE MemberOfHouseholdIdentifier=@memberOfHouseholdIdentifier")
+                .AddMemberOfHouseholdIdentifierParameter(Identifier)
+                .AddHouseholdMemberIdentifierParameter(HouseholdMemberIdentifier)
+                .AddHouseholdIdentifierParameter(HouseholdIdentifier)
+                .AddCreationTimeParameter(CreationTime)
+                .Build();
         }
 
         /// <summary>
@@ -362,8 +203,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for deleting this binding between a given household member and a given household.</returns>
         public virtual MySqlCommand CreateDeleteCommand()
         {
-            return new FoodWasteCommandBuilder(GetSqlCommandForDelete()).Build();
+            return new HouseholdDataCommandBuilder("DELETE FROM MemberOfHouseholds WHERE MemberOfHouseholdIdentifier=@memberOfHouseholdIdentifier")
+                .AddMemberOfHouseholdIdentifierParameter(Identifier)
+                .Build();
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Gets the bindings which bind a given household member to all the households on which there is a membership.
@@ -371,15 +218,20 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdMemberProxy">Data proxy for the household member on which to get the bindings.</param>
         /// <returns>Bindings which bind a given household member to all the households on which there is a membership.</returns>
-        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IFoodWasteDataProvider dataProvider, IHouseholdMemberProxy householdMemberProxy)
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataProvider"/> or <paramref name="householdMemberProxy"/> is null.</exception>
+        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, IHouseholdMemberProxy householdMemberProxy)
         {
-            if (dataProvider == null)
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(householdMemberProxy, nameof(householdMemberProxy));
+
+            if (householdMemberProxy.Identifier.HasValue == false)
             {
-                throw new ArgumentNullException("dataProvider");
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, householdMemberProxy.Identifier, "Identifier"));
             }
-            using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
+
+            using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                MySqlCommand command = new FoodWasteCommandBuilder(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdMemberIdentifier='{0}' ORDER BY CreationTime DESC", householdMemberProxy.UniqueId)).Build();
+                MySqlCommand command = BuildHouseholdDataCommandForSelecting("WHERE moh.HouseholdMemberIdentifier=@householdMemberIdentifier", householdDataCommandBuilder => householdDataCommandBuilder.AddHouseholdMemberIdentifierParameter(householdMemberProxy.Identifier.Value));
                 return subDataProvider.GetCollection<MemberOfHouseholdProxy>(command);
             }
         }
@@ -390,36 +242,14 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdMemberProxy">Data proxy for the household member on which to delete the bindings.</param>
         /// <returns>Affected households.</returns>
-        internal static IEnumerable<IHouseholdProxy> DeleteMemberOfHouseholds(IFoodWasteDataProvider dataProvider, IHouseholdMemberProxy householdMemberProxy)
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataProvider"/> or <paramref name="householdMemberProxy"/> is null.</exception>
+        internal static IEnumerable<IHouseholdProxy> DeleteMemberOfHouseholds(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, IHouseholdMemberProxy householdMemberProxy)
         {
-            if (dataProvider == null)
-            {
-                throw new ArgumentNullException("dataProviderBase");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(householdMemberProxy, nameof(householdMemberProxy));
 
-            var memberOfHouseholdProxyCollection = GetMemberOfHouseholds(dataProvider, householdMemberProxy).ToArray();
-            foreach (var memberOfHouseholdProxy in memberOfHouseholdProxyCollection)
-            {
-                using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
-                {
-                    subDataProvider.Delete(memberOfHouseholdProxy);
-                }
-            }
 
-            return memberOfHouseholdProxyCollection
-                .Where(m => m.Household != null)
-                .Select(m =>
-                {
-                    if (m.Household as IHouseholdProxy != null)
-                    {
-                        return (IHouseholdProxy) m.Household;
-                    }
-                    using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
-                    {
-                        return subDataProvider.Get(new HouseholdProxy {Identifier = m.HouseholdIdentifier});
-                    }
-                })
-                .ToList();
+            return DeleteMemberOfHouseholds(dataProvider, () => GetMemberOfHouseholds(dataProvider, householdMemberProxy).ToArray(), memberOfHouseholdProxy => memberOfHouseholdProxy.Household as IHouseholdProxy);
         }
 
         /// <summary>
@@ -428,15 +258,20 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdProxy">Data proxy for the household on which to get the bindings.</param>
         /// <returns>Bindings which bind a given household to all the household members who has membership.</returns>
-        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IFoodWasteDataProvider dataProvider, IHouseholdProxy householdProxy)
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataProvider"/> or <paramref name="householdProxy"/> is null.</exception>
+        internal static IEnumerable<MemberOfHouseholdProxy> GetMemberOfHouseholds(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, IHouseholdProxy householdProxy)
         {
-            if (dataProvider == null)
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(householdProxy, nameof(householdProxy));
+
+            if (householdProxy.Identifier.HasValue == false)
             {
-                throw new ArgumentNullException("dataProviderBase");
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, householdProxy.Identifier, "Identifier"));
             }
-            using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
+
+            using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                MySqlCommand command = new FoodWasteCommandBuilder(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE HouseholdIdentifier='{0}' ORDER BY CreationTime DESC", householdProxy.UniqueId)).Build();
+                MySqlCommand command = BuildHouseholdDataCommandForSelecting("WHERE moh.HouseholdIdentifier=@householdIdentifier", householdDataCommandBuilder => householdDataCommandBuilder.AddHouseholdMemberIdentifierParameter(householdProxy.Identifier.Value));
                 return subDataProvider.GetCollection<MemberOfHouseholdProxy>(command);
             }
         }
@@ -447,35 +282,68 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
         /// <param name="householdProxy">Data proxy for the household on which to delete the bindings.</param>
         /// <returns>Affected household members.</returns>
-        internal static IEnumerable<IHouseholdMemberProxy> DeleteMemberOfHouseholds(IFoodWasteDataProvider dataProvider, IHouseholdProxy householdProxy)
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataProvider"/> or <paramref name="householdProxy"/> is null.</exception>
+        internal static IEnumerable<IHouseholdMemberProxy> DeleteMemberOfHouseholds(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, IHouseholdProxy householdProxy)
         {
-            if (dataProvider == null)
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(householdProxy, nameof(householdProxy));
+
+            return DeleteMemberOfHouseholds(dataProvider, () => GetMemberOfHouseholds(dataProvider, householdProxy).ToArray(), memberOfHouseholdProxy => memberOfHouseholdProxy.HouseholdMember as IHouseholdMemberProxy);
+        }
+
+        /// <summary>
+        /// Creates a MySQL command selecting a collection of <see cref="MemberOfHouseholdProxy"/>.
+        /// </summary>
+        /// <param name="whereClause">The WHERE clause which the MySQL command should use.</param>
+        /// <param name="parameterAdder">The callback to add MySQL parameters to the MySQL command.</param>
+        /// <returns>MySQL command selecting a collection of <see cref="MemberOfHouseholdProxy"/>.</returns>
+        private static MySqlCommand BuildHouseholdDataCommandForSelecting(string whereClause = null, Action<HouseholdDataCommandBuilder> parameterAdder = null)
+        {
+            // ReSharper disable StringLiteralTypo
+            StringBuilder selectStatementBuilder = new StringBuilder("SELECT moh.MemberOfHouseholdIdentifier,moh.HouseholdMemberIdentifier,hm.MailAddress AS HouseholdMemberMailAddress,hm.Membership AS HouseholdMemberMembership,hm.MembershipExpireTime AS HouseholdMemberMembershipExpireTime,hm.ActivationCode AS HouseholdMemberActivationCode,hm.ActivationTime AS HouseholdMemberActivationTime,hm.PrivacyPolicyAcceptedTime AS HouseholdMemberPrivacyPolicyAcceptedTime,hm.CreationTime AS HouseholdMemberCreationTime,moh.HouseholdIdentifier,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,moh.CreationTime FROM MemberOfHouseholds AS moh INNER JOIN HouseholdMembers hm ON hm.HouseholdMemberIdentifier=moh.HouseholdMemberIdentifier INNER JOIN Households h ON h.HouseholdIdentifier=moh.HouseholdIdentifier");
+            // ReSharper restore StringLiteralTypo
+            if (string.IsNullOrWhiteSpace(whereClause) == false)
             {
-                throw new ArgumentNullException("dataProviderBase");
+                selectStatementBuilder.Append($" {whereClause}");
             }
 
-            var memberOfHouseholdProxyCollection = GetMemberOfHouseholds(dataProvider, householdProxy).ToArray();
-            foreach (var memberOfHouseholdProxy in memberOfHouseholdProxyCollection)
+            HouseholdDataCommandBuilder householdDataCommandBuilder = new HouseholdDataCommandBuilder(selectStatementBuilder.ToString());
+            if (parameterAdder == null)
             {
-                using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
+                return householdDataCommandBuilder.Build();
+            }
+
+            parameterAdder(householdDataCommandBuilder);
+            return householdDataCommandBuilder.Build();
+        }
+
+        /// <summary>
+        /// Deletes the bindings which binds household members to households.
+        /// </summary>
+        /// <typeparam name="T">Type of the result which should be returned for the deleted binding.</typeparam>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="memberOfHouseholdProxyCollectionGetter">The getter which gets the bindings to delete.</param>
+        /// <param name="resultGetter">The getter which gets the result for each deleted binding.</param>
+        /// <returns>Collection of the results for each deleted binding.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataProvider"/>, <paramref name="memberOfHouseholdProxyCollectionGetter"/> or <paramref name="resultGetter"/> is null.</exception>
+        private static IEnumerable<T> DeleteMemberOfHouseholds<T>(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, Func<MemberOfHouseholdProxy[]> memberOfHouseholdProxyCollectionGetter, Func<MemberOfHouseholdProxy, T> resultGetter) where T : IMySqlDataProxy
+        {
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider))
+                .NotNull(memberOfHouseholdProxyCollectionGetter, nameof(memberOfHouseholdProxyCollectionGetter))
+                .NotNull(resultGetter, nameof(resultGetter));
+
+            MemberOfHouseholdProxy[] memberOfHouseholdProxyCollection = memberOfHouseholdProxyCollectionGetter();
+            foreach (MemberOfHouseholdProxy memberOfHouseholdProxy in memberOfHouseholdProxyCollection)
+            {
+                using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
                 {
                     subDataProvider.Delete(memberOfHouseholdProxy);
                 }
             }
 
             return memberOfHouseholdProxyCollection
-                .Where(m => m.HouseholdMember != null)
-                .Select(m =>
-                {
-                    if (m.HouseholdMember as IHouseholdMemberProxy != null)
-                    {
-                        return (IHouseholdMemberProxy) m.HouseholdMember;
-                    }
-                    using (var subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
-                    {
-                        return subDataProvider.Get(new HouseholdMemberProxy {Identifier = m.HouseholdMemberIdentifier});
-                    }
-                })
+                .Where(memberOfHouseholdProxy => memberOfHouseholdProxy != null && resultGetter(memberOfHouseholdProxy) != null)
+                .Select(resultGetter)
                 .ToList();
         }
 

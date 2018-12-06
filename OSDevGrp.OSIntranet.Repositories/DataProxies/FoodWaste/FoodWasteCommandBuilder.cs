@@ -25,6 +25,30 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Adds a date parameter to the command.
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter.</param>
+        /// <param name="value">The value for the parameter.</param>
+        /// <param name="isNullable">Indicates whether the parameter can be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown when the <paramref name="parameterName"/> is null, empty or white space.</exception>
+        protected override void AddDateTimeParameter(string parameterName, DateTime? value, bool isNullable = false)
+        {
+            if (value.HasValue == false)
+            {
+                base.AddDateTimeParameter(parameterName, null, isNullable);
+                return;
+            }
+
+            if (value.Value.Kind == DateTimeKind.Utc)
+            {
+                base.AddDateTimeParameter(parameterName, value.Value, isNullable);
+                return;
+            }
+
+            base.AddDateTimeParameter(parameterName, value.Value.ToUniversalTime(), isNullable);
+        }
+
+        /// <summary>
         /// Adds an identifier parameter to the command.
         /// </summary>
         /// <param name="parameterName">The name of the parameter.</param>

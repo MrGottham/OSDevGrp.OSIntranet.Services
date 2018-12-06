@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Linq;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -20,23 +18,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class MemberOfHouseholdProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tests that the constructor without a household member and a household initialize a data proxy which bind a given household member to a given household.
         /// </summary>
         [Test]
         public void TestThatConstructorWithoutHouseholdMemberAndHouseholdInitializeMemberOfHouseholdProxy()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier.HasValue, Is.False);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.False);
-            Assert.That(memberOfHouseholdProxy.Household, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.False);
-            Assert.That(memberOfHouseholdProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.HouseholdMember, Is.Null);
+            Assert.That(sut.HouseholdMemberIdentifier, Is.Null);
+            Assert.That(sut.HouseholdMemberIdentifier.HasValue, Is.False);
+            Assert.That(sut.Household, Is.Null);
+            Assert.That(sut.HouseholdIdentifier, Is.Null);
+            Assert.That(sut.HouseholdIdentifier.HasValue, Is.False);
+            Assert.That(sut.CreationTime, Is.EqualTo(DateTime.MinValue));
         }
 
         /// <summary>
@@ -45,37 +58,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatConstructorWithHouseholdMemberAndHouseholdInitializeMemberOfHouseholdProxy()
         {
-            var householdMemberIdentifier = Guid.NewGuid();
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(householdMemberIdentifier)
-                .Repeat.Any();
+            Guid identifier = Guid.NewGuid();
+            Guid householdMemberIdentifier = Guid.NewGuid();
+            HouseholdMemberProxy householdMemberProxy = BuildHouseholdMemberProxy(identifier: householdMemberIdentifier);
+            Guid householdIdentifier = Guid.NewGuid();
+            HouseholdProxy householdProxy = BuildHouseholdProxy(identifier: householdIdentifier);
+            DateTime creationTime = DateTime.Now;
 
-            var householdIdentifier = Guid.NewGuid();
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(householdIdentifier)
-                .Repeat.Any();
-
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMemberMock, householdMock);
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier.HasValue, Is.False);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.EqualTo(householdMemberMock));
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.Value, Is.EqualTo(householdMemberIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.Household, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Household, Is.EqualTo(householdMock));
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.Value, Is.EqualTo(householdIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            IMemberOfHouseholdProxy sut = CreateSut(identifier, householdMemberProxy, householdProxy, creationTime);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.EqualTo(identifier));
+            Assert.That(sut.HouseholdMember, Is.Not.Null);
+            Assert.That(sut.HouseholdMember, Is.EqualTo(householdMemberProxy));
+            Assert.That(sut.HouseholdMemberIdentifier, Is.Not.Null);
+            Assert.That(sut.HouseholdMemberIdentifier, Is.EqualTo(householdMemberIdentifier));
+            Assert.That(sut.Household, Is.Not.Null);
+            Assert.That(sut.Household, Is.EqualTo(householdProxy));
+            Assert.That(sut.HouseholdIdentifier, Is.Not.Null);
+            Assert.That(sut.HouseholdIdentifier, Is.EqualTo(householdIdentifier));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
         }
 
         /// <summary>
@@ -84,17 +86,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatConstructorWithHouseholdMemberAndHouseholdThrowsArgumentNullExceptionWhenHouseholdMemberIsNull()
         {
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => CreateSut(Guid.NewGuid(), null, BuildHouseholdProxy(), DateTime.Now));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MemberOfHouseholdProxy(null, householdMock));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "householdMember");
         }
 
         /// <summary>
@@ -103,163 +97,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatConstructorWithHouseholdMemberAndHouseholdThrowsArgumentNullExceptionWhenHouseholdIsNull()
         {
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => CreateSut(Guid.NewGuid(), BuildHouseholdMemberProxy(), null, DateTime.Now));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new MemberOfHouseholdProxy(householdMemberMock, null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("household"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that the setter for HouseholdMemberIdentifier updates the value of HouseholdMemberIdentifier.
-        /// </summary>
-        [Test]
-        public void TestThatHouseholdMemberIdentifierSetterUpdatesValueOfHouseholdMemberIdentifier()
-        {
-            var householdMemberIdentifier = Guid.NewGuid();
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(householdMemberIdentifier)
-                .Repeat.Any();
-
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMemberMock, householdMock);
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.EqualTo(householdMemberMock));
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.Value, Is.EqualTo(householdMemberIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
-
-            var newValue = Guid.NewGuid();
-            Assert.That(newValue, Is.Not.EqualTo(householdMemberIdentifier));
-
-            memberOfHouseholdProxy.HouseholdMemberIdentifier = newValue;
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.Value, Is.EqualTo(newValue));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that the setter for HouseholdMemberIdentifier updates the value of HouseholdMemberIdentifier with null.
-        /// </summary>
-        [Test]
-        public void TestThatHouseholdMemberIdentifierSetterUpdatesValueOfHouseholdMemberIdentifierWithNull()
-        {
-            var householdMemberIdentifier = Guid.NewGuid();
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(householdMemberIdentifier)
-                .Repeat.Any();
-
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMemberMock, householdMock);
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.EqualTo(householdMemberMock));
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.Value, Is.EqualTo(householdMemberIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
-
-            memberOfHouseholdProxy.HouseholdMemberIdentifier = null;
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.False);
-        }
-
-        /// <summary>
-        /// Tests that the setter for HouseholdIdentifier updates the value of HouseholdIdentifier.
-        /// </summary>
-        [Test]
-        public void TestThatHouseholdIdentifierSetterUpdatesValueOfHouseholdIdentifier()
-        {
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var householdIdentifier = Guid.NewGuid();
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(householdIdentifier)
-                .Repeat.Any();
-
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMemberMock, householdMock);
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Household, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.Value, Is.EqualTo(householdIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
-
-            var newValue = Guid.NewGuid();
-            Assert.That(newValue, Is.Not.EqualTo(householdIdentifier));
-
-            memberOfHouseholdProxy.HouseholdIdentifier = newValue;
-            Assert.That(memberOfHouseholdProxy.Household, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.Value, Is.EqualTo(newValue));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that the setter for HouseholdIdentifier updates the value of HouseholdIdentifier with null.
-        /// </summary>
-        [Test]
-        public void TestThatHouseholdIdentifierSetterUpdatesValueOfHouseholdIdentifierWithNull()
-        {
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var householdIdentifier = Guid.NewGuid();
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(householdIdentifier)
-                .Repeat.Any();
-
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMemberMock, householdMock);
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Household, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.Value, Is.EqualTo(householdIdentifier));
-            // ReSharper restore PossibleInvalidOperationException
-
-            memberOfHouseholdProxy.HouseholdIdentifier = null;
-            Assert.That(memberOfHouseholdProxy.Household, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.False);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "household");
         }
 
         /// <summary>
@@ -268,19 +108,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenMemberOfHouseholdProxyHasNoIdentifier()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy
-            {
-                Identifier = null
-            };
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
             // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var uniqueId = memberOfHouseholdProxy.UniqueId; });
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => {var uniqueId = sut.UniqueId;});
             // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, memberOfHouseholdProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -289,159 +124,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterGetsUniqueIdentificationForMemberOfHouseholdProxy()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
+            Guid identifier = Guid.NewGuid();
 
-            var uniqueId = memberOfHouseholdProxy.UniqueId;
+            IMemberOfHouseholdProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(uniqueId, Is.EqualTo(memberOfHouseholdProxy.Identifier.Value.ToString("D").ToUpper()));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an ArgumentNullException when binding for a given household member to a given household is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenMemberOfHouseholdProxyIsNull()
-        {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<ArgumentNullException>(() => { var sqlQueryForId = memberOfHouseholdProxy.GetSqlQueryForId(null); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("memberOfHouseholdProxy"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given binding for a given household member to a given household has no value.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnMemberOfHouseholdProxyHasNoValue()
-        {
-            var memberOfHouseholdProxyMock = MockRepository.GenerateMock<IMemberOfHouseholdProxy>();
-            memberOfHouseholdProxyMock.Expect(m => m.Identifier)
-                .Return(null)
-                .Repeat.Any();
-
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var sqlQueryForId = memberOfHouseholdProxy.GetSqlQueryForId(memberOfHouseholdProxyMock); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, memberOfHouseholdProxyMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given binding for a given household member to a given household.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
-        {
-            var memberOfHouseholdProxyMock = MockRepository.GenerateMock<IMemberOfHouseholdProxy>();
-            memberOfHouseholdProxyMock.Expect(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-
-            var sqlQueryForId = memberOfHouseholdProxy.GetSqlQueryForId(memberOfHouseholdProxyMock);
-            Assert.That(sqlQueryForId, Is.Not.Null);
-            Assert.That(sqlQueryForId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime FROM MemberOfHouseholds WHERE MemberOfHouseholdIdentifier='{0}'", memberOfHouseholdProxyMock.Identifier.Value.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a binding for a given household member to a given household.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert()
-        {
-            var householdMemberIdentifier = Guid.NewGuid();
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(householdMemberIdentifier)
-                .Repeat.Any();
-
-            var householdIdentifier = Guid.NewGuid();
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(householdIdentifier)
-                .Repeat.Any();
-
-            var identifier = Guid.NewGuid();
-            var creationTime = DateTime.Now;
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMemberMock, householdMock, creationTime)
-            {
-                Identifier = identifier
-            };
-
-            var sqlCommand = memberOfHouseholdProxy.GetSqlCommandForInsert();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO MemberOfHouseholds (MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime) VALUES('{0}','{1}','{2}',{3})", memberOfHouseholdProxy.UniqueId, householdMemberIdentifier.ToString("D").ToUpper(), householdIdentifier.ToString("D").ToUpper(), DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a given household member to a given household.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate()
-        {
-            var householdMemberIdentifier = Guid.NewGuid();
-            var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
-            householdMemberMock.Stub(m => m.Identifier)
-                .Return(householdMemberIdentifier)
-                .Repeat.Any();
-
-            var householdIdentifier = Guid.NewGuid();
-            var householdMock = MockRepository.GenerateMock<IHousehold>();
-            householdMock.Stub(m => m.Identifier)
-                .Return(householdIdentifier)
-                .Repeat.Any();
-
-            var identifier = Guid.NewGuid();
-            var creationTime = DateTime.Now;
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy(householdMemberMock, householdMock, creationTime)
-            {
-                Identifier = identifier
-            };
-
-            var sqlCommand = memberOfHouseholdProxy.GetSqlCommandForUpdate();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE MemberOfHouseholds SET HouseholdMemberIdentifier='{1}',HouseholdIdentifier='{2}',CreationTime={3} WHERE MemberOfHouseholdIdentifier='{0}'", memberOfHouseholdProxy.UniqueId, householdMemberIdentifier.ToString("D").ToUpper(), householdIdentifier.ToString("D").ToUpper(), DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete a given household member to a given household.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
-        {
-            var identifier = Guid.NewGuid();
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy
-            {
-                Identifier = identifier
-            };
-
-            var sqlCommand = memberOfHouseholdProxy.GetSqlCommandForDelete();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("DELETE FROM MemberOfHouseholds WHERE MemberOfHouseholdIdentifier='{0}'", memberOfHouseholdProxy.UniqueId)));
+            Assert.That(uniqueId, Is.EqualTo(identifier.ToString("D").ToUpper()));
         }
 
         /// <summary>
@@ -450,15 +141,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => memberOfHouseholdProxy.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataReader"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
 
         /// <summary>
@@ -467,107 +155,66 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => memberOfHouseholdProxy.MapData(MockRepository.GenerateStub<MySqlDataReader>(), null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
-        /// Tests that MapData and MapRelations maps data into the proxy.
+        /// Tests that MapData maps data into the proxy.
         /// </summary>
         [Test]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy()
+        public void TestThatMapDataMapsDataIntoProxy()
         {
-            var fixture = new Fixture();
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderBaseMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            dataProviderBaseMock.Stub(m => m.Clone())
-                .Return(dataProviderBaseMock)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.Get(Arg<HouseholdMemberProxy>.Is.NotNull))
-                .WhenCalled(e =>
-                {
-                    var householdMemberProxy = (HouseholdMemberProxy) e.Arguments.ElementAt(0);
-                    Assert.That(householdMemberProxy, Is.Not.Null);
-                    Assert.That(householdMemberProxy.Identifier, Is.Not.Null);
-                    Assert.That(householdMemberProxy.Identifier.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdMemberProxy.Identifier.Value, Is.EqualTo(Guid.Parse("F0A03C7D-0E05-4A2E-A360-B4B51242D33B")));
-                    // ReSharper restore PossibleInvalidOperationException
-                })
-                .Return(fixture.Create<HouseholdMemberProxy>())
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.Get(Arg<HouseholdProxy>.Is.NotNull))
-                .WhenCalled(e =>
-                {
-                    var householdProxy = (HouseholdProxy)e.Arguments.ElementAt(0);
-                    Assert.That(householdProxy, Is.Not.Null);
-                    Assert.That(householdProxy.Identifier, Is.Not.Null);
-                    Assert.That(householdProxy.Identifier.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdProxy.Identifier.Value, Is.EqualTo(Guid.Parse("723F0DE5-4108-46A8-B952-C4BE521BB5F1")));
-                    // ReSharper restore PossibleInvalidOperationException
-                })
-                .Return(fixture.Create<HouseholdProxy>())
-                .Repeat.Any();
+            Guid memberOfHouseholdIdentifier = Guid.NewGuid();
+            Guid householdMemberIdentifier = Guid.NewGuid();
+            Guid householdIdentifier = Guid.NewGuid();
+            DateTime creationTime = DateTime.Now;
+            MySqlDataReader dataReader = CreateMySqlDataReader(memberOfHouseholdIdentifier, householdMemberIdentifier, householdIdentifier, creationTime);
 
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("MemberOfHouseholdIdentifier")))
-                .Return("C8FA8391-4AB0-48F2-AA6E-DBE8CDF53838")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("HouseholdMemberIdentifier")))
-                .Return("F0A03C7D-0E05-4A2E-A360-B4B51242D33B")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("HouseholdIdentifier")))
-                .Return("723F0DE5-4108-46A8-B952-C4BE521BB5F1")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return(DateTime.Now.ToUniversalTime())
-                .Repeat.Any();
+            HouseholdMemberProxy householdMemberProxy = BuildHouseholdMemberProxy(identifier: householdMemberIdentifier);
+            HouseholdProxy householdProxy = BuildHouseholdProxy(identifier: householdIdentifier);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(householdMemberProxy, householdProxy);
 
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier.HasValue, Is.False);
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.False);
-            Assert.That(memberOfHouseholdProxy.Household, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.False);
-            Assert.That(memberOfHouseholdProxy.CreationTime, Is.EqualTo(DateTime.MinValue));
+            sut.MapData(dataReader, dataProvider);
 
-            memberOfHouseholdProxy.MapData(dataReader, dataProviderBaseMock);
-            memberOfHouseholdProxy.MapRelations(dataProviderBaseMock);
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("MemberOfHouseholdIdentifier")));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdMember, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdMemberIdentifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("HouseholdMemberIdentifier")));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.Household, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.HouseholdIdentifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("HouseholdIdentifier")));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(memberOfHouseholdProxy.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.EqualTo(memberOfHouseholdIdentifier));
+            Assert.That(sut.HouseholdMember, Is.Not.Null);
+            Assert.That(sut.HouseholdMember, Is.EqualTo(householdMemberProxy));
+            Assert.That(sut.HouseholdMemberIdentifier, Is.Not.Null);
+            Assert.That(sut.HouseholdMemberIdentifier, Is.EqualTo(householdMemberIdentifier));
+            // TODO: fix this.
+            Assert.That(sut.Household, Is.Null);
+            Assert.That(sut.HouseholdIdentifier, Is.Null);
+            Assert.That(sut.HouseholdIdentifier.HasValue, Is.False);
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
 
-            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
-            dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<HouseholdMemberProxy>.Is.NotNull));
-            dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<HouseholdProxy>.Is.NotNull));
+            dataReader.AssertWasCalled(m => m.GetString("MemberOfHouseholdIdentifier"), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetDateTime("CreationTime"), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
+
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IHouseholdMemberProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 8 &&
+                                               e[0] == "HouseholdMemberIdentifier" &&
+                                               e[1] == "HouseholdMemberMailAddress" &&
+                                               e[2] == "HouseholdMemberMembership" &&
+                                               e[3] == "HouseholdMemberMembershipExpireTime" &&
+                                               e[4] == "HouseholdMemberActivationCode" &&
+                                               e[5] == "HouseholdMemberActivationTime" &&
+                                               e[6] == "HouseholdMemberPrivacyPolicyAcceptedTime" &&
+                                               e[7] == "HouseholdMemberCreationTime")),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -576,15 +223,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => memberOfHouseholdProxy.MapRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that MapRelations does not clone the data provider.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsDoesNotCloneDataProvider()
+        {
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
+
+            sut.MapRelations(dataProvider);
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
         }
 
         /// <summary>
@@ -593,17 +253,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var fixture = new Fixture();
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.SaveRelations(null, _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => memberOfHouseholdProxy.SaveRelations(null, fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
@@ -612,22 +267,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
-            var fixture = new Fixture();
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
 
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy
-            {
-                Identifier = null
-            };
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier.HasValue, Is.False);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => memberOfHouseholdProxy.SaveRelations(MockRepository.GenerateStub<IMySqlDataProvider>(), fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, memberOfHouseholdProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -636,15 +283,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy();
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => memberOfHouseholdProxy.DeleteRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.DeleteRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
@@ -653,20 +297,197 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
-            var memberOfHouseholdProxy = new MemberOfHouseholdProxy
-            {
-                Identifier = null
-            };
-            Assert.That(memberOfHouseholdProxy, Is.Not.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier, Is.Null);
-            Assert.That(memberOfHouseholdProxy.Identifier.HasValue, Is.False);
+            IMemberOfHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => memberOfHouseholdProxy.DeleteRelations(MockRepository.GenerateStub<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, memberOfHouseholdProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
+        }
+
+        /// <summary>
+        /// Tests that CreateGetCommand returns the SQL command for selecting the given binding for a given household member to a given household.
+        /// </summary>
+        [Test]
+        public void TestThatCreateGetCommandReturnsSqlCommand()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IMemberOfHouseholdProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            // ReSharper disable StringLiteralTypo
+            new DbCommandTestBuilder("SELECT moh.MemberOfHouseholdIdentifier,moh.HouseholdMemberIdentifier,hm.MailAddress AS HouseholdMemberMailAddress,hm.Membership AS HouseholdMemberMembership,hm.MembershipExpireTime AS HouseholdMemberMembershipExpireTime,hm.ActivationCode AS HouseholdMemberActivationCode,hm.ActivationTime AS HouseholdMemberActivationTime,hm.PrivacyPolicyAcceptedTime AS HouseholdMemberPrivacyPolicyAcceptedTime,hm.CreationTime AS HouseholdMemberCreationTime,moh.HouseholdIdentifier,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,moh.CreationTime FROM MemberOfHouseholds AS moh INNER JOIN HouseholdMembers hm ON hm.HouseholdMemberIdentifier=moh.HouseholdMemberIdentifier INNER JOIN Households h ON h.HouseholdIdentifier=moh.HouseholdIdentifier WHERE moh.MemberOfHouseholdIdentifier=@memberOfHouseholdIdentifier")
+            // ReSharper restore StringLiteralTypo
+                .AddCharDataParameter("@memberOfHouseholdIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateInsertCommand returns the SQL command to insert a binding for a given household member to a given household.
+        /// </summary>
+        [Test]
+        public void TestThatCreateInsertCommandReturnsSqlCommandForInsert()
+        {
+            Guid identifier = Guid.NewGuid();
+            Guid householdMemberIdentifier = Guid.NewGuid();
+            HouseholdMemberProxy householdMemberProxy = BuildHouseholdMemberProxy(identifier: householdMemberIdentifier);
+            Guid householdIdentifier = Guid.NewGuid();
+            HouseholdProxy householdProxy = BuildHouseholdProxy(identifier: householdIdentifier);
+            DateTime creationTime = DateTime.Now;
+
+            IMemberOfHouseholdProxy sut = CreateSut(identifier, householdMemberProxy, householdProxy, creationTime);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("INSERT INTO MemberOfHouseholds (MemberOfHouseholdIdentifier,HouseholdMemberIdentifier,HouseholdIdentifier,CreationTime) VALUES(@memberOfHouseholdIdentifier,@householdMemberIdentifier,@householdIdentifier,@creationTime)")
+                .AddCharDataParameter("@memberOfHouseholdIdentifier", identifier)
+                .AddCharDataParameter("@householdMemberIdentifier", householdMemberIdentifier)
+                .AddCharDataParameter("@householdIdentifier", householdIdentifier)
+                .AddDateTimeDataParameter("@creationTime", creationTime.ToUniversalTime())
+                .Build()
+                .Run(sut.CreateInsertCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateUpdateCommand returns the SQL command to update a given household member to a given household.
+        /// </summary>
+        [Test]
+        public void TestThatCreateUpdateCommandReturnsSqlCommandForUpdate()
+        {
+            Guid identifier = Guid.NewGuid();
+            Guid householdMemberIdentifier = Guid.NewGuid();
+            HouseholdMemberProxy householdMemberProxy = BuildHouseholdMemberProxy(identifier: householdMemberIdentifier);
+            Guid householdIdentifier = Guid.NewGuid();
+            HouseholdProxy householdProxy = BuildHouseholdProxy(identifier: householdIdentifier);
+            DateTime creationTime = DateTime.Now;
+
+            IMemberOfHouseholdProxy sut = CreateSut(identifier, householdMemberProxy, householdProxy, creationTime);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("UPDATE MemberOfHouseholds SET HouseholdMemberIdentifier=@householdMemberIdentifier,HouseholdIdentifier=@householdIdentifier,CreationTime=@creationTime WHERE MemberOfHouseholdIdentifier=@memberOfHouseholdIdentifier")
+                .AddCharDataParameter("@memberOfHouseholdIdentifier", identifier)
+                .AddCharDataParameter("@householdMemberIdentifier", householdMemberIdentifier)
+                .AddCharDataParameter("@householdIdentifier", householdIdentifier)
+                .AddDateTimeDataParameter("@creationTime", creationTime.ToUniversalTime())
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateDeleteCommand returns the SQL command to delete a given household member to a given household.
+        /// </summary>
+        [Test]
+        public void TestThatCreateDeleteCommandReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IMemberOfHouseholdProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("DELETE FROM MemberOfHouseholds WHERE MemberOfHouseholdIdentifier=@memberOfHouseholdIdentifier")
+                .AddCharDataParameter("@memberOfHouseholdIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy which bind a given household member to a given household.
+        /// </summary>
+        /// <returns>Instance of a data proxy which bind a given household member to a given household.</returns>
+        private IMemberOfHouseholdProxy CreateSut()
+        {
+            return new MemberOfHouseholdProxy();
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy which bind a given household member to a given household.
+        /// </summary>
+        /// <returns>Instance of a data proxy which bind a given household member to a given household.</returns>
+        private IMemberOfHouseholdProxy CreateSut(Guid identifier)
+        {
+            return new MemberOfHouseholdProxy
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy which bind a given household member to a given household.
+        /// </summary>
+        /// <returns>Instance of a data proxy which bind a given household member to a given household.</returns>
+        private IMemberOfHouseholdProxy CreateSut(Guid identifier, IHouseholdMember householdMember, IHousehold household, DateTime creationTime)
+        {
+            return new MemberOfHouseholdProxy(householdMember, household, creationTime)
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates a stub for the MySQL data reader.
+        /// </summary>
+        /// <returns>Stub for the MySQL data reader.</returns>
+        private MySqlDataReader CreateMySqlDataReader(Guid? memberOfHouseholdIdentifier = null, Guid? householdMemberIdentifier = null, Guid? householdIdentifier = null, DateTime? creationTime = null)
+        {
+            MySqlDataReader mySqlDataReaderMock = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("MemberOfHouseholdIdentifier")))
+                .Return(memberOfHouseholdIdentifier.HasValue ? memberOfHouseholdIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("HouseholdMemberIdentifier")))
+                .Return(householdMemberIdentifier.HasValue ? householdMemberIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("HouseholdIdentifier")))
+                .Return(householdIdentifier.HasValue ? householdIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
+                .Return((creationTime ?? DateTime.Now).ToUniversalTime())
+                .Repeat.Any();
+            return mySqlDataReaderMock;
+        }
+
+        /// <summary>
+        /// Creates a mockup for the data provider which can access data in the food waste repository.
+        /// </summary>
+        /// <returns>Mockup for the data provider which can access data in the food waste repository.</returns>
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(HouseholdMemberProxy householdMemberProxy = null, HouseholdProxy householdProxy = null)
+        {
+            IFoodWasteDataProvider foodWasteDataProvider = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProvider.Stub(m => m.Create(Arg<IHouseholdMemberProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(householdMemberProxy ?? BuildHouseholdMemberProxy())
+                .Repeat.Any();
+            // TODO: fix this.
+            return foodWasteDataProvider;
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a household member.
+        /// </summary>
+        /// <param name="hasIdentifier">Indicates whether the data proxy has an identifier.</param>
+        /// <param name="identifier">The identifier for the data proxy.</param>
+        /// <returns>Data proxy to a household member.</returns>
+        private HouseholdMemberProxy BuildHouseholdMemberProxy(bool hasIdentifier = true, Guid? identifier = null)
+        {
+            return new HouseholdMemberProxy
+            {
+                Identifier = hasIdentifier ? identifier ?? Guid.NewGuid() : (Guid?) null
+            };
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a household.
+        /// </summary>
+        /// <param name="hasIdentifier">Indicates whether the data proxy has an identifier.</param>
+        /// <param name="identifier">The identifier for the data proxy.</param>
+        /// <returns>Data proxy to a household.</returns>
+        private HouseholdProxy BuildHouseholdProxy(bool hasIdentifier = true, Guid? identifier = null)
+        {
+            return new HouseholdProxy
+            {
+                Identifier = hasIdentifier ? identifier ?? Guid.NewGuid() : (Guid?) null
+            };
         }
     }
 }

@@ -49,16 +49,5 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             var valueToStore = storeAsUniversalTime ? dateTime.ToUniversalTime() : dateTime;
             return string.Format("'{0}'", valueToStore.ToString(MySqlDateTimeFormat));
         }
-
-        /// <summary>
-        /// Gets the SQL value for a given nullable DateTime value.
-        /// </summary>
-        /// <param name="dateTime">Nullable DateTime value for which to get the SQL value.</param>
-        /// <param name="storeAsUniversalTime">Indicates whether the time should be stored as universal time.</param>
-        /// <returns>SQL value for the given nullable DateTime value.</returns>
-        public static string GetSqlValueForDateTime(DateTime? dateTime, bool storeAsUniversalTime = true)
-        {
-            return dateTime.HasValue ? GetSqlValueForDateTime(dateTime.Value, storeAsUniversalTime) : "NULL";
-        }
     }
 }

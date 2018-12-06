@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -22,22 +23,39 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class PaymentProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+        private Random _random;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _random = new Random(_fixture.Create<int>());
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a data proxy to a payment from a stakeholder.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializePaymentProxy()
         {
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
-            Assert.That(paymentProxy.Identifier, Is.Null);
-            Assert.That(paymentProxy.Identifier.HasValue, Is.False);
-            Assert.That(paymentProxy.Stakeholder, Is.Null);
-            Assert.That(paymentProxy.DataProvider, Is.Null);
-            Assert.That(paymentProxy.PaymentTime, Is.EqualTo(default(DateTime)));
-            Assert.That(paymentProxy.PaymentReference, Is.Null);
-            Assert.That(paymentProxy.PaymentReceipt, Is.Null);
-            Assert.That(paymentProxy.CreationTime, Is.EqualTo(default(DateTime)));
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+            Assert.That(sut.Stakeholder, Is.Null);
+            Assert.That(sut.DataProvider, Is.Null);
+            Assert.That(sut.PaymentTime, Is.EqualTo(default(DateTime)));
+            Assert.That(sut.PaymentReference, Is.Null);
+            Assert.That(sut.PaymentReceipt, Is.Null);
+            Assert.That(sut.CreationTime, Is.EqualTo(default(DateTime)));
         }
 
         /// <summary>
@@ -46,19 +64,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterThrowsIntranetRepositoryExceptionWhenPaymentProxyHasNoIdentifier()
         {
-            var paymentProxy = new PaymentProxy
-            {
-                Identifier = null
-            };
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
             // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var uniqueId = paymentProxy.UniqueId; });
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => {var uniqueId = sut.UniqueId;});
             // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, paymentProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -67,166 +80,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatUniqueIdGetterGetsUniqueIdentificationForPaymentProxy()
         {
-            var paymentProxy = new PaymentProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
+            Guid identifier = Guid.NewGuid();
 
-            var uniqueId = paymentProxy.UniqueId;
+            IPaymentProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
             Assert.That(uniqueId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(uniqueId, Is.EqualTo(paymentProxy.Identifier.Value.ToString("D").ToUpper()));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given payment from a stakeholder is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenPaymentIsNull()
-        {
-            var paymentProxy = new PaymentProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<ArgumentNullException>(() => { var sqlQueryForId = paymentProxy.GetSqlQueryForId(null); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("payment"));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given payment from a stakeholder has no value.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnPaymentHasNoValue()
-        {
-            var paymentMock = MockRepository.GenerateMock<IPayment>();
-            paymentMock.Expect(m => m.Identifier)
-                .Return(null)
-                .Repeat.Any();
-
-            var paymentProxy = new PaymentProxy();
-
-            // ReSharper disable UnusedVariable
-            var exception = Assert.Throws<IntranetRepositoryException>(() => { var sqlQueryForId = paymentProxy.GetSqlQueryForId(paymentMock); });
-            // ReSharper restore UnusedVariable
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, paymentMock.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given payment from a stakeholder is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
-        {
-            var paymentMock = MockRepository.GenerateMock<IPayment>();
-            paymentMock.Expect(m => m.Identifier)
-                .Return(Guid.NewGuid())
-                .Repeat.Any();
-
-            var paymentProxy = new PaymentProxy();
-
-            var sqlQueryForId = paymentProxy.GetSqlQueryForId(paymentMock);
-            Assert.That(sqlQueryForId, Is.Not.Null);
-            Assert.That(sqlQueryForId, Is.Not.Empty);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(sqlQueryForId, Is.EqualTo(string.Format("SELECT PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime FROM Payments WHERE PaymentIdentifier='{0}'", paymentMock.Identifier.Value.ToString("D").ToUpper())));
-            // ReSharper restore PossibleInvalidOperationException
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert a payment from a stakeholder.
-        /// </summary>
-        [Test]
-        [TestCase(StakeholderType.HouseholdMember, true)]
-        [TestCase(StakeholderType.HouseholdMember, false)]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(StakeholderType stakeholderType, bool hasPaymentReceipt)
-        {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-
-            var stakeholderMock = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(true);
-            var paymentTime = DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
-            var paymentReference = fixture.Create<string>();
-            var paymentReceipt = hasPaymentReceipt ? fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray() : null;
-            var creationTime = DateTime.Now;
-
-            var paymentProxy = new PaymentProxy(stakeholderMock, dataProviderMock, paymentTime, paymentReference, paymentReceipt, creationTime)
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            // ReSharper disable PossibleInvalidOperationException
-            var stakeholderIdentifierSqlvalue = stakeholderMock.Identifier.Value.ToString("D").ToUpper();
-            var dataProviderIdentifierSqlValue = dataProviderMock.Identifier.Value.ToString("D").ToUpper();
-            // ReSharper restore PossibleInvalidOperationException
-            var paymentReceiptSqlValue = paymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(paymentReceipt));
-
-            var sqlCommand = paymentProxy.GetSqlCommandForInsert();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("INSERT INTO Payments (PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime) VALUES('{0}','{1}',{2},'{3}',{4},'{5}',{6},{7})", paymentProxy.UniqueId, stakeholderIdentifierSqlvalue, (int) stakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(paymentTime), paymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update a payment from a stakeholder.
-        /// </summary>
-        [Test]
-        [TestCase(StakeholderType.HouseholdMember, true)]
-        [TestCase(StakeholderType.HouseholdMember, false)]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(StakeholderType stakeholderType, bool hasPaymentReceipt)
-        {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-
-            var stakeholderMock = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(true);
-            var paymentTime = DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
-            var paymentReference = fixture.Create<string>();
-            var paymentReceipt = hasPaymentReceipt ? fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray() : null;
-            var creationTime = DateTime.Now;
-
-            var paymentProxy = new PaymentProxy(stakeholderMock, dataProviderMock, paymentTime, paymentReference, paymentReceipt, creationTime)
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            // ReSharper disable PossibleInvalidOperationException
-            var stakeholderIdentifierSqlvalue = stakeholderMock.Identifier.Value.ToString("D").ToUpper();
-            var dataProviderIdentifierSqlValue = dataProviderMock.Identifier.Value.ToString("D").ToUpper();
-            // ReSharper restore PossibleInvalidOperationException
-            var paymentReceiptSqlValue = paymentReceipt == null ? "NULL" : string.Format("'{0}'", Convert.ToBase64String(paymentReceipt));
-
-            var sqlCommand = paymentProxy.GetSqlCommandForUpdate();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("UPDATE Payments SET StakeholderIdentifier='{1}',StakeholderType={2},DataProviderIdentifier='{3}',PaymentTime={4},PaymentReference='{5}',PaymentReceipt={6},CreationTime={7} WHERE PaymentIdentifier='{0}'", paymentProxy.UniqueId, stakeholderIdentifierSqlvalue, (int) stakeholderType, dataProviderIdentifierSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(paymentTime), paymentReference, paymentReceiptSqlValue, DataRepositoryHelper.GetSqlValueForDateTime(creationTime))));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete a payment from a stakeholder.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
-        {
-            var paymentProxy = new PaymentProxy
-            {
-                Identifier = Guid.NewGuid()
-            };
-
-            var sqlCommand = paymentProxy.GetSqlCommandForDelete();
-            Assert.That(sqlCommand, Is.Not.Null);
-            Assert.That(sqlCommand, Is.Not.Empty);
-            Assert.That(sqlCommand, Is.EqualTo(string.Format("DELETE FROM Payments WHERE PaymentIdentifier='{0}'", paymentProxy.UniqueId)));
+            Assert.That(uniqueId, Is.EqualTo(identifier.ToString("D").ToUpper()));
         }
 
         /// <summary>
@@ -235,15 +97,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataReaderIsNull()
         {
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataReader"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
 
         /// <summary>
@@ -252,143 +111,111 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapDataThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.MapData(MockRepository.GenerateStub<MySqlDataReader>(), null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
-        /// Tests that the constructor initialize a data proxy to a payment from a stakeholder.
+        /// Tests that MapData maps data into the proxy.
         /// </summary>
         [Test]
         [TestCase(StakeholderType.HouseholdMember, true)]
         [TestCase(StakeholderType.HouseholdMember, false)]
-        public void TestThatMapDataAndMapRelationsMapsDataIntoProxy(StakeholderType stakeholderType, bool hasPaymentReceipt)
+        public void TestThatMapDataMapsDataIntoProxy(StakeholderType stakeholderType, bool hasPaymentReceipt)
         {
-            var fixture = new Fixture();
-            var random = new Random(fixture.Create<int>());
-            
-            var dataProviderBaseMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            dataProviderBaseMock.Stub(m => m.Clone())
-                .Return(dataProviderBaseMock)
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.Get(Arg<HouseholdMemberProxy>.Is.NotNull))
-                .WhenCalled(e =>
-                {
-                    var householdMemberProxy = (HouseholdMemberProxy) e.Arguments.ElementAt(0);
-                    Assert.That(householdMemberProxy, Is.Not.Null);
-                    Assert.That(householdMemberProxy.Identifier, Is.Not.Null);
-                    Assert.That(householdMemberProxy.Identifier.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdMemberProxy.Identifier.Value, Is.EqualTo(Guid.Parse("61AAB0D8-314F-4C46-B604-3FF443CA183A")));
-                    // ReSharper restore PossibleInvalidOperationException
-                })
-                .Return(fixture.Create<HouseholdMemberProxy>())
-                .Repeat.Any();
-            dataProviderBaseMock.Stub(m => m.Get(Arg<DataProviderProxy>.Is.NotNull))
-                .WhenCalled(e =>
-                {
-                    var dataProviderProxy = (DataProviderProxy) e.Arguments.ElementAt(0);
-                    Assert.That(dataProviderProxy, Is.Not.Null);
-                    Assert.That(dataProviderProxy.Identifier, Is.Not.Null);
-                    Assert.That(dataProviderProxy.Identifier.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(dataProviderProxy.Identifier.Value, Is.EqualTo(Guid.Parse("9D8B58A7-B8FE-4392-8A60-F3722A2F3C45")));
-                    // ReSharper restore PossibleInvalidOperationException
-                })
-                .Return(fixture.Create<DataProviderProxy>())
-                .Repeat.Any();
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var paymentTime = DateTime.Now.AddDays(random.Next(1, 7)*-1).AddMinutes(random.Next(120, 240));
-            var paymentReference = fixture.Create<string>();
-            var paymentReceipt = hasPaymentReceipt ? fixture.CreateMany<byte>(random.Next(1024, 4096)).ToArray() : null;
-            var creationTime = DateTime.Now;
-            var dataReader = MockRepository.GenerateStub<MySqlDataReader>();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("PaymentIdentifier")))
-                .Return("C4BDF4A8-668A-4FCC-8816-2C9A53DA8941")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("StakeholderIdentifier")))
-                .Return("61AAB0D8-314F-4C46-B604-3FF443CA183A")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetInt32(Arg<string>.Is.Equal("StakeholderType")))
-                .Return((int) stakeholderType)
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
-                .Return("9D8B58A7-B8FE-4392-8A60-F3722A2F3C45")
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("PaymentTime")))
-                .Return(paymentTime.ToUniversalTime())
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetString("PaymentReference"))
-                .Return(paymentReference)
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("PaymentReceipt")))
-                .Return(6)
-                .Repeat.Any();
-            dataReader.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(6)))
-                .Return(!hasPaymentReceipt)
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetTextReader(6))
-                .Return(hasPaymentReceipt ? new StringReader(Convert.ToBase64String(paymentReceipt)) : null)
-                .Repeat.Any();
-            dataReader.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return(creationTime.ToUniversalTime())
-                .Repeat.Any();
+            Guid paymentIdentifier = Guid.NewGuid();
+            Guid stakeholderIdentifier = Guid.NewGuid();
+            Guid dataProviderIdentifier = Guid.NewGuid();
+            DateTime paymentTime = DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240));
+            string paymentReference = _fixture.Create<string>();
+            byte[] paymentReceipt = hasPaymentReceipt ? _fixture.CreateMany<byte>(_random.Next(1024, 4096)).ToArray() : null;
+            DateTime creationTime = DateTime.Now;
+            MySqlDataReader dataReader = CreateMySqlDataReader(paymentIdentifier, stakeholderIdentifier, stakeholderType, dataProviderIdentifier, paymentTime, paymentReference, paymentReceipt, creationTime);
 
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
-            Assert.That(paymentProxy.Identifier, Is.Null);
-            Assert.That(paymentProxy.Identifier.HasValue, Is.False);
-            Assert.That(paymentProxy.Stakeholder, Is.Null);
-            Assert.That(paymentProxy.DataProvider, Is.Null);
-            Assert.That(paymentProxy.PaymentTime, Is.EqualTo(default(DateTime)));
-            Assert.That(paymentProxy.PaymentReference, Is.Null);
-            Assert.That(paymentProxy.PaymentReceipt, Is.Null);
-            Assert.That(paymentProxy.CreationTime, Is.EqualTo(default(DateTime)));
+            DataProviderProxy dataProviderProxy = BuildDataProviderProxy();
+            HouseholdMemberProxy householdMemberProxy = BuildHouseholdMemberProxy();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(dataProviderProxy, householdMemberProxy);
 
-            paymentProxy.MapData(dataReader, dataProviderBaseMock);
-            paymentProxy.MapRelations(dataProviderBaseMock);
-            Assert.That(paymentProxy, Is.Not.Null);
-            Assert.That(paymentProxy.Identifier, Is.Not.Null);
-            Assert.That(paymentProxy.Identifier.HasValue, Is.True);
-            // ReSharper disable PossibleInvalidOperationException
-            Assert.That(paymentProxy.Identifier.Value.ToString("D").ToUpper(), Is.EqualTo(dataReader.GetString("PaymentIdentifier")));
-            // ReSharper restore PossibleInvalidOperationException
-            Assert.That(paymentProxy.Stakeholder, Is.Not.Null);
-            Assert.That(paymentProxy.DataProvider, Is.Not.Null);
-            Assert.That(paymentProxy.PaymentTime, Is.EqualTo(paymentTime));
-            Assert.That(paymentProxy.PaymentReference, Is.Not.Null);
-            Assert.That(paymentProxy.PaymentReference, Is.Not.Empty);
-            Assert.That(paymentProxy.PaymentReference, Is.EqualTo(paymentReference));
-            if (hasPaymentReceipt)
+            sut.MapData(dataReader, dataProvider);
+
+            Assert.That(sut.Identifier, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.EqualTo(paymentIdentifier));
+            Assert.That(sut.Stakeholder, Is.Not.Null);
+            Assert.That(sut.Stakeholder, Is.EqualTo(householdMemberProxy));
+            Assert.That(sut.DataProvider, Is.Not.Null);
+            Assert.That(sut.DataProvider, Is.EqualTo(dataProviderProxy));
+            Assert.That(sut.PaymentTime, Is.EqualTo(paymentTime));
+            Assert.That(sut.PaymentReference, Is.Not.Null);
+            Assert.That(sut.PaymentReference, Is.Not.Empty);
+            Assert.That(sut.PaymentReference, Is.EqualTo(paymentReference));
+            if (paymentReceipt != null)
             {
-                Assert.That(paymentProxy.PaymentReceipt, Is.Not.Null);
-                Assert.That(paymentProxy.PaymentReceipt, Is.Not.Empty);
-                Assert.That(paymentProxy.PaymentReceipt, Is.EqualTo(paymentReceipt));
+                Assert.That(sut.PaymentReceipt, Is.Not.Null);
+                Assert.That(sut.PaymentReceipt, Is.Not.Empty);
+                Assert.That(sut.PaymentReceipt, Is.EqualTo(paymentReceipt));
             }
             else
             {
-                Assert.That(paymentProxy.PaymentReceipt, Is.Null);
+                Assert.That(sut.PaymentReceipt, Is.Null);
             }
-            Assert.That(paymentProxy.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
 
-            dataProviderBaseMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("PaymentIdentifier")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("StakeholderType")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("PaymentTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("PaymentReference")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("PaymentReceipt")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
+            if (paymentReceipt != null)
+            {
+                dataReader.AssertWasCalled(m => m.GetTextReader(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
+            }
+            else
+            {
+                dataReader.AssertWasNotCalled(m => m.GetTextReader(Arg<int>.Is.Equal(6)));
+            }
+            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
+
             switch (stakeholderType)
             {
                 case StakeholderType.HouseholdMember:
-                    dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<HouseholdMemberProxy>.Is.NotNull));
+                    dataProvider.AssertWasCalled(m => m.Create(
+                            Arg<IHouseholdMemberProxy>.Is.TypeOf,
+                            Arg<MySqlDataReader>.Is.Equal(dataReader),
+                            Arg<string[]>.Matches(e => e != null && e.Length == 8 &&
+                                                       e[0] == "StakeholderIdentifier" &&
+                                                       e[1] == "HouseholdMemberMailAddress" &&
+                                                       e[2] == "HouseholdMemberMembership" &&
+                                                       e[3] == "HouseholdMemberMembershipExpireTime" &&
+                                                       e[4] == "HouseholdMemberActivationCode" &&
+                                                       e[5] == "HouseholdMemberActivationTime" &&
+                                                       e[6] == "HouseholdMemberPrivacyPolicyAcceptedTime" &&
+                                                       e[7] == "HouseholdMemberCreationTime")),
+                        opt => opt.Repeat.Once());
                     break;
 
                 default:
-                    throw new NotSupportedException(string.Format("The stakeholderType '{0}' is not supported.", stakeholderType));
+                    throw new NotSupportedException($"The stakeholderType '{stakeholderType}' is not supported.");
             }
-            dataProviderBaseMock.AssertWasCalled(m => m.Get(Arg<DataProviderProxy>.Is.NotNull));
+
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IDataProviderProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 4 &&
+                                               e[0] == "DataProviderIdentifier" &&
+                                               e[1] == "DataProviderName" &&
+                                               e[2] == "DataProviderHandlesPayments" &&
+                                               e[3] == "DataProviderDataSourceStatementIdentifier")),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -397,15 +224,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatMapRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.MapRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that MapRelations does not clone the data provider.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsDoesNotCloneDataProvider()
+        {
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
+
+            sut.MapRelations(dataProvider);
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
         }
 
         /// <summary>
@@ -414,17 +254,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var fixture = new Fixture();
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.SaveRelations(null, _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.SaveRelations(null, fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
@@ -433,22 +268,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
-            var fixture = new Fixture();
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
 
-            var paymentProxy = new PaymentProxy
-            {
-                Identifier = null
-            };
-            Assert.That(paymentProxy, Is.Not.Null);
-            Assert.That(paymentProxy.Identifier, Is.Null);
-            Assert.That(paymentProxy.Identifier.HasValue, Is.False);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.SaveRelations(MockRepository.GenerateStub<IMySqlDataProvider>(), fixture.Create<bool>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, paymentProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -457,15 +284,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            var paymentProxy = new PaymentProxy();
-            Assert.That(paymentProxy, Is.Not.Null);
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var exception = Assert.Throws<ArgumentNullException>(() => paymentProxy.DeleteRelations(null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("dataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.DeleteRelations(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
 
         /// <summary>
@@ -474,20 +298,225 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [Test]
         public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
         {
-            var paymentProxy = new PaymentProxy
-            {
-                Identifier = null
-            };
-            Assert.That(paymentProxy, Is.Not.Null);
-            Assert.That(paymentProxy.Identifier, Is.Null);
-            Assert.That(paymentProxy.Identifier.HasValue, Is.False);
+            IPaymentProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => paymentProxy.DeleteRelations(MockRepository.GenerateStub<IMySqlDataProvider>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, paymentProxy.Identifier, "Identifier")));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
+        }
+
+        /// <summary>
+        /// Tests that CreateGetCommand returns the SQL command for selecting the given payment from a stakeholder is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateGetCommandReturnsSqlCommand()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IPaymentProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("SELECT p.PaymentIdentifier,p.StakeholderIdentifier,p.StakeholderType,p.DataProviderIdentifier,p.PaymentTime,p.PaymentReference,p.PaymentReceipt,p.CreationTime,hm.MailAddress AS HouseholdMemberMailAddress,hm.ActivationCode AS HouseholdMemberActivationCode,hm.ActivationTime AS HouseholdMemberActivationTime,hm.CreationTime AS HouseholdMemberCreationTime,hm.Membership AS HouseholdMemberMembership,hm.MembershipExpireTime AS HouseholdMemberMembershipExpireTime,hm.PrivacyPolicyAcceptedTime AS HouseholdMemberPrivacyPolicyAcceptedTime,dp.Name AS DataProviderName,dp.HandlesPayments AS DataProviderHandlesPayments,dp.DataSourceStatementIdentifier AS DataProviderDataSourceStatementIdentifier FROM Payments AS p LEFT JOIN HouseholdMembers AS hm ON hm.HouseholdMemberIdentifier=p.StakeholderIdentifier INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=p.DataProviderIdentifier WHERE p.PaymentIdentifier=@paymentIdentifier")
+                .AddCharDataParameter("@paymentIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateInsertCommand returns the SQL command to insert a payment from a stakeholder.
+        /// </summary>
+        [Test]
+        [TestCase(StakeholderType.HouseholdMember, true)]
+        [TestCase(StakeholderType.HouseholdMember, false)]
+        public void TestThatCreateInsertCommandReturnsSqlCommandForInsert(StakeholderType stakeholderType, bool hasPaymentReceipt)
+        {
+            Guid identifier = Guid.NewGuid();
+            IStakeholder stakeholder = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
+            IDataProvider dataProvider = DomainObjectMockBuilder.BuildDataProviderMock(true);
+            DateTime paymentTime = DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240));
+            string paymentReference = _fixture.Create<string>();
+            byte[] paymentReceipt = hasPaymentReceipt ? _fixture.CreateMany<byte>(_random.Next(1024, 4096)).ToArray() : null;
+            DateTime creationTime = DateTime.Now;
+            IPaymentProxy sut = CreateSut(identifier, stakeholder, dataProvider, paymentTime, paymentReference, paymentReceipt, creationTime);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("INSERT INTO Payments (PaymentIdentifier,StakeholderIdentifier,StakeholderType,DataProviderIdentifier,PaymentTime,PaymentReference,PaymentReceipt,CreationTime) VALUES(@paymentIdentifier,@stakeholderIdentifier,@stakeholderType,@dataProviderIdentifier,@paymentTime,@paymentReference,@paymentReceipt,@creationTime)")
+                .AddCharDataParameter("@paymentIdentifier", identifier)
+                .AddCharDataParameter("@stakeholderIdentifier", stakeholder.Identifier)
+                .AddTinyIntDataParameter("@stakeholderType", (int) stakeholderType, 4)
+                .AddCharDataParameter("@dataProviderIdentifier", dataProvider.Identifier)
+                .AddDateTimeDataParameter("@paymentTime", paymentTime.ToUniversalTime())
+                .AddVarCharDataParameter("@paymentReference", paymentReference, 128)
+                .AddLongTextDataParameter("@paymentReceipt", paymentReceipt, true)
+                .AddDateTimeDataParameter("@creationTime", creationTime.ToUniversalTime())
+                .Build()
+                .Run(sut.CreateInsertCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateUpdateCommand returns the SQL command to update a payment from a stakeholder.
+        /// </summary>
+        [Test]
+        [TestCase(StakeholderType.HouseholdMember, true)]
+        [TestCase(StakeholderType.HouseholdMember, false)]
+        public void TestThatCreateUpdateCommandReturnsSqlCommandForUpdate(StakeholderType stakeholderType, bool hasPaymentReceipt)
+        {
+            Guid identifier = Guid.NewGuid();
+            IStakeholder stakeholder = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
+            IDataProvider dataProvider = DomainObjectMockBuilder.BuildDataProviderMock(true);
+            DateTime paymentTime = DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240));
+            string paymentReference = _fixture.Create<string>();
+            byte[] paymentReceipt = hasPaymentReceipt ? _fixture.CreateMany<byte>(_random.Next(1024, 4096)).ToArray() : null;
+            DateTime creationTime = DateTime.Now;
+            IPaymentProxy sut = CreateSut(identifier, stakeholder, dataProvider, paymentTime, paymentReference, paymentReceipt, creationTime);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("UPDATE Payments SET StakeholderIdentifier=@stakeholderIdentifier,StakeholderType=@stakeholderType,DataProviderIdentifier=@dataProviderIdentifier,PaymentTime=@paymentTime,PaymentReference=@paymentReference,PaymentReceipt=@paymentReceipt,CreationTime=@creationTime WHERE PaymentIdentifier=@paymentIdentifier")
+                .AddCharDataParameter("@paymentIdentifier", identifier)
+                .AddCharDataParameter("@stakeholderIdentifier", stakeholder.Identifier)
+                .AddTinyIntDataParameter("@stakeholderType", (int) stakeholderType, 4)
+                .AddCharDataParameter("@dataProviderIdentifier", dataProvider.Identifier)
+                .AddDateTimeDataParameter("@paymentTime", paymentTime.ToUniversalTime())
+                .AddVarCharDataParameter("@paymentReference", paymentReference, 128)
+                .AddLongTextDataParameter("@paymentReceipt", paymentReceipt, true)
+                .AddDateTimeDataParameter("@creationTime", creationTime.ToUniversalTime())
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateDeleteCommand returns the SQL command to delete a payment from a stakeholder.
+        /// </summary>
+        [Test]
+        public void TestThatCreateDeleteCommandReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IPaymentProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            new DbCommandTestBuilder("DELETE FROM Payments WHERE PaymentIdentifier=@paymentIdentifier")
+                .AddCharDataParameter("@paymentIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a payment from a stakeholder.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a payment from a stakeholder.</returns>
+        private IPaymentProxy CreateSut()
+        {
+            return new PaymentProxy();
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a payment from a stakeholder.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a payment from a stakeholder.</returns>
+        private IPaymentProxy CreateSut(Guid identifier)
+        {
+            return new PaymentProxy
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates an instance of a data proxy to a payment from a stakeholder.
+        /// </summary>
+        /// <returns>Instance of a data proxy to a payment from a stakeholder.</returns>
+        private IPaymentProxy CreateSut(Guid identifier, IStakeholder stakeholder, IDataProvider dataProvider, DateTime paymentTime, string paymentReference, IEnumerable<byte> paymentReceipt, DateTime creationTime)
+        {
+            return new PaymentProxy(stakeholder, dataProvider, paymentTime, paymentReference, paymentReceipt, creationTime)
+            {
+                Identifier = identifier
+            };
+        }
+
+        /// <summary>
+        /// Creates a stub for the MySQL data reader.
+        /// </summary>
+        /// <returns>Stub for the MySQL data reader.</returns>
+        private MySqlDataReader CreateMySqlDataReader(Guid? paymentIdentifier = null, Guid? stakeholderIdentifier = null, StakeholderType? stakeholderType = null, Guid? dataProviderIdentifier = null, DateTime? paymentTime = null, string paymentReference = null, IEnumerable<byte> paymentReceipt = null, DateTime? creationTime = null)
+        {
+            MySqlDataReader mySqlDataReaderMock = MockRepository.GenerateStub<MySqlDataReader>();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("PaymentIdentifier")))
+                .Return(paymentIdentifier.HasValue ? paymentIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("StakeholderIdentifier")))
+                .Return(stakeholderIdentifier.HasValue ? stakeholderIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetInt32(Arg<string>.Is.Equal("StakeholderType")))
+                .Return((int) (stakeholderType ?? _fixture.Create<StakeholderType>()))
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
+                .Return(dataProviderIdentifier.HasValue ? dataProviderIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("PaymentTime")))
+                .Return((paymentTime ?? DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240))).ToUniversalTime())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("PaymentReference")))
+                .Return(paymentReference ?? _fixture.Create<string>())
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("PaymentReceipt")))
+                .Return(6)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(6)))
+                .Return(paymentReceipt == null)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetTextReader(Arg<int>.Is.Equal(6)))
+                .Return(paymentReceipt != null ? new StringReader(Convert.ToBase64String(paymentReceipt.ToArray())) : null)
+                .Repeat.Any();
+            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
+                .Return((creationTime ?? DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240))).ToUniversalTime())
+                .Repeat.Any();
+            return mySqlDataReaderMock;
+        }
+
+        /// <summary>
+        /// Creates a mockup for the data provider which can access data in the food waste repository.
+        /// </summary>
+        /// <returns>Mockup for the data provider which can access data in the food waste repository.</returns>
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(DataProviderProxy dataProviderProxy = null, HouseholdMemberProxy householdMemberProxy = null)
+        {
+            IFoodWasteDataProvider foodWasteDataProvider = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            foodWasteDataProvider.Stub(m => m.Create(Arg<IDataProviderProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(dataProviderProxy ?? BuildDataProviderProxy())
+                .Repeat.Any();
+            foodWasteDataProvider.Stub(m => m.Create(Arg<IHouseholdMemberProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(householdMemberProxy ?? BuildHouseholdMemberProxy())
+                .Repeat.Any();
+            return foodWasteDataProvider;
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a given data provider.
+        /// </summary>
+        /// <param name="identifier">The identifier for the data proxy.</param>
+        /// <returns>Data proxy to a given data provider.</returns>
+        private DataProviderProxy BuildDataProviderProxy(Guid? identifier = null)
+        {
+            return new DataProviderProxy
+            {
+                Identifier = identifier ?? Guid.NewGuid()
+            };
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a given household member.
+        /// </summary>
+        /// <param name="identifier">The identifier for the data proxy.</param>
+        /// <returns>Data proxy to a given household member.</returns>
+        private HouseholdMemberProxy BuildHouseholdMemberProxy(Guid? identifier = null)
+        {
+            return new HouseholdMemberProxy
+            {
+                Identifier = identifier ?? Guid.NewGuid()
+            };
         }
     }
 }
