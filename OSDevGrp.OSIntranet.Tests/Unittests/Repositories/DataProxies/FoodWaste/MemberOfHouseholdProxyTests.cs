@@ -191,10 +191,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.HouseholdMember, Is.EqualTo(householdMemberProxy));
             Assert.That(sut.HouseholdMemberIdentifier, Is.Not.Null);
             Assert.That(sut.HouseholdMemberIdentifier, Is.EqualTo(householdMemberIdentifier));
-            // TODO: fix this.
-            Assert.That(sut.Household, Is.Null);
-            Assert.That(sut.HouseholdIdentifier, Is.Null);
-            Assert.That(sut.HouseholdIdentifier.HasValue, Is.False);
+            Assert.That(sut.Household, Is.Not.Null);
+            Assert.That(sut.Household, Is.EqualTo(householdProxy));
+            Assert.That(sut.HouseholdIdentifier, Is.Not.Null);
+            Assert.That(sut.HouseholdIdentifier, Is.EqualTo(householdIdentifier));
             Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
 
             dataReader.AssertWasCalled(m => m.GetString("MemberOfHouseholdIdentifier"), opt => opt.Repeat.Once());
@@ -214,6 +214,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                                                e[5] == "HouseholdMemberActivationTime" &&
                                                e[6] == "HouseholdMemberPrivacyPolicyAcceptedTime" &&
                                                e[7] == "HouseholdMemberCreationTime")),
+                opt => opt.Repeat.Once());
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IHouseholdProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 4 &&
+                                               e[0] == "HouseholdIdentifier" &&
+                                               e[1] == "HouseholdName" &&
+                                               // ReSharper disable StringLiteralTypo
+                                               e[2] == "HouseholdDescr" &&
+                                               // ReSharper restore StringLiteralTypo
+                                               e[3] == "HouseholdCreationTime")),
                 opt => opt.Repeat.Once());
         }
 
@@ -458,7 +469,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             foodWasteDataProvider.Stub(m => m.Create(Arg<IHouseholdMemberProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
                 .Return(householdMemberProxy ?? BuildHouseholdMemberProxy())
                 .Repeat.Any();
-            // TODO: fix this.
+            foodWasteDataProvider.Stub(m => m.Create(Arg<IHouseholdProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(householdProxy ?? BuildHouseholdProxy())
+                .Repeat.Any();
             return foodWasteDataProvider;
         }
 

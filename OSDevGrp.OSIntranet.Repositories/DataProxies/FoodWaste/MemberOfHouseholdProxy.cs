@@ -118,7 +118,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             Identifier = Guid.Parse(dataReader.GetString("MemberOfHouseholdIdentifier"));
             HouseholdMember = dataProvider.Create(new HouseholdMemberProxy(), dataReader, "HouseholdMemberIdentifier", "HouseholdMemberMailAddress", "HouseholdMemberMembership", "HouseholdMemberMembershipExpireTime", "HouseholdMemberActivationCode", "HouseholdMemberActivationTime", "HouseholdMemberPrivacyPolicyAcceptedTime", "HouseholdMemberCreationTime");
-            Household = null;
+            // ReSharper disable StringLiteralTypo
+            Household = dataProvider.Create(new HouseholdProxy(), dataReader, "HouseholdIdentifier", "HouseholdName", "HouseholdDescr", "HouseholdCreationTime");
+            // ReSharper restore StringLiteralTypo
             CreationTime = dataReader.GetDateTime("CreationTime").ToLocalTime();
         }
 
@@ -271,7 +273,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                MySqlCommand command = BuildHouseholdDataCommandForSelecting("WHERE moh.HouseholdIdentifier=@householdIdentifier", householdDataCommandBuilder => householdDataCommandBuilder.AddHouseholdMemberIdentifierParameter(householdProxy.Identifier.Value));
+                MySqlCommand command = BuildHouseholdDataCommandForSelecting("WHERE moh.HouseholdIdentifier=@householdIdentifier", householdDataCommandBuilder => householdDataCommandBuilder.AddHouseholdIdentifierParameter(householdProxy.Identifier.Value));
                 return subDataProvider.GetCollection<MemberOfHouseholdProxy>(command);
             }
         }

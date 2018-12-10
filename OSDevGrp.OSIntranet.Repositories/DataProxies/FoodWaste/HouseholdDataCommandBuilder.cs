@@ -39,6 +39,33 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Adds a household name parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the household name.</param>
+        /// <returns>This instance of the <see cref="HouseholdDataCommandBuilder"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="value"/> is null, empty or white space.</exception>
+        internal HouseholdDataCommandBuilder AddHouseholdNameParameter(string value)
+        {
+            ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
+            AddVarCharParameter("@name", value, 64);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a household description parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the household description.</param>
+        /// <returns>This instance of the <see cref="HouseholdDataCommandBuilder"/>.</returns>
+        internal HouseholdDataCommandBuilder AddHouseholdDescriptionParameter(string value)
+        {
+            // ReSharper disable StringLiteralTypo
+            AddVarCharParameter("@descr", value, 2048, true);
+            // ReSharper restore StringLiteralTypo
+            return this;
+        }
+
+        /// <summary>
         /// Adds a household member identifier parameter to the command.
         /// </summary>
         /// <param name="value">The value for the household member identifier.</param>
