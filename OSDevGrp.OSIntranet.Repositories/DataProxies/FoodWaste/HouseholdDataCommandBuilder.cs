@@ -66,6 +66,63 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Adds a storage identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage identifier.</param>
+        /// <returns>This instance of the <see cref="HouseholdDataCommandBuilder"/>.</returns>
+        internal HouseholdDataCommandBuilder AddStorageIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@storageIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a storage sort order parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage sort order.</param>
+        /// <returns>This instance of the <see cref="HouseholdDataCommandBuilder"/>.</returns>
+        internal HouseholdDataCommandBuilder AddStorageSortOrderParameter(int value)
+        {
+            AddTinyIntParameter("@sortOrder", value, 4);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a storage description parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage description.</param>
+        /// <returns>This instance of the <see cref="HouseholdDataCommandBuilder"/>.</returns>
+        internal HouseholdDataCommandBuilder AddStorageDescriptionParameter(string value)
+        {
+            // ReSharper disable StringLiteralTypo
+            AddVarCharParameter("@descr", value, 2048, true);
+            // ReSharper restore StringLiteralTypo
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a storage temperature parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage temperature.</param>
+        /// <returns>This instance of the <see cref="HouseholdDataCommandBuilder"/>.</returns>
+        internal HouseholdDataCommandBuilder AddStorageTemperatureParameter(int value)
+        {
+            AddTinyIntParameter("@temperature", value, 4);
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a storage type identifier parameter to the command.
+        /// </summary>
+        /// <param name="value">The value for the storage type identifier.</param>
+        /// <returns>This instance of the <see cref="HouseholdDataCommandBuilder"/>.</returns>
+        internal HouseholdDataCommandBuilder AddStorageTypeIdentifierParameter(Guid? value)
+        {
+            AddIdentifierParameter("@storageTypeIdentifier", value);
+            return this;
+        }
+
+        /// <summary>
         /// Adds a household member identifier parameter to the command.
         /// </summary>
         /// <param name="value">The value for the household member identifier.</param>

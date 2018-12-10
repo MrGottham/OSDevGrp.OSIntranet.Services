@@ -10,11 +10,6 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
     public static class DataRepositoryHelper
     {
         /// <summary>
-        /// MySQL DateTime format.
-        /// </summary>
-        public const string MySqlDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-
-        /// <summary>
         /// Gets the SQL command for selecting the translations to a given domain object in the food waste domain.
         /// </summary>
         /// <param name="translationOfIdentifier">Identifier for the given domain object on which to get the translations.</param>
@@ -36,18 +31,6 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             return new SystemDataCommandBuilder("SELECT fk.ForeignKeyIdentifier,fk.DataProviderIdentifier,dp.Name AS DataProviderName,dp.HandlesPayments,dp.DataSourceStatementIdentifier,fk.ForeignKeyForIdentifier,fk.ForeignKeyForTypes,fk.ForeignKeyValue FROM ForeignKeys AS fk INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=fk.DataProviderIdentifier WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier")
                 .AddForeignKeyForIdentifierParameter(foreignKeyForIdentifier)
                 .Build();
-        }
-
-        /// <summary>
-        /// Gets the SQL value for a given DateTime value.
-        /// </summary>
-        /// <param name="dateTime">DateTime value for which to get the SQL value.</param>
-        /// <param name="storeAsUniversalTime">Indicates whether the time should be stored as universal time.</param>
-        /// <returns>SQL value for the given DateTime value.</returns>
-        public static string GetSqlValueForDateTime(DateTime dateTime, bool storeAsUniversalTime = true)
-        {
-            var valueToStore = storeAsUniversalTime ? dateTime.ToUniversalTime() : dateTime;
-            return string.Format("'{0}'", valueToStore.ToString(MySqlDateTimeFormat));
         }
     }
 }

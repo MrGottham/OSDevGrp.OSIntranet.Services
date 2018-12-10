@@ -120,7 +120,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             // ReSharper disable StringLiteralTypo
             Description = GetDescription(dataReader, "Descr");
             // ReSharper restore StringLiteralTypo
-            CreationTime = GetCreationTime(dataReader, "CreationTime").ToLocalTime();
+            CreationTime = GetCreationTime(dataReader, "CreationTime");
 
             _householdMemberCollectionHasBeenLoaded = false;
             _dataProvider = (IFoodWasteDataProvider) dataProvider;
@@ -133,6 +133,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         public virtual void MapRelations(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider)
         {
             ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
+            _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }
 
         /// <summary>

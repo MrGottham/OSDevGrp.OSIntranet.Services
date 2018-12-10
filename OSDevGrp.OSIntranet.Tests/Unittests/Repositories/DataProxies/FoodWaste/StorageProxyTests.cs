@@ -1,15 +1,15 @@
 ﻿using System;
+using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
@@ -20,6 +20,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
     [TestFixture]
     public class StorageProxyTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+        private Random _random;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _random = new Random(_fixture.Create<int>());
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a data proxy to a given storage.
         /// </summary>
@@ -49,10 +66,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut(identifier);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Identifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.Value, Is.EqualTo(identifier));
 
             string uniqueId = sut.UniqueId;
             Assert.That(uniqueId, Is.Not.Null);
@@ -79,138 +92,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that GetSqlQueryForId throws an ArgumentNullException when the given storage is null.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsArgumentNullExceptionWhenStorageIsNull()
-        {
-            IStorageProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => ((StorageProxy) sut).GetSqlQueryForId(null));
-
-            TestHelper.AssertArgumentNullExceptionIsValid(result, "storage");
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId throws an IntranetRepositoryException when the identifier on the given storage has no value.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdThrowsIntranetRepositoryExceptionWhenIdentifierOnStorageHasNoValue()
-        {
-            IStorage storageMock = MockRepository.GenerateMock<IStorage>();
-            storageMock.Stub(m => m.Identifier)
-                .Return(null)
-                .Repeat.Any();
-
-            IStorageProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-
-            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => ((StorageProxy) sut).GetSqlQueryForId(storageMock));
-
-            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, storageMock.Identifier, "Identifier");
-        }
-
-        /// <summary>
-        /// Tests that GetSqlQueryForId returns the SQL statement for selecting the given storage.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlQueryForIdReturnsSqlQueryForId()
-        {
-            Guid identifier = Guid.NewGuid();
-
-            IStorage storageMock = MockRepository.GenerateMock<IStorage>();
-            storageMock.Stub(m => m.Identifier)
-                .Return(identifier)
-                .Repeat.Any();
-
-            IStorageProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageProxy) sut).GetSqlQueryForId(storageMock);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"SELECT StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime FROM Storages WHERE StorageIdentifier='{identifier.ToString("D").ToUpper()}'"));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForInsert returns the SQL statement to insert this storage type.
-        /// </summary>
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForInsertReturnsSqlCommandForInsert(bool hasDescription)
-        {
-            Fixture fixture = new Fixture();
-
-            Guid identifier = Guid.NewGuid();
-            Guid householdIdentifier = Guid.NewGuid();
-            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock(householdIdentifier);
-            int sortOrder = GetLegalSortOrder(fixture);
-            Guid storageTypeIdentifier = Guid.NewGuid();
-            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
-            int temperatur = GetLegalTemperature(fixture, storageTypeMock.TemperatureRange);
-            DateTime creationTime = DateTime.Now;
-            string description = hasDescription ? fixture.Create<string>() : null;
-            string descritionAsSql = string.IsNullOrWhiteSpace(description) ? "NULL" : $"'{description}'";
-
-            IStorageProxy sut = CreateSut(identifier, householdMock, sortOrder, storageTypeMock, temperatur, creationTime, description);
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageProxy) sut).GetSqlCommandForInsert();
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) VALUES('{identifier.ToString("D").ToUpper()}','{householdIdentifier.ToString("D").ToUpper()}',{sortOrder},'{storageTypeIdentifier.ToString("D").ToUpper()}',{descritionAsSql},{temperatur},{DataRepositoryHelper.GetSqlValueForDateTime(creationTime)})"));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForUpdate returns the SQL statement to update this storage type.
-        /// </summary>
-        [Test]
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestThatGetSqlCommandForUpdateReturnsSqlCommandForUpdate(bool hasDescription)
-        {
-            Fixture fixture = new Fixture();
-
-            Guid identifier = Guid.NewGuid();
-            Guid householdIdentifier = Guid.NewGuid();
-            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock(householdIdentifier);
-            int sortOrder = GetLegalSortOrder(fixture);
-            Guid storageTypeIdentifier = Guid.NewGuid();
-            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
-            int temperatur = GetLegalTemperature(fixture, storageTypeMock.TemperatureRange);
-            DateTime creationTime = DateTime.Now;
-            string description = hasDescription ? fixture.Create<string>() : null;
-            string descritionAsSql = string.IsNullOrWhiteSpace(description) ? "NULL" : $"'{description}'";
-
-            IStorageProxy sut = CreateSut(identifier, householdMock, sortOrder, storageTypeMock, temperatur, creationTime, description);
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageProxy) sut).GetSqlCommandForUpdate();
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"UPDATE Storages SET HouseholdIdentifier='{householdIdentifier.ToString("D").ToUpper()}',SortOrder={sortOrder},StorageTypeIdentifier='{storageTypeIdentifier.ToString("D").ToUpper()}',Descr={descritionAsSql},Temperature={temperatur},CreationTime={DataRepositoryHelper.GetSqlValueForDateTime(creationTime)} WHERE StorageIdentifier='{identifier.ToString("D").ToUpper()}'"));
-        }
-
-        /// <summary>
-        /// Tests that GetSqlCommandForDelete returns the SQL statement to delete this storage type.
-        /// </summary>
-        [Test]
-        public void TestThatGetSqlCommandForDeleteReturnsSqlCommandForDelete()
-        {
-            Guid identifier = Guid.NewGuid();
-
-            IStorageProxy sut = CreateSut(identifier);
-            Assert.That(sut, Is.Not.Null);
-
-            string result = ((StorageProxy) sut).GetSqlCommandForDelete();
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.Not.Empty);
-            Assert.That(result, Is.EqualTo($"DELETE FROM Storages WHERE StorageIdentifier='{identifier.ToString("D").ToUpper()}'"));
-        }
-
-        /// <summary>
         /// Tests that MapData throws an ArgumentNullException if the data reader is null.
         /// </summary>
         [Test]
@@ -219,7 +100,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, MockRepository.GenerateMock<IMySqlDataProvider>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(null, CreateFoodWasteDataProvider()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
         }
@@ -233,7 +114,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(MockRepository.GenerateStub<MySqlDataReader>(), null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MapData(CreateMySqlDataReader(), null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
         }
@@ -246,47 +127,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         [TestCase(false)]
         public void TestThatMapDataMapsDataIntoProxy(bool hasDescription)
         {
-            Fixture fixture = new Fixture();
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
             Guid identifier = Guid.NewGuid();
             Guid householdIdentifier = Guid.NewGuid();
-            int sortOrder = GetLegalSortOrder(fixture);
+            int sortOrder = GetLegalSortOrder();
             Guid storageTypeIdentifier = Guid.NewGuid();
-            string description = hasDescription ? fixture.Create<string>() : null;
-            int temperatur = GetLegalTemperature(fixture, DomainObjectMockBuilder.BuildIntRange());
+            string description = hasDescription ? _fixture.Create<string>() : null;
+            IRange<int> temperatureRange = DomainObjectMockBuilder.BuildIntRange();
+            int temperature = GetLegalTemperature(temperatureRange);
             DateTime creationTime = DateTime.Now;
+            MySqlDataReader dataReader = CreateMySqlDataReader(identifier, householdIdentifier, sortOrder, storageTypeIdentifier, description, temperature, creationTime);
 
-            MySqlDataReader mySqlDataReaderStub = CreateMySqlDataReaderStub(identifier, householdIdentifier, sortOrder, storageTypeIdentifier, description, temperatur, creationTime);
+            HouseholdProxy householdProxy = BuildHouseholdProxy();
+            StorageTypeProxy storageTypeProxy = BuildStorageTypeProxy(temperatureRange: temperatureRange);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(householdProxy, storageTypeProxy);
 
-            HouseholdProxy householdProxy = fixture.Create<HouseholdProxy>();
-            StorageTypeProxy storageTypeProxy = fixture.Create<StorageTypeProxy>();
-
-            IMySqlDataProvider dataProviderMock = CreateDataProviderMock(fixture, householdProxy, storageTypeProxy);
-
-            IStorageProxy sut = CreateSut();
-            Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.Identifier, Is.Null);
-            Assert.That(sut.Identifier.HasValue, Is.False);
-            Assert.That(sut.Household, Is.Null);
-            Assert.That(sut.SortOrder, Is.EqualTo(default(int)));
-            Assert.That(sut.StorageType, Is.Null);
-            Assert.That(sut.Description, Is.Null);
-            Assert.That(sut.Temperature, Is.EqualTo(default(int)));
-            Assert.That(sut.CreationTime, Is.EqualTo(default(DateTime)));
-
-            sut.MapData(mySqlDataReaderStub, dataProviderMock);
+            sut.MapData(dataReader, dataProvider);
 
             Assert.That(sut.Identifier, Is.Not.Null);
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.HasValue, Is.True);
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            Assert.That(sut.Identifier.Value, Is.EqualTo(identifier));
+            Assert.That(sut.Identifier, Is.EqualTo(identifier));
             Assert.That(sut.Household, Is.Not.Null);
             Assert.That(sut.Household, Is.EqualTo(householdProxy));
             Assert.That(sut.SortOrder, Is.EqualTo(sortOrder));
             Assert.That(sut.StorageType, Is.Not.Null);
             Assert.That(sut.StorageType, Is.EqualTo(storageTypeProxy));
-            if (hasDescription)
+            if (string.IsNullOrWhiteSpace(description) == false)
             {
                 Assert.That(sut.Description, Is.Not.Null);
                 Assert.That(sut.Description, Is.Not.Empty);
@@ -296,12 +163,53 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 Assert.That(sut.Description, Is.Null);
             }
-            Assert.That(sut.Temperature, Is.EqualTo(temperatur));
+            Assert.That(sut.Temperature, Is.EqualTo(temperature));
             Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
 
-            dataProviderMock.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
-            dataProviderMock.AssertWasCalled(m => m.Get(Arg<HouseholdProxy>.Matches(src => src != null && src.Identifier.HasValue && src.Identifier.Value == householdIdentifier)), opt => opt.Repeat.Once());
-            dataProviderMock.AssertWasCalled(m => m.Get(Arg<StorageTypeProxy>.Matches(src => src != null && src.Identifier.HasValue && src.Identifier.Value == storageTypeIdentifier)), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("StorageIdentifier")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")), opt => opt.Repeat.Once());
+            // ReSharper disable StringLiteralTypo
+            dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("Descr")), opt => opt.Repeat.Once());
+            // ReSharper restore StringLiteralTypo
+            dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(4)), opt => opt.Repeat.Once());
+            if (string.IsNullOrWhiteSpace(description) == false)
+            {
+                dataReader.AssertWasCalled(m => m.GetString(Arg<int>.Is.Equal(4)), opt => opt.Repeat.Once());
+            }
+            else
+            {
+                dataReader.AssertWasNotCalled(m => m.GetString(Arg<int>.Is.Equal(4)));
+            }
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
+
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IHouseholdProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 4 &&
+                                               e[0] == "HouseholdIdentifier" &&
+                                               e[1] == "HouseholdName" &&
+                                               // ReSharper disable StringLiteralTypo
+                                               e[2] == "HouseholdDescr" &&
+                                               // ReSharper restore StringLiteralTypo
+                                               e[3] == "HouseholdCreationTime")),
+                opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IStorageTypeProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 8 &&
+                                               e[0] == "StorageTypeIdentifier" &&
+                                               e[1] == "StorageTypeSortOrder" &&
+                                               e[2] == "StorageTypeTemperature" &&
+                                               e[3] == "StorageTypeTemperatureRangeStartValue" &&
+                                               e[4] == "StorageTypeTemperatureRangeEndValue" &&
+                                               e[5] == "StorageTypeCreatable" &&
+                                               e[6] == "StorageTypeEditable" &&
+                                               e[7] == "StorageTypeDeletable")),
+                opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -319,19 +227,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that MapRelations does not clone the data provider.
+        /// </summary>
+        [Test]
+        public void TestThatMapRelationsDoesNotCloneDataProvider()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider();
+
+            sut.MapRelations(dataProvider);
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
+        }
+
+        /// <summary>
         /// Tests that SaveRelations throws an ArgumentNullException if the data provider is null.
         /// </summary>
         [Test]
         public void TestThatSaveRelationsThrowsArgumentNullExceptionIfDataProviderIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IStorageProxy sut = CreateSut();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.SaveRelations(null, fixture.Create<bool>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.SaveRelations(null, _fixture.Create<bool>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that SaveRelations throws an IntranetRepositoryException when the identifier for the payment made by a stakeholder is null.
+        /// </summary>
+        [Test]
+        public void TestThatSaveRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.SaveRelations(CreateFoodWasteDataProvider(), _fixture.Create<bool>()));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
         }
 
         /// <summary>
@@ -349,10 +287,275 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
+        /// Tests that DeleteRelations throws an IntranetRepositoryException when the identifier for the payment made by a stakeholder is null.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsThrowsIntranetRepositoryExceptionWhenIdentifierIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Identifier, Is.Null);
+            Assert.That(sut.Identifier.HasValue, Is.False);
+
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.DeleteRelations(CreateFoodWasteDataProvider()));
+
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, ExceptionMessage.IllegalValue, sut.Identifier, "Identifier");
+        }
+
+        /// <summary>
+        /// Tests that CreateGetCommand returns the SQL command for selecting the given storage.
+        /// </summary>
+        [Test]
+        public void TestThatCreateGetCommandReturnsSqlQueryForId()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorageProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            // ReSharper disable StringLiteralTypo
+            new DbCommandTestBuilder("SELECT s.StorageIdentifier,s.HouseholdIdentifier,s.SortOrder,s.StorageTypeIdentifier,s.Descr,s.Temperature,s.CreationTime,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,st.SortOrder AS StorageTypeSortOrder,st.Temperature AS StorageTypeTemperature,st.TemperatureRangeStartValue AS StorageTypeTemperatureRangeStartValue,st.TemperatureRangeEndValue AS StorageTypeTemperatureRangeEndValue,st.Creatable AS StorageTypeCreatable,st.Editable AS StorageTypeEditable,st.Deletable AS StorageTypeDeletable FROM Storages AS s INNER JOIN Households AS h ON h.HouseholdIdentifier=s.HouseholdIdentifier INNER JOIN StorageTypes AS st ON st.StorageTypeIdentifier=s.StorageTypeIdentifier WHERE s.StorageIdentifier=@storageIdentifier")
+            // ReSharper restore StringLiteralTypo
+                .AddCharDataParameter("@storageIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateGetCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateInsertCommand returns the SQL command to insert this storage type.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateInsertCommandReturnsSqlCommandForInsert(bool hasDescription)
+        {
+            Guid identifier = Guid.NewGuid();
+            Guid householdIdentifier = Guid.NewGuid();
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock(householdIdentifier);
+            int sortOrder = GetLegalSortOrder();
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
+            int temperature = GetLegalTemperature(storageTypeMock.TemperatureRange);
+            DateTime creationTime = DateTime.Now;
+            string description = hasDescription ? _fixture.Create<string>() : null;
+
+            IStorageProxy sut = CreateSut(identifier, householdMock, sortOrder, storageTypeMock, temperature, creationTime, description);
+            Assert.That(sut, Is.Not.Null);
+
+            // ReSharper disable StringLiteralTypo
+            new DbCommandTestBuilder("INSERT INTO Storages (StorageIdentifier,HouseholdIdentifier,SortOrder,StorageTypeIdentifier,Descr,Temperature,CreationTime) VALUES(@storageIdentifier,@householdIdentifier,@sortOrder,@storageTypeIdentifier,@descr,@temperature,@creationTime)")
+            // ReSharper restore StringLiteralTypo
+                .AddCharDataParameter("@storageIdentifier", identifier)
+                .AddCharDataParameter("@householdIdentifier", householdIdentifier)
+                .AddTinyIntDataParameter("@sortOrder", sortOrder, 4)
+                .AddCharDataParameter("@storageTypeIdentifier", storageTypeIdentifier)
+                // ReSharper disable StringLiteralTypo
+                .AddVarCharDataParameter("@descr", description, 2048, true)
+                // ReSharper restore StringLiteralTypo
+                .AddTinyIntDataParameter("@temperature", temperature, 4)
+                .AddDateTimeDataParameter("@creationTime", creationTime.ToUniversalTime())
+                .Build()
+                .Run(sut.CreateInsertCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateUpdateCommand returns the SQL command to update this storage type.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateUpdateCommandReturnsSqlCommandForUpdate(bool hasDescription)
+        {
+            Guid identifier = Guid.NewGuid();
+            Guid householdIdentifier = Guid.NewGuid();
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock(householdIdentifier);
+            int sortOrder = GetLegalSortOrder();
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock(storageTypeIdentifier);
+            int temperature = GetLegalTemperature(storageTypeMock.TemperatureRange);
+            DateTime creationTime = DateTime.Now;
+            string description = hasDescription ? _fixture.Create<string>() : null;
+
+            IStorageProxy sut = CreateSut(identifier, householdMock, sortOrder, storageTypeMock, temperature, creationTime, description);
+            Assert.That(sut, Is.Not.Null);
+
+            // ReSharper disable StringLiteralTypo
+            new DbCommandTestBuilder("UPDATE Storages SET HouseholdIdentifier=@householdIdentifier,SortOrder=@sortOrder,StorageTypeIdentifier=@storageTypeIdentifier,Descr=@descr,Temperature=@temperature,CreationTime=@creationTime WHERE StorageIdentifier=@storageIdentifier")
+            // ReSharper restore StringLiteralTypo
+                .AddCharDataParameter("@storageIdentifier", identifier)
+                .AddCharDataParameter("@householdIdentifier", householdIdentifier)
+                .AddTinyIntDataParameter("@sortOrder", sortOrder, 4)
+                .AddCharDataParameter("@storageTypeIdentifier", storageTypeIdentifier)
+                // ReSharper disable StringLiteralTypo
+                .AddVarCharDataParameter("@descr", description, 2048, true)
+                // ReSharper restore StringLiteralTypo
+                .AddTinyIntDataParameter("@temperature", temperature, 4)
+                .AddDateTimeDataParameter("@creationTime", creationTime.ToUniversalTime())
+                .Build()
+                .Run(sut.CreateUpdateCommand());
+        }
+
+        /// <summary>
+        /// Tests that CreateDeleteCommand returns the SQL command to delete this storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCreateDeleteCommandReturnsSqlCommandForDelete()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IStorageProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            // ReSharper disable StringLiteralTypo
+            new DbCommandTestBuilder("DELETE FROM Storages WHERE StorageIdentifier=@storageIdentifier")
+            // ReSharper restore StringLiteralTypo
+                .AddCharDataParameter("@storageIdentifier", identifier)
+                .Build()
+                .Run(sut.CreateDeleteCommand());
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data reader is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataReaderIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(null, CreateFoodWasteDataProvider(), _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataReader");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the data provider is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfDataProviderIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), null, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>()));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "dataProvider");
+        }
+
+        /// <summary>
+        /// Tests that Create throws an ArgumentNullException if the column name collection is null.
+        /// </summary>
+        [Test]
+        public void TestThatCreateThrowsArgumentNullExceptionIfColumnNameCollectionIsNull()
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Create(CreateMySqlDataReader(), CreateFoodWasteDataProvider(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "columnNameCollection");
+        }
+
+        /// <summary>
+        /// Tests that Create creates a data proxy to a given household member with values from the data reader.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCreateCreatesProxy(bool hasDescription)
+        {
+            IStorageProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid identifier = Guid.NewGuid();
+            Guid householdIdentifier = Guid.NewGuid();
+            int sortOrder = GetLegalSortOrder();
+            Guid storageTypeIdentifier = Guid.NewGuid();
+            string description = hasDescription ? _fixture.Create<string>() : null;
+            IRange<int> temperatureRange = DomainObjectMockBuilder.BuildIntRange();
+            int temperature = GetLegalTemperature(temperatureRange);
+            DateTime creationTime = DateTime.Now;
+            MySqlDataReader dataReader = CreateMySqlDataReader(identifier, householdIdentifier, sortOrder, storageTypeIdentifier, description, temperature, creationTime);
+
+            HouseholdProxy householdProxy = BuildHouseholdProxy();
+            StorageTypeProxy storageTypeProxy = BuildStorageTypeProxy(temperatureRange: temperatureRange);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(householdProxy, storageTypeProxy);
+
+            // ReSharper disable StringLiteralTypo
+            IStorageProxy result = sut.Create(dataReader, dataProvider, "StorageIdentifier", "HouseholdIdentifier", "SortOrder", "StorageTypeIdentifier", "Descr", "Temperature", "CreationTime", "HouseholdName", "HouseholdDescr", "HouseholdCreationTime", "StorageTypeSortOrder", "StorageTypeTemperature", "StorageTypeTemperatureRangeStartValue", "StorageTypeTemperatureRangeEndValue", "StorageTypeCreatable", "StorageTypeEditable", "StorageTypeDeletable");
+            // ReSharper restore StringLiteralTypo
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Identifier, Is.Not.Null);
+            Assert.That(result.Identifier, Is.EqualTo(identifier));
+            Assert.That(result.Household, Is.Not.Null);
+            Assert.That(result.Household, Is.EqualTo(householdProxy));
+            Assert.That(result.SortOrder, Is.EqualTo(sortOrder));
+            Assert.That(result.StorageType, Is.Not.Null);
+            Assert.That(result.StorageType, Is.EqualTo(storageTypeProxy));
+            if (string.IsNullOrWhiteSpace(description) == false)
+            {
+                Assert.That(result.Description, Is.Not.Null);
+                Assert.That(result.Description, Is.Not.Empty);
+                Assert.That(result.Description, Is.EqualTo(description));
+            }
+            else
+            {
+                Assert.That(result.Description, Is.Null);
+            }
+            Assert.That(result.Temperature, Is.EqualTo(temperature));
+            Assert.That(result.CreationTime, Is.EqualTo(creationTime));
+
+            dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("StorageIdentifier")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")), opt => opt.Repeat.Once());
+            // ReSharper disable StringLiteralTypo
+            dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("Descr")), opt => opt.Repeat.Once());
+            // ReSharper restore StringLiteralTypo
+            dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(4)), opt => opt.Repeat.Once());
+            if (string.IsNullOrWhiteSpace(description) == false)
+            {
+                dataReader.AssertWasCalled(m => m.GetString(Arg<int>.Is.Equal(4)), opt => opt.Repeat.Once());
+            }
+            else
+            {
+                dataReader.AssertWasNotCalled(m => m.GetString(Arg<int>.Is.Equal(4)));
+            }
+            dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasNotCalled(m => m.Clone());
+
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IHouseholdProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 4 &&
+                                               e[0] == "HouseholdIdentifier" &&
+                                               e[1] == "HouseholdName" &&
+                                               // ReSharper disable StringLiteralTypo
+                                               e[2] == "HouseholdDescr" &&
+                                               // ReSharper restore StringLiteralTypo
+                                               e[3] == "HouseholdCreationTime")),
+                opt => opt.Repeat.Once());
+
+            dataProvider.AssertWasCalled(m => m.Create(
+                    Arg<IStorageTypeProxy>.Is.TypeOf,
+                    Arg<MySqlDataReader>.Is.Equal(dataReader),
+                    Arg<string[]>.Matches(e => e != null && e.Length == 8 &&
+                                               e[0] == "StorageTypeIdentifier" &&
+                                               e[1] == "StorageTypeSortOrder" &&
+                                               e[2] == "StorageTypeTemperature" &&
+                                               e[3] == "StorageTypeTemperatureRangeStartValue" &&
+                                               e[4] == "StorageTypeTemperatureRangeEndValue" &&
+                                               e[5] == "StorageTypeCreatable" &&
+                                               e[6] == "StorageTypeEditable" &&
+                                               e[7] == "StorageTypeDeletable")),
+                opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
         /// Creates an instance of the data proxy to a given storage which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage which should be used for unit testing.</returns>
-        private static IStorageProxy CreateSut(Guid? storageIdentifier = null)
+        private IStorageProxy CreateSut(Guid? storageIdentifier = null)
         {
             return new StorageProxy
             {
@@ -364,7 +567,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of the data proxy to a given storage which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of the data proxy to a given storage which should be used for unit testing.</returns>
-        private static IStorageProxy CreateSut(Guid storageIdentifier, IHousehold household, int sortOrder, IStorageType storageType, int temperature, DateTime creationTime, string description = null)
+        private IStorageProxy CreateSut(Guid storageIdentifier, IHousehold household, int sortOrder, IStorageType storageType, int temperature, DateTime creationTime, string description = null)
         {
             return new StorageProxy(household, sortOrder, storageType, temperature, creationTime, description)
             {
@@ -376,35 +579,37 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a MySQL data reader which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a MySQL data reader which should be used for unit testing.</returns>
-        private static MySqlDataReader CreateMySqlDataReaderStub(Guid storageIdentifier, Guid householdIdentifier, int sortOrder, Guid storageTypeIdentifier, string description, int temperature, DateTime creationTime)
+        private MySqlDataReader CreateMySqlDataReader(Guid? storageIdentifier = null, Guid? householdIdentifier = null, int? sortOrder = null, Guid? storageTypeIdentifier = null, string description = null, int? temperature = null, DateTime? creationTime = null)
         {
             MySqlDataReader mySqlDataReaderStub = MockRepository.GenerateStub<MySqlDataReader>();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<string>.Is.Equal("StorageIdentifier")))
-                .Return(storageIdentifier.ToString("D").ToUpper())
+                .Return(storageIdentifier.HasValue ? storageIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<string>.Is.Equal("HouseholdIdentifier")))
-                .Return(householdIdentifier.ToString("D").ToUpper())
+                .Return(householdIdentifier.HasValue ? householdIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")))
-                .Return((short) sortOrder)
+                .Return((short) (sortOrder ?? GetLegalSortOrder()))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<string>.Is.Equal("StorageTypeIdentifier")))
-                .Return(storageTypeIdentifier.ToString("D").ToUpper())
+                .Return(storageTypeIdentifier.HasValue ? storageTypeIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
                 .Repeat.Any();
+            // ReSharper disable StringLiteralTypo
             mySqlDataReaderStub.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("Descr")))
+            // ReSharper restore StringLiteralTypo
                 .Return(4)
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(4)))
                 .Return(string.IsNullOrWhiteSpace(description))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<int>.Is.Equal(4)))
-                .Return(description)
+                .Return(description ?? _fixture.Create<string>())
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")))
-                .Return((short) temperature)
+                .Return((short) (temperature ?? GetLegalTemperature(DomainObjectMockBuilder.BuildIntRange())))
                 .Repeat.Any();
             mySqlDataReaderStub.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return(creationTime.ToUniversalTime())
+                .Return((creationTime ?? DateTime.Now).ToUniversalTime())
                 .Repeat.Any();
             return mySqlDataReaderStub;
         }
@@ -413,22 +618,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private static IFoodWasteDataProvider CreateDataProviderMock(Fixture fixture, HouseholdProxy householdProxy = null, StorageTypeProxy storageTypeProxy = null)
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(HouseholdProxy householdProxy = null, StorageTypeProxy storageTypeProxy = null)
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
-
             IFoodWasteDataProvider dataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            dataProviderMock.Stub(m => m.Clone())
-                .Return(dataProviderMock)
+            dataProviderMock.Stub(m => m.Create(Arg<IHouseholdProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(householdProxy ?? BuildHouseholdProxy())
                 .Repeat.Any();
-            dataProviderMock.Stub(m => m.Get(Arg<HouseholdProxy>.Is.Anything))
-                .Return(householdProxy ?? fixture.Create<HouseholdProxy>())
-                .Repeat.Any();
-            dataProviderMock.Stub(m => m.Get(Arg<StorageTypeProxy>.Is.Anything))
-                .Return(storageTypeProxy ?? fixture.Create<StorageTypeProxy>())
+            dataProviderMock.Stub(m => m.Create(Arg<IStorageTypeProxy>.Is.TypeOf, Arg<MySqlDataReader>.Is.Anything, Arg<string[]>.Is.Anything))
+                .Return(storageTypeProxy ?? BuildStorageTypeProxy())
                 .Repeat.Any();
             return dataProviderMock;
         }
@@ -436,38 +633,54 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// <summary>
         /// Gets a legal sort order for a storage.
         /// </summary>
-        /// <param name="fixture">Auto fixture.</param>
         /// <returns>Legal sort order for a storage.</returns>
-        private int GetLegalSortOrder(Fixture fixture)
+        private int GetLegalSortOrder()
         {
-            if (fixture == null)
-            {
-                throw new ArgumentNullException(nameof(fixture));
-            }
-
-            Random random = new Random(fixture.Create<int>());
-            return random.Next(1, 100);
+            return _random.Next(1, 100);
         }
 
         /// <summary>
         /// Gets a legal temperature for a storage.
         /// </summary>
-        /// <param name="fixture">Auto fixture.</param>
         /// <param name="temperatureRange">Temperature range.</param>
         /// <returns>Legal temperature for a storage.</returns>
-        private int GetLegalTemperature(Fixture fixture, IRange<int> temperatureRange)
+        private int GetLegalTemperature(IRange<int> temperatureRange)
         {
-            if (fixture == null)
+            ArgumentNullGuard.NotNull(temperatureRange, nameof(temperatureRange));
+
+            return _random.Next(temperatureRange.StartValue, temperatureRange.EndValue);
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a household.
+        /// </summary>
+        /// <param name="identifier">The identifier for the data proxy.</param>
+        /// <returns>Data proxy to a household.</returns>
+        private HouseholdProxy BuildHouseholdProxy(Guid? identifier = null)
+        {
+            return new HouseholdProxy
             {
-                throw new ArgumentNullException(nameof(fixture));
-            }
+                Identifier = identifier ?? Guid.NewGuid()
+            };
+        }
+
+        /// <summary>
+        /// Creates a data proxy to a household.
+        /// </summary>
+        /// <param name="identifier">The identifier for the data proxy.</param>
+        /// <param name="temperatureRange">The temperature range.</param>
+        /// <returns>Data proxy to a household.</returns>
+        private StorageTypeProxy BuildStorageTypeProxy(Guid? identifier = null, IRange<int> temperatureRange = null)
+        {
             if (temperatureRange == null)
             {
-                throw new ArgumentNullException(nameof(temperatureRange));
+                temperatureRange = DomainObjectMockBuilder.BuildIntRange();
             }
 
-            Random random = new Random(fixture.Create<int>());
-            return random.Next(temperatureRange.StartValue, temperatureRange.EndValue);
+            return new StorageTypeProxy(GetLegalSortOrder(), GetLegalTemperature(temperatureRange), temperatureRange, _fixture.Create<bool>(), _fixture.Create<bool>(), _fixture.Create<bool>())
+            {
+                Identifier = identifier ?? Guid.NewGuid()
+            };
         }
     }
 }
