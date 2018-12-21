@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
@@ -127,6 +127,23 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             #endregion
         }
 
+        #region Private variables
+
+        private Fixture _fixture;
+        private Random _random;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _random = new Random(_fixture.Create<int>());
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a household member.
         /// </summary>
@@ -157,7 +174,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.IsActivated, Is.False);
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.False);
-            Assert.That(sut.IsPrivacyPolictyAccepted, Is.False);
+            Assert.That(sut.IsPrivacyPolicyAccepted, Is.False);
             Assert.That(sut.HasReachedHouseholdLimit, Is.False);
             Assert.That(sut.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
             Assert.That(sut.UpgradeableMemberships, Is.Not.Null);
@@ -173,12 +190,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the constructor throws an ArgumentNullException when the mail address is null or empty.
+        /// Tests that the constructor throws an ArgumentNullException when the mail address is null, empty or white space.
         /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestThatConstructorThrowsArgumentNullExceptionWhenMailAddressIsNullOrEmpty(string invalidMailAddress)
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("  ")]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenMailAddressIsNullEmptyOrWhiteSpace(string invalidMailAddress)
         {
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
@@ -188,12 +208,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the constructor throws an ArgumentNullException when the activation code is null or empty.
+        /// Tests that the constructor throws an ArgumentNullException when the activation code is null, empty or white space.
         /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestThatConstructorThrowsArgumentNullExceptionWhenActivationCodeIsNullOrEmpty(string invalidActivationCode)
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("  ")]
+        public void TestThatConstructorThrowsArgumentNullExceptionWhenActivationCodeIsNullEmptyOrWhiteSpace(string invalidActivationCode)
         {
             Fixture fixture = new Fixture();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
@@ -209,10 +232,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatConstructorCallsIsMailAddressOnDomainObjectValidations()
         {
-            Fixture fixture = new Fixture();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            string mailAddress = fixture.Create<string>();
+            string mailAddress = _fixture.Create<string>();
             IHouseholdMember sut = CreateSut(mailAddress, domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
@@ -225,32 +247,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatConstructorThrowsIntranetSystemExceptionWhenMailAddressIsNotValidMailAddress()
         {
-            Fixture fixture = new Fixture();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(false);
 
-            string invalidMailAddress = fixture.Create<string>();
+            string invalidMailAddress = _fixture.Create<string>();
             IntranetSystemException result = Assert.Throws<IntranetSystemException>(() => CreateSut(invalidMailAddress, domainObjectValidations: domainObjectValidationsMock));
 
             TestHelper.AssertIntranetSystemExceptionIsValid(result, ExceptionMessage.IllegalValue, invalidMailAddress, "mailAddress");
         }
 
         /// <summary>
-        /// Tests that the setter for MailAddress throws an ArgumentNullException when the mail address is null or empty.
+        /// Tests that the setter for MailAddress throws an ArgumentNullException when the mail address is null, empty or white space.
         /// </summary>
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestThatMailAddressSetterThrowsArgumentNullExceptionWhenMailAddressIsNullOrEmpty(string invalidMailAddress)
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("  ")]
+        public void TestThatMailAddressSetterThrowsArgumentNullExceptionWhenMailAddressIsNullEmptyOrWhiteSpace(string invalidMailAddress)
         {
-            Fixture fixture = new Fixture();
-            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
+           IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException resut = Assert.Throws<ArgumentNullException>(() => sut.MailAddress = invalidMailAddress);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.MailAddress = invalidMailAddress);
 
-            TestHelper.AssertArgumentNullExceptionIsValid(resut, "value");
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "value");
         }
 
         /// <summary>
@@ -259,13 +282,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMailAddressSetterCallsIsMailAddressOnDomainObjectValidations()
         {
-            Fixture fixture = new Fixture();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
-            string newMailAddress = fixture.Create<string>();
+            string newMailAddress = _fixture.Create<string>();
             sut.MailAddress = newMailAddress;
 
             domainObjectValidationsMock.AssertWasCalled(m => m.IsMailAddress(Arg<string>.Is.Equal(newMailAddress)));
@@ -277,10 +299,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMailAddressSetterThrowsIntranetSystemExceptionWhenMailAddressIsNotValidMailAddress()
         {
-            Fixture fixture = new Fixture();
-
-            string validMailAddress = fixture.Create<string>();
-            string invalidMailAddress = fixture.Create<string>();
+            string validMailAddress = _fixture.Create<string>();
+            string invalidMailAddress = _fixture.Create<string>();
             IDomainObjectValidations domainObjectValidationsMock = MockRepository.GenerateMock<IDomainObjectValidations>();
             domainObjectValidationsMock.Stub(m => m.IsMailAddress(Arg<string>.Is.Equal(validMailAddress)))
                 .Return(true)
@@ -303,11 +323,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMailAddressSetterSetsMailAddress()
         {
-            Fixture fixture = new Fixture();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            string newMailAddress = fixture.Create<string>();
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            string newMailAddress = _fixture.Create<string>();
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.MailAddress, Is.Not.Null);
             Assert.That(sut.MailAddress, Is.Not.Empty);
@@ -325,13 +344,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMembershipGetterReturnsBasicWhenMembershipExpireTimeIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             foreach (Membership membershipToTest in Enum.GetValues(typeof (Membership)).Cast<Membership>())
             {
-                MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), membershipToTest, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membershipToTest, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
                 Assert.That(sut.MembershipExpireTime, Is.Null);
@@ -346,14 +363,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMembershipGetterReturnsBasicWhenMembershipExpireTimeIsInPast()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             foreach (Membership membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
             {
-                MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), membershipToTest, DateTime.Now.AddDays(random.Next(1, 365)*-1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membershipToTest, DateTime.Now.AddDays(_random.Next(1, 365)*-1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
                 Assert.That(sut.MembershipExpireTime, Is.Not.Null);
@@ -371,14 +385,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMembershipGetterReturnsBasicWhenMembershipExpireTimeIsInFuture()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             foreach (Membership membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
             {
-                MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), membershipToTest, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membershipToTest, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.Membership, Is.EqualTo(membershipToTest));
                 Assert.That(sut.MembershipExpireTime, Is.Not.Null);
@@ -396,14 +407,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMembershipSetterSetsMembership()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             foreach (Membership membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
             {
-                MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
                 Assert.That(sut.MembershipExpireTime, Is.Not.Null);
@@ -419,20 +427,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the setter for Membership sets the membership exprie date and time to null when the membership is set to basic.
+        /// Tests that the setter for Membership sets the membership expire date and time to null when the membership is set to basic.
         /// </summary>
         [Test]
         public void TestThatMembershipSetterSetsMembershipExpireTimeToNullWhenMembershipIsSetToBasic()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             foreach (Membership membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>().Where(m => m != Membership.Basic))
             {
-                DateTime membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365));
-                MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), membershipToTest, membershipExpireTime, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+                DateTime membershipExpireTime = DateTime.Now.AddDays(_random.Next(1, 365));
+                MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membershipToTest, membershipExpireTime, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.Membership, Is.EqualTo(membershipToTest));
                 Assert.That(sut.MembershipExpireTime, Is.Not.Null);
@@ -456,18 +461,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeInPast()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), fixture.Create<Membership>(), null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), _fixture.Create<Membership>(), null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.MembershipExpireTime, Is.Null);
             Assert.That(sut.MembershipExpireTime.HasValue, Is.False);
             Assert.That(sut.MembershipHasExpired, Is.True);
 
-            DateTime membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365) * -1);
+            DateTime membershipExpireTime = DateTime.Now.AddDays(_random.Next(1, 365) * -1);
             sut.MembershipExpireTime = membershipExpireTime;
             Assert.That(sut.MembershipExpireTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -483,18 +485,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeInFuture()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), fixture.Create<Membership>(), null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), _fixture.Create<Membership>(), null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.MembershipExpireTime, Is.Null);
             Assert.That(sut.MembershipExpireTime.HasValue, Is.False);
             Assert.That(sut.MembershipHasExpired, Is.True);
 
-            DateTime membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365));
+            DateTime membershipExpireTime = DateTime.Now.AddDays(_random.Next(1, 365));
             sut.MembershipExpireTime = membershipExpireTime;
             Assert.That(sut.MembershipExpireTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -510,13 +509,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatMembershipExpireTimeSetterSetsMembershipExpireTimeEqualToNull()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            DateTime membershipExpireTime = DateTime.Now.AddDays(random.Next(1, 365));
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), fixture.Create<Membership>(), membershipExpireTime, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            DateTime membershipExpireTime = DateTime.Now.AddDays(_random.Next(1, 365));
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), _fixture.Create<Membership>(), membershipExpireTime, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.MembershipExpireTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -537,11 +533,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterDoesNotCallCanUpgradeMembershipOnDomainObjectValidationsWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -557,11 +551,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterReturnsFalseWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -575,12 +567,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterCallsCanUpgradeMembershipWithDeluxeAsMembershipToUpgradeToOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -596,12 +585,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterDoesNotCallCanUpgradeMembershipWithAnyOtherMembershipsThenDeluxeAsMembershipToUpgradeToOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -620,13 +606,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterReturnsResultFromCanUpgradeMembershipOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
-            bool canRenewMembership = fixture.Create<bool>();
+            bool canRenewMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canRenewMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -640,12 +623,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterCallsCanUpgradeMembershipWithPremiumAsMembershipToUpgradeToOnDomainObjectValidationsWhenCurrentMembershipIsPremium()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Premium));
 
@@ -661,12 +641,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterDoesNotCallCanUpgradeMembershipWithAnyOtherMembershipsThenPremiumAsMembershipToUpgradeToOnDomainObjectValidationsWhenCurrentMembershipIsPremium()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Premium));
 
@@ -685,13 +662,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterReturnsResultFromCanUpgradeMembershipOnDomainObjectValidationsWhenCurrentMembershipIsPremium()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
-            bool canRenewMembership = fixture.Create<bool>();
+            bool canRenewMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canRenewMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Premium));
 
@@ -705,12 +679,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanRenewMembershipGetterThrowIntranetSystemExceptionWhenCurrentMembershipIsIllegal()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), 0, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), 0, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo((Membership) 0));
 
@@ -727,11 +698,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterCallsCanUpgradeMembershipWithAllHigherMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -750,11 +719,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterDoesNotCallCanUpgradeMembershipWithAnyLowerMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -773,12 +740,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterReturnsResultFromCanUpgradeMembershipOnDomainObjectValidationsWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
-            bool canUpgradeMembership = fixture.Create<bool>();
+            bool canUpgradeMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canUpgradeMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -792,12 +757,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterCallsCanUpgradeMembershipWithAllHigherMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -816,12 +778,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterDoesNotCallCanUpgradeMembershipWithAnyLowerMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -840,13 +799,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterReturnsResultFromCanUpgradeMembershipOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
-            bool canUpgradeMembership = fixture.Create<bool>();
+            bool canUpgradeMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canUpgradeMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -860,12 +816,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterDoesNotCallCanUpgradeMembershipOnDomainObjectValidationsWhenCurrentMembershipIsPremium()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Premium));
 
@@ -881,12 +834,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterReturnsFalseWhenCurrentMembershipIsPremium()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Premium));
 
@@ -900,12 +850,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCanUpgradeMembershipGetterThrowIntranetSystemExceptionWhenCurrentMembershipIsIllegal()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), 0, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), 0, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo((Membership) 0));
 
@@ -922,6 +869,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("   ")]
         public void TestThatActivationCodeSetterThrowsArgumentNullExceptionWhenActivationCodeIsInValid(string invalidActivationCode)
         {
             MyHouseholdMember sut = CreateMySut();
@@ -938,13 +888,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatActivationCodeSetterSetsActivationCode()
         {
-            Fixture fixture = new Fixture();
-
             MyHouseholdMember sut = CreateMySut();
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.ActivationCode, Is.Null);
 
-            string newActivationCode = fixture.Create<string>();
+            string newActivationCode = _fixture.Create<string>();
             sut.ActivationCode = newActivationCode;
             Assert.That(sut.ActivationCode, Is.Not.Null);
             Assert.That(sut.ActivationCode, Is.Not.Empty);
@@ -957,11 +905,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatActivationTimeSetterSetsActivationTimeNotEqualToNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.ActivationTime, Is.Null);
             Assert.That(sut.ActivationTime.HasValue, Is.False);
@@ -981,12 +927,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatActivationTimeSetterSetsActivationTimeEqualToNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             DateTime activationTime = DateTime.Now;
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), activationTime, domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), activationTime, domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.ActivationTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -1004,11 +948,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatIsActivatedGetterReturnsFalseWhenActivationTimeIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.ActivationTime, Is.Null);
             Assert.That(sut.ActivationTime.HasValue, Is.False);
@@ -1016,18 +958,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the getter for IsActivated returns false when the activation time is in the future.
+        /// Tests that the getter for IsActivated returns false when the activation time is date in the future.
         /// </summary>
         [Test]
-        public void TestThatIsActivatedGetterReturnsFalseWhenActivationTimeIsInFuture()
+        public void TestThatIsActivatedGetterReturnsFalseWhenActivationTimeIsDateInFuture()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            DateTime activationTime = DateTime.Now.AddMinutes(random.Next(1, 60));
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), activationTime, domainObjectValidations: domainObjectValidationsMock);
+            DateTime activationTime = DateTime.Now.AddDays(_random.Next(1, 30));
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), activationTime, domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.ActivationTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -1038,18 +977,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the getter for IsActivated returns true when the activation time is in the past.
+        /// Tests that the getter for IsActivated returns true when the activation time is today.
         /// </summary>
         [Test]
-        public void TestThatIsActivatedGetterReturnsTrueWhenActivationTimeIsInPast()
+        public void TestThatIsActivatedGetterReturnsTrueWhenActivationTimeIsToday()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            DateTime activationTime = DateTime.Now.AddMinutes(random.Next(1, 60) * -1);
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), activationTime, domainObjectValidations: domainObjectValidationsMock);
+            DateTime activationTime = DateTime.Now.AddMinutes(_random.Next(-120, 120));
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), activationTime, domainObjectValidations: domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.ActivationTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.ActivationTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.ActivationTime.Value.Date, Is.EqualTo(DateTime.Today));
+            Assert.That(sut.IsActivated, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsActivated returns true when the activation time is date in the past.
+        /// </summary>
+        [Test]
+        public void TestThatIsActivatedGetterReturnsTrueWhenActivationTimeIsDateInPast()
+        {
+            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
+
+            DateTime activationTime = DateTime.Now.AddDays(_random.Next(1, 30) * -1);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), activationTime, domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.ActivationTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -1065,11 +1020,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatPrivacyPolicyAcceptedTimeSetterSetsPrivacyPolicyAcceptedTimeNotEqualToNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.False);
@@ -1089,12 +1042,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatPrivacyPolicyAcceptedTimeSetterSetsPrivacyPolicyAcceptedTimeEqualToNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             DateTime privacyPolicyAcceptedTime = DateTime.Now;
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), privacyPolicyAcceptedTime: privacyPolicyAcceptedTime, domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), privacyPolicyAcceptedTime: privacyPolicyAcceptedTime, domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -1107,64 +1058,75 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Tests that the getter for IsPrivacyPolictyAccepted returns false when the time that the household member has accepted our privacy policy is null.
+        /// Tests that the getter for IsPrivacyPolicyAccepted returns false when the time that the household member has accepted our privacy policy is null.
         /// </summary>
         [Test]
-        public void TestThatIsPrivacyPolictyAcceptedGetterReturnsFalseWhenPrivacyPolicyAcceptedTimeIsNull()
+        public void TestThatIsPrivacyPolicyAcceptedGetterReturnsFalseWhenPrivacyPolicyAcceptedTimeIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.False);
-            Assert.That(sut.IsPrivacyPolictyAccepted, Is.False);
+            Assert.That(sut.IsPrivacyPolicyAccepted, Is.False);
         }
 
         /// <summary>
-        /// Tests that the getter for IsPrivacyPolictyAccepted returns false when the time that the household member has accepted our privacy policy is in the future.
+        /// Tests that the getter for IsPrivacyPolicyAccepted returns false when the time that the household member has accepted our privacy policy is date in the future.
         /// </summary>
         [Test]
-        public void TestThatIsPrivacyPolictyAcceptedGetterReturnsFalseWhenPrivacyPolicyAcceptedTimeIsInFuture()
+        public void TestThatIsPrivacyPolicyAcceptedGetterReturnsFalseWhenPrivacyPolicyAcceptedTimeIsDateInFuture()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            DateTime privacyPolicyAcceptedTime = DateTime.Now.AddMinutes(random.Next(1, 60));
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), privacyPolicyAcceptedTime: privacyPolicyAcceptedTime, domainObjectValidations: domainObjectValidationsMock);
+            DateTime privacyPolicyAcceptedTime = DateTime.Now.AddDays(_random.Next(1, 30));
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), privacyPolicyAcceptedTime: privacyPolicyAcceptedTime, domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.True);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.PrivacyPolicyAcceptedTime.Value, Is.GreaterThan(DateTime.Now));
-            Assert.That(sut.IsPrivacyPolictyAccepted, Is.False);
+            Assert.That(sut.IsPrivacyPolicyAccepted, Is.False);
         }
 
         /// <summary>
-        /// Tests that the getter for IsPrivacyPolictyAccepted returns true when the time that the household member has accepted our privacy policy is in the past.
+        /// Tests that the getter for IsPrivacyPolicyAccepted returns true when the time that the household member has accepted our privacy policy is today.
         /// </summary>
         [Test]
-        public void TestThatIsPrivacyPolictyAcceptedGetterReturnsTrueWhenPrivacyPolicyAcceptedTimeIsInPast()
+        public void TestThatIsPrivacyPolicyAcceptedGetterReturnsTrueWhenPrivacyPolicyAcceptedTimeIsToday()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            DateTime privacyPolicyAcceptedTime = DateTime.Now.AddMinutes(random.Next(1, 60) * -1);
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), privacyPolicyAcceptedTime: privacyPolicyAcceptedTime, domainObjectValidations: domainObjectValidationsMock);
+            DateTime privacyPolicyAcceptedTime = DateTime.Now.AddMinutes(_random.Next(-120, 120));
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), privacyPolicyAcceptedTime: privacyPolicyAcceptedTime, domainObjectValidations: domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Not.Null);
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.True);
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            Assert.That(sut.PrivacyPolicyAcceptedTime.Value.Date, Is.EqualTo(DateTime.Today));
+            Assert.That(sut.IsPrivacyPolicyAccepted, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that the getter for IsPrivacyPolicyAccepted returns true when the time that the household member has accepted our privacy policy is date in the past.
+        /// </summary>
+        [Test]
+        public void TestThatIsPrivacyPolicyAcceptedGetterReturnsTrueWhenPrivacyPolicyAcceptedTimeIsDateInPast()
+        {
+           IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
+
+            DateTime privacyPolicyAcceptedTime = DateTime.Now.AddDays(_random.Next(1, 30) * -1);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), privacyPolicyAcceptedTime: privacyPolicyAcceptedTime, domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.True);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
             Assert.That(sut.PrivacyPolicyAcceptedTime.Value, Is.LessThan(DateTime.Now));
-            Assert.That(sut.IsPrivacyPolictyAccepted, Is.True);
+            Assert.That(sut.IsPrivacyPolicyAccepted, Is.True);
         }
 
         /// <summary>
@@ -1176,15 +1138,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium)]
         public void TestThatHasReachedHouseholdLimitGetterCallsHasReachedHouseholdLimitOnDomainObjectValidations(Membership membership)
         {
-            Fixture fixture = new Fixture();
-
-            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
+           IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             IHousehold[] householdMockCollection = DomainObjectMockBuilder.BuildHouseholdMockCollection(membership).ToArray();
             Assert.That(householdMockCollection, Is.Not.Null);
             Assert.That(householdMockCollection, Is.Not.Empty);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             sut.Households = householdMockCollection;
@@ -1208,12 +1168,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium)]
         public void TestThatHasReachedHouseholdLimitGetterReturnsResultFromHasReachedHouseholdLimitOnDomainObjectValidations(Membership membership)
         {
-            Fixture fixture = new Fixture();
-
-            bool hasReachedHouseholdLimit = fixture.Create<bool>();
+            bool hasReachedHouseholdLimit = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(hasReachedHouseholdLimit: hasReachedHouseholdLimit);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(membership));
 
@@ -1227,16 +1185,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatCreationTimeSetterSetsCreationTime()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
 
-            DateTime newCreationTime = DateTime.Today.AddDays(random.Next(1, 365) * -1);
+            DateTime newCreationTime = DateTime.Today.AddDays(_random.Next(1, 365) * -1);
             sut.CreationTime = newCreationTime;
             Assert.That(sut.CreationTime, Is.EqualTo(newCreationTime));
         }
@@ -1247,12 +1202,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterCallsCanUpgradeMembershipWithAllHigherMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
-            bool canUpgradeMembership = fixture.Create<bool>(); 
+            bool canUpgradeMembership = _fixture.Create<bool>(); 
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canUpgradeMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -1271,12 +1224,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterDoesNotCallCanUpgradeMembershipWithAnyLowerMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
-            bool canUpgradeMembership = fixture.Create<bool>();
+            bool canUpgradeMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canUpgradeMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -1295,11 +1246,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterReturnsUpgradeableMembershipsWhenCurrentMembershipIsBasic()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -1317,12 +1266,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterCallsCanUpgradeMembershipWithAllHigherMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -1341,13 +1287,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterDoesNotCallCanUpgradeMembershipWithAnyLowerMembershipsOnDomainObjectValidationsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
-            bool canUpgradeMembership = fixture.Create<bool>();
+            bool canUpgradeMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canUpgradeMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -1366,12 +1309,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterReturnsUpgradeableMembershipsWhenCurrentMembershipIsDeluxe()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
 
@@ -1388,13 +1328,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterDoesNotCallCanUpgradeMembershipOnDomainObjectValidationsWhenCurrentMembershipIsPremium()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
-            bool canUpgradeMembership = fixture.Create<bool>();
+            bool canUpgradeMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: canUpgradeMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Premium));
 
@@ -1410,12 +1347,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatUpgradeableMembershipsGetterReturnsUpgradeableMembershipsWhenCurrentMembershipIsPremium()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(random.Next(1, 365)), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Premium, DateTime.Now.AddDays(_random.Next(1, 365)), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Premium));
 
@@ -1430,11 +1364,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdsSetterThrowsArgumentNullExceptionWhenValueIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Households = null);
@@ -1448,12 +1380,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdsSetterCallsGetHouseholdLimitOnDomainObjectValidations()
         {
-            Fixture fixture = new Fixture();
-
             const int householdLimit = 0;
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(householdLimit: householdLimit);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             sut.Households = new List<IHousehold>(0);
@@ -1467,12 +1397,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdsSetterThrowsIntranetBusinessExceptionWhenHouseholdCollectionContainsMoreHouseholdsThanHouseholdLimit()
         {
-            Fixture fixture = new Fixture();
-
             const int householdLimit = 0;
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(householdLimit: householdLimit);
 
-            MyHouseholdMember householdMember = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember householdMember = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
 
             IntranetBusinessException result = Assert.Throws<IntranetBusinessException>(() => householdMember.Households = new List<IHousehold> {CreateHouseholdMock()});
@@ -1486,12 +1414,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdsSetterSetsHouseholds()
         {
-            Fixture fixture = new Fixture();
-
             const int householdLimit = 3;
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(householdLimit: householdLimit);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -1514,11 +1440,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatPaymentsSetterThrowsArgumentNullExceptionWhenValueIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Payments = null);
@@ -1532,11 +1456,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatPaymentsSetterSetsPayments()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Payments, Is.Not.Null);
             Assert.That(sut.Payments, Is.Empty);
@@ -1568,12 +1490,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium, Membership.Premium)]
         public void TestThatHasRequiredMembershipCallsHasRequiredMembershipOnDomainObjectValidations(Membership currentMembership, Membership requiredMembership)
         {
-            Fixture fixture = new Fixture();
-
-            bool hasRequiredMembership = fixture.Create<bool>();
+            bool hasRequiredMembership = _fixture.Create<bool>();
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(hasRequiredMembership: hasRequiredMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), currentMembership, currentMembership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), currentMembership, currentMembership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(currentMembership));
 
@@ -1590,11 +1510,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(false)]
         public void TestThatHasRequiredMembershipReturnsResultFromHasRequiredMembershipOnDomainObjectValidations(bool hasRequiredMembership)
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(hasRequiredMembership: hasRequiredMembership);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
 
@@ -1617,11 +1535,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [TestCase(Membership.Premium, Membership.Premium)]
         public void TestThatHouseholdApplyCallsCanUpgradeMembershipOnDomainObjectValidations(Membership currentMembership, Membership upgradeToMembership)
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), currentMembership, currentMembership == Membership.Basic ? null : (DateTime?) DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), currentMembership, currentMembership == Membership.Basic ? null : (DateTime?) DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(currentMembership));
 
@@ -1636,14 +1552,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdApplyThrowsIntranetBusinessExceptionWhenCanUpgradeMembershipOnDomainObjectValidationsReturnsFalse()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(canUpgradeMembership: false);
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
-            IntranetBusinessException result = Assert.Throws<IntranetBusinessException>(() => sut.MembershipApply(fixture.Create<Membership>()));
+            IntranetBusinessException result = Assert.Throws<IntranetBusinessException>(() => sut.MembershipApply(_fixture.Create<Membership>()));
 
             TestHelper.AssertIntranetBusinessExceptionIsValid(result, ExceptionMessage.MembershipCannotDowngrade);
         }
@@ -1654,11 +1568,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdApplyAppliesBasicMembership()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddYears(1), fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Deluxe, DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Deluxe));
             Assert.That(sut.MembershipExpireTime, Is.Not.Null);
@@ -1682,11 +1594,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdApplyAppliesDeluxeMembership()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(sut.MembershipExpireTime, Is.Null);
@@ -1710,11 +1620,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdApplyAppliesPremiumMembership()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            MyHouseholdMember sut = CreateMySut(fixture.Create<string>(), Membership.Basic, null, fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), Membership.Basic, null, _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(sut.MembershipExpireTime, Is.Null);
@@ -1738,11 +1646,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdAddThrowsArgumentNullExceptionWhenHouseholdIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.HouseholdAdd(null));
@@ -1756,11 +1662,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdAddCallsHasReachedHouseholdLimitOnDomainObjectValidations()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             IHousehold householdMock = CreateHouseholdMock();
@@ -1776,11 +1680,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdAddThrowsIntranetBusinessExceptionWhenHouseholdLimitHasBeenReached()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(hasReachedHouseholdLimit: true);
 
-            IHouseholdMember householdMember = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember householdMember = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(householdMember, Is.Not.Null);
 
             IntranetBusinessException result = Assert.Throws<IntranetBusinessException>(() => householdMember.HouseholdAdd(CreateHouseholdMock()));
@@ -1794,11 +1696,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdAddAddsHousehold()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -1818,11 +1718,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdAddCallsHouseholdMembersOnHousehold()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             IHousehold householdMock = CreateHouseholdMock();
@@ -1838,11 +1736,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdAddCallsHouseholdMemberAddOnHouseholdWhenHouseholdMemberIsNotMemberOfHousehold()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             IHousehold householdMock = CreateHouseholdMock();
@@ -1858,11 +1754,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdAddDoesNotCallHouseholdMemberAddOnHouseholdWhenHouseholdMemberIsMemberOfHousehold()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             IHousehold householdMock = CreateHouseholdMock(sut);
@@ -1878,11 +1772,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdRemoveThrowsArgumentNullExceptionWhenHouseholdIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.HouseholdRemove(null));
@@ -1896,15 +1788,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdRemoveReturnsNullWhenHouseholdMemberDoesNotExistOnHouseholdMember()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             IHousehold household1Mock = CreateHouseholdMock();
             IHousehold household2Mock = CreateHouseholdMock();
             IHousehold household3Mock = CreateHouseholdMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -1929,15 +1819,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdRemoveRemovesHouseholdMember()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             IHousehold household1Mock = CreateHouseholdMock();
             IHousehold household2Mock = CreateHouseholdMock();
             IHousehold household3Mock = CreateHouseholdMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -1967,15 +1855,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdRemoveCallsHouseholdMembersOnHouseholdMember()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             IHousehold household1Mock = CreateHouseholdMock();
             IHousehold household2Mock = CreateHouseholdMock();
             IHousehold household3Mock = CreateHouseholdMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -2001,11 +1887,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdRemoveCallsHouseholdMemberRemoveOnHouseholdMemberWhenHouseholdMemberExistsOnHousehold()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -2035,15 +1919,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdRemoveDoesNotCallHouseholdMemberRemoveOnHouseholdMemberWhenHouseholdMemberDoesNotExistOnHousehold()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             IHousehold household1Mock = CreateHouseholdMock();
             IHousehold household2Mock = CreateHouseholdMock();
             IHousehold household3Mock = CreateHouseholdMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -2069,15 +1951,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatHouseholdRemoveReturnsRemovedHousehold()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
             IHousehold household1Mock = CreateHouseholdMock();
             IHousehold household2Mock = CreateHouseholdMock();
             IHousehold household3Mock = CreateHouseholdMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -2103,11 +1983,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatPaymentAddThrowsArgumentNullExceptionWhenPaymentIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
             ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.PaymentAdd(null));
@@ -2121,11 +1999,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatPaymentAddAddsPayment()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Payments, Is.Not.Null);
             Assert.That(sut.Payments, Is.Empty);
@@ -2144,14 +2020,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateThrowsArgumentNullExceptionWhenTranslationCultureIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Translate(null, fixture.Create<bool>(), fixture.Create<bool>()));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.Translate(null, _fixture.Create<bool>(), _fixture.Create<bool>()));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "translationCulture");
         }
@@ -2162,17 +2036,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateCallsTranslateOnEachHouseholdWhenTranslateHouseholdsIsTrue()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
 
-            int numberOfHouseholds = random.Next(1, 5);
+            int numberOfHouseholds = _random.Next(1, 5);
             while (sut.Households.Count() < numberOfHouseholds)
             {
                 sut.HouseholdAdd(CreateHouseholdMock());
@@ -2182,7 +2053,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.Households.Count(), Is.EqualTo(numberOfHouseholds));
 
             CultureInfo translationCulture = CultureInfo.CurrentCulture;
-            sut.Translate(translationCulture, true, fixture.Create<bool>());
+            sut.Translate(translationCulture, true, _fixture.Create<bool>());
 
             foreach (IHousehold householdMock in sut.Households)
             {
@@ -2196,17 +2067,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateDoesNotCallTranslateOnAnyHouseholdWhenTranslateHouseholdsIsFalse()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
 
-            int numberOfHouseholds = random.Next(1, 5);
+            int numberOfHouseholds = _random.Next(1, 5);
             while (sut.Households.Count() < numberOfHouseholds)
             {
                 sut.HouseholdAdd(CreateHouseholdMock());
@@ -2215,7 +2083,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.Households, Is.Not.Empty);
             Assert.That(sut.Households.Count(), Is.EqualTo(numberOfHouseholds));
 
-            sut.Translate(CultureInfo.CurrentCulture, false, fixture.Create<bool>());
+            sut.Translate(CultureInfo.CurrentCulture, false, _fixture.Create<bool>());
 
             foreach (IHousehold householdMock in sut.Households)
             {
@@ -2229,17 +2097,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateCallsTranslateOnEachPaymentWhenTranslatePaymentsIsTrue()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Payments, Is.Not.Null);
             Assert.That(sut.Payments, Is.Empty);
 
-            int numberOfPayments = random.Next(1, 5);
+            int numberOfPayments = _random.Next(1, 5);
             while (sut.Payments.Count() < numberOfPayments)
             {
                 sut.PaymentAdd(MockRepository.GenerateMock<IPayment>());
@@ -2249,7 +2114,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.Payments.Count(), Is.EqualTo(numberOfPayments));
 
             CultureInfo translationCulture = CultureInfo.CurrentCulture;
-            sut.Translate(translationCulture, fixture.Create<bool>());
+            sut.Translate(translationCulture, _fixture.Create<bool>());
 
             foreach (IPayment paymentMock in sut.Payments)
             {
@@ -2263,17 +2128,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatTranslateDoesNotCallTranslateOnAnyPaymentWhenTranslatePaymentsIsFalse()
         {
-            Fixture fixture = new Fixture();
-            Random random = new Random(fixture.Create<int>());
-
             IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
 
-            IHouseholdMember sut = CreateSut(fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
+            IHouseholdMember sut = CreateSut(_fixture.Create<string>(), domainObjectValidations: domainObjectValidationsMock);
             Assert.That(sut, Is.Not.Null);
             Assert.That(sut.Payments, Is.Not.Null);
             Assert.That(sut.Payments, Is.Empty);
 
-            var numberOfPayments = random.Next(1, 5);
+            var numberOfPayments = _random.Next(1, 5);
             while (sut.Payments.Count() < numberOfPayments)
             {
                 sut.PaymentAdd(MockRepository.GenerateMock<IPayment>());
@@ -2282,7 +2144,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.Payments, Is.Not.Empty);
             Assert.That(sut.Payments.Count(), Is.EqualTo(numberOfPayments));
 
-            sut.Translate(CultureInfo.CurrentCulture, fixture.Create<bool>(), false);
+            sut.Translate(CultureInfo.CurrentCulture, _fixture.Create<bool>(), false);
 
             foreach (IPayment paymentMock in sut.Payments)
             {

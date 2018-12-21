@@ -193,14 +193,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         /// Build a mockup for a household member.
         /// </summary>
         /// <returns>Mockup for a household member.</returns>
-        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolictyAccepted = true, bool canRenewMembership = false, bool canUpgradeMembership = true, bool hasReachedHouseholdLimit = false, IEnumerable<Membership> upgradeableMemberships = null, bool membershipHasExpired = true)
+        public static IHouseholdMember BuildHouseholdMemberMock(Membership membership = Membership.Basic, bool isActivated = true, bool isPrivacyPolicyAccepted = true, bool canRenewMembership = false, bool canUpgradeMembership = true, bool hasReachedHouseholdLimit = false, IEnumerable<Membership> upgradeableMemberships = null, bool membershipHasExpired = true)
         {
             var fixture = new Fixture();
-            var identfier = Guid.NewGuid();
-            var mailAddress = $"test.{identfier.ToString("D").ToLower()}@osdevgrp.dk";
+            var identifier = Guid.NewGuid();
+            var mailAddress = $"test.{identifier.ToString("D").ToLower()}@osdevgrp.dk";
             var householdMemberMock = MockRepository.GenerateMock<IHouseholdMember>();
             householdMemberMock.Stub(m => m.Identifier)
-                .Return(identfier)
+                .Return(identifier)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.StakeholderType)
                 .Return(StakeholderType.HouseholdMember)
@@ -233,10 +233,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
                 .Return(isActivated)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.PrivacyPolicyAcceptedTime)
-                .Return(isPrivacyPolictyAccepted ? (DateTime?) DateTime.Today : null)
+                .Return(isPrivacyPolicyAccepted ? (DateTime?) DateTime.Today : null)
                 .Repeat.Any();
-            householdMemberMock.Stub(m => m.IsPrivacyPolictyAccepted)
-                .Return(isPrivacyPolictyAccepted)
+            householdMemberMock.Stub(m => m.IsPrivacyPolicyAccepted)
+                .Return(isPrivacyPolicyAccepted)
                 .Repeat.Any();
             householdMemberMock.Stub(m => m.HasReachedHouseholdLimit)
                 .Return(hasReachedHouseholdLimit)

@@ -8,6 +8,7 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -20,12 +21,6 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
     /// <typeparam name="TCommand">Type of the command for modifying some data on a household member.</typeparam>
     public abstract class HouseholdMemberDataModificationCommandHandlerBase<TCommand> : FoodWasteHouseholdDataCommandHandlerBase, ICommandHandler<TCommand, ServiceReceiptResponse> where TCommand : HouseholdMemberDataModificationCommandBase
     {
-        #region Private variables
-
-        private readonly IClaimValueProvider _claimValueProvider;
-
-        #endregion
-
         #region Constructor
 
         /// <summary>
@@ -40,11 +35,9 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         protected HouseholdMemberDataModificationCommandHandlerBase(IHouseholdDataRepository householdDataRepository, IClaimValueProvider claimValueProvider, IFoodWasteObjectMapper foodWasteObjectMapper, ISpecification specification, ICommonValidations commonValidations, IExceptionBuilder exceptionBuilder) 
             : base(householdDataRepository, foodWasteObjectMapper, specification, commonValidations, exceptionBuilder)
         {
-            if (claimValueProvider == null)
-            {
-                throw new ArgumentNullException("claimValueProvider");
-            }
-            _claimValueProvider = claimValueProvider;
+            ArgumentNullGuard.NotNull(claimValueProvider, nameof(claimValueProvider));
+
+            ClaimValueProvider = claimValueProvider;
         }
 
         #endregion
@@ -54,34 +47,22 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <summary>
         /// Gets whether the household member should be activated to execute the command handled by this command handler.
         /// </summary>
-        public virtual bool ShouldBeActivated
-        {
-            get { return true; }
-        }
+        public virtual bool ShouldBeActivated => true;
 
         /// <summary>
         /// Gets whether the household member should have accepted the privacy policy to execute the command handled by this command handler.
         /// </summary>
-        public virtual bool ShouldHaveAcceptedPrivacyPolicy
-        {
-            get { return true; }
-        }
+        public virtual bool ShouldHaveAcceptedPrivacyPolicy => true;
 
         /// <summary>
-        /// Gets the requeired membership which the household member should have to execute the command handled by this command handler.
+        /// Gets the required membership which the household member should have to execute the command handled by this command handler.
         /// </summary>
-        public virtual Membership RequiredMembership
-        {
-            get { return Membership.Basic; }
-        }
+        public virtual Membership RequiredMembership => Membership.Basic;
 
         /// <summary>
         /// Gets the provider which can resolve values from the current users claims.
         /// </summary>
-        protected virtual IClaimValueProvider ClaimValueProvider
-        {
-            get { return _claimValueProvider; }
-        }
+        protected virtual IClaimValueProvider ClaimValueProvider { get; }
 
         #endregion
 
@@ -94,16 +75,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <returns>Service receipt.</returns>
         public virtual ServiceReceiptResponse Execute(TCommand command)
         {
-            if (command == null)
-            {
-                throw new ArgumentNullException("command");
-            }
+            ArgumentNullGuard.NotNull(command, nameof(command));
 
-            var householdMember = HouseholdDataRepository.HouseholdMemberGetByMailAddress(ClaimValueProvider.MailAddress);
+            IHouseholdMember householdMember = HouseholdDataRepository.HouseholdMemberGetByMailAddress(ClaimValueProvider.MailAddress);
 
             Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(householdMember), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated)))
                 .IsSatisfiedBy(() => ShouldBeActivated == false || householdMember.IsActivated, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated)))
-                .IsSatisfiedBy(() => ShouldHaveAcceptedPrivacyPolicy == false || householdMember.IsPrivacyPolictyAccepted, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy)))
+                .IsSatisfiedBy(() => ShouldHaveAcceptedPrivacyPolicy == false || householdMember.IsPrivacyPolicyAccepted, new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy)))
                 .IsSatisfiedBy(() => householdMember.HasRequiredMembership(RequiredMembership), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership)))
                 .Evaluate();
 
@@ -111,7 +89,7 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             
             Specification.Evaluate();
 
-            var identifiableDomainObject = ModifyData(householdMember, command);
+            IIdentifiable identifiableDomainObject = ModifyData(householdMember, command);
 
             return ObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(identifiableDomainObject);
         }

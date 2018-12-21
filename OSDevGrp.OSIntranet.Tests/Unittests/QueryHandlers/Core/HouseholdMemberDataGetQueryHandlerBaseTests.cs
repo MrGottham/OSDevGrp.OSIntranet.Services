@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Queries;
@@ -11,7 +12,6 @@ using OSDevGrp.OSIntranet.QueryHandlers.Core;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
@@ -622,10 +622,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
         }
 
         /// <summary>
-        /// Tests that Query does not call IsPrivacyPolictyAccepted on the household member when the household member does not need to have accepted the privacy policies.
+        /// Tests that Query does not call IsPrivacyPolicyAccepted on the household member when the household member does not need to have accepted the privacy policies.
         /// </summary>
         [Test]
-        public void TestThatQueryDoesNotCallIsPrivacyPolictyAcceptedOnHouseholdMemberWhenHouseholdMemberDoesNotNeedToHaveAcceptedPrivacyPolicy()
+        public void TestThatQueryDoesNotCallIsPrivacyPolicyAcceptedOnHouseholdMemberWhenHouseholdMemberDoesNotNeedToHaveAcceptedPrivacyPolicy()
         {
             var fixture = new Fixture();
 
@@ -655,14 +655,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery());
 
-            householdMemberMock.AssertWasNotCalled(m => m.IsPrivacyPolictyAccepted);
+            householdMemberMock.AssertWasNotCalled(m => m.IsPrivacyPolicyAccepted);
         }
 
         /// <summary>
-        /// Tests that Query calls IsPrivacyPolictyAccepted on the household member when the household member should have accepted the privacy policies.
+        /// Tests that Query calls IsPrivacyPolicyAccepted on the household member when the household member should have accepted the privacy policies.
         /// </summary>
         [Test]
-        public void TestThatQueryCallsIsPrivacyPolictyAcceptedOnHouseholdMemberWhenHouseholdMemberShouldHaveAcceptedPrivacyPolicy()
+        public void TestThatQueryCallsIsPrivacyPolicyAcceptedOnHouseholdMemberWhenHouseholdMemberShouldHaveAcceptedPrivacyPolicy()
         {
             var fixture = new Fixture();
 
@@ -692,7 +692,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             householdMemberDataGetQueryHandlerBase.Query(householdMemberDataGetQueryHandlerBase.GenerateQuery());
 
-            householdMemberMock.AssertWasCalled(m => m.IsPrivacyPolictyAccepted);
+            householdMemberMock.AssertWasCalled(m => m.IsPrivacyPolicyAccepted);
         }
 
         /// <summary>
@@ -704,7 +704,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             var fixture = new Fixture();
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(isPrivacyPolictyAccepted: false);
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(isPrivacyPolicyAccepted: false);
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             householdDataRepositoryMock.Stub(m => m.HouseholdMemberGetByMailAddress(Arg<string>.Is.Anything))
                 .Return(householdMemberMock)

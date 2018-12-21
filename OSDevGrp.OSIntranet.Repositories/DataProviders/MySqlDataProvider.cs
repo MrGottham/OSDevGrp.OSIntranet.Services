@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Transactions;
@@ -301,7 +300,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProviders
                 {
                     return;
                 }
-                throw new NotSupportedException();
+
+                _mySqlConnection.Open();
+                return;
             }
 
             if (_mySqlConnection.State == ConnectionState.Open)

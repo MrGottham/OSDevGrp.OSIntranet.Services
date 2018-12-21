@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -158,9 +158,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for getting this foreign key to a domain object in the food waste domain.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new SystemDataCommandBuilder("SELECT fk.ForeignKeyIdentifier,fk.DataProviderIdentifier,dp.Name AS DataProviderName,dp.HandlesPayments,dp.DataSourceStatementIdentifier,fk.ForeignKeyForIdentifier,fk.ForeignKeyForTypes,fk.ForeignKeyValue FROM ForeignKeys AS fk INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=fk.DataProviderIdentifier WHERE fk.ForeignKeyIdentifier=@foreignKeyIdentifier")
-                .AddForeignKeyIdentifierParameter(Identifier)
-                .Build();
+            return BuildSystemDataCommandForSelecting("WHERE fk.ForeignKeyIdentifier=@foreignKeyIdentifier", systemDataCommandBuilder => systemDataCommandBuilder.AddForeignKeyIdentifierParameter(Identifier));
         }
 
         /// <summary>
@@ -220,8 +218,32 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlCommandForSelectingForeignKeys(foreignKeyForIdentifier));
+                return subDataProvider.GetCollection<ForeignKeyProxy>(BuildSystemDataCommandForSelecting("WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier", systemDataCommandBuilder => systemDataCommandBuilder.AddForeignKeyForIdentifierParameter(foreignKeyForIdentifier)));
             }
+        }
+
+        /// <summary>
+        /// Creates a MySQL command selecting a collection of <see cref="ForeignKeyProxy"/>.
+        /// </summary>
+        /// <param name="whereClause">The WHERE clause which the MySQL command should use.</param>
+        /// <param name="parameterAdder">The callback to add MySQL parameters to the MySQL command.</param>
+        /// <returns>MySQL command selecting a collection of <see cref="ForeignKeyProxy"/>.</returns>
+        internal static MySqlCommand BuildSystemDataCommandForSelecting(string whereClause = null, Action<SystemDataCommandBuilder> parameterAdder = null)
+        {
+            StringBuilder selectStatementBuilder = new StringBuilder("SELECT fk.ForeignKeyIdentifier,fk.DataProviderIdentifier,dp.Name AS DataProviderName,dp.HandlesPayments,dp.DataSourceStatementIdentifier,fk.ForeignKeyForIdentifier,fk.ForeignKeyForTypes,fk.ForeignKeyValue FROM ForeignKeys AS fk INNER JOIN DataProviders AS dp ON dp.DataProviderIdentifier=fk.DataProviderIdentifier");
+            if (string.IsNullOrWhiteSpace(whereClause) == false)
+            {
+                selectStatementBuilder.Append($" {whereClause}");
+            }
+
+            SystemDataCommandBuilder systemDataCommandBuilder = new SystemDataCommandBuilder(selectStatementBuilder.ToString());
+            if (parameterAdder == null)
+            {
+                return systemDataCommandBuilder.Build();
+            }
+
+            parameterAdder(systemDataCommandBuilder);
+            return systemDataCommandBuilder.Build();
         }
 
         /// <summary>

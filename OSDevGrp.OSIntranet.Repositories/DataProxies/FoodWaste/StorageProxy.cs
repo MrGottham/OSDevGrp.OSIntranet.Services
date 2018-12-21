@@ -333,7 +333,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
                 .NotNullOrWhiteSpace(columnName, nameof(columnName));
 
-            return dataReader.GetDateTime(columnName).ToLocalTime();
+            return dataReader.GetMySqlDateTime(columnName).Value.ToLocalTime();
         }
 
         #endregion

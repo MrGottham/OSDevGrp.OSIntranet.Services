@@ -58,7 +58,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// <summary>
         /// Indicates whether the household member has accepted our privacy policy.
         /// </summary>
-        bool IsPrivacyPolictyAccepted { get; }
+        bool IsPrivacyPolicyAccepted { get; }
 
         /// <summary>
         /// Indicates whether the household member has reached the household limit.

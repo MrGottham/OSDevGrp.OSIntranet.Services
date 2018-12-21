@@ -210,7 +210,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.ActivationTime, opt => opt.MapFrom(s => s.ActivationTime))
                     .ForMember(m => m.IsActivated, opt => opt.MapFrom(s => s.IsActivated))
                     .ForMember(m => m.PrivacyPolicyAcceptedTime, opt => opt.MapFrom(s => s.PrivacyPolicyAcceptedTime))
-                    .ForMember(m => m.IsPrivacyPolictyAccepted, opt => opt.MapFrom(s => s.IsPrivacyPolictyAccepted))
+                    .ForMember(m => m.IsPrivacyPolicyAccepted, opt => opt.MapFrom(s => s.IsPrivacyPolicyAccepted))
                     .ForMember(m => m.HasReachedHouseholdLimit, opt => opt.MapFrom(s => s.HasReachedHouseholdLimit))
                     .ForMember(m => m.UpgradeableMemberships, opt => opt.MapFrom(s => s.UpgradeableMemberships))
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))

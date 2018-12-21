@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using AutoFixture;
 using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
@@ -151,7 +152,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Stakeholder, Is.EqualTo(householdMemberProxy));
             Assert.That(sut.DataProvider, Is.Not.Null);
             Assert.That(sut.DataProvider, Is.EqualTo(dataProviderProxy));
-            Assert.That(sut.PaymentTime, Is.EqualTo(paymentTime));
+            Assert.That(sut.PaymentTime, Is.EqualTo(paymentTime).Within(1).Milliseconds);
             Assert.That(sut.PaymentReference, Is.Not.Null);
             Assert.That(sut.PaymentReference, Is.Not.Empty);
             Assert.That(sut.PaymentReference, Is.EqualTo(paymentReference));
@@ -165,11 +166,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 Assert.That(sut.PaymentReceipt, Is.Null);
             }
-            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("PaymentIdentifier")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetInt32(Arg<string>.Is.Equal("StakeholderType")), opt => opt.Repeat.Once());
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("PaymentTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("PaymentTime")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("PaymentReference")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("PaymentReceipt")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
@@ -181,7 +182,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 dataReader.AssertWasNotCalled(m => m.GetTextReader(Arg<int>.Is.Equal(6)));
             }
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
 
@@ -456,8 +457,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("DataProviderIdentifier")))
                 .Return(dataProviderIdentifier.HasValue ? dataProviderIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
                 .Repeat.Any();
-            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("PaymentTime")))
-                .Return((paymentTime ?? DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240))).ToUniversalTime())
+            mySqlDataReaderMock.Stub(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("PaymentTime")))
+                .Return(new MySqlDateTime((paymentTime ?? DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240))).ToUniversalTime()))
                 .Repeat.Any();
             mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("PaymentReference")))
                 .Return(paymentReference ?? _fixture.Create<string>())
@@ -471,8 +472,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderMock.Stub(m => m.GetTextReader(Arg<int>.Is.Equal(6)))
                 .Return(paymentReceipt != null ? new StringReader(Convert.ToBase64String(paymentReceipt.ToArray())) : null)
                 .Repeat.Any();
-            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return((creationTime ?? DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240))).ToUniversalTime())
+            mySqlDataReaderMock.Stub(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")))
+                .Return(new MySqlDateTime((creationTime ?? DateTime.Now.AddDays(_random.Next(1, 7) * -1).AddMinutes(_random.Next(120, 240))).ToUniversalTime()))
                 .Repeat.Any();
             return mySqlDataReaderMock;
         }

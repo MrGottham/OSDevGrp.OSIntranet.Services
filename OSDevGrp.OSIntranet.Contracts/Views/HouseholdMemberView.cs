@@ -29,7 +29,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         public bool CanRenewMembership { get; set; }
 
         /// <summary>
-        /// Gets or sets the identification ofwhether the membership can be upgraded.
+        /// Gets or sets the identification of whether the membership can be upgraded.
         /// </summary>
         [DataMember(IsRequired = true)]
         public bool CanUpgradeMembership { get; set; }
@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         /// Get or sets the identification of whether the household member has accepted our privacy policy or not.
         /// </summary>
         [DataMember(IsRequired = true)]
-        public bool IsPrivacyPolictyAccepted { get; set; }
+        public bool IsPrivacyPolicyAccepted { get; set; }
 
         /// <summary>
         /// Gets or sets the identification of whether the household member has reached the household limit.

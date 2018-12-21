@@ -1,4 +1,5 @@
 ﻿using System;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
@@ -6,7 +7,6 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
@@ -57,10 +57,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         }
 
         /// <summary>
-        /// Tests that GetData calls IsPrivacyPolictyAccepted on the household member.
+        /// Tests that GetData calls IsPrivacyPolicyAccepted on the household member.
         /// </summary>
         [Test]
-        public void TestThatGetDataCallsIsPrivacyPolictyAcceptedOnHouseholdMember()
+        public void TestThatGetDataCallsIsPrivacyPolicyAcceptedOnHouseholdMember()
         {
             var fixture = new Fixture();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
@@ -74,7 +74,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
 
             householdMemberHasAcceptedPrivacyPolicyQueryHandler.GetData(householdMemberMock, fixture.Create<HouseholdMemberHasAcceptedPrivacyPolicyQuery>(), DomainObjectMockBuilder.BuildTranslationInfoMock());
 
-            householdMemberMock.AssertWasCalled(m => m.IsPrivacyPolictyAccepted);
+            householdMemberMock.AssertWasCalled(m => m.IsPrivacyPolicyAccepted);
         }
 
         /// <summary>
@@ -83,21 +83,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public void TestThatGetDataReturnsValueFromIsPrivacyPolictyAcceptedOnHouseholdMember(bool isPrivacyPolictyAccepted)
+        public void TestThatGetDataReturnsValueFromIsPrivacyPolicyAcceptedOnHouseholdMember(bool isPrivacyPolicyAccepted)
         {
             var fixture = new Fixture();
             var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
             var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
             var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
 
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(isPrivacyPolictyAccepted: isPrivacyPolictyAccepted);
+            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(isPrivacyPolicyAccepted: isPrivacyPolicyAccepted);
 
             var householdMemberHasAcceptedPrivacyPolicyQueryHandler = new HouseholdMemberHasAcceptedPrivacyPolicyQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
             Assert.That(householdMemberHasAcceptedPrivacyPolicyQueryHandler, Is.Not.Null);
 
             var result = householdMemberHasAcceptedPrivacyPolicyQueryHandler.GetData(householdMemberMock, fixture.Create<HouseholdMemberHasAcceptedPrivacyPolicyQuery>(), DomainObjectMockBuilder.BuildTranslationInfoMock());
 
-            Assert.That(result, Is.EqualTo(isPrivacyPolictyAccepted));
+            Assert.That(result, Is.EqualTo(isPrivacyPolicyAccepted));
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommandHandlers.Validation;
@@ -14,7 +15,6 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
@@ -635,10 +635,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
         }
 
         /// <summary>
-        /// Tests that Execute does not call IsPrivacyPolictyAccepted on the household member when the household member does not need to have accepted the privacy policies.
+        /// Tests that Execute does not call IsPrivacyPolicyAccepted on the household member when the household member does not need to have accepted the privacy policies.
         /// </summary>
         [Test]
-        public void TestThatExecuteDoesNotCallIsPrivacyPolictyAcceptedOnHouseholdMemberWhenHouseholdMemberDoesNotNeedToHaveAcceptedPrivacyPolicy()
+        public void TestThatExecuteDoesNotCallIsPrivacyPolicyAcceptedOnHouseholdMemberWhenHouseholdMemberDoesNotNeedToHaveAcceptedPrivacyPolicy()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -676,14 +676,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             householdMemberDataModificationCommandHandlerBase.Execute(householdMemberDataModificationCommandHandlerBase.GenerateCommand());
 
-            householdMemberMock.AssertWasNotCalled(m => m.IsPrivacyPolictyAccepted);
+            householdMemberMock.AssertWasNotCalled(m => m.IsPrivacyPolicyAccepted);
         }
 
         /// <summary>
-        /// Tests that Execute calls IsPrivacyPolictyAccepted on the household member when the household member should have accepted the privacy policies.
+        /// Tests that Execute calls IsPrivacyPolicyAccepted on the household member when the household member should have accepted the privacy policies.
         /// </summary>
         [Test]
-        public void TestThatExecuteCallsIsPrivacyPolictyAcceptedOnHouseholdMemberWhenHouseholdMemberShouldHaveAcceptedPrivacyPolicy()
+        public void TestThatExecuteCallsIsPrivacyPolicyAcceptedOnHouseholdMemberWhenHouseholdMemberShouldHaveAcceptedPrivacyPolicy()
         {
             var fixture = new Fixture();
             var commonValidationsMock = MockRepository.GenerateMock<ICommonValidations>();
@@ -721,7 +721,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
 
             householdMemberDataModificationCommandHandlerBase.Execute(householdMemberDataModificationCommandHandlerBase.GenerateCommand());
 
-            householdMemberMock.AssertWasCalled(m => m.IsPrivacyPolictyAccepted);
+            householdMemberMock.AssertWasCalled(m => m.IsPrivacyPolicyAccepted);
         }
 
         /// <summary>

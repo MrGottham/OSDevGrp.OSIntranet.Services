@@ -121,7 +121,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             // ReSharper disable StringLiteralTypo
             Household = dataProvider.Create(new HouseholdProxy(), dataReader, "HouseholdIdentifier", "HouseholdName", "HouseholdDescr", "HouseholdCreationTime");
             // ReSharper restore StringLiteralTypo
-            CreationTime = dataReader.GetDateTime("CreationTime").ToLocalTime();
+            CreationTime = dataReader.GetMySqlDateTime("CreationTime").Value.ToLocalTime();
         }
 
         /// <summary>

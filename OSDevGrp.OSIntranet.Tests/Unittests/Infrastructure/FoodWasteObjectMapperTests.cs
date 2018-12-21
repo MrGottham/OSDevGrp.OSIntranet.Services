@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Views;
@@ -16,7 +17,6 @@ using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
@@ -554,7 +554,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberView.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));
             Assert.That(householdMemberView.IsActivated, Is.EqualTo(householdMemberMock.IsActivated));
             Assert.That(householdMemberView.PrivacyPolicyAcceptedTime, Is.EqualTo(householdMemberMock.PrivacyPolicyAcceptedTime));
-            Assert.That(householdMemberView.IsPrivacyPolictyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolictyAccepted));
+            Assert.That(householdMemberView.IsPrivacyPolicyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolicyAccepted));
             Assert.That(householdMemberView.HasReachedHouseholdLimit, Is.EqualTo(householdMemberMock.HasReachedHouseholdLimit));
             Assert.That(householdMemberView.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
             Assert.That(householdMemberView.UpgradeableMemberships, Is.Not.Null);
@@ -604,7 +604,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.ActivationTime, Is.EqualTo(householdMemberMock.ActivationTime));
             Assert.That(householdMemberProxy.IsActivated, Is.EqualTo(householdMemberMock.IsActivated));
             Assert.That(householdMemberProxy.PrivacyPolicyAcceptedTime, Is.EqualTo(householdMemberMock.PrivacyPolicyAcceptedTime));
-            Assert.That(householdMemberProxy.IsPrivacyPolictyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolictyAccepted));
+            Assert.That(householdMemberProxy.IsPrivacyPolicyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolicyAccepted));
             Assert.That(householdMemberProxy.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Not.Empty);

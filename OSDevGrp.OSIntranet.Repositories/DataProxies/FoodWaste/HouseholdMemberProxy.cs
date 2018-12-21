@@ -437,7 +437,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 .NotNullOrWhiteSpace(columnName, nameof(columnName));
 
             int columnNo = dataReader.GetOrdinal(columnName);
-            return dataReader.IsDBNull(columnNo) == false ? dataReader.GetDateTime(columnNo).ToLocalTime() : (DateTime?) null;
+            return dataReader.IsDBNull(columnNo) == false ? dataReader.GetMySqlDateTime(columnNo).Value.ToLocalTime() : (DateTime?) null;
         }
 
         /// <summary>
@@ -468,7 +468,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 .NotNullOrWhiteSpace(columnName, nameof(columnName));
 
             int columnNo = dataReader.GetOrdinal(columnName);
-            return dataReader.IsDBNull(columnNo) == false ? dataReader.GetDateTime(columnNo).ToLocalTime() : (DateTime?) null;
+            return dataReader.IsDBNull(columnNo) == false ? dataReader.GetMySqlDateTime(columnNo).Value.ToLocalTime() : (DateTime?) null;
         }
 
         /// <summary>
@@ -484,7 +484,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 .NotNullOrWhiteSpace(columnName, nameof(columnName));
 
             int columnNo = dataReader.GetOrdinal(columnName);
-            return dataReader.IsDBNull(columnNo) == false ? dataReader.GetDateTime(columnNo).ToLocalTime() : (DateTime?) null;
+            return dataReader.IsDBNull(columnNo) == false ? dataReader.GetMySqlDateTime(columnNo).Value.ToLocalTime() : (DateTime?) null;
         }
 
         /// <summary>
@@ -499,7 +499,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             ArgumentNullGuard.NotNull(dataReader, nameof(dataReader))
                 .NotNullOrWhiteSpace(columnName, nameof(columnName));
 
-            return dataReader.GetDateTime(columnName).ToLocalTime();
+            return dataReader.GetMySqlDateTime(columnName).Value.ToLocalTime();
         }
 
         /// <summary>

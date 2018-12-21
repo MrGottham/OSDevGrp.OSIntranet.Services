@@ -77,9 +77,9 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 .NotNull(dataProvider, nameof(dataProvider));
 
             Identifier = Guid.Parse(dataReader.GetString("PaymentIdentifier"));
-            PaymentTime = dataReader.GetDateTime("PaymentTime").ToLocalTime();
+            PaymentTime = dataReader.GetMySqlDateTime("PaymentTime").Value.ToLocalTime();
             PaymentReference = dataReader.GetString("PaymentReference");
-            CreationTime = dataReader.GetDateTime("CreationTime").ToLocalTime();
+            CreationTime = dataReader.GetMySqlDateTime("CreationTime").Value.ToLocalTime();
 
             int stakeholderTypeAsInt = dataReader.GetInt32("StakeholderType");
             switch ((StakeholderType) stakeholderTypeAsInt)

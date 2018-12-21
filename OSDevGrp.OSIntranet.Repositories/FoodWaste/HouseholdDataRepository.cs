@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
-using OSDevGrp.OSIntranet.Repositories.DataProviders;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -41,13 +41,11 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         /// <returns>Household member when exists; otherwise null.</returns>
         public virtual IHouseholdMember HouseholdMemberGetByMailAddress(string mailAddress)
         {
-            if (string.IsNullOrEmpty(mailAddress))
-            {
-                throw new ArgumentNullException("mailAddress");
-            }
+            ArgumentNullGuard.NotNullOrWhiteSpace(mailAddress, nameof(mailAddress));
+
             try
             {
-                MySqlCommand command = new FoodWasteCommandBuilder(string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress)).Build();
+                MySqlCommand command = HouseholdMemberProxy.BuildHouseholdDataCommandForSelecting("WHERE MailAddress=@mailAddress", householdDataCommandBuilder => householdDataCommandBuilder.AddMailAddressParameter(mailAddress));
                 return DataProvider.GetCollection<HouseholdMemberProxy>(command).SingleOrDefault();
             }
             catch (IntranetRepositoryException)

@@ -124,7 +124,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     // ReSharper disable PossibleInvalidOperationException
                     Assert.That(householdMemberData.PrivacyPolicyAcceptedTime.Value, Is.EqualTo(DateTime.Now).Within(5).Seconds);
                     // ReSharper restore PossibleInvalidOperationException
-                    Assert.That(householdMemberData.IsPrivacyPolictyAccepted, Is.True);
+                    Assert.That(householdMemberData.IsPrivacyPolicyAccepted, Is.True);
                     Assert.That(householdMemberData.CreationTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
                     Assert.That(householdMemberData.Households, Is.Not.Null);
                     Assert.That(householdMemberData.Households, Is.Empty);

@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using AutoFixture;
+using MySql.Data.MySqlClient;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
+using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
-using AutoFixture;
-using MySql.Data.MySqlClient;
+using OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
@@ -19,17 +22,33 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
     [TestFixture]
     public class HouseholdDataRepositoryTests
     {
+        #region Private variables
+
+        private IFoodWasteDataProvider _foodWasteDataProviderMock;
+        private IFoodWasteObjectMapper _foodWasteObjectMapperMock;
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            _foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tests that the constructor initialize a repository which can access household data for the food waste domain.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializeHouseholdDataRepository()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
-            var householdDataRepository = new HouseholdDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(householdDataRepository, Is.Not.Null);
+            IHouseholdDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
         }
 
         /// <summary>
@@ -38,14 +57,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatConstructorThrowsArgumentNullExceptionIfFoodWasteDataProviderIsNull()
         {
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => new HouseholdDataRepository(null, _foodWasteObjectMapperMock));
+            // ReSharper restore ObjectCreationAsStatement
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdDataRepository(null, foodWasteObjectMapperMock));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("foodWasteDataProvider"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "foodWasteDataProvider");
         }
 
         /// <summary>
@@ -54,14 +70,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatConstructorThrowsArgumentNullExceptionIfFoodWasteObjectMapperIsNull()
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
+            // ReSharper disable ObjectCreationAsStatement
+            ArgumentNullException result =  Assert.Throws<ArgumentNullException>(() => new HouseholdDataRepository(_foodWasteDataProviderMock, null));
+            // ReSharper restore ObjectCreationAsStatement
 
-            var exception = Assert.Throws<ArgumentNullException>(() => new HouseholdDataRepository(foodWasteDataProviderMock, null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("foodWasteObjectMapper"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "foodWasteObjectMapper");
         }
 
         /// <summary>
@@ -70,20 +83,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         [TestCase(null)]
         [TestCase("")]
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("  ")]
         public void TestThatHouseholdMemberGetByMailAddressThrowsArgumentNullExceptionWhenMailAddressIsInvalid(string invalidMailAddress)
         {
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            IHouseholdDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataRepository = new HouseholdDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(householdDataRepository, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.HouseholdMemberGetByMailAddress(invalidMailAddress));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => householdDataRepository.HouseholdMemberGetByMailAddress(invalidMailAddress));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("mailAddress"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "mailAddress");
         }
 
         /// <summary>
@@ -92,21 +102,16 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatHouseholdMemberGetByMailAddressCallsGetCollectionOnFoodWasteDataProvider()
         {
-            var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            IHouseholdDataRepository sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
-                .Return(new List<HouseholdMemberProxy>(0))
-                .Repeat.Any();
+            string mailAddress = _fixture.Create<string>();
+            sut.HouseholdMemberGetByMailAddress(mailAddress);
 
-            var householdDataRepository = new HouseholdDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(householdDataRepository, Is.Not.Null);
-
-            var mailAddress = fixture.Create<string>();
-            householdDataRepository.HouseholdMemberGetByMailAddress(mailAddress);
-
-            foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Matches(cmd => cmd.CommandText == string.Format("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE MailAddress='{0}'", mailAddress))));
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT HouseholdMemberIdentifier,MailAddress,Membership,MembershipExpireTime,ActivationCode,ActivationTime,PrivacyPolicyAcceptedTime,CreationTime FROM HouseholdMembers WHERE MailAddress=@mailAddress")
+                .AddVarCharDataParameter("@mailAddress", mailAddress, 128)
+                .Build();
+            _foodWasteDataProviderMock.AssertWasCalled(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -115,19 +120,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatHouseholdMemberGetByMailAddressReturnsHouseholdMemberWhenHouseholdMemberWasFoundByFoodWasteDataProvider()
         {
-            var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdMemberProxy householdMemberProxy = new HouseholdMemberProxy();
 
-            var householdMemberProxy = new HouseholdMemberProxy();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
-                .Return(new List<HouseholdMemberProxy> {householdMemberProxy})
-                .Repeat.Any();
+            IHouseholdDataRepository sut = CreateSut(new List<HouseholdMemberProxy> {householdMemberProxy});
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataRepository = new HouseholdDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(householdDataRepository, Is.Not.Null);
-
-            var result = householdDataRepository.HouseholdMemberGetByMailAddress(fixture.Create<string>());
+            IHouseholdMember result = sut.HouseholdMemberGetByMailAddress(_fixture.Create<string>());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(householdMemberProxy));
         }
@@ -138,18 +136,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatHouseholdMemberGetByMailAddressReturnsNullWhenHouseholdMemberWasNotFoundByFoodWasteDataProvider()
         {
-            var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            IHouseholdDataRepository sut = CreateSut(new List<HouseholdMemberProxy>(0));
+            Assert.That(sut, Is.Not.Null);
 
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
-                .Return(new List<HouseholdMemberProxy>(0))
-                .Repeat.Any();
-
-            var householdDataRepository = new HouseholdDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(householdDataRepository, Is.Not.Null);
-
-            var result = householdDataRepository.HouseholdMemberGetByMailAddress(fixture.Create<string>());
+            IHouseholdMember result = sut.HouseholdMemberGetByMailAddress(_fixture.Create<string>());
             Assert.That(result, Is.Null);
         }
 
@@ -159,22 +149,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatHouseholdMemberGetByMailAddressThrowsIntranetRepositoryExceptionWhenIntranetRepositoryExceptionOccurs()
         {
-            var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            IntranetRepositoryException exceptionToThrow = _fixture.Create<IntranetRepositoryException>();
 
-            var exceptionToThrow = fixture.Create<IntranetRepositoryException>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            IHouseholdDataRepository sut = CreateSut(exception: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataRepository = new HouseholdDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(householdDataRepository, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => householdDataRepository.HouseholdMemberGetByMailAddress(fixture.Create<string>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception, Is.EqualTo(exceptionToThrow));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.HouseholdMemberGetByMailAddress(_fixture.Create<string>()));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.EqualTo(exceptionToThrow));
         }
 
         /// <summary>
@@ -183,25 +165,36 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         [Test]
         public void TestThatHouseholdMemberGetByMailAddressThrowsIntranetRepositoryExceptionWhenExceptionOccurs()
         {
-            var fixture = new Fixture();
-            var foodWasteObjectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            Exception exceptionToThrow = _fixture.Create<Exception>();
 
-            var exceptionToThrow = fixture.Create<Exception>();
-            var foodWasteDataProviderMock = MockRepository.GenerateMock<IFoodWasteDataProvider>();
-            foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
-                .Throw(exceptionToThrow)
-                .Repeat.Any();
+            IHouseholdDataRepository sut = CreateSut(exception: exceptionToThrow);
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataRepository = new HouseholdDataRepository(foodWasteDataProviderMock, foodWasteObjectMapperMock);
-            Assert.That(householdDataRepository, Is.Not.Null);
+            IntranetRepositoryException result = Assert.Throws<IntranetRepositoryException>(() => sut.HouseholdMemberGetByMailAddress(_fixture.Create<string>()));
 
-            var exception = Assert.Throws<IntranetRepositoryException>(() => householdDataRepository.HouseholdMemberGetByMailAddress(fixture.Create<string>()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, "HouseholdMemberGetByMailAddress", exceptionToThrow.Message)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.EqualTo(exceptionToThrow));
+            TestHelper.AssertIntranetRepositoryExceptionIsValid(result, exceptionToThrow, ExceptionMessage.RepositoryError, "HouseholdMemberGetByMailAddress", exceptionToThrow.Message);
+        }
+
+        /// <summary>
+        /// Creates an instance of the <see cref="HouseholdDataRepository"/> for unit testing.
+        /// </summary>
+        /// <returns>Instance of the <see cref="HouseholdDataRepository"/> for unit testing.</returns>
+        private IHouseholdDataRepository CreateSut(IEnumerable<HouseholdMemberProxy> householdMemberProxyCollection = null, Exception exception = null)
+        {
+            if (exception == null)
+            {
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
+                    .Return(householdMemberProxyCollection ?? new List<HouseholdMemberProxy>(0))
+                    .Repeat.Any();
+            }
+            else
+            {
+                _foodWasteDataProviderMock.Stub(m => m.GetCollection<HouseholdMemberProxy>(Arg<MySqlCommand>.Is.Anything))
+                    .Throw(exception)
+                    .Repeat.Any();
+            }
+
+            return new HouseholdDataRepository(_foodWasteDataProviderMock, _foodWasteObjectMapperMock);
         }
     }
 }

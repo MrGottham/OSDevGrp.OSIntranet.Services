@@ -241,7 +241,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<ForeignKeyProxy>(DataRepositoryHelper.GetSqlCommandForSelectingForeignKeys(identifiableDomainObject.Identifier.Value));
+                    return DataProvider.GetCollection<ForeignKeyProxy>(ForeignKeyProxy.BuildSystemDataCommandForSelecting("WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier", systemDataCommandBuilder => systemDataCommandBuilder.AddForeignKeyForIdentifierParameter(identifiableDomainObject.Identifier.Value)));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }
@@ -408,7 +408,7 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
             {
                 if (identifiableDomainObject.Identifier.HasValue)
                 {
-                    return DataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlCommandForSelectingTranslations(identifiableDomainObject.Identifier.Value));
+                    return DataProvider.GetCollection<TranslationProxy>(TranslationProxy.BuildSystemDataCommandForSelecting("WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName", systemDataCommandBuilder => systemDataCommandBuilder.AddTranslationOfIdentifierParameter(identifiableDomainObject.Identifier.Value)));
                 }
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, identifiableDomainObject.Identifier, "Identifier"));
             }
@@ -423,9 +423,9 @@ namespace OSDevGrp.OSIntranet.Repositories.FoodWaste
         }
 
         /// <summary>
-        /// Gets all the translation informations which can be used for translation.
+        /// Gets all the translation information which can be used for translation.
         /// </summary>
-        /// <returns>All the translation informations which can be used for translation.</returns>
+        /// <returns>All the translation information which can be used for translation.</returns>
         public virtual IEnumerable<ITranslationInfo> TranslationInfoGetAll()
         {
             try

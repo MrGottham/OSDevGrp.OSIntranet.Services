@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
@@ -229,7 +230,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 Assert.That(sut.Description, Is.Null);
             }
-            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("HouseholdIdentifier")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Name")), opt => opt.Repeat.Once());
@@ -245,7 +246,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 dataReader.AssertWasNotCalled(m => m.GetString(Arg<int>.Is.Equal(2)));
             }
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
         }
@@ -754,7 +755,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 Assert.That(result.Description, Is.Null);
             }
-            Assert.That(result.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(result.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("HouseholdIdentifier")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("Name")), opt => opt.Repeat.Once());
@@ -770,7 +771,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             {
                 dataReader.AssertWasNotCalled(m => m.GetString(Arg<int>.Is.Equal(2)));
             }
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
         }
@@ -823,8 +824,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderStub.Stub(m => m.GetString(Arg<int>.Is.Equal(2)))
                 .Return(description ?? _fixture.Create<string>())
                 .Repeat.Any();
-            mySqlDataReaderStub.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return((creationTime ?? DateTime.Now).ToUniversalTime())
+            mySqlDataReaderStub.Stub(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")))
+                .Return(new MySqlDateTime((creationTime ?? DateTime.Now).ToUniversalTime()))
                 .Repeat.Any();
             return mySqlDataReaderStub;
         }

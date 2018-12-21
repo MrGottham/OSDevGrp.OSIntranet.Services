@@ -5,7 +5,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// <summary>
     /// Internal builder which can build a MySQL command for SQL statements used by the <see cref="DataProviders.FoodWasteDataProvider"/>.
     /// </summary>
-    internal class FoodWasteCommandBuilder : MySqlCommandBuilderBase
+    internal abstract class FoodWasteCommandBuilder : MySqlCommandBuilderBase
     {
         #region Constructor
 
@@ -15,7 +15,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <param name="sqlStatement">The SQL statement for the MySQL command.</param>
         /// <param name="timeout">Wait time (in seconds) before terminating the attempt to execute a command and generating an error.</param>
         /// <exception cref="System.ArgumentNullException">Thrown when the <paramref name="sqlStatement"/> is null, empty or white space.</exception>
-        internal FoodWasteCommandBuilder(string sqlStatement, int timeout = 30)
+        protected FoodWasteCommandBuilder(string sqlStatement, int timeout = 30)
             : base(sqlStatement, timeout)
         {
         }

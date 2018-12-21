@@ -1,6 +1,7 @@
 ﻿using System;
 using AutoFixture;
 using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -164,7 +165,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 Assert.That(sut.Description, Is.Null);
             }
             Assert.That(sut.Temperature, Is.EqualTo(temperature));
-            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("StorageIdentifier")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")), opt => opt.Repeat.Once());
@@ -181,7 +182,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 dataReader.AssertWasNotCalled(m => m.GetString(Arg<int>.Is.Equal(4)));
             }
             dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")), opt => opt.Repeat.Once());
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
 
@@ -503,7 +504,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 Assert.That(result.Description, Is.Null);
             }
             Assert.That(result.Temperature, Is.EqualTo(temperature));
-            Assert.That(result.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(result.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("StorageIdentifier")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("SortOrder")), opt => opt.Repeat.Once());
@@ -520,7 +521,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 dataReader.AssertWasNotCalled(m => m.GetString(Arg<int>.Is.Equal(4)));
             }
             dataReader.AssertWasCalled(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")), opt => opt.Repeat.Once());
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
 
@@ -608,8 +609,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderStub.Stub(m => m.GetInt16(Arg<string>.Is.Equal("Temperature")))
                 .Return((short) (temperature ?? GetLegalTemperature(DomainObjectMockBuilder.BuildIntRange())))
                 .Repeat.Any();
-            mySqlDataReaderStub.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return((creationTime ?? DateTime.Now).ToUniversalTime())
+            mySqlDataReaderStub.Stub(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")))
+                .Return(new MySqlDateTime((creationTime ?? DateTime.Now).ToUniversalTime()))
                 .Repeat.Any();
             return mySqlDataReaderStub;
         }

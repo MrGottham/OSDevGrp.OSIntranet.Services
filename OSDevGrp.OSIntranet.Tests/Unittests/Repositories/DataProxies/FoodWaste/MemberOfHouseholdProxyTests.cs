@@ -1,6 +1,7 @@
 ﻿using System;
 using AutoFixture;
 using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -195,10 +196,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Household, Is.EqualTo(householdProxy));
             Assert.That(sut.HouseholdIdentifier, Is.Not.Null);
             Assert.That(sut.HouseholdIdentifier, Is.EqualTo(householdIdentifier));
-            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString("MemberOfHouseholdIdentifier"), opt => opt.Repeat.Once());
-            dataReader.AssertWasCalled(m => m.GetDateTime("CreationTime"), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime("CreationTime"), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
 
@@ -453,8 +454,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("HouseholdIdentifier")))
                 .Return(householdIdentifier.HasValue ? householdIdentifier.Value.ToString("D").ToUpper() : Guid.NewGuid().ToString("D").ToUpper())
                 .Repeat.Any();
-            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return((creationTime ?? DateTime.Now).ToUniversalTime())
+            mySqlDataReaderMock.Stub(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")))
+                .Return(new MySqlDateTime((creationTime ?? DateTime.Now).ToUniversalTime()))
                 .Repeat.Any();
             return mySqlDataReaderMock;
         }

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers;
 using OSDevGrp.OSIntranet.CommandHandlers.Dispatchers;
@@ -15,7 +16,6 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
@@ -518,7 +518,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers
                     Assert.That(householdMember.IsActivated, Is.False);
                     Assert.That(householdMember.PrivacyPolicyAcceptedTime, Is.Null);
                     Assert.That(householdMember.PrivacyPolicyAcceptedTime.HasValue, Is.False);
-                    Assert.That(householdMember.IsPrivacyPolictyAccepted, Is.False);
+                    Assert.That(householdMember.IsPrivacyPolicyAccepted, Is.False);
                     Assert.That(householdMember.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
                     Assert.That(householdMember.Households, Is.Not.Null);
                     Assert.That(householdMember.Households, Is.Empty);

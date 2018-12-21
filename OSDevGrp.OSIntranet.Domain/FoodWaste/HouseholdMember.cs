@@ -8,6 +8,7 @@ using System.Text;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Domain.FoodWaste
@@ -61,14 +62,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="domainObjectValidations">Implementation for common validations used by domain objects in the food waste domain.</param>
         protected HouseholdMember(string mailAddress, Membership membership, DateTime? membershipExpireTime, string activationCode, DateTime creationTime, IDomainObjectValidations domainObjectValidations = null)
         {
-            if (string.IsNullOrEmpty(mailAddress))
-            {
-                throw new ArgumentNullException(nameof(mailAddress));
-            }
-            if (string.IsNullOrEmpty(activationCode))
-            {
-                throw new ArgumentNullException(nameof(activationCode));
-            }
+            ArgumentNullGuard.NotNullOrWhiteSpace(mailAddress, nameof(mailAddress))
+                .NotNullOrWhiteSpace(activationCode, nameof(activationCode));
 
             _domainObjectValidations = domainObjectValidations ?? DomainObjectValidations.Create();
             if (_domainObjectValidations.IsMailAddress(mailAddress) == false)
@@ -100,14 +95,13 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             get => _mailAddress;
             protected set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
                 if (_domainObjectValidations.IsMailAddress(value) == false)
                 {
                     throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, value, "value"));
                 }
+
                 _mailAddress = value;
             }
         }
@@ -199,10 +193,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             get => _activationCode;
             protected set
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
                 _activationCode = value;
             }
         }
@@ -219,7 +211,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <summary>
         /// Indicates whether the household member is activated.
         /// </summary>
-        public virtual bool IsActivated => ActivationTime.HasValue && ActivationTime.Value <= DateTime.Now;
+        public virtual bool IsActivated => ActivationTime.HasValue && ActivationTime.Value.Date <= DateTime.Today;
 
         /// <summary>
         /// Date and time for when the household member has accepted our privacy policy.
@@ -233,7 +225,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <summary>
         /// Indicates whether the household member has accepted our privacy policy.
         /// </summary>
-        public virtual bool IsPrivacyPolictyAccepted => PrivacyPolicyAcceptedTime.HasValue && PrivacyPolicyAcceptedTime.Value <= DateTime.Now;
+        public virtual bool IsPrivacyPolicyAccepted => PrivacyPolicyAcceptedTime.HasValue && PrivacyPolicyAcceptedTime.Value.Date <= DateTime.Today;
 
         /// <summary>
         /// Indicates whether the household member has reached the household limit.
@@ -271,14 +263,13 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             get => _households;
             protected set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
                 if (value.Count() > _domainObjectValidations.GetHouseholdLimit(Membership))
                 {
                     throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached));
                 }
+
                 _households = value.ToList();
             }
         }
@@ -291,10 +282,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
             get => _payments;
             protected set
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
                 _payments = value.ToList();
             }
         }
@@ -352,14 +341,13 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="household">Household on which the household member has a membership.</param>
         public virtual void HouseholdAdd(IHousehold household)
         {
-            if (household == null)
-            {
-                throw new ArgumentNullException(nameof(household));
-            }
+            ArgumentNullGuard.NotNull(household, nameof(household));
+
             if (_domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count()))
             {
                 throw new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached));
             }
+
             _households.Add(household);
             if (household.HouseholdMembers.Contains(this))
             {
@@ -375,11 +363,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <returns>Household where the membership for the household member has been removed.</returns>
         public virtual IHousehold HouseholdRemove(IHousehold household)
         {
-            if (household == null)
-            {
-                throw new ArgumentNullException(nameof(household));
-            }
-            
+            ArgumentNullGuard.NotNull(household, nameof(household));
+
             var householdToRemove = Households.SingleOrDefault(household.Equals);
             if (householdToRemove == null)
             {
@@ -400,10 +385,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="payment">Payment made by the household member.</param>
         public virtual void PaymentAdd(IPayment payment)
         {
-            if (payment == null)
-            {
-                throw new ArgumentNullException(nameof(payment));
-            }
+            ArgumentNullGuard.NotNull(payment, nameof(payment));
+
             _payments.Add(payment);
         }
 
@@ -415,10 +398,8 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="translatePayments">Indicates whether to make translation for all payments made by the household member.</param>
         public virtual void Translate(CultureInfo translationCulture, bool translateHouseholds, bool translatePayments = true)
         {
-            if (translationCulture == null)
-            {
-                throw new ArgumentNullException(nameof(translationCulture));
-            }
+            ArgumentNullGuard.NotNull(translationCulture, nameof(translationCulture));
+
             if (translateHouseholds)
             {
                 foreach (var household in Households)

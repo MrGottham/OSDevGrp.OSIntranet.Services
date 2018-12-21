@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
-using OSDevGrp.OSIntranet.Repositories.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -120,9 +120,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         /// <returns>SQL statement for getting this translation of a domain object.</returns>
         public virtual MySqlCommand CreateGetCommand()
         {
-            return new SystemDataCommandBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier WHERE t.TranslationIdentifier=@translationIdentifier")
-                .AddTranslationIdentifierParameter(Identifier)
-                .Build();
+            return BuildSystemDataCommandForSelecting("WHERE t.TranslationIdentifier=@translationIdentifier", systemDataCommandBuilder => systemDataCommandBuilder.AddTranslationIdentifierParameter(Identifier));
         }
 
         /// <summary>
@@ -180,8 +178,32 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
 
             using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<TranslationProxy>(DataRepositoryHelper.GetSqlCommandForSelectingTranslations(translationOfIdentifier));
+                return subDataProvider.GetCollection<TranslationProxy>(BuildSystemDataCommandForSelecting("WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName", systemDataCommandBuilder => systemDataCommandBuilder.AddTranslationOfIdentifierParameter(translationOfIdentifier)));
             }
+        }
+
+        /// <summary>
+        /// Creates a MySQL command selecting a collection of <see cref="TranslationProxy"/>.
+        /// </summary>
+        /// <param name="whereClause">The WHERE clause which the MySQL command should use.</param>
+        /// <param name="parameterAdder">The callback to add MySQL parameters to the MySQL command.</param>
+        /// <returns>MySQL command selecting a collection of <see cref="TranslationProxy"/>.</returns>
+        internal static MySqlCommand BuildSystemDataCommandForSelecting(string whereClause = null, Action<SystemDataCommandBuilder> parameterAdder = null)
+        {
+            StringBuilder selectStatementBuilder = new StringBuilder("SELECT t.TranslationIdentifier AS TranslationIdentifier,t.OfIdentifier AS OfIdentifier,ti.TranslationInfoIdentifier AS InfoIdentifier,ti.CultureName AS CultureName,t.Value AS Value FROM Translations AS t INNER JOIN TranslationInfos AS ti ON ti.TranslationInfoIdentifier=t.InfoIdentifier");
+            if (string.IsNullOrWhiteSpace(whereClause) == false)
+            {
+                selectStatementBuilder.Append($" {whereClause}");
+            }
+
+            SystemDataCommandBuilder systemDataCommandBuilder = new SystemDataCommandBuilder(selectStatementBuilder.ToString());
+            if (parameterAdder == null)
+            {
+                return systemDataCommandBuilder.Build();
+            }
+
+            parameterAdder(systemDataCommandBuilder);
+            return systemDataCommandBuilder.Build();
         }
 
         /// <summary>

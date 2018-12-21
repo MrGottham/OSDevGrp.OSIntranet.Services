@@ -108,9 +108,9 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste
         IEnumerable<ITranslation> TranslationsForDomainObjectGet(IIdentifiable identifiableDomainObject);
 
         /// <summary>
-        /// Gets all the translation informations which can be used for translation.
+        /// Gets all the translation information which can be used for translation.
         /// </summary>
-        /// <returns>All the translation informations which can be used for translation.</returns>
+        /// <returns>All the translation information which can be used for translation.</returns>
         IEnumerable<ITranslationInfo> TranslationInfoGetAll();
     }
 }

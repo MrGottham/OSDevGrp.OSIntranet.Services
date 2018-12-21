@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -59,7 +60,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.IsActivated, Is.False);
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.False);
-            Assert.That(sut.IsPrivacyPolictyAccepted, Is.False);
+            Assert.That(sut.IsPrivacyPolicyAccepted, Is.False);
             Assert.That(sut.CreationTime, Is.EqualTo(DateTime.MinValue));
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
@@ -308,7 +309,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             if (membershipExpireTime.HasValue)
             {
                 Assert.That(sut.MembershipExpireTime, Is.Not.Null);
-                Assert.That(sut.MembershipExpireTime, Is.EqualTo(membershipExpireTime.Value));
+                Assert.That(sut.MembershipExpireTime, Is.EqualTo(membershipExpireTime.Value).Within(1).Milliseconds);
             }
             else
             {
@@ -321,7 +322,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             if (activationTime.HasValue)
             {
                 Assert.That(sut.ActivationTime, Is.Not.Null);
-                Assert.That(sut.ActivationTime, Is.EqualTo(activationTime.Value));
+                Assert.That(sut.ActivationTime, Is.EqualTo(activationTime.Value).Within(1).Milliseconds);
             }
             else
             {
@@ -331,14 +332,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             if (privacyPolicyAcceptedTime.HasValue)
             {
                 Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Not.Null);
-                Assert.That(sut.PrivacyPolicyAcceptedTime, Is.EqualTo(privacyPolicyAcceptedTime.Value));
+                Assert.That(sut.PrivacyPolicyAcceptedTime, Is.EqualTo(privacyPolicyAcceptedTime.Value).Within(1).Milliseconds);
             }
             else
             {
                 Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Null);
                 Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.False);
             }
-            Assert.That(sut.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(sut.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("HouseholdMemberIdentifier")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("MailAddress")), opt => opt.Repeat.Once());
@@ -347,34 +348,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
             if (membershipExpireTime.HasValue)
             {
-                dataReader.AssertWasCalled(m => m.GetDateTime(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
             }
             else
             {
-                dataReader.AssertWasNotCalled(m => m.GetDateTime(Arg<int>.Is.Equal(3)));
+                dataReader.AssertWasNotCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(3)));
             }
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("ActivationCode")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("ActivationTime")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(5)), opt => opt.Repeat.Once());
             if (activationTime.HasValue)
             {
-                dataReader.AssertWasCalled(m => m.GetDateTime(Arg<int>.Is.Equal(5)), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(5)), opt => opt.Repeat.Once());
             }
             else
             {
-                dataReader.AssertWasNotCalled(m => m.GetDateTime(Arg<int>.Is.Equal(5)));
+                dataReader.AssertWasNotCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(5)));
             }
             dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("PrivacyPolicyAcceptedTime")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
             if (privacyPolicyAcceptedTime.HasValue)
             {
-                dataReader.AssertWasCalled(m => m.GetDateTime(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
             }
             else
             {
-                dataReader.AssertWasNotCalled(m => m.GetDateTime(Arg<int>.Is.Equal(6)));
+                dataReader.AssertWasNotCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(6)));
             }
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
         }
@@ -971,7 +972,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             if (membershipExpireTime.HasValue)
             {
                 Assert.That(result.MembershipExpireTime, Is.Not.Null);
-                Assert.That(result.MembershipExpireTime, Is.EqualTo(membershipExpireTime.Value));
+                Assert.That(result.MembershipExpireTime, Is.EqualTo(membershipExpireTime.Value).Within(1).Milliseconds);
             }
             else
             {
@@ -984,7 +985,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             if (activationTime.HasValue)
             {
                 Assert.That(result.ActivationTime, Is.Not.Null);
-                Assert.That(result.ActivationTime, Is.EqualTo(activationTime.Value));
+                Assert.That(result.ActivationTime, Is.EqualTo(activationTime.Value).Within(1).Milliseconds);
             }
             else
             {
@@ -994,14 +995,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             if (privacyPolicyAcceptedTime.HasValue)
             {
                 Assert.That(result.PrivacyPolicyAcceptedTime, Is.Not.Null);
-                Assert.That(result.PrivacyPolicyAcceptedTime, Is.EqualTo(privacyPolicyAcceptedTime.Value));
+                Assert.That(result.PrivacyPolicyAcceptedTime, Is.EqualTo(privacyPolicyAcceptedTime.Value).Within(1).Milliseconds);
             }
             else
             {
                 Assert.That(result.PrivacyPolicyAcceptedTime, Is.Null);
                 Assert.That(result.PrivacyPolicyAcceptedTime.HasValue, Is.False);
             }
-            Assert.That(result.CreationTime, Is.EqualTo(creationTime));
+            Assert.That(result.CreationTime, Is.EqualTo(creationTime).Within(1).Milliseconds);
 
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("HouseholdMemberIdentifier")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("MailAddress")), opt => opt.Repeat.Once());
@@ -1010,34 +1011,34 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
             if (membershipExpireTime.HasValue)
             {
-                dataReader.AssertWasCalled(m => m.GetDateTime(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(3)), opt => opt.Repeat.Once());
             }
             else
             {
-                dataReader.AssertWasNotCalled(m => m.GetDateTime(Arg<int>.Is.Equal(3)));
+                dataReader.AssertWasNotCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(3)));
             }
             dataReader.AssertWasCalled(m => m.GetString(Arg<string>.Is.Equal("ActivationCode")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("ActivationTime")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(5)), opt => opt.Repeat.Once());
             if (activationTime.HasValue)
             {
-                dataReader.AssertWasCalled(m => m.GetDateTime(Arg<int>.Is.Equal(5)), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(5)), opt => opt.Repeat.Once());
             }
             else
             {
-                dataReader.AssertWasNotCalled(m => m.GetDateTime(Arg<int>.Is.Equal(5)));
+                dataReader.AssertWasNotCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(5)));
             }
             dataReader.AssertWasCalled(m => m.GetOrdinal(Arg<string>.Is.Equal("PrivacyPolicyAcceptedTime")), opt => opt.Repeat.Once());
             dataReader.AssertWasCalled(m => m.IsDBNull(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
             if (privacyPolicyAcceptedTime.HasValue)
             {
-                dataReader.AssertWasCalled(m => m.GetDateTime(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
+                dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(6)), opt => opt.Repeat.Once());
             }
             else
             {
-                dataReader.AssertWasNotCalled(m => m.GetDateTime(Arg<int>.Is.Equal(6)));
+                dataReader.AssertWasNotCalled(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(6)));
             }
-            dataReader.AssertWasCalled(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
+            dataReader.AssertWasCalled(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")), opt => opt.Repeat.Once());
 
             dataProvider.AssertWasNotCalled(m => m.Clone());
         }
@@ -1101,8 +1102,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderMock.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(3)))
                 .Return(membershipExpireTime.HasValue == false)
                 .Repeat.Any();
-            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<int>.Is.Equal(3)))
-                .Return((membershipExpireTime ?? DateTime.Now).ToUniversalTime())
+            mySqlDataReaderMock.Stub(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(3)))
+                .Return(new MySqlDateTime((membershipExpireTime ?? DateTime.Now).ToUniversalTime()))
                 .Repeat.Any();
             mySqlDataReaderMock.Stub(m => m.GetString(Arg<string>.Is.Equal("ActivationCode")))
                 .Return(activationCode ?? _fixture.Create<string>())
@@ -1113,8 +1114,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderMock.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(5)))
                 .Return(activationTime.HasValue == false)
                 .Repeat.Any();
-            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<int>.Is.Equal(5)))
-                .Return((activationTime ?? DateTime.Now).ToUniversalTime())
+            mySqlDataReaderMock.Stub(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(5)))
+                .Return(new MySqlDateTime((activationTime ?? DateTime.Now).ToUniversalTime()))
                 .Repeat.Any();
             mySqlDataReaderMock.Stub(m => m.GetOrdinal(Arg<string>.Is.Equal("PrivacyPolicyAcceptedTime")))
                 .Return(6)
@@ -1122,11 +1123,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             mySqlDataReaderMock.Stub(m => m.IsDBNull(Arg<int>.Is.Equal(6)))
                 .Return(privacyPolicyAcceptedTime.HasValue == false)
                 .Repeat.Any();
-            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<int>.Is.Equal(6)))
-                .Return((privacyPolicyAcceptedTime ?? DateTime.Now).ToUniversalTime())
+            mySqlDataReaderMock.Stub(m => m.GetMySqlDateTime(Arg<int>.Is.Equal(6)))
+                .Return(new MySqlDateTime((privacyPolicyAcceptedTime ?? DateTime.Now).ToUniversalTime()))
                 .Repeat.Any();
-            mySqlDataReaderMock.Stub(m => m.GetDateTime(Arg<string>.Is.Equal("CreationTime")))
-                .Return((creationTime ?? DateTime.Now).ToUniversalTime())
+            mySqlDataReaderMock.Stub(m => m.GetMySqlDateTime(Arg<string>.Is.Equal("CreationTime")))
+                .Return(new MySqlDateTime((creationTime ?? DateTime.Now).ToUniversalTime()))
                 .Repeat.Any();
             return mySqlDataReaderMock;
         }
