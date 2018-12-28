@@ -54,6 +54,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.Membership, Is.EqualTo(Membership.Basic));
             Assert.That(sut.MembershipExpireTime, Is.Null);
             Assert.That(sut.MembershipExpireTime.HasValue, Is.False);
+            Assert.That(sut.MembershipHasExpired, Is.True);
+            Assert.That(sut.CanRenewMembership, Is.False);
+            Assert.That(sut.CanUpgradeMembership, Is.True);
             Assert.That(sut.ActivationCode, Is.Null);
             Assert.That(sut.ActivationTime, Is.Null);
             Assert.That(sut.ActivationTime.HasValue, Is.False);
@@ -61,7 +64,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.PrivacyPolicyAcceptedTime, Is.Null);
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.False);
             Assert.That(sut.IsPrivacyPolicyAccepted, Is.False);
+            Assert.That(sut.HasReachedHouseholdLimit, Is.False);
+            Assert.That(sut.CanCreateStorage, Is.False);
+            Assert.That(sut.CanUpdateStorage, Is.True);
+            Assert.That(sut.CanDeleteStorage, Is.False);
             Assert.That(sut.CreationTime, Is.EqualTo(DateTime.MinValue));
+            Assert.That(sut.UpgradeableMemberships, Is.Not.Null);
+            Assert.That(sut.UpgradeableMemberships, Is.Not.Empty);
+            Assert.That(sut.UpgradeableMemberships.Count(), Is.EqualTo(2));
+            Assert.That(sut.UpgradeableMemberships.Contains(Membership.Basic), Is.False);
+            Assert.That(sut.UpgradeableMemberships.Contains(Membership.Deluxe), Is.True);
+            Assert.That(sut.UpgradeableMemberships.Contains(Membership.Premium), Is.True);
             Assert.That(sut.Households, Is.Not.Null);
             Assert.That(sut.Households, Is.Empty);
             Assert.That(sut.Payments, Is.Not.Null);

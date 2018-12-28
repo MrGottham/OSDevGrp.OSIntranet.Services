@@ -66,6 +66,21 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         bool HasReachedHouseholdLimit { get; }
 
         /// <summary>
+        /// Indicates whether the household member can create new a new storage.
+        /// </summary>
+        bool CanCreateStorage { get; }
+
+        /// <summary>
+        /// Indicates whether the household member can update an existing storage.
+        /// </summary>
+        bool CanUpdateStorage { get; }
+
+        /// <summary>
+        /// Indicates whether the household member can delete an existing storage.
+        /// </summary>
+        bool CanDeleteStorage { get; }
+
+        /// <summary>
         /// Date and time for when the household member was created.
         /// </summary>
         DateTime CreationTime { get; }

@@ -212,6 +212,9 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.PrivacyPolicyAcceptedTime, opt => opt.MapFrom(s => s.PrivacyPolicyAcceptedTime))
                     .ForMember(m => m.IsPrivacyPolicyAccepted, opt => opt.MapFrom(s => s.IsPrivacyPolicyAccepted))
                     .ForMember(m => m.HasReachedHouseholdLimit, opt => opt.MapFrom(s => s.HasReachedHouseholdLimit))
+                    .ForMember(m => m.CanCreateStorage, opt => opt.MapFrom(s => s.CanCreateStorage))
+                    .ForMember(m => m.CanUpdateStorage, opt => opt.MapFrom(s => s.CanUpdateStorage))
+                    .ForMember(m => m.CanDeleteStorage, opt => opt.MapFrom(s => s.CanDeleteStorage))
                     .ForMember(m => m.UpgradeableMemberships, opt => opt.MapFrom(s => s.UpgradeableMemberships))
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
                     .ForMember(m => m.Households, opt => opt.MapFrom(s => s.Households))
@@ -707,7 +710,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
 
         #endregion
 
-        #region Properties
+        #region Methods
 
         /// <summary>
         /// Maps a source object to a destination object.

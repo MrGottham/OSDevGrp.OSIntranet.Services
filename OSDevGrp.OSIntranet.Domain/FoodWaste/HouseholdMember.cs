@@ -233,6 +233,21 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         public virtual bool HasReachedHouseholdLimit => _domainObjectValidations.HasReachedHouseholdLimit(Membership, Households.Count());
 
         /// <summary>
+        /// Indicates whether the household member can create new a new storage.
+        /// </summary>
+        public virtual bool CanCreateStorage => _domainObjectValidations.HasRequiredMembership(Membership, Membership.Deluxe);
+
+        /// <summary>
+        /// Indicates whether the household member can update an existing storage.
+        /// </summary>
+        public virtual bool CanUpdateStorage => _domainObjectValidations.HasRequiredMembership(Membership, Membership.Basic);
+
+        /// <summary>
+        /// Indicates whether the household member can delete an existing storage.
+        /// </summary>
+        public virtual bool CanDeleteStorage => _domainObjectValidations.HasRequiredMembership(Membership, Membership.Deluxe);
+
+        /// <summary>
         /// Date and time for when the household member was created.
         /// </summary>
         public virtual DateTime CreationTime

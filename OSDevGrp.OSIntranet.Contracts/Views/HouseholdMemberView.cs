@@ -65,6 +65,24 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         public bool HasReachedHouseholdLimit { get; set; }
 
         /// <summary>
+        /// Get or sets the identification of whether the household member can create new a new storage.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public bool CanCreateStorage { get; set; }
+
+        /// <summary>
+        /// Get or sets the identification of whether the household member can update an existing storage.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public bool CanUpdateStorage { get; set; }
+
+        /// <summary>
+        /// Get or sets the identification of whether the household member can delete an existing storage.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public bool CanDeleteStorage { get; set; }
+
+        /// <summary>
         /// Gets or sets the date and time for when the household member was created.
         /// </summary>
         [DataMember(IsRequired = true)]

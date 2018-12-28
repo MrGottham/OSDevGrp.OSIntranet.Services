@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.CommandHandlers.Core;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
+using OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces;
 using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Contracts.Responses;
 using OSDevGrp.OSIntranet.Contracts.Services;
+using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
@@ -28,12 +32,12 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         #endregion
 
         /// <summary>
-        /// Opsætning af tests.
+        /// Setup each tests.
         /// </summary>
         [SetUp]
         public void TestSetUp()
         {
-            var container = ContainerFactory.Create();
+            IContainer container = ContainerFactory.Create();
             _logicExecutor = container.Resolve<ILogicExecutor>();
             _householdDataRepository = container.Resolve<IHouseholdDataRepository>();
             _householdDataService = container.Resolve<IFoodWasteHouseholdDataService>();
@@ -45,40 +49,40 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
         [Test]
         public void TestHouseholdMemberCreationFlow()
         {
-            using (var executor = new ClaimsPrincipalTestExecutor())
+            using (ClaimsPrincipalTestExecutor executor = new ClaimsPrincipalTestExecutor())
             {
-                var translationInfoCollection = _householdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
+                IList<TranslationInfoSystemView> translationInfoCollection = new List<TranslationInfoSystemView>(_householdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery()));_householdDataService.TranslationInfoGetAll(new TranslationInfoCollectionGetQuery());
                 Assert.That(translationInfoCollection, Is.Not.Null);
                 Assert.That(translationInfoCollection, Is.Not.Empty);
 
-                var translationInfoIdentifier = translationInfoCollection.Take(1).First().TranslationInfoIdentifier;
+                Guid translationInfoIdentifier = translationInfoCollection.Take(1).First().TranslationInfoIdentifier;
 
-                var dataProviderWhoHandlesPaymentsCollectionGetQuery = new DataProviderWhoHandlesPaymentsCollectionGetQuery
+                DataProviderWhoHandlesPaymentsCollectionGetQuery dataProviderWhoHandlesPaymentsCollectionGetQuery = new DataProviderWhoHandlesPaymentsCollectionGetQuery
                 {
                     TranslationInfoIdentifier = translationInfoIdentifier
                 };
-                var dataProviderWhoHandlesPaymentsCollection = _householdDataService.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery);
+                IList<DataProviderView> dataProviderWhoHandlesPaymentsCollection = new List<DataProviderView>(_householdDataService.DataProviderWhoHandlesPaymentsCollectionGet(dataProviderWhoHandlesPaymentsCollectionGetQuery));
                 Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Null);
                 Assert.That(dataProviderWhoHandlesPaymentsCollection, Is.Not.Empty);
 
-                var dataProviderWhoHandlesPaymentsIdentifier = dataProviderWhoHandlesPaymentsCollection.Take(1).First().DataProviderIdentifier;
+                Guid dataProviderWhoHandlesPaymentsIdentifier = dataProviderWhoHandlesPaymentsCollection.Take(1).First().DataProviderIdentifier;
 
-                var householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(executor.MailAddress, translationInfoIdentifier);
+                Guid householdMemberIdentifier = _logicExecutor.HouseholdMemberAdd(executor.MailAddress, translationInfoIdentifier);
                 try
                 {
-                    var householdMemberIsCreated = _householdDataService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
+                    BooleanResultResponse householdMemberIsCreated = _householdDataService.HouseholdMemberIsCreated(new HouseholdMemberIsCreatedQuery());
                     Assert.That(householdMemberIsCreated, Is.Not.Null);
                     Assert.That(householdMemberIsCreated.Result, Is.True);
 
-                    var householdMemberIsActivated = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
+                    BooleanResultResponse householdMemberIsActivated = _householdDataService.HouseholdMemberIsActivated(new HouseholdMemberIsActivatedQuery());
                     Assert.That(householdMemberIsActivated, Is.Not.Null);
                     Assert.That(householdMemberIsActivated.Result, Is.False);
 
-                    var householdMemberActivateCommand = new HouseholdMemberActivateCommand
+                    HouseholdMemberActivateCommand householdMemberActivateCommand = new HouseholdMemberActivateCommand
                     {
                         ActivationCode = _householdDataRepository.Get<IHouseholdMember>(householdMemberIdentifier).ActivationCode
                     };
-                    var householdMemberActivate = _householdDataService.HouseholdMemberActivate(householdMemberActivateCommand);
+                    ServiceReceiptResponse householdMemberActivate = _householdDataService.HouseholdMemberActivate(householdMemberActivateCommand);
                     Assert.That(householdMemberActivate, Is.Not.Null);
                     Assert.That(householdMemberActivate.Identifier, Is.EqualTo(householdMemberIdentifier));
 
@@ -86,11 +90,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberIsActivated, Is.Not.Null);
                     Assert.That(householdMemberIsActivated.Result, Is.True);
 
-                    var householdMemberHasAcceptedPrivacyPolicy = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
+                    BooleanResultResponse householdMemberHasAcceptedPrivacyPolicy = _householdDataService.HouseholdMemberHasAcceptedPrivacyPolicy(new HouseholdMemberHasAcceptedPrivacyPolicyQuery());
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.False);
 
-                    var householdMemberAcceptPrivacyPolicy = _householdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand());
+                    ServiceReceiptResponse householdMemberAcceptPrivacyPolicy = _householdDataService.HouseholdMemberAcceptPrivacyPolicy(new HouseholdMemberAcceptPrivacyPolicyCommand());
                     Assert.That(householdMemberAcceptPrivacyPolicy, Is.Not.Null);
                     Assert.That(householdMemberAcceptPrivacyPolicy.Identifier, Is.EqualTo(householdMemberIdentifier));
 
@@ -98,11 +102,11 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy, Is.Not.Null);
                     Assert.That(householdMemberHasAcceptedPrivacyPolicy.Result, Is.True);
 
-                    var householdMemberDataGetQuery = new HouseholdMemberDataGetQuery
+                    HouseholdMemberDataGetQuery householdMemberDataGetQuery = new HouseholdMemberDataGetQuery
                     {
                         TranslationInfoIdentifier = translationInfoIdentifier
                     };
-                    var householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
+                    HouseholdMemberView householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
                     Assert.That(householdMemberData, Is.Not.Null);
                     Assert.That(householdMemberData.HouseholdMemberIdentifier, Is.EqualTo(householdMemberIdentifier));
                     Assert.That(householdMemberData.MailAddress, Is.Not.Null);
@@ -113,26 +117,33 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Membership, Is.EqualTo(Convert.ToString(Membership.Basic)));
                     Assert.That(householdMemberData.MembershipExpireTime, Is.Null);
                     Assert.That(householdMemberData.MembershipExpireTime.HasValue, Is.False);
+                    Assert.That(householdMemberData.CanRenewMembership, Is.False);
+                    Assert.That(householdMemberData.CanUpgradeMembership, Is.True);
                     Assert.That(householdMemberData.ActivationTime, Is.Not.Null);
-                    Assert.That(householdMemberData.ActivationTime.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdMemberData.ActivationTime.Value, Is.EqualTo(DateTime.Now).Within(5).Seconds);
-                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(householdMemberData.ActivationTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
                     Assert.That(householdMemberData.IsActivated, Is.True);
                     Assert.That(householdMemberData.PrivacyPolicyAcceptedTime, Is.Not.Null);
-                    Assert.That(householdMemberData.PrivacyPolicyAcceptedTime.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
                     Assert.That(householdMemberData.PrivacyPolicyAcceptedTime.Value, Is.EqualTo(DateTime.Now).Within(5).Seconds);
-                    // ReSharper restore PossibleInvalidOperationException
                     Assert.That(householdMemberData.IsPrivacyPolicyAccepted, Is.True);
+                    Assert.That(householdMemberData.HasReachedHouseholdLimit, Is.False);
+                    Assert.That(householdMemberData.CanCreateStorage, Is.False);
+                    Assert.That(householdMemberData.CanUpdateStorage, Is.True);
+                    Assert.That(householdMemberData.CanDeleteStorage, Is.False);
                     Assert.That(householdMemberData.CreationTime, Is.EqualTo(DateTime.Now).Within(5).Seconds);
+                    Assert.That(householdMemberData.Households, Is.Not.Null);
+                    Assert.That(householdMemberData.Households, Is.Empty);
+                    Assert.That(householdMemberData.UpgradeableMemberships, Is.Not.Null);
+                    Assert.That(householdMemberData.UpgradeableMemberships, Is.Not.Empty);
+                    Assert.That(householdMemberData.UpgradeableMemberships.Count(), Is.EqualTo(2));
+                    Assert.That(householdMemberData.UpgradeableMemberships.Contains("Deluxe"), Is.True);
+                    Assert.That(householdMemberData.UpgradeableMemberships.Contains("Premium"), Is.True);
                     Assert.That(householdMemberData.Households, Is.Not.Null);
                     Assert.That(householdMemberData.Households, Is.Empty);
                     Assert.That(householdMemberData.Payments, Is.Not.Null);
                     Assert.That(householdMemberData.Payments, Is.Empty);
 
-                    var householdMemberUpgradeMembershipToDeluxePaymentReference = Guid.NewGuid().ToString("D").ToUpper();
-                    var householdMemberUpgradeMembershipToDeluxeCommand = new HouseholdMemberUpgradeMembershipCommand
+                    string householdMemberUpgradeMembershipToDeluxePaymentReference = Guid.NewGuid().ToString("D").ToUpper();
+                    HouseholdMemberUpgradeMembershipCommand householdMemberUpgradeMembershipToDeluxeCommand = new HouseholdMemberUpgradeMembershipCommand
                     {
                         Membership = Membership.Deluxe.ToString(),
                         DataProviderIdentifier = dataProviderWhoHandlesPaymentsIdentifier,
@@ -140,7 +151,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                         PaymentReference = householdMemberUpgradeMembershipToDeluxePaymentReference,
                         PaymentReceipt = null
                     };
-                    var householdMemberUpgradeMembershipToDeluxe = _householdDataService.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipToDeluxeCommand);
+                    ServiceReceiptResponse householdMemberUpgradeMembershipToDeluxe = _householdDataService.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipToDeluxeCommand);
                     Assert.That(householdMemberUpgradeMembershipToDeluxe, Is.Not.Null);
                     Assert.That(householdMemberUpgradeMembershipToDeluxe.Identifier, Is.EqualTo(householdMemberIdentifier));
 
@@ -150,14 +161,20 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Membership, Is.Not.Empty);
                     Assert.That(householdMemberData.Membership, Is.EqualTo(Convert.ToString(Membership.Deluxe)));
                     Assert.That(householdMemberData.MembershipExpireTime, Is.Not.Null);
-                    Assert.That(householdMemberData.MembershipExpireTime.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdMemberData.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(5).Seconds);
-                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(householdMemberData.MembershipExpireTime, Is.EqualTo(DateTime.Now.AddYears(1)).Within(5).Seconds);
+                    Assert.That(householdMemberData.CanRenewMembership, Is.True);
+                    Assert.That(householdMemberData.CanUpgradeMembership, Is.True);
+                    Assert.That(householdMemberData.CanCreateStorage, Is.True);
+                    Assert.That(householdMemberData.CanUpdateStorage, Is.True);
+                    Assert.That(householdMemberData.CanDeleteStorage, Is.True);
+                    Assert.That(householdMemberData.UpgradeableMemberships, Is.Not.Null);
+                    Assert.That(householdMemberData.UpgradeableMemberships, Is.Not.Empty);
+                    Assert.That(householdMemberData.UpgradeableMemberships.Count(), Is.EqualTo(1));
+                    Assert.That(householdMemberData.UpgradeableMemberships.Contains("Premium"), Is.True);
                     Assert.That(householdMemberData.Payments, Is.Not.Null);
                     Assert.That(householdMemberData.Payments, Is.Not.Empty);
 
-                    var householdMemberUpgradeMembershipToDeluxePayment = householdMemberData.Payments.SingleOrDefault(m => string.Compare(m.PaymentReference, householdMemberUpgradeMembershipToDeluxePaymentReference, StringComparison.Ordinal) == 0);
+                    PaymentView householdMemberUpgradeMembershipToDeluxePayment = householdMemberData.Payments.SingleOrDefault(m => string.Compare(m.PaymentReference, householdMemberUpgradeMembershipToDeluxePaymentReference, StringComparison.Ordinal) == 0);
                     Assert.That(householdMemberUpgradeMembershipToDeluxePayment, Is.Not.Null);
                     Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentIdentifier, Is.Not.EqualTo(default(Guid)));
                     Assert.That(householdMemberUpgradeMembershipToDeluxePayment.Stakeholder, Is.Not.Null);
@@ -170,9 +187,9 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentReference, Is.EqualTo(householdMemberUpgradeMembershipToDeluxePaymentReference));
                     Assert.That(householdMemberUpgradeMembershipToDeluxePayment.PaymentReceipt, Is.Null);
 
-                    var householdMemberUpgradeMembershipToPremiumPaymentReference = Guid.NewGuid().ToString("D").ToUpper();
-                    var householdMemberUpgradeMembershipToPremiumPaymentReceipt = Convert.ToBase64String(Services.TestHelper.GetTestDocument().ToArray());
-                    var householdMemberUpgradeMembershipToPremiumCommand = new HouseholdMemberUpgradeMembershipCommand
+                    string householdMemberUpgradeMembershipToPremiumPaymentReference = Guid.NewGuid().ToString("D").ToUpper();
+                    string householdMemberUpgradeMembershipToPremiumPaymentReceipt = Convert.ToBase64String(Services.TestHelper.GetTestDocument().ToArray());
+                    HouseholdMemberUpgradeMembershipCommand householdMemberUpgradeMembershipToPremiumCommand = new HouseholdMemberUpgradeMembershipCommand
                     {
                         Membership = Membership.Premium.ToString(),
                         DataProviderIdentifier = dataProviderWhoHandlesPaymentsIdentifier,
@@ -180,7 +197,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                         PaymentReference = householdMemberUpgradeMembershipToPremiumPaymentReference,
                         PaymentReceipt = householdMemberUpgradeMembershipToPremiumPaymentReceipt
                     };
-                    var householdMemberUpgradeMembershipToPremium = _householdDataService.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipToPremiumCommand);
+                    ServiceReceiptResponse householdMemberUpgradeMembershipToPremium = _householdDataService.HouseholdMemberUpgradeMembership(householdMemberUpgradeMembershipToPremiumCommand);
                     Assert.That(householdMemberUpgradeMembershipToPremium, Is.Not.Null);
                     Assert.That(householdMemberUpgradeMembershipToPremium.Identifier, Is.EqualTo(householdMemberIdentifier));
 
@@ -190,14 +207,18 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberData.Membership, Is.Not.Empty);
                     Assert.That(householdMemberData.Membership, Is.EqualTo(Convert.ToString(Membership.Premium)));
                     Assert.That(householdMemberData.MembershipExpireTime, Is.Not.Null);
-                    Assert.That(householdMemberData.MembershipExpireTime.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdMemberData.MembershipExpireTime.Value, Is.EqualTo(DateTime.Now.AddYears(1)).Within(5).Seconds);
-                    // ReSharper restore PossibleInvalidOperationException
+                    Assert.That(householdMemberData.MembershipExpireTime, Is.EqualTo(DateTime.Now.AddYears(1)).Within(5).Seconds);
+                    Assert.That(householdMemberData.CanRenewMembership, Is.True);
+                    Assert.That(householdMemberData.CanUpgradeMembership, Is.False);
+                    Assert.That(householdMemberData.CanCreateStorage, Is.True);
+                    Assert.That(householdMemberData.CanUpdateStorage, Is.True);
+                    Assert.That(householdMemberData.CanDeleteStorage, Is.True);
+                    Assert.That(householdMemberData.UpgradeableMemberships, Is.Not.Null);
+                    Assert.That(householdMemberData.UpgradeableMemberships, Is.Empty);
                     Assert.That(householdMemberData.Payments, Is.Not.Null);
                     Assert.That(householdMemberData.Payments, Is.Not.Empty);
 
-                    var householdMemberUpgradeMembershipToPremiumPayment = householdMemberData.Payments.SingleOrDefault(m => string.Compare(m.PaymentReference, householdMemberUpgradeMembershipToPremiumPaymentReference, StringComparison.Ordinal) == 0);
+                    PaymentView householdMemberUpgradeMembershipToPremiumPayment = householdMemberData.Payments.SingleOrDefault(m => string.Compare(m.PaymentReference, householdMemberUpgradeMembershipToPremiumPaymentReference, StringComparison.Ordinal) == 0);
                     Assert.That(householdMemberUpgradeMembershipToPremiumPayment, Is.Not.Null);
                     Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentIdentifier, Is.Not.EqualTo(default(Guid)));
                     Assert.That(householdMemberUpgradeMembershipToPremiumPayment.Stakeholder, Is.Not.Null);
@@ -212,20 +233,17 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                     Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReceipt, Is.Not.Empty);
                     Assert.That(householdMemberUpgradeMembershipToPremiumPayment.PaymentReceipt, Is.EqualTo(householdMemberUpgradeMembershipToPremiumPaymentReceipt));
 
-                    var householdAddCommand = new HouseholdAddCommand
+                    HouseholdAddCommand householdAddCommand = new HouseholdAddCommand
                     {
                         Name = Guid.NewGuid().ToString("N"),
                         Description = null,
                         TranslationInfoIdentifier = translationInfoIdentifier
                     };
-                    var householdAddServiceReceipt1 = _householdDataService.HouseholdAdd(householdAddCommand);
+                    ServiceReceiptResponse householdAddServiceReceipt1 = _householdDataService.HouseholdAdd(householdAddCommand);
                     Assert.That(householdAddServiceReceipt1, Is.Not.Null);
                     Assert.That(householdAddServiceReceipt1.Identifier, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt1.Identifier.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
-                    Assert.That(householdAddServiceReceipt1.Identifier.Value, Is.Not.EqualTo(default(Guid)));
-                    // ReSharper restore PossibleInvalidOperationException
-
+                    Assert.That(householdAddServiceReceipt1.Identifier, Is.Not.EqualTo(default(Guid)));
+ 
                     householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
                     Assert.That(householdMemberData, Is.Not.Null);
                     Assert.That(householdMemberData.Households, Is.Not.Null);
@@ -239,13 +257,10 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Flows
                         Description = Guid.NewGuid().ToString("N"),
                         TranslationInfoIdentifier = translationInfoIdentifier
                     };
-                    var householdAddServiceReceipt2 = _householdDataService.HouseholdAdd(householdAddCommand);
+                    ServiceReceiptResponse householdAddServiceReceipt2 = _householdDataService.HouseholdAdd(householdAddCommand);
                     Assert.That(householdAddServiceReceipt2, Is.Not.Null);
                     Assert.That(householdAddServiceReceipt2.Identifier, Is.Not.Null);
-                    Assert.That(householdAddServiceReceipt2.Identifier.HasValue, Is.True);
-                    // ReSharper disable PossibleInvalidOperationException
                     Assert.That(householdAddServiceReceipt2.Identifier.Value, Is.Not.EqualTo(default(Guid)));
-                    // ReSharper restore PossibleInvalidOperationException
 
                     householdMemberData = _householdDataService.HouseholdMemberDataGet(householdMemberDataGetQuery);
                     Assert.That(householdMemberData, Is.Not.Null);

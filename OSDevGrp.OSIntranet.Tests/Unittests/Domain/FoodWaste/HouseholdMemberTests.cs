@@ -176,6 +176,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             Assert.That(sut.PrivacyPolicyAcceptedTime.HasValue, Is.False);
             Assert.That(sut.IsPrivacyPolicyAccepted, Is.False);
             Assert.That(sut.HasReachedHouseholdLimit, Is.False);
+            Assert.That(sut.CanCreateStorage, Is.False);
+            Assert.That(sut.CanUpdateStorage, Is.True);
+            Assert.That(sut.CanDeleteStorage, Is.False);
             Assert.That(sut.CreationTime, Is.EqualTo(DateTime.Now).Within(3).Seconds);
             Assert.That(sut.UpgradeableMemberships, Is.Not.Null);
             Assert.That(sut.UpgradeableMemberships, Is.Not.Empty);
@@ -1177,6 +1180,105 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             bool result = sut.HasReachedHouseholdLimit;
             Assert.That(result, Is.EqualTo(hasReachedHouseholdLimit));
+        }
+
+        /// <summary>
+        /// Tests that the getter for CanCreateStorage calls HasRequiredMembership on the common validations used by domain objects in the food waste domain..
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatCanCreateStorageGetterCallsHasRequiredMembershipOnDomainObjectValidations(Membership membership)
+        {
+            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
+
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?) null : DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Membership, Is.EqualTo(membership));
+            Assert.That(sut.CanCreateStorage, Is.AnyOf(true, false));
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.HasRequiredMembership(Arg<Membership>.Is.Equal(membership), Arg<Membership>.Is.Equal(Membership.Deluxe)));
+        }
+
+        /// <summary>
+        /// Tests that the getter for CanCreateStorage returns the result of HasRequiredMembership from the common validations used by domain objects in the food waste domain..
+        /// </summary>
+        [Test]
+        public void TestThatCanCreateStorageGetterReturnResultOfHasRequiredMembershipFromDomainObjectValidations()
+        {
+            bool hasRequiredMembership = _fixture.Create<bool>();
+            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(hasRequiredMembership: hasRequiredMembership);
+
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.CanCreateStorage, Is.EqualTo(hasRequiredMembership));
+        }
+
+        /// <summary>
+        /// Tests that the getter for CanUpdateStorage calls HasRequiredMembership on the common validations used by domain objects in the food waste domain..
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatCanUpdateStorageGetterCallsHasRequiredMembershipOnDomainObjectValidations(Membership membership)
+        {
+            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
+
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?)null : DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Membership, Is.EqualTo(membership));
+            Assert.That(sut.CanUpdateStorage, Is.AnyOf(true, false));
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.HasRequiredMembership(Arg<Membership>.Is.Equal(membership), Arg<Membership>.Is.Equal(Membership.Basic)));
+        }
+
+        /// <summary>
+        /// Tests that the getter for CanUpdateStorage returns the result of HasRequiredMembership from the common validations used by domain objects in the food waste domain..
+        /// </summary>
+        [Test]
+        public void TestThatCanUpdateStorageGetterReturnResultOfHasRequiredMembershipFromDomainObjectValidations()
+        {
+            bool hasRequiredMembership = _fixture.Create<bool>();
+            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(hasRequiredMembership: hasRequiredMembership);
+
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.CanUpdateStorage, Is.EqualTo(hasRequiredMembership));
+        }
+
+        /// <summary>
+        /// Tests that the getter for CanDeleteStorage calls HasRequiredMembership on the common validations used by domain objects in the food waste domain..
+        /// </summary>
+        [Test]
+        [TestCase(Membership.Basic)]
+        [TestCase(Membership.Deluxe)]
+        [TestCase(Membership.Premium)]
+        public void TestThatCanDeleteStorageGetterCallsHasRequiredMembershipOnDomainObjectValidations(Membership membership)
+        {
+            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock();
+
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), membership, membership == Membership.Basic ? (DateTime?)null : DateTime.Now.AddYears(1), _fixture.Create<string>(), DateTime.Now, domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.Membership, Is.EqualTo(membership));
+            Assert.That(sut.CanDeleteStorage, Is.AnyOf(true, false));
+
+            domainObjectValidationsMock.AssertWasCalled(m => m.HasRequiredMembership(Arg<Membership>.Is.Equal(membership), Arg<Membership>.Is.Equal(Membership.Deluxe)));
+        }
+
+        /// <summary>
+        /// Tests that the getter for CanDeleteStorage returns the result of HasRequiredMembership from the common validations used by domain objects in the food waste domain..
+        /// </summary>
+        [Test]
+        public void TestThatCanDeleteStorageGetterReturnResultOfHasRequiredMembershipFromDomainObjectValidations()
+        {
+            bool hasRequiredMembership = _fixture.Create<bool>();
+            IDomainObjectValidations domainObjectValidationsMock = CreateDomainObjectValidationsMock(hasRequiredMembership: hasRequiredMembership);
+
+            MyHouseholdMember sut = CreateMySut(_fixture.Create<string>(), domainObjectValidationsMock);
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.CanDeleteStorage, Is.EqualTo(hasRequiredMembership));
         }
 
         /// <summary>

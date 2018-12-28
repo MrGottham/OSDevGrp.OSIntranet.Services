@@ -27,14 +27,29 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
     [TestFixture]
     public class FoodWasteObjectMapperTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tests that the object mapper which can map objects in the food waste domain can be initialized.
         /// </summary>
         [Test]
         public void TestThatFoodWasteObjectMapperCanBeInitialized()
         {
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
         }
 
         /// <summary>
@@ -43,10 +58,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapThrowsArgumentNullExceptionIfSourceIsNull()
         {
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => foodWasteObjectMapper.Map<object, object>(null));
+            ArgumentNullException exception = Assert.Throws<ArgumentNullException>(() => sut.Map<object, object>(null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(exception, "source");
         }
@@ -57,15 +72,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapThrowsIntranetSystemExceptionWhenSourceIsIsIdentifiableAndIdentifierIsNull()
         {
-            var identifiableMock = MockRepository.GenerateMock<IIdentifiable>();
+            IIdentifiable identifiableMock = MockRepository.GenerateMock<IIdentifiable>();
             identifiableMock.Stub(m => m.Identifier)
                 .Return(null)
                 .Repeat.Any();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            IntranetSystemException exception = Assert.Throws<IntranetSystemException>(() => foodWasteObjectMapper.Map<object, object>(identifiableMock));
+            IntranetSystemException exception = Assert.Throws<IntranetSystemException>(() => sut.Map<object, object>(identifiableMock));
 
             TestHelper.AssertIntranetSystemExceptionIsValid(exception, ExceptionMessage.IllegalValue, identifiableMock.Identifier, "Identifier");
         }
@@ -76,15 +91,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapThrowsIntranetSystemExceptionWhenSourceIsIsIdentifiableAndIdentifierHasNoValue()
         {
-            var identifiableMock = MockRepository.GenerateMock<IIdentifiable>();
+            IIdentifiable identifiableMock = MockRepository.GenerateMock<IIdentifiable>();
             identifiableMock.Stub(m => m.Identifier)
                 .Return(null)
                 .Repeat.Any();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            IntranetSystemException exception = Assert.Throws<IntranetSystemException>(() => foodWasteObjectMapper.Map<object, object>(identifiableMock));
+            IntranetSystemException exception = Assert.Throws<IntranetSystemException>(() => sut.Map<object, object>(identifiableMock));
 
             TestHelper.AssertIntranetSystemExceptionIsValid(exception, ExceptionMessage.IllegalValue, identifiableMock.Identifier, "Identifier");
         }
@@ -95,12 +110,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapCallsTranslateOnSourceIfTranslatableAndTranslationCultureIsNull()
         {
-            var translatableMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            IFoodGroup translatableMock = DomainObjectMockBuilder.BuildFoodGroupMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            foodWasteObjectMapper.Map<IFoodGroup, object>(translatableMock);
+            sut.Map<IFoodGroup, object>(translatableMock);
 
             translatableMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(Thread.CurrentThread.CurrentUICulture)));
         }
@@ -113,13 +128,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase("en-US")]
         public void TestThatMapCallsTranslateOnSourceIfTranslatableAndTranslationCultureIsNotNull(string cultureName)
         {
-            var translatableMock = DomainObjectMockBuilder.BuildFoodGroupMock();
-            var translationCulture = new CultureInfo(cultureName);
+            IFoodGroup translatableMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            CultureInfo translationCulture = new CultureInfo(cultureName);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            foodWasteObjectMapper.Map<IFoodGroup, object>(translatableMock, translationCulture);
+            sut.Map<IFoodGroup, object>(translatableMock, translationCulture);
 
             translatableMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture)));
         }
@@ -130,40 +145,42 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapCallsTranslateOnDataProviderForEachForeignKeyWhenSourceHasForeignKeysAndTranslationCultureIsNull()
         {
-            var fixture = new Fixture();
-            fixture.Customize<IDataProvider>(e => e.FromFactory(() =>
+            _fixture.Customize<IDataProvider>(e => e.FromFactory(() =>
             {
-                var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
+                IDataProvider dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
                 dataProviderMock.Stub(m => m.Translation)
                     .Return(null)
                     .Repeat.Any();
                 return dataProviderMock;
             }));
-            fixture.Customize<IForeignKey>(e => e.FromFactory(() =>
+            _fixture.Customize<IForeignKey>(e => e.FromFactory(() =>
             {
-                var foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
+                IForeignKey foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
                 foreignKeyMock.Stub(m => m.DataProvider)
-                    .Return(fixture.Create<IDataProvider>())
+                    .Return(_fixture.Create<IDataProvider>())
                     .Repeat.Any();
                 return foreignKeyMock;
             }));
 
-            var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            IFoodGroup foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
             foodGroupMock.Stub(m => m.Identifier)
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.ForeignKeys)
-                .Return(fixture.CreateMany<IForeignKey>(7).ToList())
+                .Return(_fixture.CreateMany<IForeignKey>(7).ToList())
                 .Repeat.Any();
 
-            var dataProviderMockCollection = foodGroupMock.ForeignKeys.Where(m => m.DataProvider != null).Select(m => m.DataProvider).ToList();
+            List<IDataProvider> dataProviderMockCollection = foodGroupMock.ForeignKeys
+                .Where(m => m.DataProvider != null)
+                .Select(m => m.DataProvider)
+                .ToList();
             Assert.That(dataProviderMockCollection, Is.Not.Null);
             Assert.That(dataProviderMockCollection, Is.Not.Empty);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            foodWasteObjectMapper.Map<IFoodGroup, object>(foodGroupMock);
+            sut.Map<IFoodGroup, object>(foodGroupMock);
 
             dataProviderMockCollection.ForEach(dataProviderMock => dataProviderMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(Thread.CurrentThread.CurrentUICulture))));
         }
@@ -176,42 +193,41 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase("en-US")]
         public void TestThatMapCallsTranslateOnDataProviderForEachForeignKeyWhenSourceHasForeignKeysAndTranslationCultureIsNotNull(string cultureName)
         {
-            var fixture = new Fixture();
-            fixture.Customize<IDataProvider>(e => e.FromFactory(() =>
+            _fixture.Customize<IDataProvider>(e => e.FromFactory(() =>
             {
-                var dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
+                IDataProvider dataProviderMock = MockRepository.GenerateMock<IDataProvider>();
                 dataProviderMock.Stub(m => m.Translation)
                     .Return(null)
                     .Repeat.Any();
                 return dataProviderMock;
             }));
-            fixture.Customize<IForeignKey>(e => e.FromFactory(() =>
+            _fixture.Customize<IForeignKey>(e => e.FromFactory(() =>
             {
-                var foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
+                IForeignKey foreignKeyMock = MockRepository.GenerateMock<IForeignKey>();
                 foreignKeyMock.Stub(m => m.DataProvider)
-                    .Return(fixture.Create<IDataProvider>())
+                    .Return(_fixture.Create<IDataProvider>())
                     .Repeat.Any();
                 return foreignKeyMock;
             }));
 
-            var foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
+            IFoodGroup foodGroupMock = MockRepository.GenerateMock<IFoodGroup>();
             foodGroupMock.Stub(m => m.Identifier)
                 .Return(Guid.NewGuid())
                 .Repeat.Any();
             foodGroupMock.Stub(m => m.ForeignKeys)
-                .Return(fixture.CreateMany<IForeignKey>(7).ToList())
+                .Return(_fixture.CreateMany<IForeignKey>(7).ToList())
                 .Repeat.Any();
 
-            var dataProviderMockCollection = foodGroupMock.ForeignKeys.Where(m => m.DataProvider != null).Select(m => m.DataProvider).ToList();
+            List<IDataProvider> dataProviderMockCollection = foodGroupMock.ForeignKeys.Where(m => m.DataProvider != null).Select(m => m.DataProvider).ToList();
             Assert.That(dataProviderMockCollection, Is.Not.Null);
             Assert.That(dataProviderMockCollection, Is.Not.Empty);
 
-            var translationCulture = new CultureInfo(cultureName);
+            CultureInfo translationCulture = new CultureInfo(cultureName);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            foodWasteObjectMapper.Map<IFoodGroup, object>(foodGroupMock, translationCulture);
+            sut.Map<IFoodGroup, object>(foodGroupMock, translationCulture);
 
             dataProviderMockCollection.ForEach(dataProviderMock => dataProviderMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationCulture))));
         }
@@ -220,14 +236,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that Map calls Translate on each translatable domain object in source if source is a collection of translatable domain objects and the translation culture is null.
         /// </summary>
         [Test]
-        public void TestThatMapCallsTranslateOnEachTranslatableInSourceIfSourceIsCollectionOfTranslatablesAndTranslationCultureIsNull()
+        public void TestThatMapCallsTranslateOnEachTranslatableInSourceIfSourceIsCollectionOfTranslatableAndTranslationCultureIsNull()
         {
-            var translatableMockCollection = DomainObjectMockBuilder.BuildFoodGroupMockCollection().ToList();
+            List<IFoodGroup> translatableMockCollection = DomainObjectMockBuilder.BuildFoodGroupMockCollection().ToList();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            foodWasteObjectMapper.Map<List<IFoodGroup>, IEnumerable<object>>(translatableMockCollection);
+            sut.Map<List<IFoodGroup>, IEnumerable<object>>(translatableMockCollection);
 
             translatableMockCollection.ForEach(m => m.AssertWasCalled(n => n.Translate(Arg<CultureInfo>.Is.Equal(Thread.CurrentThread.CurrentUICulture))));
         }
@@ -238,15 +254,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         [TestCase("da-DK")]
         [TestCase("en-US")]
-        public void TestThatMapCallsTranslateOnEachTranslatableInSourceIfSourceIsCollectionOfTranslatablesAndTranslationCultureIsNotNull(string cultureName)
+        public void TestThatMapCallsTranslateOnEachTranslatableInSourceIfSourceIsCollectionOfTranslatableAndTranslationCultureIsNotNull(string cultureName)
         {
-            var translatableMockCollection = DomainObjectMockBuilder.BuildFoodGroupMockCollection().ToList();
-            var translationCulture = new CultureInfo(cultureName);
+            List<IFoodGroup> translatableMockCollection = DomainObjectMockBuilder.BuildFoodGroupMockCollection().ToList();
+            CultureInfo translationCulture = new CultureInfo(cultureName);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            foodWasteObjectMapper.Map<List<IFoodGroup>, IEnumerable<object>>(translatableMockCollection, translationCulture);
+            sut.Map<List<IFoodGroup>, IEnumerable<object>>(translatableMockCollection, translationCulture);
 
             translatableMockCollection.ForEach(m => m.AssertWasCalled(n => n.Translate(Arg<CultureInfo>.Is.Equal(translationCulture))));
         }
@@ -257,12 +273,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsHouseholdToHouseholdIdentificationView()
         {
-            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdIdentificationView = foodWasteObjectMapper.Map<IHousehold, HouseholdIdentificationView>(householdMock);
+            HouseholdIdentificationView householdIdentificationView = sut.Map<IHousehold, HouseholdIdentificationView>(householdMock);
             Assert.That(householdIdentificationView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdIdentificationView.HouseholdIdentifier, Is.EqualTo(householdMock.Identifier.Value));
@@ -278,12 +294,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsHouseholdToHouseholdView()
         {
-            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdView = foodWasteObjectMapper.Map<IHousehold, HouseholdView>(householdMock);
+            HouseholdView householdView = sut.Map<IHousehold, HouseholdView>(householdMock);
             Assert.That(householdView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdView.HouseholdIdentifier, Is.EqualTo(householdMock.Identifier.Value));
@@ -307,12 +323,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsHouseholdToHouseholdProxy()
         {
-            var householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
+            IHousehold householdMock = DomainObjectMockBuilder.BuildHouseholdMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdProxy = foodWasteObjectMapper.Map<IHousehold, IHouseholdProxy>(householdMock);
+            IHouseholdProxy householdProxy = sut.Map<IHousehold, IHouseholdProxy>(householdMock);
             Assert.That(householdProxy, Is.Not.Null);
             Assert.That(householdProxy.Identifier, Is.Not.Null);
             Assert.That(householdProxy.Identifier, Is.EqualTo(householdMock.Identifier));
@@ -326,7 +342,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdProxy.HouseholdMembers, Is.Not.Null);
             Assert.That(householdProxy.HouseholdMembers, Is.Not.Empty);
             Assert.That(householdProxy.HouseholdMembers.Count(), Is.EqualTo(householdMock.HouseholdMembers.Count()));
-            foreach (var householdMember in householdProxy.HouseholdMembers)
+            foreach (IHouseholdMember householdMember in householdProxy.HouseholdMembers)
             {
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember, Is.TypeOf<HouseholdMemberProxy>());
@@ -343,10 +359,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             IStorage storageMock = DomainObjectMockBuilder.BuildStorageMock(hasDescription: hasDescription);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            IStorageProxy storageProxy = foodWasteObjectMapper.Map<IStorage, IStorageProxy>(storageMock);
+            IStorageProxy storageProxy = sut.Map<IStorage, IStorageProxy>(storageMock);
             Assert.That(storageProxy.Identifier, Is.Not.Null);
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             Assert.That(storageProxy.Identifier.HasValue, Is.True);
@@ -381,10 +397,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
 
-            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            StorageTypeIdentificationView storageTypeIdentificationView = foodWasteObjectMapper.Map<IStorageType, StorageTypeIdentificationView>(storageTypeMock);
+            StorageTypeIdentificationView storageTypeIdentificationView = sut.Map<IStorageType, StorageTypeIdentificationView>(storageTypeMock);
             Assert.That(storageTypeIdentificationView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(storageTypeIdentificationView.StorageTypeIdentifier, Is.EqualTo(storageTypeMock.Identifier.Value));
@@ -402,10 +418,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
 
-            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            StorageTypeView storageTypeView = foodWasteObjectMapper.Map<IStorageType, StorageTypeView>(storageTypeMock);
+            StorageTypeView storageTypeView = sut.Map<IStorageType, StorageTypeView>(storageTypeMock);
             Assert.That(storageTypeView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(storageTypeView.StorageTypeIdentifier, Is.EqualTo(storageTypeMock.Identifier.Value));
@@ -431,10 +447,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
 
-            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            StorageTypeSystemView storageTypeSystemView = foodWasteObjectMapper.Map<IStorageType, StorageTypeSystemView>(storageTypeMock);
+            StorageTypeSystemView storageTypeSystemView = sut.Map<IStorageType, StorageTypeSystemView>(storageTypeMock);
             Assert.That(storageTypeSystemView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(storageTypeSystemView.StorageTypeIdentifier, Is.EqualTo(storageTypeMock.Identifier.Value));
@@ -464,10 +480,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             IStorageType storageTypeMock = DomainObjectMockBuilder.BuildStorageTypeMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            IStorageTypeProxy storageTypeProxy = foodWasteObjectMapper.Map<IStorageType, IStorageTypeProxy>(storageTypeMock);
+            IStorageTypeProxy storageTypeProxy = sut.Map<IStorageType, IStorageTypeProxy>(storageTypeMock);
             Assert.That(storageTypeProxy, Is.Not.Null);
             Assert.That(storageTypeProxy.Identifier, Is.Not.Null);
             Assert.That(storageTypeProxy.Identifier, Is.EqualTo(storageTypeMock.Identifier));
@@ -497,12 +513,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsHouseholdMemberToHouseholdMemberIdentificationView()
         {
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            IHouseholdMember householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdMemberIdentificationView = foodWasteObjectMapper.Map<IHouseholdMember, HouseholdMemberIdentificationView>(householdMemberMock);
+            HouseholdMemberIdentificationView householdMemberIdentificationView = sut.Map<IHouseholdMember, HouseholdMemberIdentificationView>(householdMemberMock);
             Assert.That(householdMemberIdentificationView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMemberIdentificationView.HouseholdMemberIdentifier, Is.EqualTo(householdMemberMock.Identifier.Value));
@@ -524,12 +540,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase(Membership.Premium, false)]
         public void TestThatMapMapsHouseholdMemberToHouseholdMemberView(Membership membership, bool membershipHasExpired)
         {
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership, membershipHasExpired: membershipHasExpired);
+            IHouseholdMember householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership, membershipHasExpired: membershipHasExpired);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdMemberView = foodWasteObjectMapper.Map<IHouseholdMember, HouseholdMemberView>(householdMemberMock);
+            HouseholdMemberView householdMemberView = sut.Map<IHouseholdMember, HouseholdMemberView>(householdMemberMock);
             Assert.That(householdMemberView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(householdMemberView.HouseholdMemberIdentifier, Is.EqualTo(householdMemberMock.Identifier.Value));
@@ -556,12 +572,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberView.PrivacyPolicyAcceptedTime, Is.EqualTo(householdMemberMock.PrivacyPolicyAcceptedTime));
             Assert.That(householdMemberView.IsPrivacyPolicyAccepted, Is.EqualTo(householdMemberMock.IsPrivacyPolicyAccepted));
             Assert.That(householdMemberView.HasReachedHouseholdLimit, Is.EqualTo(householdMemberMock.HasReachedHouseholdLimit));
+            Assert.That(householdMemberView.CanCreateStorage, Is.EqualTo(householdMemberMock.CanCreateStorage));
+            Assert.That(householdMemberView.CanUpdateStorage, Is.EqualTo(householdMemberMock.CanUpdateStorage));
+            Assert.That(householdMemberView.CanDeleteStorage, Is.EqualTo(householdMemberMock.CanDeleteStorage));
             Assert.That(householdMemberView.CreationTime, Is.EqualTo(householdMemberMock.CreationTime));
             Assert.That(householdMemberView.UpgradeableMemberships, Is.Not.Null);
             Assert.That(householdMemberView.UpgradeableMemberships, Is.Not.Empty);
             Assert.That(householdMemberView.UpgradeableMemberships, Is.TypeOf<List<string>>());
             Assert.That(householdMemberView.UpgradeableMemberships.Count(), Is.EqualTo(householdMemberMock.UpgradeableMemberships.Count()));
-            foreach (var upgradeableMembership in householdMemberMock.UpgradeableMemberships)
+            foreach (Membership upgradeableMembership in householdMemberMock.UpgradeableMemberships)
             {
                 Assert.That(householdMemberView.UpgradeableMemberships.Contains(upgradeableMembership.ToString()), Is.True);
             }
@@ -584,12 +603,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase(Membership.Premium)]
         public void TestThatMapMapsHouseholdMemberToHouseholdMemberProxy(Membership membership)
         {
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership);
+            IHouseholdMember householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock(membership);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdMemberProxy = foodWasteObjectMapper.Map<IHouseholdMember, IHouseholdMemberProxy>(householdMemberMock);
+            IHouseholdMemberProxy householdMemberProxy = sut.Map<IHouseholdMember, IHouseholdMemberProxy>(householdMemberMock);
             Assert.That(householdMemberProxy, Is.Not.Null);
             Assert.That(householdMemberProxy.Identifier, Is.Not.Null);
             Assert.That(householdMemberProxy.Identifier, Is.EqualTo(householdMemberMock.Identifier));
@@ -609,7 +628,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.Households, Is.Not.Null);
             Assert.That(householdMemberProxy.Households, Is.Not.Empty);
             Assert.That(householdMemberProxy.Households.Count(), Is.EqualTo(householdMemberMock.Households.Count()));
-            foreach (var household in householdMemberProxy.Households)
+            foreach (IHousehold household in householdMemberProxy.Households)
             {
                 Assert.That(household, Is.Not.Null);
                 Assert.That(household, Is.TypeOf<HouseholdProxy>());
@@ -617,7 +636,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdMemberProxy.Payments, Is.Not.Null);
             Assert.That(householdMemberProxy.Payments, Is.Not.Empty);
             Assert.That(householdMemberProxy.Payments.Count(), Is.EqualTo(householdMemberMock.Payments.Count()));
-            foreach (var payment in householdMemberProxy.Payments)
+            foreach (IPayment payment in householdMemberProxy.Payments)
             {
                 Assert.That(payment, Is.Not.Null);
                 Assert.That(payment, Is.TypeOf<PaymentProxy>());
@@ -632,12 +651,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase(false)]
         public void TestThatMapMapsPaymentToPaymentView(bool hasPaymentReceipt)
         {
-            var paymentMock = DomainObjectMockBuilder.BuildPaymentMock(hasPaymentReceipt: hasPaymentReceipt);
+            IPayment paymentMock = DomainObjectMockBuilder.BuildPaymentMock(hasPaymentReceipt: hasPaymentReceipt);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var paymentView = foodWasteObjectMapper.Map<IPayment, PaymentView>(paymentMock);
+            PaymentView paymentView = sut.Map<IPayment, PaymentView>(paymentMock);
             Assert.That(paymentView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(paymentView.PaymentIdentifier, Is.EqualTo(paymentMock.Identifier.Value));
@@ -681,12 +700,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                 default:
                     throw new NotSupportedException($"The stakeholderType '{stakeholderType}' is not supported.");
             }
-            var paymentMock = DomainObjectMockBuilder.BuildPaymentMock(stakeholderMock, hasPaymentReceipt);
+            IPayment paymentMock = DomainObjectMockBuilder.BuildPaymentMock(stakeholderMock, hasPaymentReceipt);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var paymentProxy = foodWasteObjectMapper.Map<IPayment, IPaymentProxy>(paymentMock);
+            IPaymentProxy paymentProxy = sut.Map<IPayment, IPaymentProxy>(paymentMock);
             Assert.That(paymentProxy, Is.Not.Null);
             Assert.That(paymentProxy.Identifier, Is.Not.Null);
             Assert.That(paymentProxy.Identifier, Is.EqualTo(paymentMock.Identifier));
@@ -726,12 +745,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase(StakeholderType.HouseholdMember)]
         public void TestThatMapMapsStakeholderToStakeholderView(StakeholderType stakeholderType)
         {
-            var stakeholderMock = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
+            IStakeholder stakeholderMock = DomainObjectMockBuilder.BuildStakeholderMock(stakeholderType);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var stakeholderView = foodWasteObjectMapper.Map<IStakeholder, StakeholderView>(stakeholderMock);
+            StakeholderView stakeholderView = sut.Map<IStakeholder, StakeholderView>(stakeholderMock);
             Assert.That(stakeholderView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(stakeholderView.StakeholderIdentifier, Is.EqualTo(stakeholderMock.Identifier.Value));
@@ -750,12 +769,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodItemCollectionToFoodItemCollectionView()
         {
-            var foodItemCollection = new FoodItemCollection(DomainObjectMockBuilder.BuildFoodItemMockCollection(), DomainObjectMockBuilder.BuildDataProviderMock());
+            FoodItemCollection foodItemCollection = new FoodItemCollection(DomainObjectMockBuilder.BuildFoodItemMockCollection(), DomainObjectMockBuilder.BuildDataProviderMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodItemCollectionView = foodWasteObjectMapper.Map<IFoodItemCollection, FoodItemCollectionView>(foodItemCollection);
+            FoodItemCollectionView foodItemCollectionView = sut.Map<IFoodItemCollection, FoodItemCollectionView>(foodItemCollection);
             Assert.That(foodItemCollectionView, Is.Not.Null);
             Assert.That(foodItemCollectionView.FoodItems, Is.Not.Null);
             Assert.That(foodItemCollectionView.FoodItems, Is.Not.Empty);
@@ -771,12 +790,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodItemCollectionToFoodItemCollectionSystemView()
         {
-            var foodItemCollection = new FoodItemCollection(DomainObjectMockBuilder.BuildFoodItemMockCollection(), DomainObjectMockBuilder.BuildDataProviderMock());
+            FoodItemCollection foodItemCollection = new FoodItemCollection(DomainObjectMockBuilder.BuildFoodItemMockCollection(), DomainObjectMockBuilder.BuildDataProviderMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodItemCollectionSystemView = foodWasteObjectMapper.Map<IFoodItemCollection, FoodItemCollectionSystemView>(foodItemCollection);
+            FoodItemCollectionSystemView foodItemCollectionSystemView = sut.Map<IFoodItemCollection, FoodItemCollectionSystemView>(foodItemCollection);
             Assert.That(foodItemCollectionSystemView, Is.Not.Null);
             Assert.That(foodItemCollectionSystemView.FoodItems, Is.Not.Null);
             Assert.That(foodItemCollectionSystemView.FoodItems, Is.Not.Empty);
@@ -792,12 +811,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodItemToFoodItemIdentificationView()
         {
-            var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
+            IFoodItem foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodItemIdentificationView = foodWasteObjectMapper.Map<IFoodItem, FoodItemIdentificationView>(foodItemMock);
+            FoodItemIdentificationView foodItemIdentificationView = sut.Map<IFoodItem, FoodItemIdentificationView>(foodItemMock);
             Assert.That(foodItemIdentificationView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodItemIdentificationView.FoodItemIdentifier, Is.EqualTo(foodItemMock.Identifier.Value));
@@ -813,12 +832,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodItemToFoodItemView()
         {
-            var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
+            IFoodItem foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodItemView = foodWasteObjectMapper.Map<IFoodItem, FoodItemView>(foodItemMock);
+            FoodItemView foodItemView = sut.Map<IFoodItem, FoodItemView>(foodItemMock);
             Assert.That(foodItemView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodItemView.FoodItemIdentifier, Is.EqualTo(foodItemMock.Identifier.Value));
@@ -841,12 +860,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodItemToFoodItemSystemView()
         {
-            var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
+            IFoodItem foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodItemSystemView = foodWasteObjectMapper.Map<IFoodItem, FoodItemSystemView>(foodItemMock);
+            FoodItemSystemView foodItemSystemView = sut.Map<IFoodItem, FoodItemSystemView>(foodItemMock);
             Assert.That(foodItemSystemView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodItemSystemView.FoodItemIdentifier, Is.EqualTo(foodItemMock.Identifier.Value));
@@ -877,12 +896,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodItemToFoodItemProxy()
         {
-            var foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
+            IFoodItem foodItemMock = DomainObjectMockBuilder.BuildFoodItemMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodItemProxy = foodWasteObjectMapper.Map<IFoodItem, IFoodItemProxy>(foodItemMock);
+            IFoodItemProxy foodItemProxy = sut.Map<IFoodItem, IFoodItemProxy>(foodItemMock);
             Assert.That(foodItemProxy, Is.Not.Null);
             Assert.That(foodItemProxy.Identifier, Is.Not.Null);
             Assert.That(foodItemProxy.Identifier, Is.EqualTo(foodItemMock.Identifier));
@@ -892,7 +911,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(foodItemProxy.FoodGroups, Is.Not.Null);
             Assert.That(foodItemProxy.FoodGroups, Is.Not.Empty);
             Assert.That(foodItemProxy.FoodGroups.Count(), Is.EqualTo(foodItemMock.FoodGroups.Count()));
-            foreach (var foodGroup in foodItemProxy.FoodGroups)
+            foreach (IFoodGroup foodGroup in foodItemProxy.FoodGroups)
             {
                 Assert.That(foodGroup, Is.Not.Null);
                 Assert.That(foodGroup, Is.TypeOf<FoodGroupProxy>());
@@ -901,7 +920,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(foodItemProxy.Translations, Is.Not.Null);
             Assert.That(foodItemProxy.Translations, Is.Not.Empty);
             Assert.That(foodItemProxy.Translations.Count(), Is.EqualTo(foodItemMock.Translations.Count()));
-            foreach (var translation in foodItemProxy.Translations)
+            foreach (ITranslation translation in foodItemProxy.Translations)
             {
                 Assert.That(translation, Is.Not.Null);
                 Assert.That(translation, Is.TypeOf<TranslationProxy>());
@@ -909,7 +928,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(foodItemProxy.ForeignKeys, Is.Not.Null);
             Assert.That(foodItemProxy.ForeignKeys, Is.Not.Empty);
             Assert.That(foodItemProxy.ForeignKeys.Count(), Is.EqualTo(foodItemMock.ForeignKeys.Count()));
-            foreach (var foreignKey in foodItemProxy.ForeignKeys)
+            foreach (IForeignKey foreignKey in foodItemProxy.ForeignKeys)
             {
                 Assert.That(foreignKey, Is.Not.Null);
                 Assert.That(foreignKey, Is.TypeOf<ForeignKeyProxy>());
@@ -922,12 +941,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupCollectionToFoodGroupTreeView()
         {
-            var foodGroupMockCollection = new FoodGroupCollection(new List<IFoodGroup> {DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock()}, DomainObjectMockBuilder.BuildDataProviderMock());
+            FoodGroupCollection foodGroupMockCollection = new FoodGroupCollection(new List<IFoodGroup> {DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock()}, DomainObjectMockBuilder.BuildDataProviderMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupTreeView = foodWasteObjectMapper.Map<IFoodGroupCollection, FoodGroupTreeView>(foodGroupMockCollection);
+            FoodGroupTreeView foodGroupTreeView = sut.Map<IFoodGroupCollection, FoodGroupTreeView>(foodGroupMockCollection);
             Assert.That(foodGroupTreeView, Is.Not.Null);
             Assert.That(foodGroupTreeView.FoodGroups, Is.Not.Null);
             Assert.That(foodGroupTreeView.FoodGroups, Is.Not.Empty);
@@ -943,12 +962,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupCollectionToFoodGroupTreeSystemView()
         {
-            var foodGroupMockCollection = new FoodGroupCollection(new List<IFoodGroup> {DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock()}, DomainObjectMockBuilder.BuildDataProviderMock());
+            FoodGroupCollection foodGroupMockCollection = new FoodGroupCollection(new List<IFoodGroup> {DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock(), DomainObjectMockBuilder.BuildFoodGroupMock()}, DomainObjectMockBuilder.BuildDataProviderMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupTreeSystemView = foodWasteObjectMapper.Map<IFoodGroupCollection, FoodGroupTreeSystemView>(foodGroupMockCollection);
+            FoodGroupTreeSystemView foodGroupTreeSystemView = sut.Map<IFoodGroupCollection, FoodGroupTreeSystemView>(foodGroupMockCollection);
             Assert.That(foodGroupTreeSystemView, Is.Not.Null);
             Assert.That(foodGroupTreeSystemView.FoodGroups, Is.Not.Null);
             Assert.That(foodGroupTreeSystemView.FoodGroups, Is.Not.Empty);
@@ -964,12 +983,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupToFoodGroupIdentificationView()
         {
-            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+            IFoodGroup foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupIdentificationView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupIdentificationView>(foodGroupMock);
+            FoodGroupIdentificationView foodGroupIdentificationView = sut.Map<IFoodGroup, FoodGroupIdentificationView>(foodGroupMock);
             Assert.That(foodGroupIdentificationView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodGroupIdentificationView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
@@ -985,12 +1004,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupToFoodGroupViewWhenParentIsNotNull()
         {
-            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+            IFoodGroup foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupView>(foodGroupMock);
+            FoodGroupView foodGroupView = sut.Map<IFoodGroup, FoodGroupView>(foodGroupMock);
             Assert.That(foodGroupView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodGroupView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
@@ -1012,12 +1031,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupToFoodGroupViewWhenParentIsNull()
         {
-            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            IFoodGroup foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupView>(foodGroupMock);
+            FoodGroupView foodGroupView = sut.Map<IFoodGroup, FoodGroupView>(foodGroupMock);
             Assert.That(foodGroupView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodGroupView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
@@ -1039,12 +1058,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupToFoodGroupSystemViewWhenParentIsNotNull()
         {
-            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+            IFoodGroup foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupSystemView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupSystemView>(foodGroupMock);
+            FoodGroupSystemView foodGroupSystemView = sut.Map<IFoodGroup, FoodGroupSystemView>(foodGroupMock);
             Assert.That(foodGroupSystemView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodGroupSystemView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
@@ -1074,12 +1093,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupToFoodGroupSystemViewWhenParentIsNull()
         {
-            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
+            IFoodGroup foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupSystemView = foodWasteObjectMapper.Map<IFoodGroup, FoodGroupSystemView>(foodGroupMock);
+            FoodGroupSystemView foodGroupSystemView = sut.Map<IFoodGroup, FoodGroupSystemView>(foodGroupMock);
             Assert.That(foodGroupSystemView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foodGroupSystemView.FoodGroupIdentifier, Is.EqualTo(foodGroupMock.Identifier.Value));
@@ -1109,12 +1128,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsFoodGroupToFoodGroupProxy()
         {
-            var foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
+            IFoodGroup foodGroupMock = DomainObjectMockBuilder.BuildFoodGroupMock(DomainObjectMockBuilder.BuildFoodGroupMock());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foodGroupProxy = foodWasteObjectMapper.Map<IFoodGroup, IFoodGroupProxy>(foodGroupMock);
+            IFoodGroupProxy foodGroupProxy = sut.Map<IFoodGroup, IFoodGroupProxy>(foodGroupMock);
             Assert.That(foodGroupProxy.Identifier, Is.Not.Null);
             Assert.That(foodGroupProxy.Identifier, Is.EqualTo(foodGroupMock.Identifier));
             Assert.That(foodGroupProxy.Parent, Is.Not.Null);
@@ -1122,7 +1141,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(foodGroupProxy.Parent.Children, Is.Not.Null);
             Assert.That(foodGroupProxy.Parent.Children, Is.Not.Empty);
             Assert.That(foodGroupProxy.Parent.Children.Count(), Is.EqualTo(foodGroupMock.Parent.Children.Count()));
-            foreach (var childFoodGroup in foodGroupProxy.Parent.Children)
+            foreach (IFoodGroup childFoodGroup in foodGroupProxy.Parent.Children)
             {
                 Assert.That(childFoodGroup, Is.Not.Null);
                 Assert.That(childFoodGroup, Is.TypeOf<FoodGroupProxy>());
@@ -1134,7 +1153,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(foodGroupProxy.Translations, Is.Not.Null);
             Assert.That(foodGroupProxy.Translations, Is.Not.Empty);
             Assert.That(foodGroupProxy.Translations.Count(), Is.EqualTo(foodGroupMock.Translations.Count()));
-            foreach (var translation in foodGroupProxy.Translations)
+            foreach (ITranslation translation in foodGroupProxy.Translations)
             {
                 Assert.That(translation, Is.Not.Null);
                 Assert.That(translation, Is.TypeOf<TranslationProxy>());
@@ -1142,7 +1161,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Null);
             Assert.That(foodGroupProxy.ForeignKeys, Is.Not.Empty);
             Assert.That(foodGroupProxy.ForeignKeys.Count(), Is.EqualTo(foodGroupMock.ForeignKeys.Count()));
-            foreach (var foreignKey in foodGroupProxy.ForeignKeys)
+            foreach (IForeignKey foreignKey in foodGroupProxy.ForeignKeys)
             {
                 Assert.That(foreignKey, Is.Not.Null);
                 Assert.That(foreignKey, Is.TypeOf<ForeignKeyProxy>());
@@ -1155,12 +1174,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsForeignKeyToForeignKeyView()
         {
-            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof(IFoodGroup));
+            IForeignKey foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof(IFoodGroup));
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foreignKeyView = foodWasteObjectMapper.Map<IForeignKey, ForeignKeyView>(foreignKeyMock);
+            ForeignKeyView foreignKeyView = sut.Map<IForeignKey, ForeignKeyView>(foreignKeyMock);
             Assert.That(foreignKeyView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foreignKeyView.ForeignKeyIdentifier, Is.EqualTo(foreignKeyMock.Identifier.Value));
@@ -1179,12 +1198,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsForeignKeyToForeignKeySystemView()
         {
-            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof (IFoodGroup));
+            IForeignKey foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof (IFoodGroup));
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foreignKeySystemView = foodWasteObjectMapper.Map<IForeignKey, ForeignKeySystemView>(foreignKeyMock);
+            ForeignKeySystemView foreignKeySystemView = sut.Map<IForeignKey, ForeignKeySystemView>(foreignKeyMock);
             Assert.That(foreignKeySystemView, Is.Not.Null);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(foreignKeySystemView.ForeignKeyIdentifier, Is.EqualTo(foreignKeyMock.Identifier.Value));
@@ -1203,12 +1222,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsForeignKeyToForeignKeyProxy()
         {
-            var foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof (IDataProvider));
+            IForeignKey foreignKeyMock = DomainObjectMockBuilder.BuildForeignKeyMock(Guid.NewGuid(), typeof (IDataProvider));
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var foreignKeyProxy = foodWasteObjectMapper.Map<IForeignKey, IForeignKeyProxy>(foreignKeyMock);
+            IForeignKeyProxy foreignKeyProxy = sut.Map<IForeignKey, IForeignKeyProxy>(foreignKeyMock);
             Assert.That(foreignKeyProxy.Identifier, Is.Not.Null);
             Assert.That(foreignKeyProxy.Identifier, Is.EqualTo(foreignKeyMock.Identifier));
             Assert.That(foreignKeyProxy.DataProvider, Is.Not.Null);
@@ -1217,7 +1236,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(foreignKeyProxy.ForeignKeyForTypes, Is.Not.Null);
             Assert.That(foreignKeyProxy.ForeignKeyForTypes, Is.Not.Empty);
             Assert.That(foreignKeyProxy.ForeignKeyForTypes.Count(), Is.EqualTo(foreignKeyMock.ForeignKeyForTypes.Count()));
-            foreach (var foreignKeyType in foreignKeyProxy.ForeignKeyForTypes)
+            foreach (Type foreignKeyType in foreignKeyProxy.ForeignKeyForTypes)
             {
                 Assert.That(foreignKeyType, Is.Not.Null);
                 Assert.That(foreignKeyProxy.ForeignKeyForTypes.Contains(foreignKeyType), Is.True);
@@ -1233,12 +1252,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsStaticTextToStaticTextView()
         {
-            var staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
+            IStaticText staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var staticTextView = foodWasteObjectMapper.Map<IStaticText, StaticTextView>(staticTextMock);
+            StaticTextView staticTextView = sut.Map<IStaticText, StaticTextView>(staticTextMock);
             // ReSharper disable PossibleInvalidOperationException
             Assert.That(staticTextView.StaticTextIdentifier, Is.EqualTo(staticTextMock.Identifier.Value));
             // ReSharper restore PossibleInvalidOperationException
@@ -1262,46 +1281,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsStaticTextToStaticTextSystemView()
         {
-            var staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
+            IStaticText staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var staticTextProxy = foodWasteObjectMapper.Map<IStaticText, StaticTextSystemView>(staticTextMock);
+            StaticTextSystemView staticTextSystemView = sut.Map<IStaticText, StaticTextSystemView>(staticTextMock);
             // ReSharper disable PossibleInvalidOperationException
-            Assert.That(staticTextProxy.StaticTextIdentifier, Is.EqualTo(staticTextMock.Identifier.Value));
+            Assert.That(staticTextSystemView.StaticTextIdentifier, Is.EqualTo(staticTextMock.Identifier.Value));
             // ReSharper restore PossibleInvalidOperationException
-            Assert.That(staticTextProxy.StaticTextType, Is.EqualTo((int) staticTextMock.Type));
-            Assert.That(staticTextProxy.SubjectTranslationIdentifier, Is.EqualTo(staticTextMock.SubjectTranslationIdentifier));
-            Assert.That(staticTextProxy.SubjectTranslation, Is.Not.Null);
-            Assert.That(staticTextProxy.SubjectTranslation, Is.Not.Empty);
-            Assert.That(staticTextProxy.SubjectTranslation, Is.EqualTo(staticTextMock.SubjectTranslation.Value));
-            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
-            Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Empty);
-            Assert.That(staticTextProxy.SubjectTranslations, Is.TypeOf<List<TranslationSystemView>>());
-            Assert.That(staticTextProxy.SubjectTranslations.Count(), Is.EqualTo(staticTextMock.SubjectTranslations.Count()));
+            Assert.That(staticTextSystemView.StaticTextType, Is.EqualTo((int) staticTextMock.Type));
+            Assert.That(staticTextSystemView.SubjectTranslationIdentifier, Is.EqualTo(staticTextMock.SubjectTranslationIdentifier));
+            Assert.That(staticTextSystemView.SubjectTranslation, Is.Not.Null);
+            Assert.That(staticTextSystemView.SubjectTranslation, Is.Not.Empty);
+            Assert.That(staticTextSystemView.SubjectTranslation, Is.EqualTo(staticTextMock.SubjectTranslation.Value));
+            Assert.That(staticTextSystemView.SubjectTranslations, Is.Not.Null);
+            Assert.That(staticTextSystemView.SubjectTranslations, Is.Not.Empty);
+            Assert.That(staticTextSystemView.SubjectTranslations, Is.TypeOf<List<TranslationSystemView>>());
+            Assert.That(staticTextSystemView.SubjectTranslations.Count(), Is.EqualTo(staticTextMock.SubjectTranslations.Count()));
             if (staticTextMock.BodyTranslationIdentifier.HasValue)
             {
-                Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Not.Null);
+                Assert.That(staticTextSystemView.BodyTranslationIdentifier, Is.Not.Null);
                 // ReSharper disable ConditionIsAlwaysTrueOrFalse
-                Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.True);
+                Assert.That(staticTextSystemView.BodyTranslationIdentifier.HasValue, Is.True);
                 // ReSharper restore ConditionIsAlwaysTrueOrFalse
                 // ReSharper disable PossibleInvalidOperationException
-                Assert.That(staticTextProxy.BodyTranslationIdentifier.Value, Is.EqualTo(staticTextMock.BodyTranslationIdentifier.Value));
+                Assert.That(staticTextSystemView.BodyTranslationIdentifier.Value, Is.EqualTo(staticTextMock.BodyTranslationIdentifier.Value));
                 // ReSharper restore PossibleInvalidOperationException
-                Assert.That(staticTextProxy.BodyTranslation, Is.Not.Null);
-                Assert.That(staticTextProxy.BodyTranslation, Is.Not.Empty);
-                Assert.That(staticTextProxy.BodyTranslation, Is.EqualTo(staticTextMock.BodyTranslation.Value));
-                Assert.That(staticTextProxy.BodyTranslations, Is.Not.Null);
-                Assert.That(staticTextProxy.BodyTranslations, Is.Not.Empty);
-                Assert.That(staticTextProxy.BodyTranslations, Is.TypeOf<List<TranslationSystemView>>());
-                Assert.That(staticTextProxy.BodyTranslations.Count(), Is.EqualTo(staticTextMock.BodyTranslations.Count()));
+                Assert.That(staticTextSystemView.BodyTranslation, Is.Not.Null);
+                Assert.That(staticTextSystemView.BodyTranslation, Is.Not.Empty);
+                Assert.That(staticTextSystemView.BodyTranslation, Is.EqualTo(staticTextMock.BodyTranslation.Value));
+                Assert.That(staticTextSystemView.BodyTranslations, Is.Not.Null);
+                Assert.That(staticTextSystemView.BodyTranslations, Is.Not.Empty);
+                Assert.That(staticTextSystemView.BodyTranslations, Is.TypeOf<List<TranslationSystemView>>());
+                Assert.That(staticTextSystemView.BodyTranslations.Count(), Is.EqualTo(staticTextMock.BodyTranslations.Count()));
                 return;
             }
-            Assert.That(staticTextProxy.BodyTranslationIdentifier, Is.Null);
-            Assert.That(staticTextProxy.BodyTranslationIdentifier.HasValue, Is.False);
-            Assert.That(staticTextProxy.BodyTranslation, Is.Null);
-            Assert.That(staticTextProxy.BodyTranslations, Is.Null);
+            Assert.That(staticTextSystemView.BodyTranslationIdentifier, Is.Null);
+            Assert.That(staticTextSystemView.BodyTranslationIdentifier.HasValue, Is.False);
+            Assert.That(staticTextSystemView.BodyTranslation, Is.Null);
+            Assert.That(staticTextSystemView.BodyTranslations, Is.Null);
         }
 
         /// <summary>
@@ -1310,12 +1329,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsStaticTextToStaticTextProxy()
         {
-            var staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
+            IStaticText staticTextMock = DomainObjectMockBuilder.BuildStaticTextMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var staticTextProxy = foodWasteObjectMapper.Map<IStaticText, IStaticTextProxy>(staticTextMock);
+            IStaticTextProxy staticTextProxy = sut.Map<IStaticText, IStaticTextProxy>(staticTextMock);
             Assert.That(staticTextProxy.Identifier, Is.Not.Null);
             Assert.That(staticTextProxy.Identifier, Is.EqualTo(staticTextMock.Identifier));
             Assert.That(staticTextProxy.Type, Is.EqualTo(staticTextMock.Type));
@@ -1323,7 +1342,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(staticTextProxy.Translations, Is.Not.Null);
             Assert.That(staticTextProxy.Translations, Is.Not.Empty);
             Assert.That(staticTextProxy.Translations.Count(), Is.EqualTo(staticTextMock.Translations.Count()));
-            foreach (var translation in staticTextProxy.Translations)
+            foreach (ITranslation translation in staticTextProxy.Translations)
             {
                 Assert.That(translation, Is.Not.Null);
                 Assert.That(translation, Is.TypeOf<TranslationProxy>());
@@ -1333,7 +1352,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Null);
             Assert.That(staticTextProxy.SubjectTranslations, Is.Not.Empty);
             Assert.That(staticTextProxy.SubjectTranslations.Count(), Is.EqualTo(staticTextMock.SubjectTranslations.Count()));
-            foreach (var subjectTranslation in staticTextProxy.SubjectTranslations)
+            foreach (ITranslation subjectTranslation in staticTextProxy.SubjectTranslations)
             {
                 Assert.That(subjectTranslation, Is.Not.Null);
                 Assert.That(subjectTranslation, Is.TypeOf<TranslationProxy>());
@@ -1343,7 +1362,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(staticTextProxy.BodyTranslations, Is.Not.Null);
             Assert.That(staticTextProxy.BodyTranslations, Is.Not.Empty);
             Assert.That(staticTextProxy.BodyTranslations.Count(), Is.EqualTo(staticTextMock.BodyTranslations.Count()));
-            foreach (var bodyTranslation in staticTextProxy.BodyTranslations)
+            foreach (ITranslation bodyTranslation in staticTextProxy.BodyTranslations)
             {
                 Assert.That(bodyTranslation, Is.Not.Null);
                 Assert.That(bodyTranslation, Is.TypeOf<TranslationProxy>());
@@ -1356,12 +1375,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsDataProviderToDataProviderView()
         {
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
+            IDataProvider dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderView = foodWasteObjectMapper.Map<IDataProvider, DataProviderView>(dataProviderMock);
+            DataProviderView dataProviderView = sut.Map<IDataProvider, DataProviderView>(dataProviderMock);
             Assert.That(dataProviderView.DataProviderIdentifier, Is.Not.Null);
             Assert.That(dataProviderView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier ?? Guid.Empty));
             Assert.That(dataProviderView.Name, Is.Not.Null);
@@ -1380,12 +1399,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase(false)]
         public void TestThatMapMapsDataProviderToDataProviderSystemView(bool handlesPayments)
         {
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(handlesPayments);
+            IDataProvider dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(handlesPayments);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderSystemView = foodWasteObjectMapper.Map<IDataProvider, DataProviderSystemView>(dataProviderMock);
+            DataProviderSystemView dataProviderSystemView = sut.Map<IDataProvider, DataProviderSystemView>(dataProviderMock);
             Assert.That(dataProviderSystemView.DataProviderIdentifier, Is.Not.Null);
             Assert.That(dataProviderSystemView.DataProviderIdentifier, Is.EqualTo(dataProviderMock.Identifier ?? Guid.Empty));
             Assert.That(dataProviderSystemView.Name, Is.Not.Null);
@@ -1396,7 +1415,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderSystemView.DataSourceStatements, Is.Not.Empty);
             Assert.That(dataProviderSystemView.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
-            foreach (var dataSourceStatement in dataProviderSystemView.DataSourceStatements)
+            foreach (TranslationSystemView dataSourceStatement in dataProviderSystemView.DataSourceStatements)
             {
                 Assert.That(dataSourceStatement, Is.Not.Null);
                 Assert.That(dataSourceStatement, Is.TypeOf<TranslationSystemView>());
@@ -1411,19 +1430,19 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase(false)]
         public void TestThatMapMapsDataProviderToDataProviderProxy(bool handlesPayments)
         {
-            var dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(handlesPayments);
+            IDataProvider dataProviderMock = DomainObjectMockBuilder.BuildDataProviderMock(handlesPayments);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var dataProviderProxy = foodWasteObjectMapper.Map<IDataProvider, IDataProviderProxy>(dataProviderMock);
+            IDataProviderProxy dataProviderProxy = sut.Map<IDataProvider, IDataProviderProxy>(dataProviderMock);
             Assert.That(dataProviderProxy.Identifier, Is.Not.Null);
             Assert.That(dataProviderProxy.Identifier, Is.EqualTo(dataProviderMock.Identifier));
             Assert.That(dataProviderProxy.Translation, Is.Null);
             Assert.That(dataProviderProxy.Translations, Is.Not.Null);
             Assert.That(dataProviderProxy.Translations, Is.Not.Empty);
             Assert.That(dataProviderProxy.Translations.Count(), Is.EqualTo(dataProviderMock.Translations.Count()));
-            foreach (var translation in dataProviderProxy.Translations)
+            foreach (ITranslation translation in dataProviderProxy.Translations)
             {
                 Assert.That(translation, Is.Not.Null);
                 Assert.That(translation, Is.TypeOf<TranslationProxy>());
@@ -1437,7 +1456,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Null);
             Assert.That(dataProviderProxy.DataSourceStatements, Is.Not.Empty);
             Assert.That(dataProviderProxy.DataSourceStatements.Count(), Is.EqualTo(dataProviderMock.DataSourceStatements.Count()));
-            foreach (var dataSourceStatement in dataProviderProxy.DataSourceStatements)
+            foreach (ITranslation dataSourceStatement in dataProviderProxy.DataSourceStatements)
             {
                 Assert.That(dataSourceStatement, Is.Not.Null);
                 Assert.That(dataSourceStatement, Is.TypeOf<TranslationProxy>());
@@ -1450,12 +1469,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsTranslationToTranslationSystemView()
         {
-            var translationMock = DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid());
+            ITranslation translationMock = DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoSystemView = foodWasteObjectMapper.Map<ITranslation, TranslationSystemView>(translationMock);
+            TranslationSystemView translationInfoSystemView = sut.Map<ITranslation, TranslationSystemView>(translationMock);
             Assert.That(translationInfoSystemView.TranslationIdentifier, Is.Not.Null);
             Assert.That(translationInfoSystemView.TranslationIdentifier, Is.EqualTo(translationMock.Identifier ?? Guid.Empty));
             Assert.That(translationInfoSystemView.TranslationOfIdentifier, Is.EqualTo(translationMock.TranslationOfIdentifier));
@@ -1472,12 +1491,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsTranslationToTranslationProxy()
         {
-            var translationMock = DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid());
+            ITranslation translationMock = DomainObjectMockBuilder.BuildTranslationMock(Guid.NewGuid());
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationProxy = foodWasteObjectMapper.Map<ITranslation, ITranslationProxy>(translationMock);
+            ITranslationProxy translationProxy = sut.Map<ITranslation, ITranslationProxy>(translationMock);
             Assert.That(translationProxy.Identifier, Is.Not.Null);
             Assert.That(translationProxy.Identifier, Is.EqualTo(translationMock.Identifier));
             Assert.That(translationProxy.TranslationOfIdentifier, Is.EqualTo(translationMock.TranslationOfIdentifier));
@@ -1496,12 +1515,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase("en-US")]
         public void TestThatMapMapsTranslationInfoToTranslationInfoSystemView(string cultureName)
         {
-            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock(cultureName);
+            ITranslationInfo translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock(cultureName);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoSystemView = foodWasteObjectMapper.Map<ITranslationInfo, TranslationInfoSystemView>(translationInfoMock);
+            TranslationInfoSystemView translationInfoSystemView = sut.Map<ITranslationInfo, TranslationInfoSystemView>(translationInfoMock);
             Assert.That(translationInfoSystemView.TranslationInfoIdentifier, Is.Not.Null);
             Assert.That(translationInfoSystemView.TranslationInfoIdentifier, Is.EqualTo(translationInfoMock.Identifier ?? Guid.Empty));
             Assert.That(translationInfoSystemView.CultureName, Is.Not.Null);
@@ -1517,12 +1536,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase("en-US")]
         public void TestThatMapMapsTranslationInfoToTranslationInfoProxy(string cultureName)
         {
-            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock(cultureName);
+            ITranslationInfo translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock(cultureName);
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var translationInfoProxy = foodWasteObjectMapper.Map<ITranslationInfo, ITranslationInfoProxy>(translationInfoMock);
+            ITranslationInfoProxy translationInfoProxy = sut.Map<ITranslationInfo, ITranslationInfoProxy>(translationInfoMock);
             Assert.That(translationInfoProxy.Identifier, Is.Not.Null);
             Assert.That(translationInfoProxy.Identifier, Is.EqualTo(translationInfoMock.Identifier));
             Assert.That(translationInfoProxy.CultureName, Is.Not.Null);
@@ -1540,12 +1559,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [Test]
         public void TestThatMapMapsIIdentifiableToServiceReceiptResponse()
         {
-            var identifiableMock = DomainObjectMockBuilder.BuildIdentifiableMock();
+            IIdentifiable identifiableMock = DomainObjectMockBuilder.BuildIdentifiableMock();
 
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var serviceReceiptResponse = foodWasteObjectMapper.Map<IIdentifiable, ServiceReceiptResponse>(identifiableMock);
+            ServiceReceiptResponse serviceReceiptResponse = sut.Map<IIdentifiable, ServiceReceiptResponse>(identifiableMock);
             Assert.That(serviceReceiptResponse.Identifier, Is.EqualTo(identifiableMock.Identifier));
             Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
         }
@@ -1558,10 +1577,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         {
             IRange<int> intRangeMock = DomainObjectMockBuilder.BuildIntRange();
 
-            IFoodWasteObjectMapper foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            IntRangeView intRangeView = foodWasteObjectMapper.Map<IRange<int>, IntRangeView>(intRangeMock);
+            IntRangeView intRangeView = sut.Map<IRange<int>, IntRangeView>(intRangeMock);
             Assert.That(intRangeView, Is.Not.Null);
             Assert.That(intRangeView.StartValue, Is.EqualTo(intRangeMock.StartValue));
             Assert.That(intRangeView.EndValue, Is.EqualTo(intRangeMock.EndValue));
@@ -1575,12 +1594,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         [TestCase(false)]
         public void TestThatMapMapsBooleanToBooleanResultResponse(bool testValue)
         {
-            var foodWasteObjectMapper = new FoodWasteObjectMapper();
-            Assert.That(foodWasteObjectMapper, Is.Not.Null);
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var serviceReceiptResponse = foodWasteObjectMapper.Map<bool, BooleanResultResponse>(testValue);
-            Assert.That(serviceReceiptResponse.Result, Is.EqualTo(testValue));
-            Assert.That(serviceReceiptResponse.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+            BooleanResultResponse booleanResultResponse = sut.Map<bool, BooleanResultResponse>(testValue);
+            Assert.That(booleanResultResponse.Result, Is.EqualTo(testValue));
+            Assert.That(booleanResultResponse.EventDate, Is.EqualTo(DateTime.Now).Within(3).Seconds);
+        }
+
+        /// <summary>
+        /// Creates an instance of the object mapper which can map objects in the food waste domain.
+        /// </summary>
+        /// <returns>Instance of the object mapper which can map objects in the food waste domain.</returns>
+        private IFoodWasteObjectMapper CreateSut()
+        {
+            return new FoodWasteObjectMapper();
         }
     }
 }
