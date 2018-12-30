@@ -18,6 +18,12 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class ForeignKeyProxy : ForeignKey, IForeignKeyProxy
     {
+        #region Private constants
+
+        private const string CacheName = "OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste.ForeignKeyProxy.Cache";
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -136,6 +142,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
+
+            DataProxyCache.AddDataProxyCollectionToCache(CacheName, this, foreignKeyProxy => foreignKeyProxy.Identifier == Identifier.Value);
         }
 
         /// <summary>
@@ -150,6 +158,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
+
+            DataProxyCache.RemoveDataProxyCollectionToCache(CacheName, this, foreignKeyProxy => foreignKeyProxy.Identifier == Identifier.Value);
         }
 
         /// <summary>
@@ -216,9 +226,17 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
 
+            HashSet<ForeignKeyProxy> cache = DataProxyCache.GetCachedDataProxyCollection<ForeignKeyProxy>(CacheName);
+            if (cache.Any(foreignKeyProxy => foreignKeyProxy.ForeignKeyForIdentifier == foreignKeyForIdentifier))
+            {
+                return cache.Where(foreignKeyProxy => foreignKeyProxy.ForeignKeyForIdentifier == foreignKeyForIdentifier).ToList();
+            }
+
             using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<ForeignKeyProxy>(BuildSystemDataCommandForSelecting("WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier", systemDataCommandBuilder => systemDataCommandBuilder.AddForeignKeyForIdentifierParameter(foreignKeyForIdentifier)));
+                List<ForeignKeyProxy> result = new List<ForeignKeyProxy>(subDataProvider.GetCollection<ForeignKeyProxy>(BuildSystemDataCommandForSelecting("WHERE fk.ForeignKeyForIdentifier=@foreignKeyForIdentifier", systemDataCommandBuilder => systemDataCommandBuilder.AddForeignKeyForIdentifierParameter(foreignKeyForIdentifier))));
+                DataProxyCache.AddDataProxyCollectionToCache(CacheName, result, foreignKeyProxy => foreignKeyProxy.ForeignKeyForIdentifier == foreignKeyForIdentifier);
+                return result;
             }
         }
 

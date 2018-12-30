@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
@@ -17,20 +18,26 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
     /// </summary>
     public class TranslationProxy : Translation, ITranslationProxy
     {
+        #region Private constants
+
+        private const string CacheName = "OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste.TranslationProxy.Cache";
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
-        /// Craetes a data proxy to a given translation for a domain object.
+        /// Creates a data proxy to a given translation for a domain object.
         /// </summary>
         public TranslationProxy()
         {
         }
 
         /// <summary>
-        /// Craetes a data proxy to a given translation for a domain object.
+        /// Creates a data proxy to a given translation for a domain object.
         /// </summary>
         /// <param name="translationOfIdentifier">Identifier for the domain object which name can be translated by this object.</param>
-        /// <param name="translationInfo">Translation informations used to translate the name for a domain object.</param>
+        /// <param name="translationInfo">Translation information used to translate the name for a domain object.</param>
         /// <param name="value">Value which is the translated name for the domain object.</param>
         public TranslationProxy(Guid translationOfIdentifier, ITranslationInfo translationInfo, string value)
             : base(translationOfIdentifier, translationInfo, value)
@@ -98,6 +105,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
+
+            DataProxyCache.AddDataProxyCollectionToCache(CacheName, this, translationProxy => translationProxy.Identifier == Identifier.Value);
         }
 
         /// <summary>
@@ -112,6 +121,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, Identifier, "Identifier"));
             }
+
+            DataProxyCache.RemoveDataProxyCollectionToCache(CacheName, this, translationProxy => translationProxy.Identifier == Identifier.Value);
         }
 
         /// <summary>
@@ -176,9 +187,17 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         {
             ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
 
+            HashSet<TranslationProxy> cache = DataProxyCache.GetCachedDataProxyCollection<TranslationProxy>(CacheName);
+            if (cache.Any(translationProxy => translationProxy.TranslationOfIdentifier == translationOfIdentifier))
+            {
+                return cache.Where(translationProxy => translationProxy.TranslationOfIdentifier == translationOfIdentifier).ToList();
+            }
+
             using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                return subDataProvider.GetCollection<TranslationProxy>(BuildSystemDataCommandForSelecting("WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName", systemDataCommandBuilder => systemDataCommandBuilder.AddTranslationOfIdentifierParameter(translationOfIdentifier)));
+                List<TranslationProxy> result = new List<TranslationProxy>(subDataProvider.GetCollection<TranslationProxy>(BuildSystemDataCommandForSelecting("WHERE t.OfIdentifier=@ofIdentifier ORDER BY ti.CultureName", systemDataCommandBuilder => systemDataCommandBuilder.AddTranslationOfIdentifierParameter(translationOfIdentifier))));
+                DataProxyCache.AddDataProxyCollectionToCache(CacheName, result, translationProxy => translationProxy.TranslationOfIdentifier == translationOfIdentifier);
+                return result;
             }
         }
 
