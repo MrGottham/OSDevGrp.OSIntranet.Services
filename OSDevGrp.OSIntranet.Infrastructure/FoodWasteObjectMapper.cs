@@ -96,6 +96,27 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                                 {
                                     householdProxy.HouseholdMemberAdd(_mappingHouseholdMember);
                                 }
+                                foreach (IStorage storage in m.Storages.OrderBy(n => n.SortOrder).ThenByDescending(n => n.CreationTime))
+                                {
+                                    if (storage is IStorageProxy)
+                                    {
+                                        if (householdProxy.Storages.Contains(storage))
+                                        {
+                                            continue;
+                                        }
+                                        householdProxy.StorageAdd(storage);
+                                        continue;
+                                    }
+                                    if (Mapper != null)
+                                    {
+                                        IStorageProxy storageProxy = Mapper.Map<IStorage, IStorageProxy>(storage);
+                                        if (householdProxy.Storages.Contains(storageProxy))
+                                        {
+                                            continue;
+                                        }
+                                        householdProxy.StorageAdd(storageProxy);
+                                    }
+                                }
                             }
                             finally
                             {

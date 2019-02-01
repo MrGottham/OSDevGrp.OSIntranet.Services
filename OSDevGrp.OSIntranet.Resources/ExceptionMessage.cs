@@ -51,6 +51,7 @@
         LengthForPropertyIsInvalid,
         CannotModifyHouseholdMembershipForYourself,
         HouseholdMemberAlreadyExistsOnHousehold,
-        HouseholdMemberDoesNotExistOnHousehold
+        HouseholdMemberDoesNotExistOnHousehold,
+        OperationNotAllowedOnStorage,
     }
 }

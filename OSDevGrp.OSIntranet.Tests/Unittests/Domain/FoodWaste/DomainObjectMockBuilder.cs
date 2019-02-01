@@ -49,6 +49,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             householdMock.Stub(m => m.HouseholdMembers)
                 .Return(new List<IHouseholdMember> {householdMember ?? BuildHouseholdMemberMock()})
                 .Repeat.Any();
+            householdMock.Stub(m => m.Storages)
+                .Return(BuildStorageMockCollection(householdMock))
+                .Repeat.Any();
             return householdMock;
         }
 

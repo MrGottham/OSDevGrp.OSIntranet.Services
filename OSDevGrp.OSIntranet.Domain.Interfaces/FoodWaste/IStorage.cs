@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
 {
@@ -36,5 +37,14 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// Gets the creation date and time for when the storage was created.
         /// </summary>
         DateTime CreationTime { get; }
+
+        /// <summary>
+        /// Make translation for the storage.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        /// <param name="translateHousehold">Indicates whether the <see cref="Household"/> should be translated.</param>
+        /// <param name="translateStorageType">Indicates whether the <see cref="StorageType"/> should be translated.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="translationCulture"/> is null.</exception>
+        void Translate(CultureInfo translationCulture, bool translateHousehold, bool translateStorageType = true);
     }
 }

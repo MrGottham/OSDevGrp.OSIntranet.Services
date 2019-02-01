@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Queries;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
@@ -10,7 +12,6 @@ using OSDevGrp.OSIntranet.QueryHandlers;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
 using OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste;
-using AutoFixture;
 using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
@@ -21,21 +22,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
     [TestFixture]
     public class HouseholdDataGetQueryHandlerTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+        private IHouseholdDataRepository _householdDataRepositoryMock;
+        private IClaimValueProvider _claimValueProviderMock;
+        private IFoodWasteObjectMapper _objectMapperMock;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+            _householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
+            _claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
+            _objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+        }
+
         /// <summary>
         /// Tests that the constructor initialize the query handler which handles the query for getting household data for one of the current user households.
         /// </summary>
         [Test]
         public void TestThatConstructorInitializeHouseholdDataGetQueryHandler()
         {
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
-
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
-            Assert.That(householdDataGetQueryHandler.ShouldBeActivated, Is.True);
-            Assert.That(householdDataGetQueryHandler.ShouldHaveAcceptedPrivacyPolicy, Is.True);
-            Assert.That(householdDataGetQueryHandler.RequiredMembership, Is.EqualTo(Membership.Basic));
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+            Assert.That(sut.ShouldBeActivated, Is.True);
+            Assert.That(sut.ShouldHaveAcceptedPrivacyPolicy, Is.True);
+            Assert.That(sut.RequiredMembership, Is.EqualTo(Membership.Basic));
         }
 
         /// <summary>
@@ -44,20 +62,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestThatGetDataThrowsArgumentNullExceptionWhenHouseholdMemberIsNull()
         {
-            var fixture = new Fixture();
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetData(null, BuildHouseholdDataGetQuery(), DomainObjectMockBuilder.BuildTranslationInfoMock()));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => householdDataGetQueryHandler.GetData(null, fixture.Create<HouseholdDataGetQuery>(), DomainObjectMockBuilder.BuildTranslationInfoMock()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("householdMember"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "householdMember");
         }
 
         /// <summary>
@@ -66,41 +76,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestThatGetDataThrowsArgumentNullExceptionWhenQueryIsNull()
         {
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), null, DomainObjectMockBuilder.BuildTranslationInfoMock()));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => householdDataGetQueryHandler.GetData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), null, DomainObjectMockBuilder.BuildTranslationInfoMock()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("query"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "query");
         }
 
         /// <summary>
-        /// Tests that GetData throws ArgumentNullException when the translation informations which can be used for translation is null.
+        /// Tests that GetData throws ArgumentNullException when the translation information which can be used for translation is null.
         /// </summary>
         [Test]
         public void TestThatGetDataThrowsArgumentNullExceptionWhenTranslationInfoIsNull()
         {
-            var fixture = new Fixture();
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.GetData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), BuildHouseholdDataGetQuery(), null));
 
-            var exception = Assert.Throws<ArgumentNullException>(() => householdDataGetQueryHandler.GetData(DomainObjectMockBuilder.BuildHouseholdMemberMock(), fixture.Create<HouseholdDataGetQuery>(), null));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Null);
-            Assert.That(exception.ParamName, Is.Not.Empty);
-            Assert.That(exception.ParamName, Is.EqualTo("translationInfo"));
-            Assert.That(exception.InnerException, Is.Null);
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "translationInfo");
         }
 
         /// <summary>
@@ -109,27 +104,20 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestThatGetDataCallsHouseholdsOnHouseholdMember()
         {
-            var fixture = new Fixture();
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
-
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            IHouseholdMember householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             Assert.That(householdMemberMock, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Empty);
 
-            var householdDataGetQuery = fixture.Build<HouseholdDataGetQuery>()
-                // ReSharper disable PossibleInvalidOperationException
-                .With(m => m.HouseholdIdentifier, householdMemberMock.Households.First().Identifier.Value)
-                // ReSharper restore PossibleInvalidOperationException
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .Create();
+            // ReSharper disable PossibleInvalidOperationException
+            Guid householdIdentifier = householdMemberMock.Households.First().Identifier.Value;
+            // ReSharper restore PossibleInvalidOperationException
+            HouseholdDataGetQuery householdDataGetQuery = BuildHouseholdDataGetQuery(householdIdentifier);
 
-            householdDataGetQueryHandler.GetData(householdMemberMock, householdDataGetQuery, DomainObjectMockBuilder.BuildTranslationInfoMock());
+            sut.GetData(householdMemberMock, householdDataGetQuery, DomainObjectMockBuilder.BuildTranslationInfoMock());
 
             householdMemberMock.AssertWasCalled(m => m.Households, opt => opt.Repeat.Times(3 + 1)); // Tree times in the unit test and one time in the query handler.
         }
@@ -140,33 +128,22 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestThatGetDataThrowsIntranetBusinessExceptionWhenHouseholdIdentifierDoesNotExistOnHouseholdMember()
         {
-            var fixture = new Fixture();
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
-
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            IHouseholdMember householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             Assert.That(householdMemberMock, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Empty);
 
-            var householdIdentifier = Guid.NewGuid();
+            Guid householdIdentifier = Guid.NewGuid();
             Assert.That(householdMemberMock.Households.Any(household => household.Identifier.HasValue && household.Identifier.Value == householdIdentifier), Is.False);
 
-            var householdDataGetQuery = fixture.Build<HouseholdDataGetQuery>()
-                .With(m => m.HouseholdIdentifier, householdIdentifier)
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .Create();
+            HouseholdDataGetQuery householdDataGetQuery = BuildHouseholdDataGetQuery(householdIdentifier);
 
-            var exception = Assert.Throws<IntranetBusinessException>(() => householdDataGetQueryHandler.GetData(householdMemberMock, householdDataGetQuery, DomainObjectMockBuilder.BuildTranslationInfoMock()));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, householdIdentifier)));
-            Assert.That(exception.InnerException, Is.Null);
+            IntranetBusinessException result = Assert.Throws<IntranetBusinessException>(() => sut.GetData(householdMemberMock, householdDataGetQuery, DomainObjectMockBuilder.BuildTranslationInfoMock()));
+
+            TestHelper.AssertIntranetBusinessExceptionIsValid(result, ExceptionMessage.IdentifierUnknownToSystem, householdIdentifier);
         }
 
         /// <summary>
@@ -175,34 +152,27 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestThatGetDataCallsTranslateOnHouseholdForHouseholdIdentifier()
         {
-            var fixture = new Fixture();
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
-
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            IHouseholdMember householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             Assert.That(householdMemberMock, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Empty);
 
-            var householdMock = householdMemberMock.Households.FirstOrDefault();
+            IHousehold householdMock = householdMemberMock.Households.FirstOrDefault();
             Assert.That(householdMock, Is.Not.Null);
 
-            var householdDataGetQuery = fixture.Build<HouseholdDataGetQuery>()
-                // ReSharper disable PossibleInvalidOperationException
-                .With(m => m.HouseholdIdentifier, householdMock.Identifier.Value)
-                // ReSharper restore PossibleInvalidOperationException
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .Create();
+            // ReSharper disable PossibleInvalidOperationException
+            Guid householdIdentifier = householdMock.Identifier.Value;
+            // ReSharper restore PossibleInvalidOperationException
+            HouseholdDataGetQuery householdDataGetQuery = BuildHouseholdDataGetQuery(householdIdentifier);
 
-            var translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
+            ITranslationInfo translationInfoMock = DomainObjectMockBuilder.BuildTranslationInfoMock();
 
-            householdDataGetQueryHandler.GetData(householdMemberMock, householdDataGetQuery, translationInfoMock);
+            sut.GetData(householdMemberMock, householdDataGetQuery, translationInfoMock);
 
-            householdMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationInfoMock.CultureInfo), Arg<bool>.Is.Equal(false)));
+            householdMock.AssertWasCalled(m => m.Translate(Arg<CultureInfo>.Is.Equal(translationInfoMock.CultureInfo), Arg<bool>.Is.Equal(false), Arg<bool>.Is.Equal(true)), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -211,32 +181,46 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers
         [Test]
         public void TestThatGetDataReturnsHouseholdForHouseholdIdentifier()
         {
-            var fixture = new Fixture();
-            var householdDataRepositoryMock = MockRepository.GenerateMock<IHouseholdDataRepository>();
-            var claimValueProviderMock = MockRepository.GenerateMock<IClaimValueProvider>();
-            var objectMapperMock = MockRepository.GenerateMock<IFoodWasteObjectMapper>();
+            HouseholdDataGetQueryHandler sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
 
-            var householdDataGetQueryHandler = new HouseholdDataGetQueryHandler(householdDataRepositoryMock, claimValueProviderMock, objectMapperMock);
-            Assert.That(householdDataGetQueryHandler, Is.Not.Null);
-
-            var householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
+            IHouseholdMember householdMemberMock = DomainObjectMockBuilder.BuildHouseholdMemberMock();
             Assert.That(householdMemberMock, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Null);
             Assert.That(householdMemberMock.Households, Is.Not.Empty);
 
-            var householdMock = householdMemberMock.Households.FirstOrDefault();
+            IHousehold householdMock = householdMemberMock.Households.FirstOrDefault();
             Assert.That(householdMock, Is.Not.Null);
 
-            var householdDataGetQuery = fixture.Build<HouseholdDataGetQuery>()
-                // ReSharper disable PossibleInvalidOperationException
-                .With(m => m.HouseholdIdentifier, householdMock.Identifier.Value)
-                // ReSharper restore PossibleInvalidOperationException
-                .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .Create();
+            // ReSharper disable PossibleInvalidOperationException
+            Guid householdIdentifier = householdMock.Identifier.Value;
+            // ReSharper restore PossibleInvalidOperationException
+            HouseholdDataGetQuery householdDataGetQuery = BuildHouseholdDataGetQuery(householdIdentifier);
 
-            var result = householdDataGetQueryHandler.GetData(householdMemberMock, householdDataGetQuery, DomainObjectMockBuilder.BuildTranslationInfoMock());
+            IHousehold result = sut.GetData(householdMemberMock, householdDataGetQuery, DomainObjectMockBuilder.BuildTranslationInfoMock());
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.EqualTo(householdMock));
+        }
+
+        /// <summary>
+        /// Creates an instance of the <see cref="HouseholdDataGetQueryHandler"/> which can be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of the <see cref="HouseholdDataGetQueryHandler"/> which can be used for unit testing.</returns>
+        private HouseholdDataGetQueryHandler CreateSut()
+        {
+            return new HouseholdDataGetQueryHandler(_householdDataRepositoryMock, _claimValueProviderMock, _objectMapperMock);
+        }
+
+        /// <summary>
+        /// Builds an instance of the <see cref="HouseholdDataGetQuery"/> which can be used for unit testing.
+        /// </summary>
+        /// <returns>Instance of the <see cref="HouseholdDataGetQuery"/> which can be used for unit testing.</returns>
+        private HouseholdDataGetQuery BuildHouseholdDataGetQuery(Guid? householdIdentifier = null, Guid? translationInfoIdentifier = null)
+        {
+            return _fixture.Build<HouseholdDataGetQuery>()
+                .With(m => m.HouseholdIdentifier, householdIdentifier ?? Guid.NewGuid())
+                .With(m => m.TranslationInfoIdentifier, translationInfoIdentifier ?? Guid.NewGuid())
+                .Create();
         }
     }
 }

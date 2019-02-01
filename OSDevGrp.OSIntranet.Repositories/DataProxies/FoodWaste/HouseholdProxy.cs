@@ -21,6 +21,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Private variables
 
         private bool _householdMemberCollectionHasBeenLoaded;
+        private bool _storageCollectionHasBeenLoaded;
         private IFoodWasteDataProvider _dataProvider;
         private readonly IList<IHouseholdMember> _removedHouseholdMemberCollection = new List<IHouseholdMember>(0);
 
@@ -82,6 +83,30 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             }
         }
 
+        /// <summary>
+        /// Storages in this household.
+        /// </summary>
+        public override IEnumerable<IStorage> Storages
+        {
+            get
+            {
+                if (_storageCollectionHasBeenLoaded || _dataProvider == null || Identifier.HasValue == false)
+                {
+                    return base.Storages;
+                }
+                Storages = StorageProxy.GetStorages(_dataProvider, Identifier.Value)
+                    .OrderBy(storage => storage.SortOrder)
+                    .ThenByDescending(storage => storage.CreationTime)
+                    .ToList();
+                return base.Storages;
+            }
+            protected set
+            {
+                base.Storages = value;
+                _storageCollectionHasBeenLoaded = true;
+            }
+        }
+
         #endregion
 
         #region IMySqlDataProxy Members
@@ -123,6 +148,7 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             CreationTime = GetCreationTime(dataReader, "CreationTime");
 
             _householdMemberCollectionHasBeenLoaded = false;
+            _storageCollectionHasBeenLoaded = false;
             _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }
 
@@ -220,6 +246,8 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
             {
                 HandleAffectedHouseholdMember(dataProvider, affectedHouseholdMember);
             }
+
+            StorageProxy.DeleteStorages(dataProvider, Identifier.Value);
 
             _dataProvider = (IFoodWasteDataProvider) dataProvider;
         }

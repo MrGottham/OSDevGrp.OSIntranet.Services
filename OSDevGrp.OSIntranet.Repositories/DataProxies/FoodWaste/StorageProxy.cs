@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using MySql.Data.MySqlClient;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
@@ -235,29 +236,40 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
         #region Methods
 
         /// <summary>
-        /// Creates a MySQL command selecting a collection of <see cref="StorageProxy"/>.
+        /// Gets all the storages for a given household.
         /// </summary>
-        /// <param name="whereClause">The WHERE clause which the MySQL command should use.</param>
-        /// <param name="parameterAdder">The callback to add MySQL parameters to the MySQL command.</param>
-        /// <returns>MySQL command selecting a collection of <see cref="StorageProxy"/>.</returns>
-        internal static MySqlCommand BuildHouseholdDataCommandForSelecting(string whereClause = null, Action<HouseholdDataCommandBuilder> parameterAdder = null)
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="householdIdentifier">The identifier for the household on which to get the storages.</param>
+        /// <returns>All the storages for the given household.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataProvider"/> is null.</exception>
+        internal static IEnumerable<StorageProxy> GetStorages(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, Guid householdIdentifier)
         {
-            // ReSharper disable StringLiteralTypo
-            StringBuilder selectStatementBuilder = new StringBuilder("SELECT s.StorageIdentifier,s.HouseholdIdentifier,s.SortOrder,s.StorageTypeIdentifier,s.Descr,s.Temperature,s.CreationTime,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,st.SortOrder AS StorageTypeSortOrder,st.Temperature AS StorageTypeTemperature,st.TemperatureRangeStartValue AS StorageTypeTemperatureRangeStartValue,st.TemperatureRangeEndValue AS StorageTypeTemperatureRangeEndValue,st.Creatable AS StorageTypeCreatable,st.Editable AS StorageTypeEditable,st.Deletable AS StorageTypeDeletable FROM Storages AS s INNER JOIN Households AS h ON h.HouseholdIdentifier=s.HouseholdIdentifier INNER JOIN StorageTypes AS st ON st.StorageTypeIdentifier=s.StorageTypeIdentifier");
-            // ReSharper restore StringLiteralTypo
-            if (string.IsNullOrWhiteSpace(whereClause) == false)
-            {
-                selectStatementBuilder.Append($" {whereClause}");
-            }
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
 
-            HouseholdDataCommandBuilder householdDataCommandBuilder = new HouseholdDataCommandBuilder(selectStatementBuilder.ToString());
-            if (parameterAdder == null)
+            using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
             {
-                return householdDataCommandBuilder.Build();
+                MySqlCommand command = BuildHouseholdDataCommandForSelecting("WHERE s.HouseholdIdentifier=@householdIdentifier", householdDataCommandBuilder => householdDataCommandBuilder.AddHouseholdIdentifierParameter(householdIdentifier));
+                return subDataProvider.GetCollection<StorageProxy>(command);
             }
+        }
 
-            parameterAdder(householdDataCommandBuilder);
-            return householdDataCommandBuilder.Build();
+        /// <summary>
+        /// Deletes all the storages for a given household.
+        /// </summary>
+        /// <param name="dataProvider">Implementation of the data provider used to access data.</param>
+        /// <param name="householdIdentifier">The identifier for the household on which to delete the storages.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dataProvider"/> is null.</exception>
+        internal static void DeleteStorages(IDataProviderBase<MySqlDataReader, MySqlCommand> dataProvider, Guid householdIdentifier)
+        {
+            ArgumentNullGuard.NotNull(dataProvider, nameof(dataProvider));
+
+            foreach (StorageProxy storageProxy in GetStorages(dataProvider, householdIdentifier))
+            {
+                using (IFoodWasteDataProvider subDataProvider = (IFoodWasteDataProvider) dataProvider.Clone())
+                {
+                    subDataProvider.Delete(storageProxy);
+                }
+            }
         }
 
         /// <summary>
@@ -334,6 +346,32 @@ namespace OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste
                 .NotNullOrWhiteSpace(columnName, nameof(columnName));
 
             return dataReader.GetMySqlDateTime(columnName).Value.ToLocalTime();
+        }
+
+        /// <summary>
+        /// Creates a MySQL command selecting a collection of <see cref="StorageProxy"/>.
+        /// </summary>
+        /// <param name="whereClause">The WHERE clause which the MySQL command should use.</param>
+        /// <param name="parameterAdder">The callback to add MySQL parameters to the MySQL command.</param>
+        /// <returns>MySQL command selecting a collection of <see cref="StorageProxy"/>.</returns>
+        private static MySqlCommand BuildHouseholdDataCommandForSelecting(string whereClause = null, Action<HouseholdDataCommandBuilder> parameterAdder = null)
+        {
+            // ReSharper disable StringLiteralTypo
+            StringBuilder selectStatementBuilder = new StringBuilder("SELECT s.StorageIdentifier,s.HouseholdIdentifier,s.SortOrder,s.StorageTypeIdentifier,s.Descr,s.Temperature,s.CreationTime,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,st.SortOrder AS StorageTypeSortOrder,st.Temperature AS StorageTypeTemperature,st.TemperatureRangeStartValue AS StorageTypeTemperatureRangeStartValue,st.TemperatureRangeEndValue AS StorageTypeTemperatureRangeEndValue,st.Creatable AS StorageTypeCreatable,st.Editable AS StorageTypeEditable,st.Deletable AS StorageTypeDeletable FROM Storages AS s INNER JOIN Households AS h ON h.HouseholdIdentifier=s.HouseholdIdentifier INNER JOIN StorageTypes AS st ON st.StorageTypeIdentifier=s.StorageTypeIdentifier");
+            // ReSharper restore StringLiteralTypo
+            if (string.IsNullOrWhiteSpace(whereClause) == false)
+            {
+                selectStatementBuilder.Append($" {whereClause}");
+            }
+
+            HouseholdDataCommandBuilder householdDataCommandBuilder = new HouseholdDataCommandBuilder(selectStatementBuilder.ToString());
+            if (parameterAdder == null)
+            {
+                return householdDataCommandBuilder.Build();
+            }
+
+            parameterAdder(householdDataCommandBuilder);
+            return householdDataCommandBuilder.Build();
         }
 
         #endregion

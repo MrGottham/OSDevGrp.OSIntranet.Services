@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Domain.FoodWaste
@@ -58,13 +60,17 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="domainObjectValidations">Implementation of the common validations used by domain objects in the food waste domain.</param>
         protected Storage(IHousehold household, int sortOrder, IStorageType storageType, string description, int temperature, DateTime creationTime, IDomainObjectValidations domainObjectValidations)
         {
-            _household = household ?? throw new ArgumentNullException(nameof(household));
-            _storageType = storageType ?? throw new ArgumentNullException(nameof(storageType));
-            _domainObjectValidations = domainObjectValidations ?? throw new ArgumentNullException(nameof(domainObjectValidations));
+            ArgumentNullGuard.NotNull(household, nameof(household))
+                .NotNull(storageType, nameof(storageType))
+                .NotNull(domainObjectValidations, nameof(domainObjectValidations));
 
+            _domainObjectValidations = domainObjectValidations;
+
+            _household = household;
             _sortOrder = ValidateSortOrder(sortOrder, nameof(sortOrder));
+            _storageType = storageType;
             _description = description;
-            _temperature = ValidateTemperatue(temperature, nameof(temperature));
+            _temperature = ValidateTemperature(temperature, nameof(temperature));
             _creationTime = creationTime;
         }
 
@@ -78,7 +84,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         public virtual IHousehold Household
         {
             get => _household;
-            protected set => _household = value ?? throw new ArgumentNullException(nameof(value));
+            protected set
+            {
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _household = value;
+            }
         }
 
         /// <summary>
@@ -96,7 +107,12 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         public virtual IStorageType StorageType
         {
             get => _storageType;
-            protected set => _storageType = value ?? throw new ArgumentNullException(nameof(value));
+            protected set
+            {
+                ArgumentNullGuard.NotNull(value, nameof(value));
+
+                _storageType = value ?? throw new ArgumentNullException(nameof(value));
+            }
         }
 
         /// <summary>
@@ -114,7 +130,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         public virtual int Temperature
         {
             get => _temperature;
-            set => _temperature = ValidateTemperatue(value, nameof(value));
+            set => _temperature = ValidateTemperature(value, nameof(value));
         }
 
         /// <summary>
@@ -131,6 +147,30 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         #region Methods
 
         /// <summary>
+        /// Make translation for the storage.
+        /// </summary>
+        /// <param name="translationCulture">Culture information which are used for translation.</param>
+        /// <param name="translateHousehold">Indicates whether the <see cref="Household"/> should be translated.</param>
+        /// <param name="translateStorageType">Indicates whether the <see cref="StorageType"/> should be translated.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="translationCulture"/> is null.</exception>
+        public virtual void Translate(CultureInfo translationCulture, bool translateHousehold, bool translateStorageType = true)
+        {
+            ArgumentNullGuard.NotNull(translationCulture, nameof(translationCulture));
+
+            if (translateHousehold)
+            {
+                Household.Translate(translationCulture, true, false);
+            }
+
+            if (translateStorageType == false)
+            {
+                return;
+            }
+
+            StorageType.Translate(translationCulture);
+        }
+
+        /// <summary>
         /// Validates the sort order for the storage.
         /// </summary>
         /// <param name="sortOrder">Sort order for the storage.</param>
@@ -138,10 +178,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <returns>Validated sort order for the storage.</returns>
         private int ValidateSortOrder(int sortOrder, string propertyName)
         {
-            if (string.IsNullOrWhiteSpace(propertyName))
-            {
-                throw new ArgumentNullException(nameof(propertyName));
-            }
+            ArgumentNullGuard.NotNullOrWhiteSpace(propertyName, nameof(propertyName));
 
             if (_domainObjectValidations.InRange(sortOrder, new Range<int>(1, 100)))
             {
@@ -157,12 +194,9 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <param name="temperature">Temperature for the storage.</param>
         /// <param name="propertyName">Name of the property which sets the temperature for the storage.</param>
         /// <returns>Validated temperature for the storage.</returns>
-        private int ValidateTemperatue(int temperature, string propertyName)
+        private int ValidateTemperature(int temperature, string propertyName)
         {
-            if (string.IsNullOrWhiteSpace(propertyName))
-            {
-                throw new ArgumentNullException(nameof(propertyName));
-            }
+            ArgumentNullGuard.NotNullOrWhiteSpace(propertyName, nameof(propertyName));
 
             if (StorageType == null || _domainObjectValidations.InRange(temperature, StorageType.TemperatureRange))
             {

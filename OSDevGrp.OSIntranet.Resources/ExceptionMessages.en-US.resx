@@ -282,4 +282,8 @@
     <value>A household member with the mail address '{0}' does not exist on the household.</value>
     <comment>{0} = Mail address.</comment>
   </data>
+  <data name="OperationNotAllowedOnStorage" xml:space="preserve">
+    <value>The operation is not allowed on a storage of this type: {0}</value>
+    <comment>{0} = Operation</comment>
+  </data>
 </root>

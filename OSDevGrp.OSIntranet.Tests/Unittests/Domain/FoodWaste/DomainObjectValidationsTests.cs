@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using AutoFixture;
 using NUnit.Framework;
 using OSDevGrp.OSIntranet.Domain.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
-using AutoFixture;
+using Rhino.Mocks;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 {
@@ -14,6 +16,21 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
     [TestFixture]
     public class DomainObjectValidationsTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tests that the constructor initialize common validations used by domain objects in the food waste domain.
         /// </summary>
@@ -30,7 +47,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         [TestCase(null)]
         [TestCase("")]
-        public void TestThatIsMailAddressThrowsArgumentNullExceptionWhenMailAddressIsNullOrEmpty(string validMailAddress)
+        [TestCase(" ")]
+        [TestCase("  ")]
+        [TestCase("   ")]
+        public void TestThatIsMailAddressThrowsArgumentNullExceptionWhenMailAddressIsNullEmptyOrWhiteSpace(string validMailAddress)
         {
             IDomainObjectValidations sut = new DomainObjectValidations();
             Assert.That(sut, Is.Not.Null);
@@ -83,7 +103,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
 
             foreach (Membership membershipToTest in Enum.GetValues(typeof(Membership)).Cast<Membership>())
             {
-                var result = sut.GetHouseholdLimit(membershipToTest);
+                int result = sut.GetHouseholdLimit(membershipToTest);
                 Assert.That(result, Is.GreaterThan(0));
             }
         }
@@ -205,14 +225,263 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
         [Test]
         public void TestThatInRangeThrowsArgumentNullExceptionWhenRangeIsNull()
         {
-            Fixture fixture = new Fixture();
-
             IDomainObjectValidations sut = new DomainObjectValidations();
             Assert.That(sut, Is.Not.Null);
 
-            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.InRange(fixture.Create<int>(), null));
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.InRange(_fixture.Create<int>(), null));
 
             TestHelper.AssertArgumentNullExceptionIsValid(result, "range");
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage throws an ArgumentNullException when the storage to validate is null.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageThrowsArgumentNullExceptionWhenStorageIsNull()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.CanAddStorage(null, new List<IStorage>(0)));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "storage");
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage throws an ArgumentNullException when the existing storage collection is null.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageThrowsArgumentNullExceptionWhenExistingStorageCollectionIsNull()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.CanAddStorage(BuildStorageMock(), null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "existingStorageCollection");
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage calls StorageType on the storage to validate.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageCallsStorageTypeOnStorageToValidate()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorage storageMock = BuildStorageMock();
+            IEnumerable<IStorage> existingStorageCollection = new List<IStorage>
+            {
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForRefrigerator)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForFreezer)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket))
+            };
+
+            sut.CanAddStorage(storageMock, existingStorageCollection);
+
+            storageMock.AssertWasCalled(m => m.StorageType, opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage returns false when the storage to validate does not have a storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageReturnsFalseWhenStorageDoesNotHaveStorageType()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorage storageMock = BuildStorageMock(false);
+            IEnumerable<IStorage> existingStorageCollection = new List<IStorage>
+            {
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForRefrigerator)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForFreezer)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket))
+            };
+
+            bool result = sut.CanAddStorage(storageMock, existingStorageCollection);
+
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage calls Creatable on the storage type when the storage to validate does have a storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageCallsCreatableOnStorageTypeWhenStorageDoesHaveStorageType()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorageType storageTypeMock = BuildStorageTypeMock(StorageType.IdentifierForRefrigerator);
+            IStorage storageMock = BuildStorageMock(storageType: storageTypeMock);
+            IEnumerable<IStorage> existingStorageCollection = new List<IStorage>
+            {
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForRefrigerator)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForFreezer)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket))
+            };
+
+            sut.CanAddStorage(storageMock, existingStorageCollection);
+
+            storageTypeMock.AssertWasCalled(m => m.Creatable, opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage returns true when the storage to validate does have a creatable storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageReturnsTrueWhenStorageDoesHaveCreatableStorageType()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorageType storageTypeMock = BuildStorageTypeMock(StorageType.IdentifierForRefrigerator, true);
+            IStorage storageMock = BuildStorageMock(storageType: storageTypeMock);
+            IEnumerable<IStorage> existingStorageCollection = new List<IStorage>
+            {
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForRefrigerator)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForFreezer)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket))
+            };
+
+            bool result = sut.CanAddStorage(storageMock, existingStorageCollection);
+
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage returns true when the storage to validate does have a non creatable storage type and the existing storage collection does not contain a storage of the storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageReturnsTrueWhenStorageDoesHaveNonCreatableStorageTypeAndExistingStorageCollectionDoesNotContainStorageOfStorageType()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorageType storageTypeMock = BuildStorageTypeMock(StorageType.IdentifierForRefrigerator, false);
+            IStorage storageMock = BuildStorageMock(storageType: storageTypeMock);
+            IEnumerable<IStorage> existingStorageCollection = new List<IStorage>
+            {
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForFreezer)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket))
+            };
+
+            bool result = sut.CanAddStorage(storageMock, existingStorageCollection);
+
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that CanAddStorage returns false when the storage to validate does have a non creatable storage type and the existing storage collection does contain a storage of the storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCanAddStorageReturnsFalseWhenStorageDoesHaveNonCreatableStorageTypeAndExistingStorageCollectionDoesContainStorageOfStorageType()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorageType storageTypeMock = BuildStorageTypeMock(StorageType.IdentifierForRefrigerator, false);
+            IStorage storageMock = BuildStorageMock(storageType: storageTypeMock);
+            IEnumerable<IStorage> existingStorageCollection = new List<IStorage>
+            {
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForRefrigerator)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForFreezer)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForKitchenCabinets)),
+                BuildStorageMock(storageType: BuildStorageTypeMock(StorageType.IdentifierForShoppingBasket))
+            };
+
+            bool result = sut.CanAddStorage(storageMock, existingStorageCollection);
+
+            Assert.That(result, Is.False);
+        }
+
+        /// <summary>
+        /// Tests that CanRemoveStorage throws an ArgumentNullException when the storage to validate is null.
+        /// </summary>
+        [Test]
+        public void TestThatCanRemoveStorageThrowsArgumentNullExceptionWhenStorageIsNull()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            ArgumentNullException result = Assert.Throws<ArgumentNullException>(() => sut.CanRemoveStorage(null));
+
+            TestHelper.AssertArgumentNullExceptionIsValid(result, "storage");
+        }
+
+        /// <summary>
+        /// Tests that CanRemoveStorage calls StorageType on the storage to validate.
+        /// </summary>
+        [Test]
+        public void TestThatCanRemoveStorageCallsStorageTypeOnStorageToValidate()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorage storageMock = BuildStorageMock();
+
+            sut.CanRemoveStorage(storageMock);
+
+            storageMock.AssertWasCalled(m => m.StorageType, opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that CanRemoveStorage returns true when the storage to validate does not have a storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCanRemoveStorageReturnsTrueWhenStorageDoesNotHaveStorageType()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorage storageMock = BuildStorageMock(false);
+
+            bool result = sut.CanRemoveStorage(storageMock);
+
+            Assert.That(result, Is.True);
+        }
+
+        /// <summary>
+        /// Tests that CanRemoveStorage calls Deletable on the storage type when the storage to validate does have a storage type.
+        /// </summary>
+        [Test]
+        public void TestThatCanRemoveStorageCallsDeletableOnStorageTypeWhenStorageDoesHaveStorageType()
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorageType storageTypeMock = BuildStorageTypeMock(StorageType.IdentifierForRefrigerator);
+            IStorage storageMock = BuildStorageMock(storageType: storageTypeMock);
+
+            sut.CanRemoveStorage(storageMock);
+
+            storageTypeMock.AssertWasCalled(m => m.Deletable, opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that CanRemoveStorage returns whether the storage can be deleted when the storage to validate does have a storage type.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatCanRemoveStorageReturnsDeletableFromStorageTypeWhenStorageDoesHaveCreatableStorageType(bool deletable)
+        {
+            IDomainObjectValidations sut = new DomainObjectValidations();
+            Assert.That(sut, Is.Not.Null);
+
+            IStorageType storageTypeMock = BuildStorageTypeMock(StorageType.IdentifierForRefrigerator, deletable: deletable);
+            IStorage storageMock = BuildStorageMock(storageType: storageTypeMock);
+
+            bool result = sut.CanRemoveStorage(storageMock);
+
+            Assert.That(result, Is.EqualTo(deletable));
         }
 
         /// <summary>
@@ -224,6 +493,38 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain.FoodWaste
             IDomainObjectValidations domainObjectValidations = DomainObjectValidations.Create();
             Assert.That(domainObjectValidations, Is.Not.Null);
             Assert.That(domainObjectValidations, Is.TypeOf<DomainObjectValidations>());
+        }
+
+        /// <summary>
+        /// Builds a mockup for a storage which can be used for unit testing.
+        /// </summary>
+        /// <returns>Mockup for a storage which can be used for unit testing.</returns>
+        private IStorage BuildStorageMock(bool hasStorageType = true, IStorageType storageType = null)
+        {
+            IStorage storageMock = MockRepository.GenerateMock<IStorage>();
+            storageMock.Stub(m => m.StorageType)
+                .Return(hasStorageType ? storageType ?? BuildStorageTypeMock(StorageType.IdentifierForRefrigerator) : null)
+                .Repeat.Any();
+            return storageMock;
+        }
+
+        /// <summary>
+        /// Builds a mockup for a storage type which can be used for unit testing.
+        /// </summary>
+        /// <returns>Mockup for a storage type which can be used for unit testing.</returns>
+        private IStorageType BuildStorageTypeMock(Guid storageTypeIdentifier, bool? creatable = null, bool? deletable = null)
+        {
+            IStorageType storageTypeMock = MockRepository.GenerateMock<IStorageType>();
+            storageTypeMock.Stub(m => m.Identifier)
+                .Return(storageTypeIdentifier)
+                .Repeat.Any();
+            storageTypeMock.Stub(m => m.Creatable)
+                .Return(creatable ?? _fixture.Create<bool>())
+                .Repeat.Any();
+            storageTypeMock.Stub(m => m.Deletable)
+                .Return(deletable ?? _fixture.Create<bool>())
+                .Repeat.Any();
+            return storageTypeMock;
         }
     }
 }

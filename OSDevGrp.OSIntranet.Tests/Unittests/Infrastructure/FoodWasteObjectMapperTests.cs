@@ -347,6 +347,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                 Assert.That(householdMember, Is.Not.Null);
                 Assert.That(householdMember, Is.TypeOf<HouseholdMemberProxy>());
             }
+            Assert.That(householdProxy.Storages, Is.Not.Null);
+            Assert.That(householdProxy.Storages, Is.Not.Empty);
+            Assert.That(householdProxy.Storages.Count(), Is.EqualTo(householdMock.Storages.Count()));
+            foreach (IStorage storages in householdProxy.Storages)
+            {
+                Assert.That(storages, Is.Not.Null);
+                Assert.That(storages, Is.TypeOf<StorageProxy>());
+            }
         }
 
         /// <summary>

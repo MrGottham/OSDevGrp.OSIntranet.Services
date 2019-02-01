@@ -282,4 +282,8 @@
     <value>Der findes ikke et husstandsmedlem med mailadressen '{0}' på husstanden.</value>
     <comment>{0} = Mailadresse.</comment>
   </data>
+  <data name="OperationNotAllowedOnStorage" xml:space="preserve">
+    <value>Denne operation er ikke tilladt på et opbevaringssted af denne type: {0}</value>
+    <comment>{0} = Operation</comment>
+  </data>
 </root>

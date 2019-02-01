@@ -1,4 +1,6 @@
-﻿using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
+﻿using System;
+using System.Collections.Generic;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 
 namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
 {
@@ -22,7 +24,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         int GetHouseholdLimit(Membership membership);
 
         /// <summary>
-        /// Validates whether the limit of households has been reached accoing to a given membesrhip.
+        /// Validates whether the limit of households has been reached according to a given membership.
         /// </summary>
         /// <param name="membership">Membership.</param>
         /// <param name="numberOfHouseholds">Number of households.</param>
@@ -41,7 +43,7 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// Validates whether the current membership can be upgraded to another membership.
         /// </summary>
         /// <param name="currentMembership">Current membership.</param>
-        /// <param name="upgradeToMembership">Memvership which should be upgraded to.</param>
+        /// <param name="upgradeToMembership">Membership which should be upgraded to.</param>
         /// <returns>True if the current membership can be upgraded to the other membership otherwise false.</returns>
         bool CanUpgradeMembership(Membership currentMembership, Membership upgradeToMembership);
 
@@ -52,5 +54,22 @@ namespace OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste
         /// <param name="range">The range where the value should be inside.</param>
         /// <returns>True when the value is inside the given range otherwise false.</returns>
         bool InRange(int value, IRange<int> range);
+
+        /// <summary>
+        /// Validates whether a storage can be added to an existing storages collection.
+        /// </summary>
+        /// <param name="storage">The storage to validate.</param>
+        /// <param name="existingStorageCollection">The existing storage collection.</param>
+        /// <returns>True when the storage can be added to the existing storage collection otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="storage"/> or <paramref name="existingStorageCollection"/> is null.</exception>
+        bool CanAddStorage(IStorage storage, IEnumerable<IStorage> existingStorageCollection);
+
+        /// <summary>
+        /// Validates whether a storage can be removed.
+        /// </summary>
+        /// <param name="storage">The storage to validate.</param>
+        /// <returns>True when the storage can be removed otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="storage"/> is null.</exception>
+        bool CanRemoveStorage(IStorage storage);
     }
 }

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste.Enums;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Domain.FoodWaste
@@ -29,11 +32,9 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <returns>True if the value is a mail address otherwise false.</returns>
         public virtual bool IsMailAddress(string value)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-            var regularExpression = new Regex(@"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$", RegexOptions.Compiled);
+            ArgumentNullGuard.NotNullOrWhiteSpace(value, nameof(value));
+
+            Regex regularExpression = new Regex(@"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$", RegexOptions.Compiled);
             return regularExpression.IsMatch(value);
         }
 
@@ -61,14 +62,14 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         }
 
         /// <summary>
-        /// Validates whether the limit of households has been reached accoing to a given membesrhip.
+        /// Validates whether the limit of households has been reached according to a given membership.
         /// </summary>
         /// <param name="membership">Membership.</param>
         /// <param name="numberOfHouseholds">Number of households.</param>
         /// <returns>True if the limit of households has been reached otherwise false.</returns>
         public virtual bool HasReachedHouseholdLimit(Membership membership, int numberOfHouseholds)
         {
-            var householdLimit = GetHouseholdLimit(membership);
+            int householdLimit = GetHouseholdLimit(membership);
             return numberOfHouseholds >= householdLimit;
         }
 
@@ -87,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// Validates whether the current membership can be upgraded to another membership.
         /// </summary>
         /// <param name="currentMembership">Current membership.</param>
-        /// <param name="upgradeToMembership">Memvership which should be upgraded to.</param>
+        /// <param name="upgradeToMembership">Membership which should be upgraded to.</param>
         /// <returns>True if the current membership can be upgraded to the other membership otherwise false.</returns>
         public virtual bool CanUpgradeMembership(Membership currentMembership, Membership upgradeToMembership)
         {
@@ -102,11 +103,54 @@ namespace OSDevGrp.OSIntranet.Domain.FoodWaste
         /// <returns>True when the value is inside the given range otherwise false.</returns>
         public virtual bool InRange(int value, IRange<int> range)
         {
-            if (range == null)
-            {
-                throw new ArgumentNullException(nameof(range));
-            }
+            ArgumentNullGuard.NotNull(range, nameof(range));
+
             return value >= range.StartValue && value <= range.EndValue;
+        }
+
+        /// <summary>
+        /// Validates whether a storage can be added to an existing storages collection.
+        /// </summary>
+        /// <param name="storage">The storage to validate.</param>
+        /// <param name="existingStorageCollection">The existing storage collection.</param>
+        /// <returns>True when the storage can be added to the existing storage collection otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="storage"/> or <paramref name="existingStorageCollection"/> is null.</exception>
+        public virtual bool CanAddStorage(IStorage storage, IEnumerable<IStorage> existingStorageCollection)
+        {
+            ArgumentNullGuard.NotNull(storage, nameof(storage))
+                .NotNull(existingStorageCollection, nameof(existingStorageCollection));
+
+            IStorageType storageType = storage.StorageType;
+            if (storageType == null)
+            {
+                return false;
+            }
+
+            if (storageType.Creatable)
+            {
+                return true;
+            }
+
+            return existingStorageCollection.Any(m => m.StorageType != null && m.StorageType.Identifier == storageType.Identifier) == false;
+        }
+
+        /// <summary>
+        /// Validates whether a storage can be removed.
+        /// </summary>
+        /// <param name="storage">The storage to validate.</param>
+        /// <returns>True when the storage can be removed otherwise false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="storage"/> is null.</exception>
+        public virtual bool CanRemoveStorage(IStorage storage)
+        {
+            ArgumentNullGuard.NotNull(storage, nameof(storage));
+
+            IStorageType storageType = storage.StorageType;
+            if (storageType == null)
+            {
+                return true;
+            }
+
+            return storageType.Deletable;
         }
 
         /// <summary>

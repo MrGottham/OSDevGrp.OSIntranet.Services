@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
-using OSDevGrp.OSIntranet.Resources;
 using AutoFixture;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
+using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
 {
@@ -13,21 +13,32 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
     [TestFixture]
     public class ResourceTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tester, at ExceptionMessage for RepositoryError hentes.
         /// </summary>
         [Test]
         public void TestAtExceptionMessageForRepositoryErrorHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError,
-                                                            MethodBase.GetCurrentMethod().Name,
-                                                            fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -38,16 +49,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForUnhandledSwitchValueHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue,
-                                                            fixture.Create<int>(),
-                                                            fixture.Create<string>(),
-                                                            MethodBase.GetCurrentMethod().Name);
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, _fixture.Create<int>(), _fixture.Create<string>(), MethodBase.GetCurrentMethod().Name);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -58,14 +64,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForCantFindObjectByIdHentes()
         {
-            var fixture = new Fixture();
-            fixture.Inject(typeof(Konto));
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, fixture.Create<Type>().Name, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Konto).Name, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -76,14 +79,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForIllegalValueHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, null,
-                                                            fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, null, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -94,15 +94,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForCantAutoMapTypeHentes()
         {
-            var fixture = new Fixture();
-            fixture.Inject(typeof(Konto));
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType,
-                                                            fixture.Create<Type>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, typeof(Konto));
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -113,13 +109,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForErrorInCommandHandlerWithoutReturnValueHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue, fixture.Create<string>(), fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithoutReturnValue, _fixture.Create<string>(), _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -130,13 +124,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForErrorInCommandHandlerWithReturnValueHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, fixture.Create<string>(), fixture.Create<string>(), fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -147,14 +139,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForBalanceLineDateToOldHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld,
-                                                            fixture.Create<int>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld, _fixture.Create<int>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -165,7 +154,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForBalanceLineDateIsForwardInTimeHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -176,7 +165,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForBalanceLineAccountNumberMissingHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -187,7 +176,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForBalanceLineTextMissingHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineTextMissing);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineTextMissing);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -198,7 +187,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForBalanceLineValueBelowZeroHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -209,7 +198,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForBalanceLineValueMissingHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -220,7 +209,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForAccountIsOverdrawnHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -231,7 +220,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForBudgetAccountIsOverdrawnHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -242,15 +231,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForNoRegistrationForDelegateHentes()
         {
-            var fixture = new Fixture();
-            fixture.Inject(typeof(Func<int, Kontogruppe>));
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate,
-                                                            fixture.Create<Type>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, typeof(Func<int, Kontogruppe>));
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -261,10 +246,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForUserAppointmentAlreadyExistsHentes()
         {
-            var fixture = new Fixture();
-            fixture.Inject(typeof(Func<int, Kontogruppe>));
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentAlreadyExists);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentAlreadyExists);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -275,10 +257,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForUserAppointmentDontExistsHentes()
         {
-            var fixture = new Fixture();
-            fixture.Inject(typeof(Func<int, Kontogruppe>));
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentDontExists);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UserAppointmentDontExists);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -289,14 +268,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForNoCalendarUserWithThoseInitialsHentes()
         {
-            var fixture = new Fixture();
-            fixture.Inject(typeof(Func<int, Kontogruppe>));
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoCalendarUserWithThoseInitials, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -307,13 +283,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForCertificateWasNotFoundHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CertificateWasNotFound);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CertificateWasNotFound);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CertificateWasNotFound, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CertificateWasNotFound, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -324,13 +298,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForInvalidRelyingPartyAddressHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.InvalidRelyingPartyAddress, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -341,7 +313,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForAppliesToMustBeSuppliedInRequestSecurityTokenHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustBeSuppliedInRequestSecurityToken);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustBeSuppliedInRequestSecurityToken);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -352,7 +324,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForAppliesToMustHaveX509CertificateEndpointIdentityHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustHaveX509CertificateEndpointIdentity);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AppliesToMustHaveX509CertificateEndpointIdentity);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -363,13 +335,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForNotAuthorizedToUseServiceHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NotAuthorizedToUseService, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -380,7 +350,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForNoClaimsWasFoundHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoClaimsWasFound);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -391,7 +361,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForMissingClaimTypeForIdentityHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MissingClaimTypeForIdentity);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MissingClaimTypeForIdentity);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -402,7 +372,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForSecurityTokenCouldNotBeValidatedHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.SecurityTokenCouldNotBeValidated);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.SecurityTokenCouldNotBeValidated);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -413,7 +383,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForUserNameAndPasswordCouldNotBeValidatedHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UserNameAndPasswordCouldNotBeValidated);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UserNameAndPasswordCouldNotBeValidated);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -424,13 +394,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForIdentifierUnknownToSystemHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -441,13 +409,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForValueMustBeGivenForPropertyHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -458,13 +424,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForValueForPropertyContainsIllegalCharsHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyContainsIllegalChars, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -475,7 +439,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForHouseholdLimitHasBeenReachedHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdLimitHasBeenReached);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -486,7 +450,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForHouseholdMemberNotCreatedHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotCreated);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -497,7 +461,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForHouseholdMemberNotActivatedHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberNotActivated);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -508,7 +472,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForHouseholdMemberHasNotAcceptedPrivacyPolicyHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotAcceptedPrivacyPolicy);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -519,7 +483,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForHouseholdMemberHasNotRequiredMembershipHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberHasNotRequiredMembership);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -530,7 +494,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForWrongActivationCodeForHouseholdMemberHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.WrongActivationCodeForHouseholdMember);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.WrongActivationCodeForHouseholdMember);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -541,13 +505,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForGenericTypeHasInvalidTypeHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType, fixture.Create<string>(), typeof (object).Name);
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType, _fixture.Create<string>(), typeof (object).Name);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -558,13 +520,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForValueForPropertyIsInvalidHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid, fixture.Create<string>(), fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ValueForPropertyIsInvalid, _fixture.Create<string>(), _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -575,7 +535,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForMembershipCannotDowngradeHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.MembershipCannotDowngrade);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -586,13 +546,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForDateTimeValueForPropertyIsNotInPastHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInPast, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -603,13 +561,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForDateTimeValueForPropertyIsNotInFutureHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInFuture);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInFuture);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInFuture, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DateTimeValueForPropertyIsNotInFuture, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -620,13 +576,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForDataProviderDoesNotHandlesPaymentsHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.DataProviderDoesNotHandlesPayments, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -637,13 +591,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForLengthForPropertyIsInvalidHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, fixture.Create<string>(), fixture.Create<int>(), fixture.Create<int>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, _fixture.Create<string>(), _fixture.Create<int>(), _fixture.Create<int>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -654,7 +606,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForCannotModifyHouseholdMembershipForYourselffHentes()
         {
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CannotModifyHouseholdMembershipForYourself);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CannotModifyHouseholdMembershipForYourself);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -665,13 +617,11 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForHouseholdMemberAlreadyExistsOnHouseholdHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberAlreadyExistsOnHousehold);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberAlreadyExistsOnHousehold);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberAlreadyExistsOnHousehold, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberAlreadyExistsOnHousehold, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -682,13 +632,26 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         [Test]
         public void TestAtExceptionMessageForHouseholdMemberDoesNotExistOnHouseholdHentes()
         {
-            var fixture = new Fixture();
-
-            var exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberDoesNotExistOnHousehold);
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberDoesNotExistOnHousehold);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberDoesNotExistOnHousehold, fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.HouseholdMemberDoesNotExistOnHousehold, _fixture.Create<string>());
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+        }
+
+        /// <summary>
+        /// Tester, at ExceptionMessage for OperationNotAllowedOnStorage hentes.
+        /// </summary>
+        [Test]
+        public void TestAtExceptionMessageForOperationNotAllowedOnStorageHentes()
+        {
+            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.OperationNotAllowedOnStorage);
+            Assert.That(exceptionMessage, Is.Not.Null);
+            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
+
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.OperationNotAllowedOnStorage, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }

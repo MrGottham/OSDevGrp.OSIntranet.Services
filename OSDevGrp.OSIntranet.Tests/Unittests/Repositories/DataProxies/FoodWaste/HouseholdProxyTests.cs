@@ -53,6 +53,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut.CreationTime, Is.EqualTo(default(DateTime)));
             Assert.That(sut.HouseholdMembers, Is.Not.Null);
             Assert.That(sut.HouseholdMembers, Is.Empty);
+            Assert.That(sut.Storages, Is.Not.Null);
+            Assert.That(sut.Storages, Is.Empty);
         }
 
         /// <summary>
@@ -127,6 +129,70 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .AddCharDataParameter("@householdIdentifier", householdIdentifier)
                 .Build();
             dataProvider.AssertWasCalled(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Test that Storages maps storages into the proxy when MapData has been called and MapRelations has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatStoragesMapsStoragesIntoProxyWhenMapDataHasBeenCalledAndMapRelationsHasNotBeenCalled()
+        {
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid householdIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(householdIdentifier);
+
+            StorageProxy[] storageProxyCollection = BuildStorageProxyCollection().ToArray();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(storageProxyCollection: storageProxyCollection);
+
+            sut.MapData(dataReader, dataProvider);
+
+            Assert.That(sut.Storages, Is.Not.Null);
+            Assert.That(sut.Storages, Is.Not.Empty);
+            Assert.That(sut.Storages, Is.EqualTo(storageProxyCollection.OrderBy(m => m.SortOrder).ThenByDescending(m => m.CreationTime).ToList()));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Once());
+
+            // ReSharper disable StringLiteralTypo
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT s.StorageIdentifier,s.HouseholdIdentifier,s.SortOrder,s.StorageTypeIdentifier,s.Descr,s.Temperature,s.CreationTime,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,st.SortOrder AS StorageTypeSortOrder,st.Temperature AS StorageTypeTemperature,st.TemperatureRangeStartValue AS StorageTypeTemperatureRangeStartValue,st.TemperatureRangeEndValue AS StorageTypeTemperatureRangeEndValue,st.Creatable AS StorageTypeCreatable,st.Editable AS StorageTypeEditable,st.Deletable AS StorageTypeDeletable FROM Storages AS s INNER JOIN Households AS h ON h.HouseholdIdentifier=s.HouseholdIdentifier INNER JOIN StorageTypes AS st ON st.StorageTypeIdentifier=s.StorageTypeIdentifier WHERE s.HouseholdIdentifier=@householdIdentifier")
+            // ReSharper restore StringLiteralTypo
+                .AddCharDataParameter("@householdIdentifier", householdIdentifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<StorageProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Test that Storages maps storages into the proxy when Create has been called and MapData has not been called.
+        /// </summary>
+        [Test]
+        public void TestThatStoragesMapsStoragesIntoProxyWhenCreateHasBeenCalledAndMapDataHasNotBeenCalled()
+        {
+            IHouseholdProxy sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            Guid householdIdentifier = Guid.NewGuid();
+            MySqlDataReader dataReader = CreateMySqlDataReader(householdIdentifier);
+
+            StorageProxy[] storageProxyCollection = BuildStorageProxyCollection().ToArray();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(storageProxyCollection: storageProxyCollection);
+
+            // ReSharper disable StringLiteralTypo
+            IHouseholdProxy result = sut.Create(dataReader, dataProvider, "HouseholdIdentifier", "Name", "Descr", "CreationTime");
+            // ReSharper restore StringLiteralTypo
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Storages, Is.Not.Null);
+            Assert.That(result.Storages, Is.Not.Empty);
+            Assert.That(result.Storages, Is.EqualTo(storageProxyCollection.OrderBy(m => m.SortOrder).ThenByDescending(m => m.CreationTime).ToList()));
+
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Once());
+
+            // ReSharper disable StringLiteralTypo
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT s.StorageIdentifier,s.HouseholdIdentifier,s.SortOrder,s.StorageTypeIdentifier,s.Descr,s.Temperature,s.CreationTime,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,st.SortOrder AS StorageTypeSortOrder,st.Temperature AS StorageTypeTemperature,st.TemperatureRangeStartValue AS StorageTypeTemperatureRangeStartValue,st.TemperatureRangeEndValue AS StorageTypeTemperatureRangeEndValue,st.Creatable AS StorageTypeCreatable,st.Editable AS StorageTypeEditable,st.Deletable AS StorageTypeDeletable FROM Storages AS s INNER JOIN Households AS h ON h.HouseholdIdentifier=s.HouseholdIdentifier INNER JOIN StorageTypes AS st ON st.StorageTypeIdentifier=s.StorageTypeIdentifier WHERE s.HouseholdIdentifier=@householdIdentifier")
+            // ReSharper restore StringLiteralTypo
+                    .AddCharDataParameter("@householdIdentifier", householdIdentifier)
+                    .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<StorageProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
         }
 
         /// <summary>
@@ -514,10 +580,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         }
 
         /// <summary>
-        /// Tests that DeleteRelations calls Clone on the data provider one time.
+        /// Tests that DeleteRelations calls Clone on the data provider two time.
         /// </summary>
         [Test]
-        public void TestThatDeleteRelationsCallsCloneOnDataProviderOneTime()
+        public void TestThatDeleteRelationsCallsCloneOnDataProviderTwoTime()
         {
             Guid identifier = Guid.NewGuid();
 
@@ -525,11 +591,12 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             Assert.That(sut, Is.Not.Null);
 
             IEnumerable<MemberOfHouseholdProxy> memberOfHouseholdProxyCollection = BuildMemberOfHouseholdProxyCollection(sut);
-            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(memberOfHouseholdProxyCollection);
+            IEnumerable<StorageProxy> storageProxyCollection = new List<StorageProxy>(0);
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(memberOfHouseholdProxyCollection, storageProxyCollection);
 
             sut.DeleteRelations(dataProvider);
 
-            dataProvider.AssertWasCalled(m => m.Clone());
+            dataProvider.AssertWasCalled(m => m.Clone(), opt => opt.Repeat.Times(2));
         }
 
         /// <summary>
@@ -579,6 +646,49 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
 
             dataProvider.AssertWasCalled(m => m.Delete(Arg<MemberOfHouseholdProxy>.Is.NotNull), opt => opt.Repeat.Times(memberOfHouseholdProxyCollection.Length));
             dataProvider.AssertWasCalled(m => m.Delete(Arg<IHouseholdMemberProxy>.Is.NotNull), opt => opt.Repeat.Times(householdMemberProxyCollection.Length));
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls GetCollection on the data provider to get storages for the household.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsGetCollectionOnDataProviderToGetStorageProxies()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IHouseholdProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            IEnumerable<StorageProxy> storageProxyCollection = BuildStorageProxyCollection();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(storageProxyCollection: storageProxyCollection);
+
+            sut.DeleteRelations(dataProvider);
+
+            // ReSharper disable StringLiteralTypo
+            IDbCommandTestExecutor commandTester = new DbCommandTestBuilder("SELECT s.StorageIdentifier,s.HouseholdIdentifier,s.SortOrder,s.StorageTypeIdentifier,s.Descr,s.Temperature,s.CreationTime,h.Name AS HouseholdName,h.Descr AS HouseholdDescr,h.CreationTime AS HouseholdCreationTime,st.SortOrder AS StorageTypeSortOrder,st.Temperature AS StorageTypeTemperature,st.TemperatureRangeStartValue AS StorageTypeTemperatureRangeStartValue,st.TemperatureRangeEndValue AS StorageTypeTemperatureRangeEndValue,st.Creatable AS StorageTypeCreatable,st.Editable AS StorageTypeEditable,st.Deletable AS StorageTypeDeletable FROM Storages AS s INNER JOIN Households AS h ON h.HouseholdIdentifier=s.HouseholdIdentifier INNER JOIN StorageTypes AS st ON st.StorageTypeIdentifier=s.StorageTypeIdentifier WHERE s.HouseholdIdentifier=@householdIdentifier")
+            // ReSharper restore StringLiteralTypo
+                .AddCharDataParameter("@householdIdentifier", identifier)
+                .Build();
+            dataProvider.AssertWasCalled(m => m.GetCollection<StorageProxy>(Arg<MySqlCommand>.Matches(cmd => commandTester.Run(cmd))), opt => opt.Repeat.Once());
+        }
+
+        /// <summary>
+        /// Tests that DeleteRelations calls Delete on the data provider for each storage in the household.
+        /// </summary>
+        [Test]
+        public void TestThatDeleteRelationsCallsDeleteOnDataProviderForEachStorageProxy()
+        {
+            Guid identifier = Guid.NewGuid();
+
+            IHouseholdProxy sut = CreateSut(identifier);
+            Assert.That(sut, Is.Not.Null);
+
+            StorageProxy[] storageProxyCollection = BuildStorageProxyCollection().ToArray();
+            IFoodWasteDataProvider dataProvider = CreateFoodWasteDataProvider(storageProxyCollection: storageProxyCollection);
+
+            sut.DeleteRelations(dataProvider);
+
+            dataProvider.AssertWasCalled(m => m.Delete(Arg<StorageProxy>.Is.NotNull), opt => opt.Repeat.Times(storageProxyCollection.Length));
         }
 
         /// <summary>
@@ -834,7 +944,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         /// Creates an instance of a data provider which should be used for unit testing.
         /// </summary>
         /// <returns>Instance of a data provider which should be used for unit testing</returns>
-        private IFoodWasteDataProvider CreateFoodWasteDataProvider(IEnumerable<MemberOfHouseholdProxy> memberOfHouseholdProxyCollection = null)
+        private IFoodWasteDataProvider CreateFoodWasteDataProvider(IEnumerable<MemberOfHouseholdProxy> memberOfHouseholdProxyCollection = null, IEnumerable<StorageProxy> storageProxyCollection = null)
         {
             IFoodWasteDataProvider foodWasteDataProvider = MockRepository.GenerateMock<IFoodWasteDataProvider>();
             foodWasteDataProvider.Stub(m => m.Clone())
@@ -842,6 +952,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
                 .Repeat.Any();
             foodWasteDataProvider.Stub(m => m.GetCollection<MemberOfHouseholdProxy>(Arg<MySqlCommand>.Is.Anything))
                 .Return(memberOfHouseholdProxyCollection ?? BuildMemberOfHouseholdProxyCollection(CreateSut(Guid.NewGuid())))
+                .Repeat.Any();
+            foodWasteDataProvider.Stub(m => m.GetCollection<StorageProxy>(Arg<MySqlCommand>.Is.Anything))
+                .Return(storageProxyCollection ?? BuildStorageProxyCollection())
                 .Repeat.Any();
             foodWasteDataProvider.Stub(m => m.Add(Arg<MemberOfHouseholdProxy>.Is.TypeOf))
                 .WhenCalled(e => e.ReturnValue = (MemberOfHouseholdProxy) e.Arguments.ElementAt(0))
@@ -880,6 +993,35 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
             return householdMemberProxyCollection
                 .Select(householdMemberProxy => new MemberOfHouseholdProxy(householdMemberProxy, householdProxy, DateTime.Now) {Identifier = Guid.NewGuid()})
                 .ToList();
+        }
+
+        /// <summary>
+        /// Creates a data proxy for a storage.
+        /// </summary>
+        /// <param name="identifier">The identifier for the data proxy.</param>
+        /// <returns>Data proxy for a storage.</returns>
+        private StorageProxy BuildStorageProxy(Guid? identifier = null)
+        {
+            return new StorageProxy
+            {
+                Identifier = identifier ?? Guid.NewGuid(),
+                SortOrder = _random.Next(1, 100)
+            };
+        }
+
+        /// <summary>
+        /// Creates a collection of data proxies for some storages.
+        /// </summary>
+        /// <returns>Collection of data proxies for some storages.</returns>
+        private IEnumerable<StorageProxy> BuildStorageProxyCollection()
+        {
+            return new List<StorageProxy>
+            {
+                BuildStorageProxy(),
+                BuildStorageProxy(),
+                BuildStorageProxy(),
+                BuildStorageProxy()
+            };
         }
     }
 }
