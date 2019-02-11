@@ -315,6 +315,10 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
             Assert.That(householdView.HouseholdMembers, Is.Not.Empty);
             Assert.That(householdView.HouseholdMembers, Is.TypeOf<List<HouseholdMemberIdentificationView>>());
             Assert.That(householdView.HouseholdMembers.Count(), Is.EqualTo(householdMock.HouseholdMembers.Count()));
+            Assert.That(householdView.Storages, Is.Not.Null);
+            Assert.That(householdView.Storages, Is.Not.Empty);
+            Assert.That(householdView.Storages, Is.TypeOf<List<StorageView>>());
+            Assert.That(householdView.Storages.Count(), Is.EqualTo(householdMock.Storages.Count()));
         }
 
         /// <summary>
@@ -355,6 +359,62 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
                 Assert.That(storages, Is.Not.Null);
                 Assert.That(storages, Is.TypeOf<StorageProxy>());
             }
+        }
+
+        /// <summary>
+        /// Tests that Map maps Storage to StorageIdentificationView.
+        /// </summary>
+        [Test]
+        public void TestThatMapMapsStorageToStorageIdentificationView()
+        {
+            IStorage storageMock = DomainObjectMockBuilder.BuildStorageMock();
+
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            StorageIdentificationView storageIdentificationView = sut.Map<IStorage, StorageIdentificationView>(storageMock);
+            Assert.That(storageIdentificationView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(storageIdentificationView.StorageIdentifier, Is.EqualTo(storageMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(storageIdentificationView.SortOrder, Is.EqualTo(storageMock.SortOrder));
+        }
+
+        /// <summary>
+        /// Tests that Map maps Storage to StorageView.
+        /// </summary>
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestThatMapMapsStorageToStorageView(bool hasDescription)
+        {
+            IStorage storageMock = DomainObjectMockBuilder.BuildStorageMock(hasDescription: hasDescription);
+
+            IFoodWasteObjectMapper sut = CreateSut();
+            Assert.That(sut, Is.Not.Null);
+
+            StorageView storageView = sut.Map<IStorage, StorageView>(storageMock);
+            Assert.That(storageView, Is.Not.Null);
+            // ReSharper disable PossibleInvalidOperationException
+            Assert.That(storageView.StorageIdentifier, Is.EqualTo(storageMock.Identifier.Value));
+            // ReSharper restore PossibleInvalidOperationException
+            Assert.That(storageView.Household, Is.Not.Null);
+            Assert.That(storageView.Household, Is.TypeOf<HouseholdIdentificationView>());
+            Assert.That(storageView.SortOrder, Is.EqualTo(storageMock.SortOrder));
+            Assert.That(storageView.StorageType, Is.Not.Null);
+            Assert.That(storageView.StorageType, Is.TypeOf<StorageTypeIdentificationView>());
+            if (hasDescription)
+            {
+                Assert.That(storageView.Description, Is.Not.Null);
+                Assert.That(storageView.Description, Is.Not.Empty);
+                Assert.That(storageView.Description, Is.EqualTo(storageMock.Description));
+            }
+            else
+            {
+                Assert.That(storageView.Description, Is.Null);
+            }
+            Assert.That(storageView.Temperature, Is.EqualTo(storageMock.Temperature));
+            Assert.That(storageView.CreationTime, Is.EqualTo(storageMock.CreationTime));
         }
 
         /// <summary>

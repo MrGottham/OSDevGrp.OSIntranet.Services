@@ -49,7 +49,8 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Name, opt => opt.MapFrom(s => s.Name))
                     .ForMember(m => m.Description, opt => opt.MapFrom(s => s.Description))
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime))
-                    .ForMember(m => m.HouseholdMembers, opt => opt.MapFrom(s => s.HouseholdMembers));
+                    .ForMember(m => m.HouseholdMembers, opt => opt.MapFrom(s => s.HouseholdMembers))
+                    .ForMember(m => m.Storages, opt => opt.MapFrom(s => s.Storages));
 
                 config.CreateMap<IHousehold, IHouseholdProxy>()
                     .ConstructUsing(m =>
@@ -152,6 +153,23 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Editable, opt => opt.MapFrom(s => s.Editable))
                     .ForMember(m => m.Deletable, opt => opt.MapFrom(s => s.Deletable))
                     .ForMember(m => m.Translations, opt => opt.MapFrom(s => s.Translations));
+
+                config.CreateMap<IStorage, StorageIdentificationView>()
+                    .ForMember(m => m.StorageIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
+                    .ForMember(m => m.SortOrder, opt => opt.MapFrom(s => s.SortOrder));
+
+                config.CreateMap<IStorage, StorageView>()
+                    .ForMember(m => m.StorageIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
+                    .ForMember(m => m.Household, opt => opt.MapFrom(s => s.Household))
+                    .ForMember(m => m.SortOrder, opt => opt.MapFrom(s => s.SortOrder))
+                    .ForMember(m => m.StorageType, opt => opt.MapFrom(s => s.StorageType))
+                    .ForMember(m => m.Description, opt =>
+                    {
+                        opt.Condition(s => string.IsNullOrWhiteSpace(s.Description) == false);
+                        opt.MapFrom(s => s.Description);
+                    })
+                    .ForMember(m => m.Temperature, opt => opt.MapFrom(s => s.Temperature))
+                    .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime));
 
                 config.CreateMap<IStorage, IStorageProxy>()
                     .ConstructUsing(m =>

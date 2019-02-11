@@ -27,5 +27,11 @@ namespace OSDevGrp.OSIntranet.Contracts.Views
         /// </summary>
         [DataMember(IsRequired = true)]
         public IEnumerable<HouseholdMemberIdentificationView> HouseholdMembers { get; set; }
+
+        /// <summary>
+        /// Gets or sets the storages which are placed in this household.
+        /// </summary>
+        [DataMember(IsRequired = true)]
+        public IEnumerable<StorageView> Storages { get; set; }
     }
 }

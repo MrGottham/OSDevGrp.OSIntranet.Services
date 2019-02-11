@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
+﻿using AutoFixture;
+using NUnit.Framework;
 using OSDevGrp.OSIntranet.Contracts.Views;
-using AutoFixture;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
 {
@@ -10,14 +10,28 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
     [TestFixture]
     public class HouseholdViewTests
     {
+        #region Private variables
+
+        private Fixture _fixture;
+
+        #endregion
+
+        /// <summary>
+        /// Setup each test.
+        /// </summary>
+        [SetUp]
+        public void SetUp()
+        {
+            _fixture = new Fixture();
+        }
+
         /// <summary>
         /// Tests that the view for a household can be initialized.
         /// </summary>
         [Test]
         public void TestThatHouseholdViewCanBeInitialized()
         {
-            var fixture = new Fixture();
-            var householdView = fixture.Create<HouseholdView>();
+            HouseholdView householdView = _fixture.Create<HouseholdView>();
             DataContractTestHelper.TestAtContractErInitieret(householdView);
         }
 
@@ -27,8 +41,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Contracts.Views
         [Test]
         public void TestThatHouseholdViewCanBeSerialized()
         {
-            var fixture = new Fixture();
-            var householdView = fixture.Create<HouseholdView>();
+            HouseholdView householdView = _fixture.Create<HouseholdView>();
             DataContractTestHelper.TestAtContractKanSerialiseresOgDeserialiseres(householdView);
         }
     }
