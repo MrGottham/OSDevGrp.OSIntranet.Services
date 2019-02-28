@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -12,14 +13,14 @@ using OSDevGrp.OSIntranet.Resources;
 namespace OSDevGrp.OSIntranet.CommandHandlers
 {
     /// <summary>
-    /// Command handler which handles a command for updatering a household to the current users household account.
+    /// Command handler which handles a command for updating a household to the current users household account.
     /// </summary>
     public class HouseholdUpdateCommandHandler : HouseholdDataModificationCommandHandlerBase<HouseholdUpdateCommand>
     {
         #region Constructor
 
         /// <summary>
-        /// Creates a command handler which handles a command for updatering a household to the current users household account.
+        /// Creates a command handler which handles a command for updating a household to the current users household account.
         /// </summary>
         /// <param name="householdDataRepository">Implementation of a repository which can access household data for the food waste domain.</param>
         /// <param name="claimValueProvider">Implementation of a provider which can resolve values from the current users claims.</param>
@@ -40,22 +41,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// Adds validation rules to the specification which encapsulates validation rules.
         /// </summary>
         /// <param name="household">Household on which to modify data.</param>
-        /// <param name="command">Command for updatering a household to the current users household account.</param>
+        /// <param name="command">Command for updating a household to the current users household account.</param>
         /// <param name="specification">Specification which encapsulates validation rules.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="household"/>, <paramref name="command"/> or <paramref name="specification"/> is null.</exception>
         public override void AddValidationRules(IHousehold household, HouseholdUpdateCommand command, ISpecification specification)
         {
-            if (household == null)
-            {
-                throw new ArgumentNullException("household");
-            }
-            if (command == null)
-            {
-                throw new ArgumentNullException("command");
-            }
-            if (specification == null)
-            {
-                throw new ArgumentNullException("specification");
-            }
+            ArgumentNullGuard.NotNull(household, nameof(household))
+                .NotNull(command, nameof(command))
+                .NotNull(specification, nameof(specification));
 
             specification.IsSatisfiedBy(() => CommonValidations.HasValue(command.Name), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.ValueMustBeGivenForProperty, "Name")))
                 .IsSatisfiedBy(() => CommonValidations.IsLengthValid(command.Name, 1, 64), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.LengthForPropertyIsInvalid, "Name", 1, 64)))
@@ -69,18 +62,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers
         /// Modifies the data.
         /// </summary>
         /// <param name="household">Household on which to modify data.</param>
-        /// <param name="command">Command for updatering a household to the current users household account.</param>
+        /// <param name="command">Command for updating a household to the current users household account.</param>
         /// <returns>The updated household.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="household"/> or <paramref name="command"/> is null.</exception>
         public override IIdentifiable ModifyData(IHousehold household, HouseholdUpdateCommand command)
         {
-            if (household == null)
-            {
-                throw new ArgumentNullException("household");
-            }
-            if (command == null)
-            {
-                throw new ArgumentNullException("command");
-            }
+            ArgumentNullGuard.NotNull(household, nameof(household))
+                .NotNull(command, nameof(command));
 
             household.Name = command.Name;
             household.Description = command.Description;

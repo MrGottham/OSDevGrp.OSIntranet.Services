@@ -5,6 +5,7 @@ using OSDevGrp.OSIntranet.Contracts.Commands;
 using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
+using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Resources;
@@ -43,22 +44,14 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <param name="householdMember">Household member for which to modify data.</param>
         /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
         /// <param name="specification">Specification which encapsulates validation rules.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="householdMember"/>, <paramref name="command"/> or <paramref name="specification"/> is null.</exception>
         public override void AddValidationRules(IHouseholdMember householdMember, TCommand command, ISpecification specification)
         {
-            if (householdMember == null)
-            {
-                throw new ArgumentNullException("householdMember");
-            }
-            if (command == null)
-            {
-                throw new ArgumentNullException("command");
-            }
-            if (specification == null)
-            {
-                throw new ArgumentNullException("specification");
-            }
+            ArgumentNullGuard.NotNull(householdMember, nameof(householdMember))
+                .NotNull(command, nameof(command))
+                .NotNull(specification, nameof(specification));
 
-            var household = householdMember.Households.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == command.HouseholdIdentifier);
+            IHousehold household = householdMember.Households.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == command.HouseholdIdentifier);
 
             specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(household), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.HouseholdIdentifier)))
                 .Evaluate();
@@ -72,18 +65,13 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
         /// <param name="householdMember">Household member for which to modify data.</param>
         /// <param name="command">Command for modifying some data on a given household on the current household member.</param>
         /// <returns>An identifiable domain object in the food waste domain.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="householdMember"/> or <paramref name="command"/> is null.</exception>
         public override IIdentifiable ModifyData(IHouseholdMember householdMember, TCommand command)
         {
-            if (householdMember == null)
-            {
-                throw new ArgumentNullException("householdMember");
-            }
-            if (command == null)
-            {
-                throw new ArgumentNullException("command");
-            }
+            ArgumentNullGuard.NotNull(householdMember, nameof(householdMember))
+                .NotNull(command, nameof(command));
 
-            var household = householdMember.Households.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == command.HouseholdIdentifier);
+            IHousehold household = householdMember.Households.SingleOrDefault(m => m.Identifier.HasValue && m.Identifier.Value == command.HouseholdIdentifier);
 
             Specification.IsSatisfiedBy(() => CommonValidations.IsNotNull(household), new IntranetBusinessException(Resource.GetExceptionMessage(ExceptionMessage.IdentifierUnknownToSystem, command.HouseholdIdentifier)))
                 .Evaluate();
