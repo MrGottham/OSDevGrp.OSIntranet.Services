@@ -469,66 +469,6 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
-        /// Henter alle kontogrupper.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter alle kontogrupper.</param>
-        /// <returns>Liste af kontogrupper.</returns>
-        [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<KontogruppeView> KontogrupperGet(KontogrupperGetQuery query)
-        {
-            try
-            {
-                return _queryBus.Query<KontogrupperGetQuery, IEnumerable<KontogruppeView>>(query);
-            }
-            catch (IntranetRepositoryException ex)
-            {
-                throw CreateIntranetRepositoryFault(ex);
-            }
-            catch (IntranetBusinessException ex)
-            {
-                throw CreateIntranetBusinessFault(ex);
-            }
-            catch (IntranetSystemException ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-            catch (Exception ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-        }
-
-        /// <summary>
-        /// Henter alle grupper af budgetkonti.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter alle grupper af budgetkonti.</param>
-        /// <returns>Liste af grupper for budgetkonti.</returns>
-        [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<BudgetkontogruppeView> BudgetkontogrupperGet(BudgetkontogrupperGetQuery query)
-        {
-            try
-            {
-                return _queryBus.Query<BudgetkontogrupperGetQuery, IEnumerable<BudgetkontogruppeView>>(query);
-            }
-            catch (IntranetRepositoryException ex)
-            {
-                throw CreateIntranetRepositoryFault(ex);
-            }
-            catch (IntranetBusinessException ex)
-            {
-                throw CreateIntranetBusinessFault(ex);
-            }
-            catch (IntranetSystemException ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-            catch (Exception ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-        }
-
-        /// <summary>
         /// Henter alle brevhoveder.
         /// </summary>
         /// <param name="query">Forespørgelse efter alle brevhoveder.</param>

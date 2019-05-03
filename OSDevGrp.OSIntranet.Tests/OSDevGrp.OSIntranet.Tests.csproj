@@ -223,7 +223,6 @@
     <Compile Include="Unittests\Contracts\Queries\BogføringerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BrevhovederGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BudgetkontogrupperGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BudgetkontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DataProviderCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DataProviderWhoHandlesPaymentsCollectionGetQueryTests.cs" />
@@ -242,7 +241,6 @@
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftalerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugereGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KontogrupperGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />
@@ -376,7 +374,6 @@
     <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BetalingsbetingelserGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BogføringerGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BudgetkontogrupperGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FoodGroupTreeGetQueryHandlerBaseTest.cs" />
@@ -407,7 +404,6 @@
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftalerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugereGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KontogrupperGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KreditorGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KreditorlisteGetQueryHandlerTests.cs" />

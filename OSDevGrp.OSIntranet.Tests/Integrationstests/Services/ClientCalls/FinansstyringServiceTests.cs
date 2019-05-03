@@ -420,46 +420,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
-        /// Tester, at kontogrupper kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtKontogrupperKanHentes()
-        {
-            var client = _channelFactory.CreateChannel<IFinansstyringService>(ClientEndpointName);
-            try
-            {
-                var query = new KontogrupperGetQuery();
-                var result = client.KontogrupperGet(query);
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.GreaterThan(0));
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(client);
-            }
-        }
-
-        /// <summary>
-        /// Tester, at grupper til budgetkonti kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBudgetkontogrupperKanHentes()
-        {
-            var client = _channelFactory.CreateChannel<IFinansstyringService>(ClientEndpointName);
-            try
-            {
-                var query = new BudgetkontogrupperGetQuery();
-                var result = client.BudgetkontogrupperGet(query);
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.GreaterThan(0));
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(client);
-            }
-        }
-
-        /// <summary>
         /// Tester, at brevhoveder kan hentes.
         /// </summary>
         [Test]

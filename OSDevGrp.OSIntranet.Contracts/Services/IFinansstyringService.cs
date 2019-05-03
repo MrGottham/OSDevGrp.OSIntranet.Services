@@ -155,26 +155,6 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         IEnumerable<BetalingsbetingelseView> BetalingsbetingelserGet(BetalingsbetingelserGetQuery query);
 
         /// <summary>
-        /// Henter alle kontogrupper.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter alle kontogrupper.</param>
-        /// <returns>Liste af kontogrupper.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<KontogruppeView> KontogrupperGet(KontogrupperGetQuery query);
-
-        /// <summary>
-        /// Henter alle grupper af budgetkonti.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter alle grupper af budgetkonti.</param>
-        /// <returns>Liste af grupper for budgetkonti.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<BudgetkontogruppeView> BudgetkontogrupperGet(BudgetkontogrupperGetQuery query);
-
-        /// <summary>
         /// Henter alle brevhoveder.
         /// </summary>
         /// <param name="query">Forespørgelse efter alle brevhoveder.</param>

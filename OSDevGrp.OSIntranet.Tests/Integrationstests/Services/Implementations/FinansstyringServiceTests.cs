@@ -300,30 +300,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
-        /// Tester, at kontogrupper kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtKontogrupperKanHentes()
-        {
-            var query = new KontogrupperGetQuery();
-            var result = _service.KontogrupperGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at grupper til budgetkonti kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBudgetkontogrupperKanHentes()
-        {
-            var query = new BudgetkontogrupperGetQuery();
-            var result = _service.BudgetkontogrupperGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at brevhoveder kan hentes.
         /// </summary>
         [Test]
