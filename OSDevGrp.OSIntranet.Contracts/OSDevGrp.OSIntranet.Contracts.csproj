@@ -144,7 +144,6 @@
     <Compile Include="Views\BetalingsbetingelseView.cs" />
     <Compile Include="Views\BogføringslinjeView.cs" />
     <Compile Include="Views\BrevhovedreferenceView.cs" />
-    <Compile Include="Views\BrevhovedView.cs" />
     <Compile Include="Views\BudgetkontogruppeView.cs" />
     <Compile Include="Views\BudgetkontoplanView.cs" />
     <Compile Include="Views\BudgetkontoView.cs" />

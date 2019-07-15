@@ -38,26 +38,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
-        /// Tester, at brevhoveder hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBrevhovederHentes()
-        {
-            var client = _channelFactory.CreateChannel<ICommonService>(ClientEndpointName);
-            try
-            {
-                var query = new BrevhovederGetQuery();
-                var result = client.BrevhovederGet(query);
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.GreaterThan(0));
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(client);
-            }
-        }
-
-        /// <summary>
         /// Tester, at systemer under OSWEBDB hentes.
         /// </summary>
         [Test]

@@ -1431,33 +1431,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
-        /// Tester, at et brevhoved kan mappes til et brevhovedview.
-        /// </summary>
-        [Test]
-        public void TestAtBrevhovedKanMappesTilBrevhovedView()
-        {
-            var fixture = new Fixture();
-
-            var objectMapper = new ObjectMapper();
-            Assert.That(objectMapper, Is.Not.Null);
-
-            var brevhoved = fixture.Create<Brevhoved>();
-            var brevhovedView = objectMapper.Map<Brevhoved, BrevhovedView>(brevhoved);
-            Assert.That(brevhovedView, Is.Not.Null);
-            Assert.That(brevhovedView.Nummer, Is.EqualTo(brevhoved.Nummer));
-            Assert.That(brevhovedView.Navn, Is.Not.Null);
-            Assert.That(brevhovedView.Navn, Is.EqualTo(brevhoved.Navn));
-            Assert.That(brevhovedView.Linje1, Is.EqualTo(brevhoved.Linje1));
-            Assert.That(brevhovedView.Linje2, Is.EqualTo(brevhoved.Linje2));
-            Assert.That(brevhovedView.Linje3, Is.EqualTo(brevhoved.Linje3));
-            Assert.That(brevhovedView.Linje4, Is.EqualTo(brevhoved.Linje4));
-            Assert.That(brevhovedView.Linje5, Is.EqualTo(brevhoved.Linje5));
-            Assert.That(brevhovedView.Linje6, Is.EqualTo(brevhoved.Linje6));
-            Assert.That(brevhovedView.Linje7, Is.EqualTo(brevhoved.Linje7));
-            Assert.That(brevhovedView.CvrNr, Is.EqualTo(brevhoved.CvrNr));
-        }
-
-        /// <summary>
         /// Tester, at et system kan mappes til et systemview.
         /// </summary>
         [Test]

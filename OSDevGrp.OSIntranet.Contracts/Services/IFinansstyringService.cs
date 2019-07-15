@@ -153,15 +153,5 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         IEnumerable<BetalingsbetingelseView> BetalingsbetingelserGet(BetalingsbetingelserGetQuery query);
-
-        /// <summary>
-        /// Henter alle brevhoveder.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter alle brevhoveder.</param>
-        /// <returns>Liste af alle brevhoveder.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<BrevhovedView> BrevhovederGet(BrevhovederGetQuery query);
     }
 }

@@ -298,17 +298,5 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.GreaterThan(0));
         }
-
-        /// <summary>
-        /// Tester, at brevhoveder kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBrevhovederKanHentes()
-        {
-            var query = new BrevhovederGetQuery();
-            var result = _service.BrevhovederGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
     }
 }

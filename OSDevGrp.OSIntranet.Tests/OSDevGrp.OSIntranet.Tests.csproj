@@ -168,7 +168,6 @@
     <Compile Include="Unittests\CommandHandlers\Core\FinansstyringCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FoodWasteHouseholdDataCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FoodWasteSystemDataCommandHandlerBaseTests.cs" />
-    <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\HouseholdDataModificationCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\HouseholdMemberDataModificationCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
@@ -264,7 +263,6 @@
     <Compile Include="Unittests\Contracts\Views\BetalingsbetingelseViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BogføringslinjeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BrevhovedreferenceViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BrevhovedViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontogruppeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontoplanViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\BudgetkontoViewTests.cs" />
@@ -368,7 +366,6 @@
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
     <Compile Include="Unittests\Infrastructure\Validation\SpecificationTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressegrupperGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BrevhovederGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\AdressekartotekQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontolisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />

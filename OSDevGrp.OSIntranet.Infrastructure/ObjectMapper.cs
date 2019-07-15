@@ -564,18 +564,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                     .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
 
-                config.CreateMap<Brevhoved, BrevhovedView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Linje1, opt => opt.MapFrom(s => s.Linje1))
-                    .ForMember(x => x.Linje2, opt => opt.MapFrom(s => s.Linje2))
-                    .ForMember(x => x.Linje3, opt => opt.MapFrom(s => s.Linje3))
-                    .ForMember(x => x.Linje4, opt => opt.MapFrom(s => s.Linje4))
-                    .ForMember(x => x.Linje5, opt => opt.MapFrom(s => s.Linje5))
-                    .ForMember(x => x.Linje6, opt => opt.MapFrom(s => s.Linje6))
-                    .ForMember(x => x.Linje7, opt => opt.MapFrom(s => s.Linje7))
-                    .ForMember(x => x.CvrNr, opt => opt.MapFrom(s => s.CvrNr));
-
                 config.CreateMap<ISystem, SystemView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                     .ForMember(x => x.Titel, opt => opt.MapFrom(s => s.Titel))

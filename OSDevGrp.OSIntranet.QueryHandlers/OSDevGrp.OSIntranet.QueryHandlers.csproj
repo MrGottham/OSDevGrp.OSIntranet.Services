@@ -60,7 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdressegrupperGetQueryHandler.cs" />
-    <Compile Include="BrevhovederGetQueryHandler.cs" />
     <Compile Include="Core\AdressekartotekQueryHandlerBase.cs" />
     <Compile Include="AdressekontolisteGetQueryHandler.cs" />
     <Compile Include="AdressekontoGetQueryHandler.cs" />
