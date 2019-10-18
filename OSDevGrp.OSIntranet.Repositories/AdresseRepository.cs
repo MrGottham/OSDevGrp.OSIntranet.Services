@@ -116,39 +116,6 @@ namespace OSDevGrp.OSIntranet.Repositories
         }
 
         /// <summary>
-        /// Henter alle postnumre.
-        /// </summary>
-        /// <returns>Liste af postnumre.</returns>
-        public IEnumerable<Postnummer> PostnummerGetAll()
-        {
-            var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
-            try
-            {
-                var query = new PostnummerGetAllQuery();
-                var postnummerViews = channel.PostnummerGetAll(query);
-                return _domainObjectBuilder.BuildMany<PostnummerView, Postnummer>(postnummerViews);
-            }
-            catch (IntranetRepositoryException)
-            {
-                throw;
-            }
-            catch (FaultException ex)
-            {
-                throw new IntranetRepositoryException(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(channel);
-            }
-        }
-
-        /// <summary>
         /// Henter alle adressegrupper.
         /// </summary>
         /// <returns>Liste af adressegrupper.</returns>

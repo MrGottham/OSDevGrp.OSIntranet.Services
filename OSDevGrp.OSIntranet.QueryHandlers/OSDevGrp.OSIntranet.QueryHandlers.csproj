@@ -100,7 +100,6 @@
     <Compile Include="KreditorlisteGetQueryHandler.cs" />
     <Compile Include="PersonGetQueryHandler.cs" />
     <Compile Include="PersonlisteGetQueryHandler.cs" />
-    <Compile Include="PostnumreGetQueryHandler.cs" />
     <Compile Include="PrivacyPolicyGetQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\QueryHandlerBase.cs" />

@@ -374,11 +374,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                         opt.MapFrom(s => s.Personer);
                     });
 
-                config.CreateMap<Postnummer, PostnummerView>()
-                    .ForMember(x => x.Landekode, opt => opt.MapFrom(s => s.Landekode))
-                    .ForMember(x => x.Postnummer, opt => opt.MapFrom(s => s.Postnr))
-                    .ForMember(x => x.Bynavn, opt => opt.MapFrom(s => s.By));
-
                 config.CreateMap<Adressegruppe, AdressegruppeView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                     .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))

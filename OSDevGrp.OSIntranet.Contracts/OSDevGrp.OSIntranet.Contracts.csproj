@@ -116,7 +116,6 @@
     <Compile Include="Queries\KreditorlisteGetQuery.cs" />
     <Compile Include="Queries\PersonGetQuery.cs" />
     <Compile Include="Queries\PersonlisteGetQuery.cs" />
-    <Compile Include="Queries\PostnumreGetQuery.cs" />
     <Compile Include="Queries\PrivacyPolicyGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Queries\StaticTextCollectionGetQuery.cs" />
@@ -182,7 +181,6 @@
     <Compile Include="Views\MånedsoplysningerView.cs" />
     <Compile Include="Views\PaymentView.cs" />
     <Compile Include="Views\PersonView.cs" />
-    <Compile Include="Views\PostnummerView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\SaldoBaseView.cs" />
     <Compile Include="Views\SaldolisteBaseView.cs" />

@@ -126,33 +126,6 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         }
 
         /// <summary>
-        /// Henter og returnerer et given postnummer.
-        /// </summary>
-        /// <param name="landekode">Landekode.</param>
-        /// <param name="postnummer">Postnummer.</param>
-        /// <returns>Postnummer.</returns>
-        public virtual Postnummer PostnummerGetByLandekodeAndPostnummer(string landekode, string postnummer)
-        {
-            if (string.IsNullOrEmpty(landekode))
-            {
-                throw new ArgumentNullException("landekode");
-            }
-            if (string.IsNullOrEmpty(postnummer))
-            {
-                throw new ArgumentNullException("postnummer");
-            }
-            var postnumre = _adresseRepository.PostnummerGetAll();
-            try
-            {
-                return postnumre.Single(m => String.Compare(m.Landekode, landekode, StringComparison.Ordinal) == 0 && String.Compare(m.Postnr, postnummer, StringComparison.Ordinal) == 0);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Postnummer).Name, string.Format("{0}-{1}", landekode, postnummer)), ex);
-            }
-        }
-
-        /// <summary>
         /// Henter og returnerer en given adressegruppe.
         /// </summary>
         /// <param name="nummer">Unik identifikation af adressegruppen.</param>

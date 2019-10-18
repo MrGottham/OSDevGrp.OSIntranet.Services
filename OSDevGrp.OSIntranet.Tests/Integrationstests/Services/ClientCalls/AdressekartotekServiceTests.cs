@@ -144,26 +144,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
-        /// Tester, at postnumre hentes.
-        /// </summary>
-        [Test]
-        public void TestAtPostnumreHentes()
-        {
-            var client = _channelFactory.CreateChannel<IAdressekartotekService>(ClientEndpointName);
-            try
-            {
-                var query = new PostnumreGetQuery();
-                var result = client.PostnumreGet(query);
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.GreaterThan(0));
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(client);
-            }
-        }
-
-        /// <summary>
         /// Tester, at adressegrupper hentes.
         /// </summary>
         [Test]

@@ -190,36 +190,6 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         }
 
         /// <summary>
-        /// Henter alle postnumre.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter alle postnumre.</param>
-        /// <returns>Liste af postnumre.</returns>
-        [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<PostnummerView> PostnumreGet(PostnumreGetQuery query)
-        {
-            try
-            {
-                return _queryBus.Query<PostnumreGetQuery, IEnumerable<PostnummerView>>(query);
-            }
-            catch (IntranetRepositoryException ex)
-            {
-                throw CreateIntranetRepositoryFault(ex);
-            }
-            catch (IntranetBusinessException ex)
-            {
-                throw CreateIntranetBusinessFault(ex);
-            }
-            catch (IntranetSystemException ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-            catch (Exception ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-        }
-
-        /// <summary>
         /// Henter alle adressegrupper.
         /// </summary>
         /// <param name="query">Foresprøgelse efter alle adressegrupper.</param>

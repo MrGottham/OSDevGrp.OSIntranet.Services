@@ -245,7 +245,6 @@
     <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\PersonGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\PersonlisteGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\PostnumreGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\PrivacyPolicyGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StaticTextCollectionGetQueryTests.cs" />
@@ -299,7 +298,6 @@
     <Compile Include="Unittests\Contracts\Views\KreditorViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\PaymentViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\PersonViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\PostnummerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StakeholderViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextSystemViewTests.cs" />
@@ -407,7 +405,6 @@
     <Compile Include="Unittests\QueryHandlers\Core\QueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\PersonGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\PersonlisteGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\PostnumreGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\PrivacyPolicyGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StaticTextCollectionGetQueryHandlerTests.cs" />

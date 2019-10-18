@@ -15,12 +15,6 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         IEnumerable<AdresseBase> AdresseGetAll();
 
         /// <summary>
-        /// Henter alle postnumre.
-        /// </summary>
-        /// <returns>Liste af postnumre.</returns>
-        IEnumerable<Postnummer> PostnummerGetAll();
-
-        /// <summary>
         /// Henter alle adressegrupper.
         /// </summary>
         /// <returns>Liste af adressegrupper.</returns>

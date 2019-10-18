@@ -96,18 +96,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
-        /// Tester, at postnumre hentes.
-        /// </summary>
-        [Test]
-        public void TestAtPostnumreHentes()
-        {
-            var query = new PostnumreGetQuery();
-            var result = _service.PostnumreGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at adressegrupper hentes.
         /// </summary>
         [Test]
