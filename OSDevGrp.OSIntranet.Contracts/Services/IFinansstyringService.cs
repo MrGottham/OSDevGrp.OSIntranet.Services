@@ -143,15 +143,5 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         BogføringslinjeOpretResponse BogføringslinjeOpret(BogføringslinjeOpretCommand command);
-
-        /// <summary>
-        /// Henter alle betalingsbetingelser.
-        /// </summary>
-        /// <param name="query">Foresprøgelse efter alle betalingsbetingelser.</param>
-        /// <returns>Liste af betalingsbetingelser.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<BetalingsbetingelseView> BetalingsbetingelserGet(BetalingsbetingelserGetQuery query);
     }
 }

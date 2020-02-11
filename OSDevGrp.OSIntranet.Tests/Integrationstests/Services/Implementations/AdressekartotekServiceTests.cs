@@ -106,17 +106,5 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count(), Is.GreaterThan(0));
         }
-
-        /// <summary>
-        /// Tester, at betalingsbetingelser hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelserHentes()
-        {
-            var query = new BetalingsbetingelserGetQuery();
-            var result = _service.BetalingsbetingelserGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
     }
 }

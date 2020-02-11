@@ -80,7 +80,6 @@
     <Compile Include="Faults\FoodWasteFaultType.cs" />
     <Compile Include="Commands\HouseholdMemberUpgradeMembershipCommand.cs" />
     <Compile Include="Queries\AdressegrupperGetQuery.cs" />
-    <Compile Include="Queries\BetalingsbetingelserGetQuery.cs" />
     <Compile Include="Faults\IntranetBusinessFault.cs" />
     <Compile Include="Faults\IntranetSystemFault.cs" />
     <Compile Include="Faults\IntranetFaultBase.cs" />

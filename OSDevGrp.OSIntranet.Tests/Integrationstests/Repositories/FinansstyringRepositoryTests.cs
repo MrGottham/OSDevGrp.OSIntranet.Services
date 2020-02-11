@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml;
 using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Domain.Adressekartotek;
 using OSDevGrp.OSIntranet.Domain.Fælles;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 
 namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
 {
@@ -116,6 +121,51 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
             regnskab = _finansstyringRepository.RegnskabGet(1, brevhovedlisteHelper.GetById, adresselisteHelper.GetById);
             budgetkontoØvrigeUdgifter = regnskab.Konti.OfType<Budgetkonto>().Single(m => m.Kontonummer == "8990");
             Assert.That(budgetkontoØvrigeUdgifter.Bogføringslinjer.Count(), Is.EqualTo(bogføringer + 2));
+        }
+
+        [Test] 
+        [Ignore("Used for data migration")]
+        public void Export()
+        {
+            IBrevhovedlisteHelper letterHeadHelper = new BrevhovedlisteHelper(_fællesRepository.BrevhovedGetAll());
+            IEnumerable<Regnskab> accountingCollection = _finansstyringRepository.RegnskabslisteGet(letterHeadHelper.GetById);
+
+            XmlDocument accountingDocument = new XmlDocument();
+            accountingDocument.AppendChild(accountingDocument.CreateXmlDeclaration("1.0", Encoding.UTF8.BodyName, null));
+
+            XmlElement accountingCollectionElement = accountingDocument.CreateElement("Accountings");
+            accountingDocument.AppendChild(accountingCollectionElement);
+
+            foreach (Regnskab accounting in accountingCollection.OrderBy(m => m.Nummer))
+            {
+                XmlElement accountingElement = accountingDocument.CreateElement("Accounting");
+
+                accountingElement.Attributes.Append(accountingDocument.CreateAttribute("number"));
+                accountingElement.Attributes["number"].Value = accounting.Nummer.ToString();
+
+                accountingElement.Attributes.Append(accountingDocument.CreateAttribute("name"));
+                accountingElement.Attributes["name"].Value = accounting.Navn.Trim();
+
+                accountingElement.Attributes.Append(accountingDocument.CreateAttribute("letterHeadNumber"));
+                accountingElement.Attributes["letterHeadNumber"].Value = accounting.Brevhoved.Nummer.ToString();
+
+                accountingCollectionElement.AppendChild(accountingElement);
+            }
+
+            using (FileStream fileStream = new FileStream(@"Accountings.xml", FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                XmlWriterSettings settings = new XmlWriterSettings
+                {
+                    Encoding = Encoding.UTF8
+                };
+                using (XmlWriter xmlWriter = XmlWriter.Create(fileStream, settings))
+                {
+                    accountingDocument.WriteTo(xmlWriter);
+
+                    xmlWriter.Flush();
+                    xmlWriter.Close();
+                }
+            }
         }
     }
 }

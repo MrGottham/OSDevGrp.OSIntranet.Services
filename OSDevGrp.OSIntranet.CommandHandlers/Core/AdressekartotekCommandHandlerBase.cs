@@ -171,17 +171,6 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             return adressegruppelisteHelper.GetById(nummer);
         }
 
-        /// <summary>
-        /// Henter og returnerer en given betalingsbetingelse.
-        /// </summary>
-        /// <param name="nummer">Unik identifikation af betalingsbetingelsen.</param>
-        /// <returns>Betalingsbetingelse.</returns>
-        public virtual Betalingsbetingelse BetalingsbetingelseGetByNummer(int nummer)
-        {
-            var betalingsbetingelselisteHelper = new BetalingsbetingelselisteHelper(Repository.BetalingsbetingelseGetAll());
-            return betalingsbetingelselisteHelper.GetById(nummer);
-        }
-
         #endregion
     }
 }

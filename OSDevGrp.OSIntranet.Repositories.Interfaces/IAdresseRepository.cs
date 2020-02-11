@@ -19,11 +19,5 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// </summary>
         /// <returns>Liste af adressegrupper.</returns>
         IEnumerable<Adressegruppe> AdressegruppeGetAll();
-
-        /// <summary>
-        /// Henter alle betalingsbetingelser.
-        /// </summary>
-        /// <returns>Liste af betalingsbetingelser.</returns>
-        IEnumerable<Betalingsbetingelse> BetalingsbetingelseGetAll();
     }
 }

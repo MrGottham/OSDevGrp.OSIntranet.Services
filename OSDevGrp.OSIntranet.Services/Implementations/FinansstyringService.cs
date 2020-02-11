@@ -438,36 +438,6 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
             }
         }
 
-        /// <summary>
-        /// Henter alle betalingsbetingelser.
-        /// </summary>
-        /// <param name="query">Foresprøgelse efter alle betalingsbetingelser.</param>
-        /// <returns>Liste af betalingsbetingelser.</returns>
-        [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<BetalingsbetingelseView> BetalingsbetingelserGet(BetalingsbetingelserGetQuery query)
-        {
-            try
-            {
-                return _queryBus.Query<BetalingsbetingelserGetQuery, IEnumerable<BetalingsbetingelseView>>(query);
-            }
-            catch (IntranetRepositoryException ex)
-            {
-                throw CreateIntranetRepositoryFault(ex);
-            }
-            catch (IntranetBusinessException ex)
-            {
-                throw CreateIntranetBusinessFault(ex);
-            }
-            catch (IntranetSystemException ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-            catch (Exception ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-        }
-
         #endregion
     }
 }

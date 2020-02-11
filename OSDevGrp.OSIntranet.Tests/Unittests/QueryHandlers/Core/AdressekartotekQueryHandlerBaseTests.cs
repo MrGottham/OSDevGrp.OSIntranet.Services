@@ -300,45 +300,5 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             Assert.Throws<IntranetRepositoryException>(() => queryHandler.AdressegruppeGetByNummer(-1));
         }
-
-        /// <summary>
-        /// Tester, at BetalingsbetingelseGetByNummer henter en given betalingsbetingelse.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelseGetByNummerHenterBetalingsbetingelse()
-        {
-            var fixture = new Fixture();
-            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
-
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.BetalingsbetingelseGetAll())
-                .Return(betalingsbetingelser);
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            var queryHandler = new MyAdressekartotekQueryHandler(adresseRepository, objectMapper);
-            Assert.That(queryHandler, Is.Not.Null);
-
-            var betalingsbetingelse = queryHandler.BetalingsbetingelseGetByNummer(betalingsbetingelser.ElementAt(1).Nummer);
-            Assert.That(betalingsbetingelse, Is.Not.Null);
-            Assert.That(betalingsbetingelse.Nummer, Is.EqualTo(betalingsbetingelser.ElementAt(1).Nummer));
-        }
-
-        /// <summary>
-        /// Tester, at BetalingsbetingelseGetByNummer kaster en IntranetRepositoryException, hvis betalingsbetingelsen ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelseGetByNummerKasterIntranetRepositoryExceptionHvisBetalingsbetingelseIkkeFindes()
-        {
-            var fixture = new Fixture();
-            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
-
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.BetalingsbetingelseGetAll())
-                .Return(betalingsbetingelser);
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            var queryHandler = new MyAdressekartotekQueryHandler(adresseRepository, objectMapper);
-            Assert.That(queryHandler, Is.Not.Null);
-
-            Assert.Throws<IntranetRepositoryException>(() => queryHandler.BetalingsbetingelseGetByNummer(-1));
-        }
     }
 }

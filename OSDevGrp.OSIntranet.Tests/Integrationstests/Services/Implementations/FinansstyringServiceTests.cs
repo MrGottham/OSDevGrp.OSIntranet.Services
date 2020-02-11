@@ -286,17 +286,5 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             Assert.That(konto, Is.Not.Null);
             Assert.That(konto.Saldo, Is.EqualTo(saldoBeforeTest));
         }
-
-        /// <summary>
-        /// Tester, at betalingsbetingelser kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelserKanHentes()
-        {
-            var query = new BetalingsbetingelserGetQuery();
-            var result = _service.BetalingsbetingelserGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
     }
 }

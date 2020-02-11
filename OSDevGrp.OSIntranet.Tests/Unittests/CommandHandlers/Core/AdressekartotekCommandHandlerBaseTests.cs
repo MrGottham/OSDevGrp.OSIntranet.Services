@@ -398,57 +398,5 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
         }
-
-        /// <summary>
-        /// Tester, at BetalingsbetingelseGetByNummer henter en given betalingsbetingelse.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelseGetByNummerHenterBetalingsbetingelse()
-        {
-            var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
-            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
-
-            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
-            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepositoryMock.Expect(m => m.BetalingsbetingelseGetAll())
-                .Return(betalingsbetingelser)
-                .Repeat.Any();
-
-            var commandHandler = new MyCommandHandler(adresseRepositoryMock, objectMapperMock, exceptionBuilderMock);
-            Assert.That(commandHandler, Is.Not.Null);
-
-            var betalingsbetingelse = commandHandler.BetalingsbetingelseGetByNummer(betalingsbetingelser.ElementAt(1).Nummer);
-            Assert.That(betalingsbetingelse, Is.Not.Null);
-            Assert.That(betalingsbetingelse.Nummer, Is.EqualTo(betalingsbetingelser.ElementAt(1).Nummer));
-        }
-
-        /// <summary>
-        /// Tester, at BetalingsbetingelseGetByNummer kaster en IntranetRepositoryException, hvis betalingsbetingelsen ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelseGetByNummerKasterIntranetRepositoryExceptionHvisBetalingsbetingelseIkkeFindes()
-        {
-            var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
-            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
-
-            var betalingsbetingelser = fixture.CreateMany<Betalingsbetingelse>(3).ToList();
-            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepositoryMock.Expect(m => m.BetalingsbetingelseGetAll())
-                .Return(betalingsbetingelser)
-                .Repeat.Any();
-
-            var commandHandler = new MyCommandHandler(adresseRepositoryMock, objectMapperMock, exceptionBuilderMock);
-            Assert.That(commandHandler, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => commandHandler.BetalingsbetingelseGetByNummer(-1));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse).Name, -1)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
-        }
     }
 }

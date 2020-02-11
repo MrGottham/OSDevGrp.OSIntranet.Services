@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -56,58 +55,32 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
             Assert.That(adressegrupper.Count(), Is.GreaterThan(0));
         }
 
-        /// <summary>
-        /// Tester, at BetalingsbetingelseGetAll henter betalingsbetingelser.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelseGetAllHenterBetalingsbetingelser()
-        {
-            var betalingsbetingelser = _adresseRepository.BetalingsbetingelseGetAll();
-            Assert.That(betalingsbetingelser, Is.Not.Null);
-            Assert.That(betalingsbetingelser.Count(), Is.GreaterThan(0));
-        }
-
         [Test]
         [Ignore("Used for data migration")]
         public void Export()
         {
-            IEnumerable<Postnummer> postalCodeCollection = new List<Postnummer>(0);
+            IEnumerable<Betalingsbetingelse> paymentTermCollection = new List<Betalingsbetingelse>(0);
 
-            XmlDocument postalCodeDocument = new XmlDocument();
-            postalCodeDocument.AppendChild(postalCodeDocument.CreateXmlDeclaration("1.0", Encoding.UTF8.BodyName, null));
+            XmlDocument paymentTermDocument = new XmlDocument();
+            paymentTermDocument.AppendChild(paymentTermDocument.CreateXmlDeclaration("1.0", Encoding.UTF8.BodyName, null));
 
-            XmlElement postalCodeCollectionElement = postalCodeDocument.CreateElement("PostalCodes");
-            postalCodeDocument.AppendChild(postalCodeCollectionElement);
+            XmlElement paymentTermCollectionElement = paymentTermDocument.CreateElement("PaymentTerms");
+            paymentTermDocument.AppendChild(paymentTermCollectionElement);
 
-            foreach (Postnummer postalCode in postalCodeCollection)
+            foreach (Betalingsbetingelse paymentTerm in paymentTermCollection.OrderBy(m => m.Nummer))
             {
-                XmlElement postalCodeElement = postalCodeDocument.CreateElement("PostalCode");
+                XmlElement paymentTermElement = paymentTermDocument.CreateElement("PaymentTerm");
 
-                postalCodeElement.Attributes.Append(postalCodeDocument.CreateAttribute("countryCode"));
-                switch (postalCode.Landekode)
-                {
-                    case "DK":
-                        postalCodeElement.Attributes["countryCode"].Value = postalCode.Landekode;
-                        break;
+                paymentTermElement.Attributes.Append(paymentTermDocument.CreateAttribute("number"));
+                paymentTermElement.Attributes["number"].Value = paymentTerm.Nummer.ToString();
 
-                    case "FR":
-                        postalCodeElement.Attributes["countryCode"].Value = "FO";
-                        break;
+                paymentTermElement.Attributes.Append(paymentTermDocument.CreateAttribute("name"));
+                paymentTermElement.Attributes["name"].Value = paymentTerm.Navn.Trim();
 
-                    default:
-                        throw new NotSupportedException(postalCode.Landekode);
-                }
-
-                postalCodeElement.Attributes.Append(postalCodeDocument.CreateAttribute("code"));
-                postalCodeElement.Attributes["code"].Value = postalCode.Postnr.Trim();
-
-                postalCodeElement.Attributes.Append(postalCodeDocument.CreateAttribute("city"));
-                postalCodeElement.Attributes["city"].Value = postalCode.By.Trim();
-
-                postalCodeCollectionElement.AppendChild(postalCodeElement);
+                paymentTermCollectionElement.AppendChild(paymentTermElement);
             }
 
-            using (FileStream fileStream = new FileStream(@"C:\Users\DFDG_OSO\Desktop\PostalCodes.xml", FileMode.Create, FileAccess.Write, FileShare.None))
+            using (FileStream fileStream = new FileStream(@"PaymentTerms.xml", FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 XmlWriterSettings settings = new XmlWriterSettings
                 {
@@ -115,7 +88,7 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
                 };
                 using (XmlWriter xmlWriter = XmlWriter.Create(fileStream, settings))
                 {
-                    postalCodeDocument.WriteTo(xmlWriter);
+                    paymentTermDocument.WriteTo(xmlWriter);
 
                     xmlWriter.Flush();
                     xmlWriter.Close();

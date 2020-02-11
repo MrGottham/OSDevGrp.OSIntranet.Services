@@ -162,25 +162,5 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
                 ChannelTools.CloseChannel(client);
             }
         }
-
-        /// <summary>
-        /// Tester, at betalingsbetingelser hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBetalingsbetingelserHentes()
-        {
-            var client = _channelFactory.CreateChannel<IAdressekartotekService>(ClientEndpointName);
-            try
-            {
-                var query = new BetalingsbetingelserGetQuery();
-                var result = client.BetalingsbetingelserGet(query);
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.GreaterThan(0));
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(client);
-            }
-        }
     }
 }

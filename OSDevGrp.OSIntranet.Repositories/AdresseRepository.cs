@@ -148,41 +148,6 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
         }
 
-        /// <summary>
-        /// Henter alle betalingsbetingelser.
-        /// </summary>
-        /// <returns>Liste af betalingsbetingelser.</returns>
-        public IEnumerable<Betalingsbetingelse> BetalingsbetingelseGetAll()
-        {
-            var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
-            try
-            {
-                var query = new BetalingsbetingelseGetAllQuery();
-                var betalingsbetingelseViews = channel.BetalingsbetingelseGetAll(query);
-                return
-                    _domainObjectBuilder.BuildMany<BetalingsbetingelseView, Betalingsbetingelse>(
-                        betalingsbetingelseViews);
-            }
-            catch (IntranetRepositoryException)
-            {
-                throw;
-            }
-            catch (FaultException ex)
-            {
-                throw new IntranetRepositoryException(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(channel);
-            }
-        }
-
         #endregion
     }
 }
