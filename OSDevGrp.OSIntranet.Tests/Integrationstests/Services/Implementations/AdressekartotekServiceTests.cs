@@ -94,17 +94,5 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Nummer, Is.EqualTo(query.Nummer));
         }
-
-        /// <summary>
-        /// Tester, at adressegrupper hentes.
-        /// </summary>
-        [Test]
-        public void TestAtAdressegrupperHentes()
-        {
-            var query = new AdressegrupperGetQuery();
-            var result = _service.AdressegrupperGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
     }
 }

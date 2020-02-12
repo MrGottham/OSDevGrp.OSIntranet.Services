@@ -115,39 +115,6 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
         }
 
-        /// <summary>
-        /// Henter alle adressegrupper.
-        /// </summary>
-        /// <returns>Liste af adressegrupper.</returns>
-        public IEnumerable<Adressegruppe> AdressegruppeGetAll()
-        {
-            var channel = _channelFactory.CreateChannel<IAdresseRepositoryService>(EndpointConfigurationName);
-            try
-            {
-                var query = new AdressegruppeGetAllQuery();
-                var adressegruppeViews = channel.AdressegruppeGetAll(query);
-                return _domainObjectBuilder.BuildMany<AdressegruppeView, Adressegruppe>(adressegruppeViews);
-            }
-            catch (IntranetRepositoryException)
-            {
-                throw;
-            }
-            catch (FaultException ex)
-            {
-                throw new IntranetRepositoryException(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                throw new IntranetRepositoryException(
-                    Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name,
-                                                 ex.Message), ex);
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(channel);
-            }
-        }
-
         #endregion
     }
 }

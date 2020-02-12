@@ -160,17 +160,6 @@ namespace OSDevGrp.OSIntranet.CommandHandlers.Core
             }
         }
 
-        /// <summary>
-        /// Henter og returnerer en given adressegruppe.
-        /// </summary>
-        /// <param name="nummer">Unik identifikation af adressegruppen.</param>
-        /// <returns>Adressegruppe.</returns>
-        public virtual Adressegruppe AdressegruppeGetByNummer(int nummer)
-        {
-            var adressegruppelisteHelper = new AdressegruppelisteHelper(Repository.AdressegruppeGetAll());
-            return adressegruppelisteHelper.GetById(nummer);
-        }
-
         #endregion
     }
 }

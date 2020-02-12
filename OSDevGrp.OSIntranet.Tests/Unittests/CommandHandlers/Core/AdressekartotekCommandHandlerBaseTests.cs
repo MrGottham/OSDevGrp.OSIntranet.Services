@@ -346,57 +346,5 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.CommandHandlers.Core
             Assert.That(exception.InnerException, Is.Not.Null);
             Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
         }
-
-        /// <summary>
-        /// Tester, at AdressegruppeGetByNummer henter en given adressegruppe.
-        /// </summary>
-        [Test]
-        public void TestAtAdressegruppeGetByNummerHenterAdressegruppe()
-        {
-            var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
-            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
-
-            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
-            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepositoryMock.Expect(m => m.AdressegruppeGetAll())
-                .Return(adressegrupper)
-                .Repeat.Any();
-
-            var commandHandler = new MyCommandHandler(adresseRepositoryMock, objectMapperMock, exceptionBuilderMock);
-            Assert.That(commandHandler, Is.Not.Null);
-
-            var adressegruppe = commandHandler.AdressegruppeGetByNummer(adressegrupper.ElementAt(1).Nummer);
-            Assert.That(adressegruppe, Is.Not.Null);
-            Assert.That(adressegruppe.Nummer, Is.EqualTo(adressegrupper.ElementAt(1).Nummer));
-        }
-
-        /// <summary>
-        /// Tester, at AdressegruppeGetByNummer kaster en IntranetRepositoryException, hvis adressegruppen ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtAdressegruppeGetByNummerKasterIntranetRepositoryExceptionHvisAdressegruppeIkkeFindes()
-        {
-            var fixture = new Fixture();
-            var objectMapperMock = MockRepository.GenerateMock<IObjectMapper>();
-            var exceptionBuilderMock = MockRepository.GenerateMock<IExceptionBuilder>();
-
-            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
-            var adresseRepositoryMock = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepositoryMock.Expect(m => m.AdressegruppeGetAll())
-                .Return(adressegrupper)
-                .Repeat.Any();
-
-            var commandHandler = new MyCommandHandler(adresseRepositoryMock, objectMapperMock, exceptionBuilderMock);
-            Assert.That(commandHandler, Is.Not.Null);
-
-            var exception = Assert.Throws<IntranetRepositoryException>(() => commandHandler.AdressegruppeGetByNummer(-1));
-            Assert.That(exception, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Null);
-            Assert.That(exception.Message, Is.Not.Empty);
-            Assert.That(exception.Message, Is.EqualTo(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe).Name, -1)));
-            Assert.That(exception.InnerException, Is.Not.Null);
-            Assert.That(exception.InnerException, Is.TypeOf<InvalidOperationException>());
-        }
     }
 }

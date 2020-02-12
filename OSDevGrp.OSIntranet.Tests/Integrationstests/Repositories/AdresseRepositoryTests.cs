@@ -44,17 +44,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
             Assert.That(adresser.Count(), Is.GreaterThan(0));
         }
 
-        /// <summary>
-        /// Tester, at AdressegruppeGetAll henter adressegrupper.
-        /// </summary>
-        [Test]
-        public void TestAtAdressegruppeGetAllHenterAdressegrupper()
-        {
-            var adressegrupper = _adresseRepository.AdressegruppeGetAll();
-            Assert.That(adressegrupper, Is.Not.Null);
-            Assert.That(adressegrupper.Count(), Is.GreaterThan(0));
-        }
-
         [Test]
         [Ignore("Used for data migration")]
         public void Export()

@@ -260,45 +260,5 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             Assert.Throws<IntranetRepositoryException>(() => queryHandler.FirmaGetByNummer(-1));
         }
-
-        /// <summary>
-        /// Tester, at AdressegruppeGetByNummer henter en given adressegruppe.
-        /// </summary>
-        [Test]
-        public void TestAtAdressegruppeGetByNummerHenterAdressegruppe()
-        {
-            var fixture = new Fixture();
-            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
-
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdressegruppeGetAll())
-                .Return(adressegrupper);
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            var queryHandler = new MyAdressekartotekQueryHandler(adresseRepository, objectMapper);
-            Assert.That(queryHandler, Is.Not.Null);
-
-            var adressegruppe = queryHandler.AdressegruppeGetByNummer(adressegrupper.ElementAt(1).Nummer);
-            Assert.That(adressegruppe, Is.Not.Null);
-            Assert.That(adressegruppe.Nummer, Is.EqualTo(adressegrupper.ElementAt(1).Nummer));
-        }
-
-        /// <summary>
-        /// Tester, at AdressegruppeGetByNummer kaster en IntranetRepositoryException, hvis adressegruppen ikke findes.
-        /// </summary>
-        [Test]
-        public void TestAtAdressegruppeGetByNummerKasterIntranetRepositoryExceptionHvisAdressegruppeIkkeFindes()
-        {
-            var fixture = new Fixture();
-            var adressegrupper = fixture.CreateMany<Adressegruppe>(3).ToList();
-
-            var adresseRepository = MockRepository.GenerateMock<IAdresseRepository>();
-            adresseRepository.Expect(m => m.AdressegruppeGetAll())
-                .Return(adressegrupper);
-            var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            var queryHandler = new MyAdressekartotekQueryHandler(adresseRepository, objectMapper);
-            Assert.That(queryHandler, Is.Not.Null);
-
-            Assert.Throws<IntranetRepositoryException>(() => queryHandler.AdressegruppeGetByNummer(-1));
-        }
     }
 }

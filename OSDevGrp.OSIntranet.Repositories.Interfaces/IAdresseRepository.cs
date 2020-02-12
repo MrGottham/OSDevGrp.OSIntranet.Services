@@ -13,11 +13,5 @@ namespace OSDevGrp.OSIntranet.Repositories.Interfaces
         /// </summary>
         /// <returns>Liste af adresser.</returns>
         IEnumerable<AdresseBase> AdresseGetAll();
-
-        /// <summary>
-        /// Henter alle adressegrupper.
-        /// </summary>
-        /// <returns>Liste af adressegrupper.</returns>
-        IEnumerable<Adressegruppe> AdressegruppeGetAll();
     }
 }

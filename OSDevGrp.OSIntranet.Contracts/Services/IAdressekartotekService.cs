@@ -61,15 +61,5 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         [FaultContract(typeof(IntranetFaultBase))]
         [TransactionFlow(TransactionFlowOption.Allowed)]
         FirmaView FirmaGet(FirmaGetQuery query);
-
-        /// <summary>
-        /// Henter alle adressegrupper.
-        /// </summary>
-        /// <param name="query">Foresprøgelse efter alle adressegrupper.</param>
-        /// <returns>Liste af adressegrupper.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<AdressegruppeView> AdressegrupperGet(AdressegrupperGetQuery query);
     }
 }

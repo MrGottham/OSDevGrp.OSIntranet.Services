@@ -59,7 +59,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdressegrupperGetQueryHandler.cs" />
     <Compile Include="Core\AdressekartotekQueryHandlerBase.cs" />
     <Compile Include="AdressekontolisteGetQueryHandler.cs" />
     <Compile Include="AdressekontoGetQueryHandler.cs" />
