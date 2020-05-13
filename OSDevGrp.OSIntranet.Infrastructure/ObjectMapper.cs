@@ -11,7 +11,7 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
-using IObjectMapper = OSDevGrp.OSIntranet.Infrastructure.Interfaces.IObjectMapper;
+using IObjectMapper=OSDevGrp.OSIntranet.Infrastructure.Interfaces.IObjectMapper;
 
 namespace OSDevGrp.OSIntranet.Infrastructure
 {
@@ -40,21 +40,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             var mapperConfiguration = new MapperConfiguration(config =>
             {
                 config.CreateMap<AdresseBase, TelefonlisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, TelefonlisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, TelefonlisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToTelefonlisteView(s));
 
                 config.CreateMap<Person, TelefonlisteView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -69,25 +55,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2));
 
                 config.CreateMap<AdresseBase, AdressekontolisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        if (s == null)
-                        {
-                            return null;
-                        }
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, AdressekontolisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, AdressekontolisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToAdressekontolisteView(s));
 
                 config.CreateMap<Person, AdressekontolisteView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -104,21 +72,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
                 config.CreateMap<AdresseBase, AdressekontoView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, AdressekontoView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, AdressekontoView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToAdressekontoView(s));
 
                 config.CreateMap<Person, AdressekontoView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -153,21 +107,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
                 config.CreateMap<AdresseBase, DebitorlisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, DebitorlisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, DebitorlisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToDebitorlisteView(s));
 
                 config.CreateMap<Person, DebitorlisteView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -184,21 +124,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
                 config.CreateMap<AdresseBase, DebitorView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, DebitorView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, DebitorView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToDebitorView(s));
 
                 config.CreateMap<Person, DebitorView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -233,21 +159,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
                 config.CreateMap<AdresseBase, KreditorlisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, KreditorlisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, KreditorlisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToKreditorlisteView(s));
 
                 config.CreateMap<Person, KreditorlisteView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -264,21 +176,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
                 config.CreateMap<AdresseBase, KreditorView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, KreditorView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, KreditorView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToKreditorView(s));
 
                 config.CreateMap<Person, KreditorView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -389,21 +287,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Brevhoved, opt => opt.MapFrom(s => s.Brevhoved));
 
                 config.CreateMap<KontoBase, KontoBaseView>()
-                    .ConvertUsing(s =>
-                    {
-                        var objectMapper = new ObjectMapper();
-                        Konto konto = s as Konto;
-                        if (konto != null)
-                        {
-                            return objectMapper.Map<Konto, KontoView>(konto);
-                        }
-                        Budgetkonto budgetkonto = s as Budgetkonto;
-                        if (budgetkonto != null)
-                        {
-                            return objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToKontoBaseView(s));
 
                 config.CreateMap<Konto, KontoplanView>()
                     .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
@@ -584,6 +468,159 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 throw new ArgumentNullException(nameof(source));
             }
             return Mapper.Map<TSource, TDestination>(source);
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private static TelefonlisteView ToTelefonlisteView(AdresseBase source)
+        {
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, TelefonlisteView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, TelefonlisteView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static AdressekontolisteView ToAdressekontolisteView(AdresseBase source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, AdressekontolisteView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, AdressekontolisteView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static AdressekontoView ToAdressekontoView(AdresseBase source)
+        {
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, AdressekontoView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, AdressekontoView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static DebitorlisteView ToDebitorlisteView(AdresseBase source)
+        {
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, DebitorlisteView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, DebitorlisteView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static DebitorView ToDebitorView(AdresseBase source)
+        {
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, DebitorView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, DebitorView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static KreditorlisteView ToKreditorlisteView(AdresseBase source)
+        {
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, KreditorlisteView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, KreditorlisteView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static KreditorView ToKreditorView(AdresseBase source)
+        {
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, KreditorView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, KreditorView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static KontoBaseView ToKontoBaseView(KontoBase source)
+        {
+            var objectMapper = new ObjectMapper();
+            Konto konto = source as Konto;
+            if (konto != null)
+            {
+                return objectMapper.Map<Konto, KontoView>(konto);
+            }
+
+            Budgetkonto budgetkonto = source as Budgetkonto;
+            if (budgetkonto != null)
+            {
+                return objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
         }
 
         #endregion

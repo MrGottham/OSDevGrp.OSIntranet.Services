@@ -173,7 +173,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -210,7 +210,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -287,7 +287,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -365,7 +365,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -404,7 +404,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -442,7 +442,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -499,7 +499,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -557,7 +557,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -602,7 +602,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);
@@ -640,7 +640,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
 
             var foodItemCollectionGetQuery = fixture.Build<FoodItemCollectionGetQuery>()
                 .With(m => m.TranslationInfoIdentifier, Guid.NewGuid())
-                .With(m => m.FoodGroupIdentifier, null)
+                .With(m => m.FoodGroupIdentifier, (Guid?) null)
                 .Create();
 
             var result = foodItemCollectionGetQueryHandlerBase.Query(foodItemCollectionGetQuery);

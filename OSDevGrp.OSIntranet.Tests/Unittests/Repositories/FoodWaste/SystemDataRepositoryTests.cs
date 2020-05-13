@@ -690,7 +690,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
         public void TestThatFoodGroupGetByForeignKeyGetReturnsFoodGroupWhenItWasFound()
         {
             FoodGroupProxy foodGroupProxy = _fixture.Build<FoodGroupProxy>()
-                .With(m => m.Parent, null)
+                .With(m => m.Parent, (IFoodGroup) null)
                 .Create();
 
             IDataProvider dataProviderMock = BuildDataProviderMock();
@@ -1558,13 +1558,13 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.FoodWaste
             return new List<FoodGroupProxy>
             {
                 fixture.Build<FoodGroupProxy>()
-                    .With(m => m.Parent, null)
+                    .With(m => m.Parent, (IFoodGroup) null)
                     .Create(),
                 fixture.Build<FoodGroupProxy>()
-                    .With(m => m.Parent, null)
+                    .With(m => m.Parent, (IFoodGroup) null)
                     .Create(),
                 fixture.Build<FoodGroupProxy>()
-                    .With(m => m.Parent, null)
+                    .With(m => m.Parent, (IFoodGroup) null)
                     .Create()
             };
         }
