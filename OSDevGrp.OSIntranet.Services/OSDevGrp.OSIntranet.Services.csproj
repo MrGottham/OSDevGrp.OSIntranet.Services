@@ -99,7 +99,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="commonservice.svc" />
-    <Content Include="adressekartotekservice.svc" />
     <Content Include="basicsecuritytokenservice.svc" />
     <Content Include="foodwastehouseholddataservice.svc" />
     <Content Include="foodwastesystemdataservice.svc" />
@@ -117,7 +116,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Implementations\AdressekartotekService.cs" />
     <Compile Include="Implementations\CommonService.cs" />
     <Compile Include="Implementations\FinansstyringService.cs" />
     <Compile Include="Implementations\FoodWasteSystemDataService.cs" />

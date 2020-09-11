@@ -94,8 +94,6 @@
     <Compile Include="Queries\DataProviderWhoHandlesPaymentsCollectionGetQuery.cs" />
     <Compile Include="Queries\DebitorGetQuery.cs" />
     <Compile Include="Queries\DebitorlisteGetQuery.cs" />
-    <Compile Include="Queries\FirmaGetQuery.cs" />
-    <Compile Include="Queries\FirmalisteGetQuery.cs" />
     <Compile Include="Queries\FoodGroupTreeGetQuery.cs" />
     <Compile Include="Queries\FoodItemCollectionGetQuery.cs" />
     <Compile Include="Queries\HouseholdDataGetQuery.cs" />
@@ -112,21 +110,17 @@
     <Compile Include="Queries\KontoplanGetQuery.cs" />
     <Compile Include="Queries\KreditorGetQuery.cs" />
     <Compile Include="Queries\KreditorlisteGetQuery.cs" />
-    <Compile Include="Queries\PersonGetQuery.cs" />
-    <Compile Include="Queries\PersonlisteGetQuery.cs" />
     <Compile Include="Queries\PrivacyPolicyGetQuery.cs" />
     <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Queries\StaticTextCollectionGetQuery.cs" />
     <Compile Include="Queries\StaticTextGetQueryBase.cs" />
     <Compile Include="Queries\StorageTypeCollectionGetQuery.cs" />
     <Compile Include="Queries\SystemerGetQuery.cs" />
-    <Compile Include="Queries\TelefonlisteGetQuery.cs" />
     <Compile Include="Queries\TranslationInfoCollectionGetQuery.cs" />
     <Compile Include="Responses\BogføringsadvarselResponse.cs" />
     <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
     <Compile Include="Responses\BooleanResultResponse.cs" />
     <Compile Include="Responses\ServiceReceiptResponse.cs" />
-    <Compile Include="Services\IAdressekartotekService.cs" />
     <Compile Include="Services\ICommonService.cs" />
     <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IFoodWasteSystemDataService.cs" />
@@ -134,8 +128,6 @@
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="Services\IKalenderService.cs" />
     <Compile Include="SoapNamespaces.cs" />
-    <Compile Include="Views\AdresseBaseView.cs" />
-    <Compile Include="Views\AdressegruppeView.cs" />
     <Compile Include="Views\AdressekontolisteView.cs" />
     <Compile Include="Views\AdressekontoView.cs" />
     <Compile Include="Views\BetalingsbetingelseView.cs" />
@@ -149,7 +141,6 @@
     <Compile Include="Views\DataProviderView.cs" />
     <Compile Include="Views\DebitorListeView.cs" />
     <Compile Include="Views\DebitorView.cs" />
-    <Compile Include="Views\FirmaView.cs" />
     <Compile Include="Views\FoodGroupIdentificationView.cs" />
     <Compile Include="Views\FoodGroupSystemView.cs" />
     <Compile Include="Views\FoodGroupTreeSystemView.cs" />
@@ -178,7 +169,6 @@
     <Compile Include="Views\KreditorView.cs" />
     <Compile Include="Views\MånedsoplysningerView.cs" />
     <Compile Include="Views\PaymentView.cs" />
-    <Compile Include="Views\PersonView.cs" />
     <Compile Include="Views\RegnskabslisteView.cs" />
     <Compile Include="Views\SaldoBaseView.cs" />
     <Compile Include="Views\SaldolisteBaseView.cs" />
