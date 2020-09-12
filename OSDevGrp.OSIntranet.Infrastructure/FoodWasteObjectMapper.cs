@@ -53,7 +53,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Storages, opt => opt.MapFrom(s => s.Storages));
 
                 config.CreateMap<IHousehold, IHouseholdProxy>()
-                    .ConstructUsing(m => ToHouseholdProxy(m));
+                    .ConvertUsing(m => ToHouseholdProxy(m));
 
                 config.CreateMap<IStorageType, StorageTypeIdentificationView>()
                     .ForMember(m => m.StorageTypeIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -100,10 +100,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime));
 
                 config.CreateMap<IStorage, IStorageProxy>()
-                    .ConstructUsing(m => ToStorageProxy(m));
+                    .ConvertUsing(m => ToStorageProxy(m));
 
                 config.CreateMap<IStorageType, IStorageTypeProxy>()
-                    .ConstructUsing(m => ToStorageTypeProxy(m));
+                    .ConvertUsing(m => ToStorageTypeProxy(m));
 
                 config.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
                     .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -134,7 +134,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Payments, opt => opt.MapFrom(s => s.Payments));
 
                 config.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
-                    .ConstructUsing(m => ToHouseholdMemberProxy(m));
+                    .ConvertUsing(m => ToHouseholdMemberProxy(m));
 
                 config.CreateMap<IPayment, PaymentView>()
                     .ForMember(m => m.PaymentIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -146,7 +146,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime));
 
                 config.CreateMap<IPayment, IPaymentProxy>()
-                    .ConstructUsing(m => ToPaymentProxy(m));
+                    .ConvertUsing(m => ToPaymentProxy(m));
 
                 config.CreateMap<IStakeholder, StakeholderView>()
                     .ForMember(m => m.StakeholderIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -466,7 +466,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 storageTypeProxy = Mapper.Map<IStorageType, IStorageTypeProxy>(source.StorageType);
             }
 
-            return new StorageProxy(householdProxy, source.SortOrder, storageTypeProxy, source.Temperature, source.CreationTime, source.Description);
+            return new StorageProxy(householdProxy, source.SortOrder, storageTypeProxy, source.Temperature, source.CreationTime, source.Description)
+            {
+                Identifier = source.Identifier
+            };
         }
 
         private static IStorageTypeProxy ToStorageTypeProxy(IStorageType source)
