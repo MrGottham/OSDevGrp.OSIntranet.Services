@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -180,6 +181,22 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
                     accountElement.Attributes.Append(accountingDocument.CreateAttribute("accountGroup"));
                     accountElement.Attributes["accountGroup"].Value = account.Kontogruppe.Nummer.ToString();
 
+                    foreach (Kreditoplysninger creditInfo in account.Kreditoplysninger.OrderBy(m => m.År).ThenBy(m => m.Måned))
+                    {
+                        XmlElement creditInfoElement = accountingDocument.CreateElement("CreditInfo");
+
+                        creditInfoElement.Attributes.Append(accountingDocument.CreateAttribute("year"));
+                        creditInfoElement.Attributes["year"].Value = creditInfo.År.ToString();
+
+                        creditInfoElement.Attributes.Append(accountingDocument.CreateAttribute("month"));
+                        creditInfoElement.Attributes["month"].Value = creditInfo.Måned.ToString();
+
+                        creditInfoElement.Attributes.Append(accountingDocument.CreateAttribute("credit"));
+                        creditInfoElement.Attributes["credit"].Value = creditInfo.Kredit.ToString("0.00", CultureInfo.InvariantCulture);
+
+                        accountElement.AppendChild(creditInfoElement);
+                    }
+
                     accountingElement.AppendChild(accountElement);
                 }
 
@@ -207,6 +224,25 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
 
                     budgetAccountElement.Attributes.Append(accountingDocument.CreateAttribute("budgetAccountGroup"));
                     budgetAccountElement.Attributes["budgetAccountGroup"].Value = budgetAccount.Budgetkontogruppe.Nummer.ToString();
+
+                    foreach (Budgetoplysninger budgetInfo in budgetAccount.Budgetoplysninger.OrderBy(m => m.År).ThenBy(m => m.Måned))
+                    {
+                        XmlElement budgetInfoElement = accountingDocument.CreateElement("BudgetInfo");
+
+                        budgetInfoElement.Attributes.Append(accountingDocument.CreateAttribute("year"));
+                        budgetInfoElement.Attributes["year"].Value = budgetInfo.År.ToString();
+
+                        budgetInfoElement.Attributes.Append(accountingDocument.CreateAttribute("month"));
+                        budgetInfoElement.Attributes["month"].Value = budgetInfo.Måned.ToString();
+
+                        budgetInfoElement.Attributes.Append(accountingDocument.CreateAttribute("income"));
+                        budgetInfoElement.Attributes["income"].Value = budgetInfo.Indtægter.ToString("0.00", CultureInfo.InvariantCulture);
+
+                        budgetInfoElement.Attributes.Append(accountingDocument.CreateAttribute("expenses"));
+                        budgetInfoElement.Attributes["expenses"].Value = budgetInfo.Udgifter.ToString("0.00", CultureInfo.InvariantCulture);
+
+                        budgetAccountElement.AppendChild(budgetInfoElement);
+                    }
 
                     accountingElement.AppendChild(budgetAccountElement);
                 }
