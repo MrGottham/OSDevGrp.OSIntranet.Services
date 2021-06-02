@@ -49,36 +49,6 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region IFinansstyringService Members
 
         /// <summary>
-        /// Henter en regnskabsliste.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en regnskabsliste.</param>
-        /// <returns>Regnskabsliste.</returns>
-        [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<RegnskabslisteView> RegnskabslisteGet(RegnskabslisteGetQuery query)
-        {
-            try
-            {
-                return _queryBus.Query<RegnskabslisteGetQuery, IEnumerable<RegnskabslisteView>>(query);
-            }
-            catch (IntranetRepositoryException ex)
-            {
-                throw CreateIntranetRepositoryFault(ex);
-            }
-            catch (IntranetBusinessException ex)
-            {
-                throw CreateIntranetBusinessFault(ex);
-            }
-            catch (IntranetSystemException ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-            catch (Exception ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-        }
-
-        /// <summary>
         /// Henter en kontoplan.
         /// </summary>
         /// <param name="query">Forespørgelse efter en kontoplan.</param>

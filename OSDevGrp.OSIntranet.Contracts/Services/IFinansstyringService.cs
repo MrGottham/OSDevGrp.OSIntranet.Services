@@ -15,16 +15,6 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFinansstyringService : IIntranetService
     {
         /// <summary>
-        /// Henter en regnskabsliste.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en regnskabsliste.</param>
-        /// <returns>Regnskabsliste.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<RegnskabslisteView> RegnskabslisteGet(RegnskabslisteGetQuery query);
-
-        /// <summary>
         /// Henter en kontoplan.
         /// </summary>
         /// <param name="query">Forespørgelse efter en kontoplan.</param>

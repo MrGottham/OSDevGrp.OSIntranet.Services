@@ -96,7 +96,6 @@
     <Compile Include="PrivacyPolicyGetQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\QueryHandlerBase.cs" />
-    <Compile Include="RegnskabslisteGetQueryHandler.cs" />
     <Compile Include="StaticTextCollectionGetQueryHandler.cs" />
     <Compile Include="StorageTypeCollectionGetQueryHandler.cs" />
     <Compile Include="StorageTypeCollectionGetQueryHandlerForSystemView.cs" />

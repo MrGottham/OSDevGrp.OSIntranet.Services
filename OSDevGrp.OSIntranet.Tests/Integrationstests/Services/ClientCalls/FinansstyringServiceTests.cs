@@ -40,26 +40,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         }
 
         /// <summary>
-        /// Tester, at en regnskabsliste kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtRegnskabslisteHentes()
-        {
-            var client = _channelFactory.CreateChannel<IFinansstyringService>(ClientEndpointName);
-            try
-            {
-                var query = new RegnskabslisteGetQuery();
-                var result = client.RegnskabslisteGet(query);
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.GreaterThan(0));
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(client);
-            }
-        }
-
-        /// <summary>
         /// Tester, at en kontoplan kan hentes.
         /// </summary>
         [Test]

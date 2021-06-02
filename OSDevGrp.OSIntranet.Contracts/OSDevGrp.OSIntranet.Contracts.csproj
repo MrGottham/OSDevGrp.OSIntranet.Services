@@ -111,7 +111,6 @@
     <Compile Include="Queries\KreditorGetQuery.cs" />
     <Compile Include="Queries\KreditorlisteGetQuery.cs" />
     <Compile Include="Queries\PrivacyPolicyGetQuery.cs" />
-    <Compile Include="Queries\RegnskabslisteGetQuery.cs" />
     <Compile Include="Queries\StaticTextCollectionGetQuery.cs" />
     <Compile Include="Queries\StaticTextGetQueryBase.cs" />
     <Compile Include="Queries\StorageTypeCollectionGetQuery.cs" />

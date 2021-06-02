@@ -270,7 +270,6 @@
     <Compile Include="Unittests\Contracts\Queries\KreditorGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\PrivacyPolicyGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StaticTextCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StorageTypeCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\SystemerGetQueryTests.cs" />
@@ -419,7 +418,6 @@
     <Compile Include="Unittests\QueryHandlers\KreditorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\QueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\PrivacyPolicyGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StaticTextCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StorageTypeCollectionGetQueryHandlerForSystemViewTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StorageTypeCollectionGetQueryHandlerTests.cs" />

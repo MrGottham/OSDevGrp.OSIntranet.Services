@@ -32,18 +32,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
-        /// Tester, at en regnskabsliste kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtRegnskabslisteHentes()
-        {
-            var query = new RegnskabslisteGetQuery();
-            var result = _service.RegnskabslisteGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at en kontoplan kan hentes.
         /// </summary>
         [Test]
