@@ -26,8 +26,6 @@ namespace OSDevGrp.OSIntranet.Repositories
             }
             try
             {
-                DebitorSaldoOverNul = base.GetBoolFromApplicationSettings(nameValueCollection, "DebitorSaldoOverNul");
-                KreditorSaldoOverNul = base.GetBoolFromApplicationSettings(nameValueCollection, "KreditorSaldoOverNul");
                 DageForBogføringsperiode = base.GetIntFromApplicationSettings(nameValueCollection, "DageForBogføringsperiode");
             }
             catch (CommonRepositoryException ex)
@@ -39,24 +37,6 @@ namespace OSDevGrp.OSIntranet.Repositories
         #endregion
 
         #region Properties
-
-        /// <summary>
-        /// Angivelse af, om saldo for debitorer skal være større end 0.
-        /// </summary>
-        public bool DebitorSaldoOverNul
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Angielse af, om saldo for kreditorer skal være større end 0.
-        /// </summary>
-        public bool KreditorSaldoOverNul
-        {
-            get;
-            private set;
-        }
 
         /// <summary>
         /// Angivelse af antal dage for bogføringsperiode.

@@ -55,66 +55,6 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
         BudgetkontoView BudgetkontoGet(BudgetkontoGetQuery query);
 
         /// <summary>
-        /// Henter en liste af debitorer.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en liste af debitorer.</param>
-        /// <returns>Liste af debitorer.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<DebitorlisteView> DebitorlisteGet(DebitorlisteGetQuery query);
-
-        /// <summary>
-        /// Henter en debitor.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en debitor.</param>
-        /// <returns>Debitor.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        DebitorView DebitorGet(DebitorGetQuery query);
-
-        /// <summary>
-        /// Henter en liste af kreditorer.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en liste af kreditorer.</param>
-        /// <returns>Liste af kreditorer.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<KreditorlisteView> KreditorlisteGet(KreditorlisteGetQuery query);
-
-        /// <summary>
-        /// Henter en kreditor.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en kreditor.</param>
-        /// <returns>Kreditor</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        KreditorView KreditorGet(KreditorGetQuery query);
-
-        /// <summary>
-        /// Hente en liste af adressekonti.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en liste af adressekonti.</param>
-        /// <returns>Liste af adressekonti.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<AdressekontolisteView> AdressekontolisteGet(AdressekontolisteGetQuery query);
-
-        /// <summary>
-        /// Hente en adressekonto.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en adressekonto.</param>
-        /// <returns>Liste af adressekonto.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        AdressekontoView AdressekontoGet(AdressekontoGetQuery query);
-
-        /// <summary>
         /// Henter et givent antal bogføringslinjer fra en given statusdato.
         /// </summary>
         /// <param name="query">Forespørgelse efter et givent antal bogføringslinjer.</param>

@@ -218,4 +218,3 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
         #endregion
     }
 }
-
