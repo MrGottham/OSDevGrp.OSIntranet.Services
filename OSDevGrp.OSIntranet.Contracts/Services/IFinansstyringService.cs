@@ -15,46 +15,6 @@ namespace OSDevGrp.OSIntranet.Contracts.Services
     public interface IFinansstyringService : IIntranetService
     {
         /// <summary>
-        /// Henter en kontoplan.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en kontoplan.</param>
-        /// <returns>Kontoplan.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<KontoplanView> KontoplanGet(KontoplanGetQuery query);
-
-        /// <summary>
-        /// Henter en konto.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en konto.</param>
-        /// <returns>Konto.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        KontoView KontoGet(KontoGetQuery query);
-
-        /// <summary>
-        /// Henter en budgetkontoplan.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en budgetkontoplan.</param>
-        /// <returns>Budgetkontoplan.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        IEnumerable<BudgetkontoplanView> BudgetkontoplanGet(BudgetkontoplanGetQuery query);
-
-        /// <summary>
-        /// Henter en budgetkonto.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter en budgetkonto.</param>
-        /// <returns>Budgetkonto.</returns>
-        [OperationContract]
-        [FaultContract(typeof(IntranetFaultBase))]
-        [TransactionFlow(TransactionFlowOption.Allowed)]
-        BudgetkontoView BudgetkontoGet(BudgetkontoGetQuery query);
-
-        /// <summary>
         /// Henter et givent antal bogføringslinjer fra en given statusdato.
         /// </summary>
         /// <param name="query">Forespørgelse efter et givent antal bogføringslinjer.</param>

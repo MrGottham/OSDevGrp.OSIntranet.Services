@@ -86,8 +86,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\BogføringerGetQuery.cs" />
     <Compile Include="Queries\BrevhovederGetQuery.cs" />
-    <Compile Include="Queries\BudgetkontoGetQuery.cs" />
-    <Compile Include="Queries\BudgetkontoplanGetQuery.cs" />
     <Compile Include="Queries\DataProviderCollectionGetQuery.cs" />
     <Compile Include="Queries\DataProviderWhoHandlesPaymentsCollectionGetQuery.cs" />
     <Compile Include="Queries\FoodGroupTreeGetQuery.cs" />
@@ -102,8 +100,6 @@
     <Compile Include="Queries\KalenderbrugerAftaleGetQuery.cs" />
     <Compile Include="Queries\KalenderbrugerAftalerGetQuery.cs" />
     <Compile Include="Queries\KalenderbrugereGetQuery.cs" />
-    <Compile Include="Queries\KontoGetQuery.cs" />
-    <Compile Include="Queries\KontoplanGetQuery.cs" />
     <Compile Include="Queries\PrivacyPolicyGetQuery.cs" />
     <Compile Include="Queries\StaticTextCollectionGetQuery.cs" />
     <Compile Include="Queries\StaticTextGetQueryBase.cs" />

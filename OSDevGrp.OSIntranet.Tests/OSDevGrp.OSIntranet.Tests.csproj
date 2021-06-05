@@ -247,8 +247,6 @@
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BogføringerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\BrevhovederGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BudgetkontoGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BudgetkontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DataProviderCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DataProviderWhoHandlesPaymentsCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodGroupTreeGetQueryTests.cs" />
@@ -261,8 +259,6 @@
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftaleGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftalerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugereGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KontoGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\PrivacyPolicyGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StaticTextCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StorageTypeCollectionGetQueryTests.cs" />
@@ -371,8 +367,6 @@
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
     <Compile Include="Unittests\Infrastructure\Validation\SpecificationTests.cs" />
     <Compile Include="Unittests\QueryHandlers\BogføringerGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BudgetkontoplanGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FoodGroupTreeGetQueryHandlerBaseTest.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FoodItemCollectionGetQueryHandlerBaseTest.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\HouseholdMemberDataGetQueryHandlerBaseTests.cs" />
@@ -396,8 +390,6 @@
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftaleGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftalerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugereGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KontoGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KontoplanGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\QueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\PrivacyPolicyGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StaticTextCollectionGetQueryHandlerTests.cs" />
