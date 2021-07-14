@@ -46,148 +46,13 @@ namespace OSDevGrp.OSIntranet.Repositories
             var mapperConfiguration = new MapperConfiguration(config =>
             {
                 config.CreateMap<AdressereferenceView, AdresseBase>()
-                    .ConvertUsing(s => { throw new NotSupportedException(); });
+                    .ConvertUsing(s => ToAdresse(s));
 
                 config.CreateMap<PersonView, AdresseBase>()
-                    .ConvertUsing(s =>
-                    {
-                        Adressegruppe adressegruppe;
-                        lock (SyncRoot)
-                        {
-                            if (GetAdressegruppeCallback == null)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
-                            }
-                            try
-                            {
-                                adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
-                            }
-                            catch (IntranetRepositoryException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe).Name, s.Adressegruppe.Nummer), ex);
-                            }
-                        }
-                        var person = new Person(s.Nummer, s.Navn, adressegruppe);
-                        person.SætAdresseoplysninger(s.Adresse1, s.Adresse2, s.PostnummerBy);
-                        person.SætTelefon(s.Telefon, s.Mobil);
-                        person.SætFødselsdato(s.Fødselsdato);
-                        person.SætBekendtskab(s.Bekendtskab);
-                        person.SætMailadresse(s.Mailadresse);
-                        person.SætWebadresse(s.Webadresse);
-                        if (s.Betalingsbetingelse != null)
-                        {
-                            Betalingsbetingelse betalingsbetingelse;
-                            lock (SyncRoot)
-                            {
-                                if (GetBetalingsbetingelseCallback == null)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
-                                }
-                                try
-                                {
-                                    betalingsbetingelse = GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
-                                }
-                                catch (IntranetRepositoryException)
-                                {
-                                    throw;
-                                }
-                                catch (Exception ex)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse).Name, s.Betalingsbetingelse.Nummer), ex);
-                                }
-                            }
-                            person.SætBetalingsbetingelse(betalingsbetingelse);
-                        }
-                        person.SætUdlånsfrist(s.Udlånsfrist);
-                        person.SætFilofaxAdresselabel(s.FilofaxAdresselabel);
-                        if (s.Firma != null)
-                        {
-                            Firma firma;
-                            lock (SyncRoot)
-                            {
-                                if (GetAdresseBaseCallback == null)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
-                                }
-                                try
-                                {
-                                    firma = (Firma) GetAdresseBaseCallback(s.Firma.Nummer);
-                                }
-                                catch (IntranetRepositoryException)
-                                {
-                                    throw;
-                                }
-                                catch (Exception ex)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Firma).Name, s.Firma.Nummer), ex);
-                                }
-                            }
-                            firma.TilføjPerson(person);
-                        }
-                        return person;
-                    });
+                    .ConvertUsing(s => ToAdresse(s));
 
                 config.CreateMap<FirmaView, AdresseBase>()
-                    .ConvertUsing(s =>
-                    {
-                        Adressegruppe adressegruppe;
-                        lock (SyncRoot)
-                        {
-                            if (GetAdressegruppeCallback == null)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
-                            }
-                            try
-                            {
-                                adressegruppe = GetAdressegruppeCallback(s.Adressegruppe.Nummer);
-                            }
-                            catch (IntranetRepositoryException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Adressegruppe).Name, s.Adressegruppe.Nummer), ex);
-                            }
-                        }
-                        var firma = new Firma(s.Nummer, s.Navn, adressegruppe);
-                        firma.SætAdresseoplysninger(s.Adresse1, s.Adresse2, s.PostnummerBy);
-                        firma.SætTelefon(s.Telefon1, s.Telefon2, s.Telefax);
-                        firma.SætBekendtskab(s.Bekendtskab);
-                        firma.SætMailadresse(s.Mailadresse);
-                        firma.SætWebadresse(s.Webadresse);
-                        if (s.Betalingsbetingelse != null)
-                        {
-                            Betalingsbetingelse betalingsbetingelse;
-                            lock (SyncRoot)
-                            {
-                                if (GetBetalingsbetingelseCallback == null)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
-                                }
-                                try
-                                {
-                                    betalingsbetingelse = GetBetalingsbetingelseCallback(s.Betalingsbetingelse.Nummer);
-                                }
-                                catch (IntranetRepositoryException)
-                                {
-                                    throw;
-                                }
-                                catch (Exception ex)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Betalingsbetingelse).Name, s.Betalingsbetingelse.Nummer), ex);
-                                }
-                            }
-                            firma.SætBetalingsbetingelse(betalingsbetingelse);
-                        }
-                        firma.SætUdlånsfrist(s.Udlånsfrist);
-                        firma.SætFilofaxAdresselabel(s.FilofaxAdresselabel);
-                        return firma;
-                    });
+                    .ConvertUsing(s => ToAdresse(s));
 
                 config.CreateMap<PostnummerView, Postnummer>()
                     .ConvertUsing(s => new Postnummer(s.Landekode, s.Postnummer, s.Bynavn));
@@ -199,326 +64,40 @@ namespace OSDevGrp.OSIntranet.Repositories
                     .ConvertUsing(s => new Betalingsbetingelse(s.Nummer, s.Navn));
 
                 config.CreateMap<RegnskabListeView, Regnskab>()
-                    .ConvertUsing(s =>
-                    {
-                        var regnskab = new Regnskab(s.Nummer, s.Navn);
-                        if (s.Brevhoved != null && s.Brevhoved.Nummer != 0)
-                        {
-                            Brevhoved brevhoved;
-                            lock (SyncRoot)
-                            {
-                                if (GetBrevhovedCallback == null)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
-                                }
-                                try
-                                {
-                                    brevhoved = GetBrevhovedCallback(s.Brevhoved.Nummer);
-                                }
-                                catch (IntranetRepositoryException)
-                                {
-                                    throw;
-                                }
-                                catch (Exception ex)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved).Name, s.Brevhoved.Nummer), ex);
-                                }
-                            }
-                            regnskab.SætBrevhoved(brevhoved);
-                        }
-                        return regnskab;
-                    });
+                    .ConvertUsing(s => ToRegnskab(s));
 
                 config.CreateMap<RegnskabView, Regnskab>()
-                    .ConvertUsing(s =>
-                    {
-                        var regnskab = new Regnskab(s.Nummer, s.Navn);
-                        if (s.Brevhoved != null && s.Brevhoved.Nummer != 0)
-                        {
-                            Brevhoved brevhoved;
-                            lock (SyncRoot)
-                            {
-                                if (GetBrevhovedCallback == null)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
-                                }
-                                try
-                                {
-                                    brevhoved = GetBrevhovedCallback(s.Brevhoved.Nummer);
-                                }
-                                catch (IntranetRepositoryException)
-                                {
-                                    throw;
-                                }
-                                catch (Exception ex)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Brevhoved).Name, s.Brevhoved.Nummer), ex);
-                                }
-                            }
-                            regnskab.SætBrevhoved(brevhoved);
-                        }
-                        lock (SyncRoot)
-                        {
-                            var cached = _regnskaber.SingleOrDefault(m => m.Nummer == regnskab.Nummer);
-                            if (cached != null)
-                            {
-                                _regnskaber.Remove(cached);
-                            }
-                            _regnskaber.Add(regnskab);
-                            var regnskabslisteHelper = new RegnskabslisteHelper(_regnskaber);
-                            GetRegnskabCallback = regnskabslisteHelper.GetById;
-                            foreach (var konto in BuildMany<KontoView, Konto>(s.Konti))
-                            {
-                                regnskab.TilføjKonto(konto);
-                            }
-                            foreach (var budgetkonto in BuildMany<BudgetkontoView, Budgetkonto>(s.Budgetkonti))
-                            {
-                                regnskab.TilføjKonto(budgetkonto);
-                            }
-                            BuildMany<BogføringslinjeView, Bogføringslinje>(s.Konti.SelectMany(m => m.Bogføringslinjer));
-                        }
-                        return regnskab;
-                    });
+                    .ConvertUsing(s => ToRegnskab(s));
 
                 config.CreateMap<KontoListeView, Konto>()
-                    .ConvertUsing(s => { throw new NotSupportedException(); });
+                    .ConvertUsing(s => ToKonto(s));
 
                 config.CreateMap<KontoView, Konto>()
-                    .ConvertUsing(s =>
-                    {
-                        Regnskab regnskab;
-                        lock (SyncRoot)
-                        {
-                            if (GetRegnskabCallback == null)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
-                            }
-                            try
-                            {
-                                regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
-                            }
-                            catch (IntranetRepositoryException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab).Name, s.Regnskab.Nummer), ex);
-                            }
-                        }
-                        Kontogruppe kontogruppe;
-                        lock (SyncRoot)
-                        {
-                            if (GetKontogruppeCallback == null)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetKontogruppeCallback"));
-                            }
-                            try
-                            {
-                                kontogruppe = GetKontogruppeCallback(s.Kontogruppe.Nummer);
-                            }
-                            catch (IntranetRepositoryException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Kontogruppe).Name, s.Kontogruppe.Nummer), ex);
-                            }
-                        }
-                        var konto = new Konto(regnskab, s.Kontonummer, s.Kontonavn, kontogruppe);
-                        konto.SætBeskrivelse(s.Beskrivelse);
-                        konto.SætNote(s.Note);
-                        foreach (var kreditoplysninger in BuildMany<KreditoplysningerView, Kreditoplysninger>(s.Kreditoplysninger))
-                        {
-                            konto.TilføjKreditoplysninger(kreditoplysninger);
-                        }
-                        return konto;
-                    });
+                    .ConvertUsing(s => ToKonto(s));
 
                 config.CreateMap<KreditoplysningerView, Kreditoplysninger>()
                     .ConvertUsing(s => new Kreditoplysninger(s.År, s.Måned, s.Kredit));
 
                 config.CreateMap<BudgetkontoListeView, Budgetkonto>()
-                    .ConvertUsing(s => { throw new NotSupportedException(); });
+                    .ConvertUsing(s => ToBudgetkonto(s));
 
                 config.CreateMap<BudgetkontoView, Budgetkonto>()
-                    .ConvertUsing(s =>
-                    {
-                        Regnskab regnskab;
-                        lock (SyncRoot)
-                        {
-                            if (GetRegnskabCallback == null)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
-                            }
-                            try
-                            {
-                                regnskab = GetRegnskabCallback(s.Regnskab.Nummer);
-                            }
-                            catch (IntranetRepositoryException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab).Name, s.Regnskab.Nummer), ex);
-                            }
-                        }
-                        Budgetkontogruppe budgetkontogruppe;
-                        lock (SyncRoot)
-                        {
-                            if (GetBudgetkontogruppeCallback == null)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBudgetkontogruppeCallback"));
-                            }
-                            try
-                            {
-                                budgetkontogruppe = GetBudgetkontogruppeCallback(s.Budgetkontogruppe.Nummer);
-                            }
-                            catch (IntranetRepositoryException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkontogruppe).Name, s.Budgetkontogruppe.Nummer), ex);
-                            }
-                        }
-                        var budgetkonto = new Budgetkonto(regnskab, s.Kontonummer, s.Kontonavn, budgetkontogruppe);
-                        budgetkonto.SætBeskrivelse(s.Beskrivelse);
-                        budgetkonto.SætNote(s.Note);
-                        foreach (var budgetoplysninger in BuildMany<BudgetoplysningerView, Budgetoplysninger>(s.Budgetoplysninger))
-                        {
-                            budgetkonto.TilføjBudgetoplysninger(budgetoplysninger);
-                        }
-                        return budgetkonto;
-                    });
+                    .ConvertUsing(s => ToBudgetkonto(s));
 
                 config.CreateMap<BudgetoplysningerView, Budgetoplysninger>()
                     .ConvertUsing(s => new Budgetoplysninger(s.År, s.Måned, s.Indtægter, s.Udgifter));
 
                 config.CreateMap<BogføringslinjeView, Bogføringslinje>()
-                    .ConvertUsing(s =>
-                    {
-                        Regnskab regnskab;
-                        lock (SyncRoot)
-                        {
-                            if (GetRegnskabCallback == null)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
-                            }
-                            try
-                            {
-                                regnskab = GetRegnskabCallback(s.Konto.Regnskab.Nummer);
-                            }
-                            catch (IntranetRepositoryException)
-                            {
-                                throw;
-                            }
-                            catch (Exception ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Regnskab).Name, s.Konto.Regnskab.Nummer), ex);
-                            }
-                        }
-                        Konto konto;
-                        try
-                        {
-                            konto = regnskab.Konti
-                                .OfType<Konto>()
-                                .Single(m => String.Compare(m.Kontonummer, s.Konto.Kontonummer, StringComparison.Ordinal) == 0);
-                        }
-                        catch (InvalidOperationException ex)
-                        {
-                            throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Konto).Name, s.Konto.Kontonummer), ex);
-                        }
-                        Budgetkonto budgetkonto = null;
-                        if (s.Budgetkonto != null && string.IsNullOrEmpty(s.Budgetkonto.Kontonummer) == false)
-                        {
-                            try
-                            {
-                                budgetkonto = regnskab.Konti
-                                    .OfType<Budgetkonto>()
-                                    .Single(m => String.Compare(m.Kontonummer, s.Budgetkonto.Kontonummer, StringComparison.Ordinal) == 0);
-                            }
-                            catch (InvalidOperationException ex)
-                            {
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (Budgetkonto).Name, s.Budgetkonto.Kontonummer), ex);
-                            }
-                        }
-                        AdresseBase adresse = null;
-                        if (s.Adresse != null && s.Adresse.Nummer != 0)
-                        {
-                            lock (SyncRoot)
-                            {
-                                if (GetAdresseBaseCallback == null)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
-                                }
-                                try
-                                {
-                                    adresse = GetAdresseBaseCallback(s.Adresse.Nummer);
-                                }
-                                catch (IntranetRepositoryException)
-                                {
-                                    throw;
-                                }
-                                catch (Exception ex)
-                                {
-                                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof (AdresseBase).Name, s.Adresse.Nummer), ex);
-                                }
-                            }
-                        }
-                        var bogføringslinje = new Bogføringslinje(s.Løbenummer, s.Dato, s.Bilag, s.Tekst, s.Debit, s.Kredit);
-                        konto.TilføjBogføringslinje(bogføringslinje);
-                        if (budgetkonto != null)
-                        {
-                            budgetkonto.TilføjBogføringslinje(bogføringslinje);
-                        }
-                        if (adresse != null)
-                        {
-                            adresse.TilføjBogføringslinje(bogføringslinje);
-                        }
-                        return bogføringslinje;
-                    });
+                    .ConvertUsing(s => ToBogføringslinje(s));
 
                 config.CreateMap<KontogruppeView, Kontogruppe>()
-                    .ConvertUsing(s =>
-                    {
-                        var kontogruppe = new Kontogruppe(s.Nummer, s.Navn, KontogruppeType.Aktiver);
-                        switch (s.KontogruppeType)
-                        {
-                            case DataAccess.Contracts.Enums.KontogruppeType.Aktiver:
-                                kontogruppe.SætKontogruppeType(KontogruppeType.Aktiver);
-                                break;
-
-                            case DataAccess.Contracts.Enums.KontogruppeType.Passiver:
-                                kontogruppe.SætKontogruppeType(KontogruppeType.Passiver);
-                                break;
-
-                            default:
-                                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, s.KontogruppeType, "KontogruppeType", MethodBase.GetCurrentMethod().Name));
-                        }
-                        return kontogruppe;
-                    });
+                    .ConvertUsing(s => ToKontogruppe(s));
 
                 config.CreateMap<BudgetkontogruppeView, Budgetkontogruppe>()
                     .ConvertUsing(s => new Budgetkontogruppe(s.Nummer, s.Navn));
 
                 config.CreateMap<BrevhovedView, Brevhoved>()
-                    .ConvertUsing(s =>
-                    {
-                        var brevhoved = new Brevhoved(s.Nummer, s.Navn);
-                        brevhoved.SætLinje1(s.Linje1);
-                        brevhoved.SætLinje2(s.Linje2);
-                        brevhoved.SætLinje3(s.Linje3);
-                        brevhoved.SætLinje4(s.Linje4);
-                        brevhoved.SætLinje5(s.Linje5);
-                        brevhoved.SætLinje6(s.Linje6);
-                        brevhoved.SætLinje7(s.Linje7);
-                        brevhoved.SætCvrNr(s.CvrNr);
-                        return brevhoved;
-                    });
+                    .ConvertUsing(s => ToBrevhoved(s));
 
                 config.CreateMap<BrevhovedreferenceView, Brevhoved>()
                     .ConvertUsing(s => new Brevhoved(s.Nummer, s.Navn));
@@ -742,6 +321,506 @@ namespace OSDevGrp.OSIntranet.Repositories
         public IEnumerable<TDomainObject> BuildMany<TSource, TDomainObject>(IEnumerable<TSource> sources)
         {
             return Build<IEnumerable<TSource>, IEnumerable<TDomainObject>>(sources);
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private AdresseBase ToAdresse(AdressereferenceView source)
+        {
+            throw new NotSupportedException();
+        }
+
+        private AdresseBase ToAdresse(PersonView source)
+        {
+            Adressegruppe adressegruppe;
+            lock (SyncRoot)
+            {
+                if (GetAdressegruppeCallback == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
+                }
+
+                try
+                {
+                    adressegruppe = GetAdressegruppeCallback(source.Adressegruppe.Nummer);
+                }
+                catch (IntranetRepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Adressegruppe).Name, source.Adressegruppe.Nummer), ex);
+                }
+            }
+
+            var person = new Person(source.Nummer, source.Navn, adressegruppe);
+            person.SætAdresseoplysninger(source.Adresse1, source.Adresse2, source.PostnummerBy);
+            person.SætTelefon(source.Telefon, source.Mobil);
+            person.SætFødselsdato(source.Fødselsdato);
+            person.SætBekendtskab(source.Bekendtskab);
+            person.SætMailadresse(source.Mailadresse);
+            person.SætWebadresse(source.Webadresse);
+            if (source.Betalingsbetingelse != null)
+            {
+                Betalingsbetingelse betalingsbetingelse;
+                lock (SyncRoot)
+                {
+                    if (GetBetalingsbetingelseCallback == null)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
+                    }
+
+                    try
+                    {
+                        betalingsbetingelse = GetBetalingsbetingelseCallback(source.Betalingsbetingelse.Nummer);
+                    }
+                    catch (IntranetRepositoryException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Betalingsbetingelse).Name, source.Betalingsbetingelse.Nummer), ex);
+                    }
+                }
+
+                person.SætBetalingsbetingelse(betalingsbetingelse);
+            }
+
+            person.SætUdlånsfrist(source.Udlånsfrist);
+            person.SætFilofaxAdresselabel(source.FilofaxAdresselabel);
+            if (source.Firma != null)
+            {
+                Firma firma;
+                lock (SyncRoot)
+                {
+                    if (GetAdresseBaseCallback == null)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
+                    }
+
+                    try
+                    {
+                        firma = (Firma) GetAdresseBaseCallback(source.Firma.Nummer);
+                    }
+                    catch (IntranetRepositoryException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Firma).Name, source.Firma.Nummer), ex);
+                    }
+                }
+
+                firma.TilføjPerson(person);
+            }
+
+            return person;
+        }
+
+        private AdresseBase ToAdresse(FirmaView source)
+        {
+            Adressegruppe adressegruppe;
+            lock (SyncRoot)
+            {
+                if (GetAdressegruppeCallback == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdressegruppeCallback"));
+                }
+
+                try
+                {
+                    adressegruppe = GetAdressegruppeCallback(source.Adressegruppe.Nummer);
+                }
+                catch (IntranetRepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Adressegruppe).Name, source.Adressegruppe.Nummer), ex);
+                }
+            }
+
+            var firma = new Firma(source.Nummer, source.Navn, adressegruppe);
+            firma.SætAdresseoplysninger(source.Adresse1, source.Adresse2, source.PostnummerBy);
+            firma.SætTelefon(source.Telefon1, source.Telefon2, source.Telefax);
+            firma.SætBekendtskab(source.Bekendtskab);
+            firma.SætMailadresse(source.Mailadresse);
+            firma.SætWebadresse(source.Webadresse);
+            if (source.Betalingsbetingelse != null)
+            {
+                Betalingsbetingelse betalingsbetingelse;
+                lock (SyncRoot)
+                {
+                    if (GetBetalingsbetingelseCallback == null)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBetalingsbetingelseCallback"));
+                    }
+
+                    try
+                    {
+                        betalingsbetingelse = GetBetalingsbetingelseCallback(source.Betalingsbetingelse.Nummer);
+                    }
+                    catch (IntranetRepositoryException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Betalingsbetingelse).Name, source.Betalingsbetingelse.Nummer), ex);
+                    }
+                }
+
+                firma.SætBetalingsbetingelse(betalingsbetingelse);
+            }
+
+            firma.SætUdlånsfrist(source.Udlånsfrist);
+            firma.SætFilofaxAdresselabel(source.FilofaxAdresselabel);
+            return firma;
+        }
+
+        private Regnskab ToRegnskab(RegnskabListeView source)
+        {
+            var regnskab = new Regnskab(source.Nummer, source.Navn);
+            if (source.Brevhoved != null && source.Brevhoved.Nummer != 0)
+            {
+                Brevhoved brevhoved;
+                lock (SyncRoot)
+                {
+                    if (GetBrevhovedCallback == null)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
+                    }
+
+                    try
+                    {
+                        brevhoved = GetBrevhovedCallback(source.Brevhoved.Nummer);
+                    }
+                    catch (IntranetRepositoryException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Brevhoved).Name, source.Brevhoved.Nummer), ex);
+                    }
+                }
+
+                regnskab.SætBrevhoved(brevhoved);
+            }
+
+            return regnskab;
+        }
+
+        private Regnskab ToRegnskab(RegnskabView source)
+        {
+            var regnskab = new Regnskab(source.Nummer, source.Navn);
+            if (source.Brevhoved != null && source.Brevhoved.Nummer != 0)
+            {
+                Brevhoved brevhoved;
+                lock (SyncRoot)
+                {
+                    if (GetBrevhovedCallback == null)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBrevhovedCallback"));
+                    }
+
+                    try
+                    {
+                        brevhoved = GetBrevhovedCallback(source.Brevhoved.Nummer);
+                    }
+                    catch (IntranetRepositoryException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Brevhoved).Name, source.Brevhoved.Nummer), ex);
+                    }
+                }
+
+                regnskab.SætBrevhoved(brevhoved);
+            }
+
+            lock (SyncRoot)
+            {
+                var cached = _regnskaber.SingleOrDefault(m => m.Nummer == regnskab.Nummer);
+                if (cached != null)
+                {
+                    _regnskaber.Remove(cached);
+                }
+
+                _regnskaber.Add(regnskab);
+                var regnskabslisteHelper = new RegnskabslisteHelper(_regnskaber);
+                GetRegnskabCallback = regnskabslisteHelper.GetById;
+                foreach (var konto in BuildMany<KontoView, Konto>(source.Konti))
+                {
+                    regnskab.TilføjKonto(konto);
+                }
+
+                foreach (var budgetkonto in BuildMany<BudgetkontoView, Budgetkonto>(source.Budgetkonti))
+                {
+                    regnskab.TilføjKonto(budgetkonto);
+                }
+
+                BuildMany<BogføringslinjeView, Bogføringslinje>(source.Konti.SelectMany(m => m.Bogføringslinjer));
+            }
+
+            return regnskab;
+        }
+
+        private Konto ToKonto(KontoListeView source)
+        {
+            throw new NotSupportedException();
+        }
+
+        private Konto ToKonto(KontoView source)
+        {
+            Regnskab regnskab;
+            lock (SyncRoot)
+            {
+                if (GetRegnskabCallback == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
+                }
+
+                try
+                {
+                    regnskab = GetRegnskabCallback(source.Regnskab.Nummer);
+                }
+                catch (IntranetRepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Regnskab).Name, source.Regnskab.Nummer), ex);
+                }
+            }
+
+            Kontogruppe kontogruppe;
+            lock (SyncRoot)
+            {
+                if (GetKontogruppeCallback == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetKontogruppeCallback"));
+                }
+
+                try
+                {
+                    kontogruppe = GetKontogruppeCallback(source.Kontogruppe.Nummer);
+                }
+                catch (IntranetRepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Kontogruppe).Name, source.Kontogruppe.Nummer), ex);
+                }
+            }
+
+            var konto = new Konto(regnskab, source.Kontonummer, source.Kontonavn, kontogruppe);
+            konto.SætBeskrivelse(source.Beskrivelse);
+            konto.SætNote(source.Note);
+            foreach (var kreditoplysninger in BuildMany<KreditoplysningerView, Kreditoplysninger>(source.Kreditoplysninger))
+            {
+                konto.TilføjKreditoplysninger(kreditoplysninger);
+            }
+
+            return konto;
+        }
+
+        private Budgetkonto ToBudgetkonto(BudgetkontoListeView source)
+        {
+            throw new NotSupportedException();
+        }
+
+        private Budgetkonto ToBudgetkonto(BudgetkontoView source)
+        {
+            Regnskab regnskab;
+            lock (SyncRoot)
+            {
+                if (GetRegnskabCallback == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
+                }
+
+                try
+                {
+                    regnskab = GetRegnskabCallback(source.Regnskab.Nummer);
+                }
+                catch (IntranetRepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Regnskab).Name, source.Regnskab.Nummer), ex);
+                }
+            }
+
+            Budgetkontogruppe budgetkontogruppe;
+            lock (SyncRoot)
+            {
+                if (GetBudgetkontogruppeCallback == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetBudgetkontogruppeCallback"));
+                }
+
+                try
+                {
+                    budgetkontogruppe = GetBudgetkontogruppeCallback(source.Budgetkontogruppe.Nummer);
+                }
+                catch (IntranetRepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Budgetkontogruppe).Name, source.Budgetkontogruppe.Nummer), ex);
+                }
+            }
+
+            var budgetkonto = new Budgetkonto(regnskab, source.Kontonummer, source.Kontonavn, budgetkontogruppe);
+            budgetkonto.SætBeskrivelse(source.Beskrivelse);
+            budgetkonto.SætNote(source.Note);
+            foreach (var budgetoplysninger in BuildMany<BudgetoplysningerView, Budgetoplysninger>(source.Budgetoplysninger))
+            {
+                budgetkonto.TilføjBudgetoplysninger(budgetoplysninger);
+            }
+
+            return budgetkonto;
+        }
+
+        private Bogføringslinje ToBogføringslinje(BogføringslinjeView source)
+        {
+            Regnskab regnskab;
+            lock (SyncRoot)
+            {
+                if (GetRegnskabCallback == null)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetRegnskabCallback"));
+                }
+
+                try
+                {
+                    regnskab = GetRegnskabCallback(source.Konto.Regnskab.Nummer);
+                }
+                catch (IntranetRepositoryException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Regnskab).Name, source.Konto.Regnskab.Nummer), ex);
+                }
+            }
+
+            Konto konto;
+            try
+            {
+                konto = regnskab.Konti
+                    .OfType<Konto>()
+                    .Single(m => String.Compare(m.Kontonummer, source.Konto.Kontonummer, StringComparison.Ordinal) == 0);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Konto).Name, source.Konto.Kontonummer), ex);
+            }
+
+            Budgetkonto budgetkonto = null;
+            if (source.Budgetkonto != null && string.IsNullOrEmpty(source.Budgetkonto.Kontonummer) == false)
+            {
+                try
+                {
+                    budgetkonto = regnskab.Konti
+                        .OfType<Budgetkonto>()
+                        .Single(m => String.Compare(m.Kontonummer, source.Budgetkonto.Kontonummer, StringComparison.Ordinal) == 0);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Budgetkonto).Name, source.Budgetkonto.Kontonummer), ex);
+                }
+            }
+
+            AdresseBase adresse = null;
+            if (source.Adresse != null && source.Adresse.Nummer != 0)
+            {
+                lock (SyncRoot)
+                {
+                    if (GetAdresseBaseCallback == null)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, "GetAdresseBaseCallback"));
+                    }
+
+                    try
+                    {
+                        adresse = GetAdresseBaseCallback(source.Adresse.Nummer);
+                    }
+                    catch (IntranetRepositoryException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(AdresseBase).Name, source.Adresse.Nummer), ex);
+                    }
+                }
+            }
+
+            var bogføringslinje = new Bogføringslinje(source.Løbenummer, source.Dato, source.Bilag, source.Tekst, source.Debit, source.Kredit);
+            konto.TilføjBogføringslinje(bogføringslinje);
+            if (budgetkonto != null)
+            {
+                budgetkonto.TilføjBogføringslinje(bogføringslinje);
+            }
+
+            if (adresse != null)
+            {
+                adresse.TilføjBogføringslinje(bogføringslinje);
+            }
+
+            return bogføringslinje;
+        }
+
+        private Kontogruppe ToKontogruppe(KontogruppeView source)
+        {
+            var kontogruppe = new Kontogruppe(source.Nummer, source.Navn, KontogruppeType.Aktiver);
+            switch (source.KontogruppeType)
+            {
+                case DataAccess.Contracts.Enums.KontogruppeType.Aktiver:
+                    kontogruppe.SætKontogruppeType(KontogruppeType.Aktiver);
+                    break;
+
+                case DataAccess.Contracts.Enums.KontogruppeType.Passiver:
+                    kontogruppe.SætKontogruppeType(KontogruppeType.Passiver);
+                    break;
+
+                default:
+                    throw new IntranetRepositoryException(Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, source.KontogruppeType, "KontogruppeType", MethodBase.GetCurrentMethod().Name));
+            }
+
+            return kontogruppe;
+        }
+
+        private Brevhoved ToBrevhoved(BrevhovedView source)
+        {
+            var brevhoved = new Brevhoved(source.Nummer, source.Navn);
+            brevhoved.SætLinje1(source.Linje1);
+            brevhoved.SætLinje2(source.Linje2);
+            brevhoved.SætLinje3(source.Linje3);
+            brevhoved.SætLinje4(source.Linje4);
+            brevhoved.SætLinje5(source.Linje5);
+            brevhoved.SætLinje6(source.Linje6);
+            brevhoved.SætLinje7(source.Linje7);
+            brevhoved.SætCvrNr(source.CvrNr);
+            return brevhoved;
         }
 
         #endregion

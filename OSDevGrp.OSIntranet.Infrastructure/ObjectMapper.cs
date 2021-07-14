@@ -11,7 +11,7 @@ using OSDevGrp.OSIntranet.Domain.Interfaces.Fælles;
 using OSDevGrp.OSIntranet.Domain.Interfaces.Kalender;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Resources;
-using IObjectMapper = OSDevGrp.OSIntranet.Infrastructure.Interfaces.IObjectMapper;
+using IObjectMapper=OSDevGrp.OSIntranet.Infrastructure.Interfaces.IObjectMapper;
 
 namespace OSDevGrp.OSIntranet.Infrastructure
 {
@@ -40,21 +40,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
             var mapperConfiguration = new MapperConfiguration(config =>
             {
                 config.CreateMap<AdresseBase, TelefonlisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, TelefonlisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, TelefonlisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToTelefonlisteView(s));
 
                 config.CreateMap<Person, TelefonlisteView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -69,25 +55,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2));
 
                 config.CreateMap<AdresseBase, AdressekontolisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        if (s == null)
-                        {
-                            return null;
-                        }
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, AdressekontolisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, AdressekontolisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToAdressekontolisteView(s));
 
                 config.CreateMap<Person, AdressekontolisteView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
@@ -103,312 +71,13 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
                     .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
 
-                config.CreateMap<AdresseBase, AdressekontoView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, AdressekontoView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, AdressekontoView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
-
-                config.CreateMap<Person, AdressekontoView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config .CreateMap<Firma, AdressekontoView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<AdresseBase, DebitorlisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, DebitorlisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, DebitorlisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
-
-                config.CreateMap<Person, DebitorlisteView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<Firma, DebitorlisteView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<AdresseBase, DebitorView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, DebitorView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, DebitorView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
-
-                config.CreateMap<Person, DebitorView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<Firma, DebitorView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<AdresseBase, KreditorlisteView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, KreditorlisteView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, KreditorlisteView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
-
-                config.CreateMap<Person, KreditorlisteView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<Firma, KreditorlisteView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<AdresseBase, KreditorView>()
-                    .ConvertUsing(s =>
-                    {
-                        var mapper = new ObjectMapper();
-                        Person person = s as Person;
-                        if (person != null)
-                        {
-                            return mapper.Map<Person, KreditorView>(person);
-                        }
-                        Firma firma = s as Firma;
-                        if (firma != null)
-                        {
-                            return mapper.Map<Firma, KreditorView>(firma);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
-
-                config.CreateMap<Person, KreditorView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<Firma, KreditorView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Saldo, opt => opt.MapFrom(s => s.SaldoPrStatusdato));
-
-                config.CreateMap<Person, PersonView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? s.Mobil : s.Telefon))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon) ? null : s.Mobil))
-                    .ForMember(x => x.Fødselsdato, opt =>
-                    {
-                        opt.Condition(s => s.Fødselsdato != null);
-                        opt.MapFrom(s => s.Fødselsdato);
-                    })
-                    .ForMember(x => x.Adressegruppe, opt =>
-                    {
-                        opt.Condition(s => s.Adressegruppe != null);
-                        opt.MapFrom(s => s.Adressegruppe);
-                    })
-                    .ForMember(x => x.Bekendtskab, opt => opt.MapFrom(s => s.Bekendtskab))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Web, opt => opt.MapFrom(s => s.Webadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Udlånsfrist, opt => opt.MapFrom(s => s.Udlånsfrist))
-                    .ForMember(x => x.Firma, opt =>
-                    {
-                        opt.Condition(s => s.Firma != null);
-                        opt.MapFrom(s => s.Firma);
-                    });
-
-                config.CreateMap<Firma, FirmaView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Adresse1, opt => opt.MapFrom(s => s.Adresse1))
-                    .ForMember(x => x.Adresse2, opt => opt.MapFrom(s => s.Adresse2))
-                    .ForMember(x => x.PostnummerBy, opt => opt.MapFrom(s => s.PostnrBy))
-                    .ForMember(x => x.PrimærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? s.Telefon2 : s.Telefon1))
-                    .ForMember(x => x.SekundærTelefon, opt => opt.MapFrom(s => string.IsNullOrEmpty(s.Telefon1) ? null : s.Telefon2))
-                    .ForMember(x => x.Telefax, opt => opt.MapFrom(s => s.Telefax))
-                    .ForMember(x => x.Adressegruppe, opt =>
-                    {
-                        opt.Condition(s => s.Adressegruppe != null);
-                        opt.MapFrom(s => s.Adressegruppe);
-                    })
-                    .ForMember(x => x.Bekendtskab, opt => opt.MapFrom(s => s.Bekendtskab))
-                    .ForMember(x => x.Mailadresse, opt => opt.MapFrom(s => s.Mailadresse))
-                    .ForMember(x => x.Web, opt => opt.MapFrom(s => s.Webadresse))
-                    .ForMember(x => x.Betalingsbetingelse, opt =>
-                    {
-                        opt.Condition(s => s.Betalingsbetingelse != null);
-                        opt.MapFrom(s => s.Betalingsbetingelse);
-                    })
-                    .ForMember(x => x.Udlånsfrist, opt => opt.MapFrom(s => s.Udlånsfrist))
-                    .ForMember(x => x.Personer, opt =>
-                    {
-                        opt.Condition(s => s.Personer != null);
-                        opt.MapFrom(s => s.Personer);
-                    });
-
-                config.CreateMap<Postnummer, PostnummerView>()
-                    .ForMember(x => x.Landekode, opt => opt.MapFrom(s => s.Landekode))
-                    .ForMember(x => x.Postnummer, opt => opt.MapFrom(s => s.Postnr))
-                    .ForMember(x => x.Bynavn, opt => opt.MapFrom(s => s.By));
-
-                config.CreateMap<Adressegruppe, AdressegruppeView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.AdressegruppeOswebdb, opt => opt.MapFrom(s => s.AdressegruppeOswebdb));
-
-                config.CreateMap<Betalingsbetingelse, BetalingsbetingelseView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
-
                 config.CreateMap<Regnskab, RegnskabslisteView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                     .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
                     .ForMember(x => x.Brevhoved, opt => opt.MapFrom(s => s.Brevhoved));
 
                 config.CreateMap<KontoBase, KontoBaseView>()
-                    .ConvertUsing(s =>
-                    {
-                        var objectMapper = new ObjectMapper();
-                        Konto konto = s as Konto;
-                        if (konto != null)
-                        {
-                            return objectMapper.Map<Konto, KontoView>(konto);
-                        }
-                        Budgetkonto budgetkonto = s as Budgetkonto;
-                        if (budgetkonto != null)
-                        {
-                            return objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
-                        }
-                        throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, s.GetType().Name));
-                    });
+                    .ConvertUsing(s => ToKontoBaseView(s));
 
                 config.CreateMap<Konto, KontoplanView>()
                     .ForMember(x => x.Regnskab, opt => opt.MapFrom(s => s.Regnskab))
@@ -479,25 +148,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.Budget))
                     .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato));
 
-                config.CreateMap<Bogføringslinje, BogføringslinjeView>()
-                    .ForMember(x => x.Løbenr, opt => opt.MapFrom(s => s.Løbenummer))
-                    .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Konto))
-                    .ForMember(x => x.Budgetkonto, opt =>
-                    {
-                        opt.Condition(s => s.Budgetkonto != null);
-                        opt.MapFrom(s => s.Budgetkonto);
-                    })
-                    .ForMember(x => x.Adressekonto, opt =>
-                    {
-                        opt.Condition(s => s.Adresse != null);
-                        opt.MapFrom(s => s.Adresse);
-                    })
-                    .ForMember(x => x.Dato, opt => opt.MapFrom(s => s.Dato))
-                    .ForMember(x => x.Bilag, opt => opt.MapFrom(s => s.Bilag))
-                    .ForMember(x => x.Tekst, opt => opt.MapFrom(s => s.Tekst))
-                    .ForMember(x => x.Debit, opt => opt.MapFrom(s => s.Debit))
-                    .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.Kredit));
-
                 config.CreateMap<IBogføringsresultat, BogføringslinjeOpretResponse>()
                     .ForMember(x => x.Løbenr, opt => opt.MapFrom(s => s.Bogføringslinje.Løbenummer))
                     .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Bogføringslinje.Konto))
@@ -564,18 +214,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                     .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn));
 
-                config.CreateMap<Brevhoved, BrevhovedView>()
-                    .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
-                    .ForMember(x => x.Navn, opt => opt.MapFrom(s => s.Navn))
-                    .ForMember(x => x.Linje1, opt => opt.MapFrom(s => s.Linje1))
-                    .ForMember(x => x.Linje2, opt => opt.MapFrom(s => s.Linje2))
-                    .ForMember(x => x.Linje3, opt => opt.MapFrom(s => s.Linje3))
-                    .ForMember(x => x.Linje4, opt => opt.MapFrom(s => s.Linje4))
-                    .ForMember(x => x.Linje5, opt => opt.MapFrom(s => s.Linje5))
-                    .ForMember(x => x.Linje6, opt => opt.MapFrom(s => s.Linje6))
-                    .ForMember(x => x.Linje7, opt => opt.MapFrom(s => s.Linje7))
-                    .ForMember(x => x.CvrNr, opt => opt.MapFrom(s => s.CvrNr));
-
                 config.CreateMap<ISystem, SystemView>()
                     .ForMember(x => x.Nummer, opt => opt.MapFrom(s => s.Nummer))
                     .ForMember(x => x.Titel, opt => opt.MapFrom(s => s.Titel))
@@ -601,6 +239,69 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 throw new ArgumentNullException(nameof(source));
             }
             return Mapper.Map<TSource, TDestination>(source);
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private static TelefonlisteView ToTelefonlisteView(AdresseBase source)
+        {
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, TelefonlisteView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, TelefonlisteView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static AdressekontolisteView ToAdressekontolisteView(AdresseBase source)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var mapper = new ObjectMapper();
+            Person person = source as Person;
+            if (person != null)
+            {
+                return mapper.Map<Person, AdressekontolisteView>(person);
+            }
+
+            Firma firma = source as Firma;
+            if (firma != null)
+            {
+                return mapper.Map<Firma, AdressekontolisteView>(firma);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
+        }
+
+        private static KontoBaseView ToKontoBaseView(KontoBase source)
+        {
+            var objectMapper = new ObjectMapper();
+            Konto konto = source as Konto;
+            if (konto != null)
+            {
+                return objectMapper.Map<Konto, KontoView>(konto);
+            }
+
+            Budgetkonto budgetkonto = source as Budgetkonto;
+            if (budgetkonto != null)
+            {
+                return objectMapper.Map<Budgetkonto, BudgetkontoView>(budgetkonto);
+            }
+
+            throw new IntranetSystemException(Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, source.GetType().Name));
         }
 
         #endregion

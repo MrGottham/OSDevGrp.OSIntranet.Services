@@ -1,19 +1,4 @@
-﻿SET @HostName = '%';
-SET @ServiceUserName = 'ODBC';
-
-DROP PROCEDURE IF EXISTS GrantRightsForFoodWasteDb;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForFoodWasteDb(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT ON ', databaseName, '.* TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForFoodWasteDb(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForFoodWasteDb;
-
-CREATE TABLE IF NOT EXISTS TranslationInfos (
+﻿CREATE TABLE IF NOT EXISTS TranslationInfos (
 	TranslationInfoIdentifier CHAR(36) NOT NULL,
 	CultureName CHAR(5) NOT NULL,
 	PRIMARY KEY (TranslationInfoIdentifier)
@@ -91,18 +76,6 @@ END $$
 DELIMITER ;
 CALL AlterTranslations();
 DROP PROCEDURE AlterTranslations;
-
-DROP PROCEDURE IF EXISTS GrantRightsForTranslations;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForTranslations(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Translations TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForTranslations(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForTranslations;
 
 CREATE TABLE IF NOT EXISTS DataProviders (
 	DataProviderIdentifier CHAR(36) NOT NULL,
@@ -247,18 +220,6 @@ DELIMITER ;
 CALL AlterForeignKeys();
 DROP PROCEDURE AlterForeignKeys;
 
-DROP PROCEDURE IF EXISTS GrantRightsForForeignKeys;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForForeignKeys(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.ForeignKeys TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForForeignKeys(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForForeignKeys;
-
 CREATE TABLE IF NOT EXISTS FoodGroups (
 	FoodGroupIdentifier CHAR(36) NOT NULL,
 	ParentIdentifier CHAR(36) NULL,
@@ -283,18 +244,6 @@ DELIMITER ;
 CALL AlterFoodGroups();
 DROP PROCEDURE AlterFoodGroups;
 
-DROP PROCEDURE IF EXISTS GrantRightsForFoodGroups;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForFoodGroups(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.FoodGroups TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForFoodGroups(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForFoodGroups;
-
 CREATE TABLE IF NOT EXISTS FoodItems (
 	FoodItemIdentifier CHAR(36) NOT NULL,
 	IsActive BIT NOT NULL,
@@ -312,18 +261,6 @@ END $$
 DELIMITER ;
 CALL AlterFoodItems();
 DROP PROCEDURE AlterFoodItems;
-
-DROP PROCEDURE IF EXISTS GrantRightsForFoodItems;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForFoodItems(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.FoodItems TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForFoodItems(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForFoodItems;
 
 CREATE TABLE IF NOT EXISTS FoodItemGroups (
 	FoodItemGroupIdentifier CHAR(36) NOT NULL,
@@ -354,18 +291,6 @@ DELIMITER ;
 CALL AlterFoodItemGroups();
 DROP PROCEDURE AlterFoodItemGroups;
 
-DROP PROCEDURE IF EXISTS GrantRightsForFoodItemGroups;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForFoodItemGroups(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.FoodItemGroups TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForFoodItemGroups(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForFoodItemGroups;
-
 CREATE TABLE IF NOT EXISTS Payments (
 	PaymentIdentifier CHAR(36) NOT NULL,
 	StakeholderIdentifier CHAR(36) NOT NULL,
@@ -392,18 +317,6 @@ END $$
 DELIMITER ;
 CALL AlterPayments();
 DROP PROCEDURE AlterPayments;
-
-DROP PROCEDURE IF EXISTS GrantRightsForPayments;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForPayments(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Payments TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForPayments(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForPayments;
 
 CREATE TABLE IF NOT EXISTS HouseholdMembers (
 	HouseholdMemberIdentifier CHAR(36) NOT NULL,
@@ -447,18 +360,6 @@ DELIMITER ;
 CALL AlterHouseholdMembers();
 DROP PROCEDURE AlterHouseholdMembers;
 
-DROP PROCEDURE IF EXISTS GrantRightsForHouseholdMembers;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForHouseholdMembers(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.HouseholdMembers TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForHouseholdMembers(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForHouseholdMembers;
-
 CREATE TABLE IF NOT EXISTS Households (
 	HouseholdIdentifier CHAR(36) NOT NULL,
 	Name NVARCHAR(64) NOT NULL,
@@ -467,18 +368,6 @@ CREATE TABLE IF NOT EXISTS Households (
 	PRIMARY KEY (HouseholdIdentifier),
 	INDEX IX_Households_Name_CreationTime (Name,CreationTime)
 );
-
-DROP PROCEDURE IF EXISTS GrantRightsForHouseholds;
-DELIMITER $$
-CREATE PROCEDURE GrantRightsForHouseholds(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Households TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantRightsForHouseholds(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantRightsForHouseholds;
 
 CREATE TABLE IF NOT EXISTS MemberOfHouseholds (
 	MemberOfHouseholdIdentifier CHAR(36) NOT NULL,
@@ -491,18 +380,6 @@ CREATE TABLE IF NOT EXISTS MemberOfHouseholds (
 	FOREIGN KEY FK_MemberOfHouseholds_HouseholdMemberIdentifier (HouseholdMemberIdentifier) REFERENCES HouseholdMembers (HouseholdMemberIdentifier) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY FK_MemberOfHouseholds_HouseholdIdentifier (HouseholdIdentifier) REFERENCES Households (HouseholdIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-DROP PROCEDURE IF EXISTS GrantMemberOfHouseholds;
-DELIMITER $$
-CREATE PROCEDURE GrantMemberOfHouseholds(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.MemberOfHouseholds TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantMemberOfHouseholds(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantMemberOfHouseholds;
 
 CREATE TABLE IF NOT EXISTS StorageTypes (
 	StorageTypeIdentifier CHAR(36) NOT NULL,
@@ -586,18 +463,6 @@ CREATE TABLE IF NOT EXISTS Storages (
 	FOREIGN KEY FK_Storages_HouseholdIdentifier (HouseholdIdentifier) REFERENCES Households (HouseholdIdentifier) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY FK_Storages_StorageTypeIdentifier (StorageTypeIdentifier) REFERENCES StorageTypes (StorageTypeIdentifier) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-DROP PROCEDURE IF EXISTS GrantStorages;
-DELIMITER $$
-CREATE PROCEDURE GrantStorages(IN hostName CHAR(60), IN databaseName CHAR(64), IN userName CHAR(16))
-BEGIN
-	SET @sql = CONCAT('GRANT SELECT,INSERT,UPDATE,DELETE ON ', databaseName, '.Storages TO "', userName, '"@"', hostName, '"');
-	PREPARE statement FROM @sql;
-	EXECUTE statement;
-END $$
-DELIMITER ;
-CALL GrantStorages(@HostName, DATABASE(), @ServiceUserName);
-DROP PROCEDURE GrantStorages;
 
 DROP PROCEDURE IF EXISTS InsertDataIntoStorages;
 DELIMITER $$

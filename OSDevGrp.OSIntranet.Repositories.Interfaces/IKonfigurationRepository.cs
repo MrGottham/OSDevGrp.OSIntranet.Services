@@ -6,22 +6,6 @@
     public interface IKonfigurationRepository
     {
         /// <summary>
-        /// Angivelse af, om saldo for debitorer skal være større end 0.
-        /// </summary>
-        bool DebitorSaldoOverNul
-        {
-            get;
-        }
-
-        /// <summary>
-        /// Angielse af, om saldo for kreditorer skal være større end 0.
-        /// </summary>
-        bool KreditorSaldoOverNul
-        {
-            get;
-        }
-
-        /// <summary>
         /// Angivelse af antal dage for bogføringsperiode.
         /// </summary>
         int DageForBogføringsperiode

@@ -4,6 +4,7 @@ using System.Linq;
 using AutoFixture;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
+using OSDevGrp.OSIntranet.Domain.Interfaces.FoodWaste;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Exceptions;
 using OSDevGrp.OSIntranet.Repositories.DataProxies.FoodWaste;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
@@ -1053,7 +1054,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             return _fixture.Build<FoodGroupProxy>()
                 .With(m => m.Identifier, foodGroupIdentifier)
-                .With(m => m.Parent, null)
+                .With(m => m.Parent, (IFoodGroup) null)
                 .Create();
         }
 
@@ -1065,7 +1066,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies.FoodWaste
         {
             return _fixture.Build<FoodGroupProxy>()
                 .With(m => m.Identifier, Guid.NewGuid())
-                .With(m => m.Parent, null)
+                .With(m => m.Parent, (IFoodGroup) null)
                 .CreateMany(_random.Next(10, 25))
                 .ToList();
         }

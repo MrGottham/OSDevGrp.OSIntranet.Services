@@ -30,18 +30,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         }
 
         /// <summary>
-        /// Tester, at brevhoveder hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBrevhovederHentes()
-        {
-            var query = new BrevhovederGetQuery();
-            var result = _service.BrevhovederGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at systemer under OSWEBDB hentes.
         /// </summary>
         [Test]

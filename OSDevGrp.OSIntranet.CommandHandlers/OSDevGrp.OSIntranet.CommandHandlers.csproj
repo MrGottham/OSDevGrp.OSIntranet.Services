@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OSDevGrp.OSIntranet.CommandHandlers</RootNamespace>
     <AssemblyName>OSDevGrp.OSIntranet.CommandHandlers</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -62,11 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BogføringslinjeOpretCommandHandler.cs" />
-    <Compile Include="Core\AdressekartotekCommandHandlerBase.cs" />
     <Compile Include="Core\FinansstyringCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteHouseholdDataCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteSystemDataCommandHandlerBase.cs" />
-    <Compile Include="Core\FællesElementCommandHandlerBase.cs" />
     <Compile Include="Core\HouseholdDataModificationCommandHandlerBase.cs" />
     <Compile Include="Core\HouseholdMemberDataModificationCommandHandlerBase.cs" />
     <Compile Include="Core\ILogicExecutor.cs" />

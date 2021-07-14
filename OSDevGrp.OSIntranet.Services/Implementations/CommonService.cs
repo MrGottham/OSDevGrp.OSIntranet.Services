@@ -40,36 +40,6 @@ namespace OSDevGrp.OSIntranet.Services.Implementations
         #region ICommonService Members
 
         /// <summary>
-        /// Henter alle brevhoveder.
-        /// </summary>
-        /// <param name="query">Forespørgelse efter alle brevhoveder.</param>
-        /// <returns>Liste af alle brevhoveder.</returns>
-        [OperationBehavior(TransactionScopeRequired = false)]
-        public IEnumerable<BrevhovedView> BrevhovederGet(BrevhovederGetQuery query)
-        {
-            try
-            {
-                return _queryBus.Query<BrevhovederGetQuery, IEnumerable<BrevhovedView>>(query);
-            }
-            catch (IntranetRepositoryException ex)
-            {
-                throw CreateIntranetRepositoryFault(ex);
-            }
-            catch (IntranetBusinessException ex)
-            {
-                throw CreateIntranetBusinessFault(ex);
-            }
-            catch (IntranetSystemException ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-            catch (Exception ex)
-            {
-                throw CreateIntranetSystemFault(ex);
-            }
-        }
-
-        /// <summary>
         /// Henter alle systemer under OSWEBDB.
         /// </summary>
         /// <param name="query">Forespørgelse efter alle systemer under OSWEBDB.</param>
