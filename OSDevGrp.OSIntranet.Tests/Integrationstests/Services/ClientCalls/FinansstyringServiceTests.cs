@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf;
 using OSDevGrp.OSIntranet.CommonLibrary.Wcf.ChannelFactory;
 using OSDevGrp.OSIntranet.Contracts.Commands;
-using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using NUnit.Framework;
 
@@ -37,31 +35,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.ClientCalls
         {
             var container = ContainerFactory.Create();
             _channelFactory = container.Resolve<IChannelFactory>();
-        }
-
-        /// <summary>
-        /// Tester, at antal bogføringslinjer kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBogføringslinjerKanHentes()
-        {
-            var client = _channelFactory.CreateChannel<IFinansstyringService>(ClientEndpointName);
-            try
-            {
-                var query = new BogføringerGetQuery
-                                {
-                                    Regnskabsnummer = 1,
-                                    StatusDato = new DateTime(2011, 3, 1),
-                                    Linjer = 250
-                                };
-                var result = client.BogføringerGet(query);
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result.Count(), Is.EqualTo(250));
-            }
-            finally
-            {
-                ChannelTools.CloseChannel(client);
-            }
         }
 
         /// <summary>

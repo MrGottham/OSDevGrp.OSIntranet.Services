@@ -59,17 +59,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BogføringerGetQueryHandler.cs" />
     <Compile Include="Core\FoodGroupTreeGetQueryHandlerBase.cs" />
     <Compile Include="Core\FoodItemCollectionGetQueryHandlerBase.cs" />
     <Compile Include="Core\HouseholdMemberDataGetQueryHandlerBase.cs" />
     <Compile Include="Core\KalenderQueryHandlerBase.cs" />
-    <Compile Include="Core\RegnskabQueryHandlerBase.cs" />
     <Compile Include="Core\StaticTextGetQueryHandlerBase.cs" />
     <Compile Include="Core\StorageTypeCollectionGetQueryHandlerBase.cs" />
     <Compile Include="DataProviderCollectionGetQueryHandler.cs" />
     <Compile Include="DataProviderWhoHandlesPaymentsCollectionGetQueryHandler.cs" />
-    <Compile Include="Core\FinansstyringQueryHandlerBase.cs" />
     <Compile Include="Core\FællesElementQueryHandlerBase.cs" />
     <Compile Include="FoodGroupTreeGetQueryHandler.cs" />
     <Compile Include="FoodGroupTreeGetQueryHandlerForSystemView.cs" />

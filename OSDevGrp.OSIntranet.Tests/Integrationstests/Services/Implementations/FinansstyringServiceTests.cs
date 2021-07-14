@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using OSDevGrp.OSIntranet.CommonLibrary.IoC;
 using OSDevGrp.OSIntranet.Contracts.Commands;
-using OSDevGrp.OSIntranet.Contracts.Queries;
 using OSDevGrp.OSIntranet.Contracts.Services;
 using NUnit.Framework;
 
@@ -29,23 +27,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Services.Implementations
         {
             var container = ContainerFactory.Create();
             _service = container.Resolve<IFinansstyringService>();
-        }
-
-        /// <summary>
-        /// Tester, at antal bogføringslinjer kan hentes.
-        /// </summary>
-        [Test]
-        public void TestAtBogføringslinjerKanHentes()
-        {
-            var query = new BogføringerGetQuery
-                            {
-                                Regnskabsnummer = 1,
-                                StatusDato = new DateTime(2011, 3, 1),
-                                Linjer = 250
-                            };
-            var result = _service.BogføringerGet(query);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(250));
         }
 
         /// <summary>

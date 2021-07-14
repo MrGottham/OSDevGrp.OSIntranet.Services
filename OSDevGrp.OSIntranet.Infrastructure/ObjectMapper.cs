@@ -148,25 +148,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(x => x.Budget, opt => opt.MapFrom(s => s.Budget))
                     .ForMember(x => x.Bogført, opt => opt.MapFrom(s => s.BogførtPrStatusdato));
 
-                config.CreateMap<Bogføringslinje, BogføringslinjeView>()
-                    .ForMember(x => x.Løbenr, opt => opt.MapFrom(s => s.Løbenummer))
-                    .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Konto))
-                    .ForMember(x => x.Budgetkonto, opt =>
-                    {
-                        opt.Condition(s => s.Budgetkonto != null);
-                        opt.MapFrom(s => s.Budgetkonto);
-                    })
-                    .ForMember(x => x.Adressekonto, opt =>
-                    {
-                        opt.Condition(s => s.Adresse != null);
-                        opt.MapFrom(s => s.Adresse);
-                    })
-                    .ForMember(x => x.Dato, opt => opt.MapFrom(s => s.Dato))
-                    .ForMember(x => x.Bilag, opt => opt.MapFrom(s => s.Bilag))
-                    .ForMember(x => x.Tekst, opt => opt.MapFrom(s => s.Tekst))
-                    .ForMember(x => x.Debit, opt => opt.MapFrom(s => s.Debit))
-                    .ForMember(x => x.Kredit, opt => opt.MapFrom(s => s.Kredit));
-
                 config.CreateMap<IBogføringsresultat, BogføringslinjeOpretResponse>()
                     .ForMember(x => x.Løbenr, opt => opt.MapFrom(s => s.Bogføringslinje.Løbenummer))
                     .ForMember(x => x.Konto, opt => opt.MapFrom(s => s.Bogføringslinje.Konto))

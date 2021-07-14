@@ -558,53 +558,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         }
 
         /// <summary>
-        /// Test, at en bogføringslinje kan mappes til et bogføringslinjeview.
-        /// </summary>
-        [Test]
-        [TestCase(true, true)]
-        [TestCase(true, false)]
-        [TestCase(false, true)]
-        [TestCase(false, false)]
-        public void TestAtBogføringslinjeKanMappesTilBogføringslinjeView(bool harBudgetkonto, bool harAdressekonto)
-        {
-            var fixture = new Fixture();
-            fixture.Inject(new DateTime(2010, 12, 31));
-
-            var objectMapper = new ObjectMapper();
-            Assert.That(objectMapper, Is.Not.Null);
-
-            var konto = fixture.Create<Konto>();
-            var budgetkonto = fixture.Create<Budgetkonto>();
-            var adresse = fixture.Create<Person>();
-
-            var bogføringslinje = new Bogføringslinje(fixture.Create<int>(), fixture.Create<DateTime>(), fixture.Create<string>(), fixture.Create<string>(), fixture.Create<decimal>(), fixture.Create<decimal>());
-            konto.TilføjBogføringslinje(bogføringslinje);
-            if (harBudgetkonto)
-            {
-                budgetkonto.TilføjBogføringslinje(bogføringslinje);
-            }
-            if (harAdressekonto)
-            {
-                adresse.TilføjBogføringslinje(bogføringslinje);
-            }
-
-            var bogføringslinjeView = objectMapper.Map<Bogføringslinje, BogføringslinjeView>(bogføringslinje);
-            Assert.That(bogføringslinjeView, Is.Not.Null);
-
-            Assert.That(bogføringslinjeView.Løbenr, Is.EqualTo(bogføringslinje.Løbenummer));
-            Assert.That(bogføringslinjeView.Konto, Is.Not.Null);
-            Assert.That(bogføringslinjeView.Budgetkonto, harBudgetkonto ? Is.Not.Null : Is.Null);
-            Assert.That(bogføringslinjeView.Adressekonto, harAdressekonto ? Is.Not.Null : Is.Null);
-            Assert.That(bogføringslinjeView.Dato, Is.EqualTo(bogføringslinje.Dato));
-            Assert.That(bogføringslinjeView.Bilag, Is.Not.Null);
-            Assert.That(bogføringslinjeView.Bilag, Is.EqualTo(bogføringslinje.Bilag));
-            Assert.That(bogføringslinjeView.Tekst, Is.Not.Null);
-            Assert.That(bogføringslinjeView.Tekst, Is.EqualTo(bogføringslinje.Tekst));
-            Assert.That(bogføringslinjeView.Debit, Is.EqualTo(bogføringslinje.Debit));
-            Assert.That(bogføringslinjeView.Kredit, Is.EqualTo(bogføringslinje.Kredit));
-        }
-
-        /// <summary>
         /// Tester, at en bogføringsresultat kan mappes til et bogføringslinjeopretresponse.
         /// </summary>
         [Test]
