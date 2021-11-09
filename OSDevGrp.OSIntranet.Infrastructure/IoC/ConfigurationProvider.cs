@@ -57,7 +57,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
             container.Register(Component.For<ICommonValidations>().ImplementedBy<CommonValidations>().LifeStyle.Singleton);
             container.Register(Component.For<ILogicExecutor>().ImplementedBy<LogicExecutor>().LifeStyle.Transient);
             container.Register(Component.For<IStaticTextFieldMerge>().ImplementedBy<StaticTextFieldMerge>().LifeStyle.Transient);
-            container.Register(Component.For<IKonfigurationRepository>().UsingFactoryMethod(() => new KonfigurationRepository(ConfigurationManager.AppSettings)).LifeStyle.Transient);
 
             container.Register(Component.For<IMySqlDataProvider>().UsingFactoryMethod(() => new MySqlDataProvider(ConfigurationManager.ConnectionStrings[MySqlDataProviderConnectionStringSettingsName])).LifeStyle.Transient);
             container.Register(Component.For<IFoodWasteDataProvider>().UsingFactoryMethod(() => new FoodWasteDataProvider(ConfigurationManager.ConnectionStrings[FoodWasteProviderConnectionStringSettingsName])).LifeStyle.Transient);

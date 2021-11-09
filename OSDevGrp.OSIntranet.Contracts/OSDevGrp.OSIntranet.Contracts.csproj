@@ -58,7 +58,6 @@
     <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\BogføringslinjeOpretCommand.cs" />
     <Compile Include="Commands\FoodItemImportFromDataProviderCommand.cs" />
     <Compile Include="Commands\ForeignKeyAddCommand.cs" />
     <Compile Include="Commands\ForeignKeyDeleteCommand.cs" />
@@ -104,23 +103,14 @@
     <Compile Include="Queries\StorageTypeCollectionGetQuery.cs" />
     <Compile Include="Queries\SystemerGetQuery.cs" />
     <Compile Include="Queries\TranslationInfoCollectionGetQuery.cs" />
-    <Compile Include="Responses\BogføringsadvarselResponse.cs" />
-    <Compile Include="Responses\BogføringslinjeOpretResponse.cs" />
     <Compile Include="Responses\BooleanResultResponse.cs" />
     <Compile Include="Responses\ServiceReceiptResponse.cs" />
     <Compile Include="Services\ICommonService.cs" />
-    <Compile Include="Services\IFinansstyringService.cs" />
     <Compile Include="Services\IFoodWasteSystemDataService.cs" />
     <Compile Include="Services\IFoodWasteHouseholdDataService.cs" />
     <Compile Include="Services\IIntranetService.cs" />
     <Compile Include="Services\IKalenderService.cs" />
     <Compile Include="SoapNamespaces.cs" />
-    <Compile Include="Views\AdressekontolisteView.cs" />
-    <Compile Include="Views\BrevhovedreferenceView.cs" />
-    <Compile Include="Views\BudgetkontogruppeView.cs" />
-    <Compile Include="Views\BudgetkontoplanView.cs" />
-    <Compile Include="Views\BudgetkontoView.cs" />
-    <Compile Include="Views\BudgetoplysningerView.cs" />
     <Compile Include="Views\DataProviderSystemView.cs" />
     <Compile Include="Views\DataProviderView.cs" />
     <Compile Include="Views\FoodGroupIdentificationView.cs" />
@@ -142,15 +132,7 @@
     <Compile Include="Views\IntRangeView.cs" />
     <Compile Include="Views\KalenderbrugerAftaleView.cs" />
     <Compile Include="Views\KalenderbrugerView.cs" />
-    <Compile Include="Views\KontoBaseView.cs" />
-    <Compile Include="Views\KontogruppeView.cs" />
-    <Compile Include="Views\KontoplanView.cs" />
-    <Compile Include="Views\KontoView.cs" />
-    <Compile Include="Views\KreditoplysningerView.cs" />
-    <Compile Include="Views\MånedsoplysningerView.cs" />
     <Compile Include="Views\PaymentView.cs" />
-    <Compile Include="Views\RegnskabslisteView.cs" />
-    <Compile Include="Views\SaldolisteBaseView.cs" />
     <Compile Include="Views\StakeholderView.cs" />
     <Compile Include="Views\StaticTextSystemView.cs" />
     <Compile Include="Views\StaticTextView.cs" />
@@ -160,8 +142,6 @@
     <Compile Include="Views\StorageTypeView.cs" />
     <Compile Include="Views\StorageView.cs" />
     <Compile Include="Views\SystemView.cs" />
-    <Compile Include="Views\TabelView.cs" />
-    <Compile Include="Views\TelefonlisteView.cs" />
     <Compile Include="Views\TranslationInfoSystemView.cs" />
     <Compile Include="Views\TranslationSystemView.cs" />
   </ItemGroup>

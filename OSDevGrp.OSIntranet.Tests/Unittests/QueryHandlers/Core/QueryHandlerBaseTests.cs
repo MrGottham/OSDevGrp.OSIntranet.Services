@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Contracts.Views;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.QueryHandlers.Core;
@@ -62,7 +61,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             var queryHandler = new MyQueryHandler(objectMapper);
             Assert.That(queryHandler, Is.Not.Null);
 
-            Assert.Throws<ArgumentNullException>(() => queryHandler.Map<Regnskab, RegnskabslisteView>(null));
+            Assert.Throws<ArgumentNullException>(() => queryHandler.Map<OSIntranet.Domain.Fælles.System, SystemView>(null));
         }
 
         /// <summary>
@@ -74,15 +73,15 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             var fixture = new Fixture();
 
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
-            objectMapper.Expect(m => m.Map<Regnskab, RegnskabslisteView>(Arg<Regnskab>.Is.NotNull))
-                .Return(fixture.Create<RegnskabslisteView>());
+            objectMapper.Expect(m => m.Map<OSIntranet.Domain.Fælles.System, SystemView>(Arg<OSIntranet.Domain.Fælles.System>.Is.NotNull))
+                .Return(fixture.Create<SystemView>());
             var queryHandler = new MyQueryHandler(objectMapper);
             Assert.That(queryHandler, Is.Not.Null);
 
-            var view = queryHandler.Map<Regnskab, RegnskabslisteView>(fixture.Create<Regnskab>());
+            var view = queryHandler.Map<OSIntranet.Domain.Fælles.System, SystemView>(fixture.Create<OSIntranet.Domain.Fælles.System>());
             Assert.That(view, Is.Not.Null);
 
-            objectMapper.AssertWasCalled(m => m.Map<Regnskab, RegnskabslisteView>(Arg<Regnskab>.Is.NotNull));
+            objectMapper.AssertWasCalled(m => m.Map<OSIntranet.Domain.Fælles.System, SystemView>(Arg<OSIntranet.Domain.Fælles.System>.Is.NotNull));
         }
 
         /// <summary>
@@ -95,8 +94,8 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             var queryHandler = new MyQueryHandler(objectMapper);
             Assert.That(queryHandler, Is.Not.Null);
 
-            IEnumerable<Regnskab> regnskaber = null;
-            Assert.Throws<ArgumentNullException>(() => queryHandler.MapMany<Regnskab, RegnskabslisteView>(regnskaber));
+            const IEnumerable<OSIntranet.Domain.Fælles.System> systemer = null;
+            Assert.Throws<ArgumentNullException>(() => queryHandler.MapMany<OSIntranet.Domain.Fælles.System, SystemView>(systemer));
         }
 
         /// <summary>
@@ -110,18 +109,18 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.QueryHandlers.Core
             var objectMapper = MockRepository.GenerateMock<IObjectMapper>();
             objectMapper.Expect(
                 m =>
-                m.Map<IEnumerable<Regnskab>, IEnumerable<RegnskabslisteView>>(Arg<IEnumerable<Regnskab>>.Is.NotNull))
-                .Return(fixture.CreateMany<RegnskabslisteView>(3));
+                m.Map<IEnumerable<OSIntranet.Domain.Fælles.System>, IEnumerable<SystemView>>(Arg<IEnumerable<OSIntranet.Domain.Fælles.System>>.Is.NotNull))
+                .Return(fixture.CreateMany<SystemView>(3));
             var queryHandler = new MyQueryHandler(objectMapper);
             Assert.That(queryHandler, Is.Not.Null);
 
-            var views = queryHandler.MapMany<Regnskab, RegnskabslisteView>(fixture.CreateMany<Regnskab>(3));
+            var views = queryHandler.MapMany<OSIntranet.Domain.Fælles.System, SystemView>(fixture.CreateMany<OSIntranet.Domain.Fælles.System>(3));
             Assert.That(views, Is.Not.Null);
             Assert.That(views.Count(), Is.EqualTo(3));
 
             objectMapper.AssertWasCalled(
                 m =>
-                m.Map<IEnumerable<Regnskab>, IEnumerable<RegnskabslisteView>>(Arg<IEnumerable<Regnskab>>.Is.NotNull));
+                m.Map<IEnumerable<OSIntranet.Domain.Fælles.System>, IEnumerable<SystemView>>(Arg<IEnumerable<OSIntranet.Domain.Fælles.System>>.Is.NotNull));
         }
     }
 }

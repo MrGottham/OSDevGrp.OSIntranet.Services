@@ -103,7 +103,6 @@
     <Content Include="foodwastehouseholddataservice.svc" />
     <Content Include="foodwastesystemdataservice.svc" />
     <Content Include="kalenderservice.svc" />
-    <Content Include="finansstyringservice.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -113,11 +112,11 @@
     </Content>
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementations\CommonService.cs" />
-    <Compile Include="Implementations\FinansstyringService.cs" />
     <Compile Include="Implementations\FoodWasteSystemDataService.cs" />
     <Compile Include="Implementations\FoodWasteHouseholdDataService.cs" />
     <Compile Include="Implementations\IntranetServiceBase.cs" />

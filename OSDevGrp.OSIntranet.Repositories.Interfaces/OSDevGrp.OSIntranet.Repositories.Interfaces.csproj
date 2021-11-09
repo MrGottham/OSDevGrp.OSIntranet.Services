@@ -140,7 +140,6 @@
     <Compile Include="IDomainObjectBuilder.cs" />
     <Compile Include="IFællesRepository.cs" />
     <Compile Include="IKalenderRepository.cs" />
-    <Compile Include="IKonfigurationRepository.cs" />
     <Compile Include="IFinansstyringRepository.cs" />
     <Compile Include="DataProxies\IMySqlDataProxyCreator.cs" />
     <Compile Include="IRepository.cs" />

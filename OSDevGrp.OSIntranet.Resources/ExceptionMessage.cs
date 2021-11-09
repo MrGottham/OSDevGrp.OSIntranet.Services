@@ -9,17 +9,8 @@
         UnhandledSwitchValue,
         CantFindObjectById,
         IllegalValue,
-        CantAutoMapType,
         ErrorInCommandHandlerWithoutReturnValue,
         ErrorInCommandHandlerWithReturnValue,
-        BalanceLineDateToOld,
-        BalanceLineDateIsForwardInTime,
-        BalanceLineAccountNumberMissing,
-        BalanceLineTextMissing,
-        BalanceLineValueBelowZero,
-        BalanceLineValueMissing,
-        AccountIsOverdrawn,
-        BudgetAccountIsOverdrawn,
         NoRegistrationForDelegate,
         UserAppointmentAlreadyExists,
         UserAppointmentDontExists,
@@ -52,6 +43,6 @@
         CannotModifyHouseholdMembershipForYourself,
         HouseholdMemberAlreadyExistsOnHousehold,
         HouseholdMemberDoesNotExistOnHousehold,
-        OperationNotAllowedOnStorage,
+        OperationNotAllowedOnStorage
     }
 }

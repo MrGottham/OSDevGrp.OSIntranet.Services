@@ -61,8 +61,6 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BogføringslinjeOpretCommandHandler.cs" />
-    <Compile Include="Core\FinansstyringCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteHouseholdDataCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteSystemDataCommandHandlerBase.cs" />
     <Compile Include="Core\HouseholdDataModificationCommandHandlerBase.cs" />
@@ -70,7 +68,6 @@
     <Compile Include="Core\ILogicExecutor.cs" />
     <Compile Include="Core\KalenderCommandHandlerBase.cs" />
     <Compile Include="Core\LogicExecutor.cs" />
-    <Compile Include="Core\RegnskabCommandHandlerBase.cs" />
     <Compile Include="Dispatchers\DispatcherBase.cs" />
     <Compile Include="Dispatchers\IDispatcher.cs" />
     <Compile Include="Dispatchers\IStaticTextFieldMerge.cs" />

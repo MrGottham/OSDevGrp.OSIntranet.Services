@@ -180,7 +180,6 @@
     <Compile Include="FoodWaste\SystemDataRepository.cs" />
     <Compile Include="FællesRepository.cs" />
     <Compile Include="KalenderRepository.cs" />
-    <Compile Include="KonfigurationRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

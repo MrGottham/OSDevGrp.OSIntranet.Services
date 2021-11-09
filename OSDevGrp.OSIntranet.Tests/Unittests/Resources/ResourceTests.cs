@@ -89,21 +89,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
         }
 
         /// <summary>
-        /// Tester, at ExceptionMessage for CantAutoMapType hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForCantAutoMapTypeHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, typeof(Konto));
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at ExceptionMessage for ErrorInCommandHandlerWithoutReturnValue hentes.
         /// </summary>
         [Test]
@@ -129,98 +114,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineDateToOld hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineDateToOldHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld, _fixture.Create<int>());
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineDateIsForwardInTime hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineDateIsForwardInTimeHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineAccountNumberMissing hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineAccountNumberMissingHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineTextMissing hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineTextMissingHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineTextMissing);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineValueBelowZero hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineValueBelowZeroHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineValueMissing hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineValueMissingHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for AccountIsOverdrawn hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForAccountIsOverdrawnHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BudgetAccountIsOverdrawn hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBudgetAccountIsOverdrawnHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
