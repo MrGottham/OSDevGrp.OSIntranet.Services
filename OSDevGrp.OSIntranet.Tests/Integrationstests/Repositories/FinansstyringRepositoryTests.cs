@@ -326,6 +326,60 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
                     accountingElement.AppendChild(contactAccountElement);
                 }
 
+                Bogføringslinje[] postingLineCollection = accounting.Konti.OfType<Konto>()
+                    .SelectMany(account => account.Bogføringslinjer)
+                    .OrderByDescending(postingLine => postingLine.Dato.Date)
+                    .ThenByDescending(postingLine => postingLine.Løbenummer)
+                    .ToArray();
+                foreach (var postingLine in postingLineCollection)
+                {
+                    XmlElement postingLineElement = accountingDocument.CreateElement("PostingLine");
+
+                    postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("postingDate"));
+                    postingLineElement.Attributes["postingDate"].Value = postingLine.Dato.ToString("yyyy-MM-dd");
+
+                    if (string.IsNullOrWhiteSpace(postingLine.Bilag) == false)
+                    {
+                        postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("reference"));
+                        postingLineElement.Attributes["reference"].Value = postingLine.Bilag.Trim();
+                    }
+
+                    postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("accountNumber"));
+                    postingLineElement.Attributes["accountNumber"].Value = postingLine.Konto.Kontonummer.Trim();
+
+                    postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("details"));
+                    postingLineElement.Attributes["details"].Value = postingLine.Tekst.Trim();
+
+                    if (postingLine.Budgetkonto != null && string.IsNullOrWhiteSpace(postingLine.Budgetkonto.Kontonummer) == false)
+                    {
+                        postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("budgetAccountNumber"));
+                        postingLineElement.Attributes["budgetAccountNumber"].Value = postingLine.Budgetkonto.Kontonummer.Trim();
+                    }
+
+                    if (postingLine.Debit != 0M)
+                    {
+                        postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("debit"));
+                        postingLineElement.Attributes["debit"].Value = postingLine.Debit.ToString("0.00", CultureInfo.InvariantCulture);
+                    }
+
+                    if (postingLine.Kredit != 0M)
+                    {
+                        postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("credit"));
+                        postingLineElement.Attributes["credit"].Value = postingLine.Kredit.ToString("0.00", CultureInfo.InvariantCulture);
+                    }
+
+                    if (postingLine.Adresse != null)
+                    {
+                        postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("contactAccountNumber"));
+                        postingLineElement.Attributes["contactAccountNumber"].Value = postingLine.Adresse.Nummer.ToString();
+                    }
+
+                    postingLineElement.Attributes.Append(accountingDocument.CreateAttribute("sortOrder"));
+                    postingLineElement.Attributes["sortOrder"].Value = postingLine.Løbenummer.ToString();
+
+                    accountingElement.AppendChild(postingLineElement);
+                }
+
                 accountingCollectionElement.AppendChild(accountingElement);
             }
 
