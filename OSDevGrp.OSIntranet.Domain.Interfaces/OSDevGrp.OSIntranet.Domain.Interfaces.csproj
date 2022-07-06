@@ -49,19 +49,10 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adressekartotek\IAdressegruppelisteHelper.cs" />
-    <Compile Include="Adressekartotek\IAdresselisteHelper.cs" />
-    <Compile Include="Adressekartotek\IBetalingsbetingelselisteHelper.cs" />
-    <Compile Include="Finansstyring\IBudgetkontogruppelisteHelper.cs" />
-    <Compile Include="Finansstyring\IKontogruppelisteHelper.cs" />
-    <Compile Include="Finansstyring\IRegnskabslisteHelper.cs" />
     <Compile Include="FoodWaste\Enums\Membership.cs" />
     <Compile Include="FoodWaste\Enums\StakeholderType.cs" />
     <Compile Include="FoodWaste\Enums\StaticTextType.cs" />
@@ -86,7 +77,6 @@
     <Compile Include="FoodWaste\ITranslatable.cs" />
     <Compile Include="FoodWaste\ITranslation.cs" />
     <Compile Include="FoodWaste\ITranslationInfo.cs" />
-    <Compile Include="Fælles\IBrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\ISystem.cs" />
     <Compile Include="Fælles\ISystemlisteHelper.cs" />
     <Compile Include="IDomainObjectListHelper.cs" />
@@ -107,6 +97,7 @@
       <Name>OSDevGrp.OSIntranet.Infrastructure.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

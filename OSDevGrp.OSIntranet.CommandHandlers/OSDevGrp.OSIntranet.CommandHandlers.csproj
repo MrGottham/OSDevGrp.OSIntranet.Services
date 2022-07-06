@@ -49,10 +49,6 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1719c289d1070527, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll</HintPath>
     </Reference>

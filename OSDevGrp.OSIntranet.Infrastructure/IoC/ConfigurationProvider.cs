@@ -15,7 +15,6 @@ using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Guards;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces.Validation;
 using OSDevGrp.OSIntranet.Infrastructure.Validation;
-using OSDevGrp.OSIntranet.Repositories;
 using OSDevGrp.OSIntranet.Repositories.DataProviders;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces.DataProviders;
@@ -43,7 +42,6 @@ namespace OSDevGrp.OSIntranet.Infrastructure.IoC
         public void AddConfiguration(IWindsorContainer container)
         {
             container.Register(Component.For<IArgumentNullGuard>().ImplementedBy<ArgumentNullGuard>().LifeStyle.Singleton);
-            container.Register(Component.For<IDomainObjectBuilder>().ImplementedBy<DomainObjectBuilder>().LifeStyle.Singleton);
             container.Register(Component.For<IObjectMapper>().ImplementedBy<ObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<IFoodWasteObjectMapper>().ImplementedBy<FoodWasteObjectMapper>().LifeStyle.Singleton);
             container.Register(Component.For<IExceptionBuilder>().ImplementedBy<ExceptionBuilder>().LifeStyle.Singleton);

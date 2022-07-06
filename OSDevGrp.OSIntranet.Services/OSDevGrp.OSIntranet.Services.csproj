@@ -67,10 +67,6 @@
     <Reference Include="microsoft.identitymodel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.7.0.0\lib\net35\microsoft.identitymodel.dll</HintPath>
     </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1719c289d1070527, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll</HintPath>
     </Reference>
@@ -83,9 +79,6 @@
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1719c289d1070527, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Wcf">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />

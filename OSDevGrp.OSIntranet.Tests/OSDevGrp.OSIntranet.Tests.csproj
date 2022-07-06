@@ -94,9 +94,6 @@
     <Reference Include="nunit.framework, Version=3.13.2.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.13.2\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll</HintPath>
     </Reference>
@@ -119,10 +116,6 @@
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Wcf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1719c289d1070527, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll</HintPath>
-    </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.DataAccess.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4e66eaaa909a8fa2, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Renci.SshNet, Version=2020.0.1.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>..\packages\SSH.NET.2020.0.1\lib\net40\Renci.SshNet.dll</HintPath>
@@ -174,8 +167,6 @@
     <Compile Include="Integrationstests\Flows\ClaimValueProviderTests.cs" />
     <Compile Include="Integrationstests\Flows\HouseholdMemberTests.cs" />
     <Compile Include="Integrationstests\Flows\HouseholdTests.cs" />
-    <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
-    <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\CommunicationRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\ConfigurationRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\HouseholdDataRepositoryTests.cs" />
@@ -291,15 +282,9 @@
     <Compile Include="Unittests\Contracts\Views\SystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TranslationInfoSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TranslationSystemViewTests.cs" />
-    <Compile Include="Unittests\Domain\Adressekartotek\AdressegruppelisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Adressekartotek\AdresselisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Adressekartotek\BetalingsbetingelselisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Comparers\BrugeraftaleComparerTests.cs" />
     <Compile Include="Unittests\Domain\Comparers\KalenderbrugerComparerTests.cs" />
     <Compile Include="Unittests\Domain\DomainObjectListHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\BudgetkontogruppelisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DataProviderTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectMockBuilder.cs" />
@@ -320,7 +305,6 @@
     <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationTests.cs" />
-    <Compile Include="Unittests\Domain\Fælles\BrevhovedlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\AftaleBaseTests.cs" />
@@ -368,7 +352,6 @@
     <Compile Include="Unittests\QueryHandlers\StorageTypeCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\SystemerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\TranslationInfoCollectionGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\FoodWasteDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
@@ -394,8 +377,6 @@
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\AftaleProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugeraftaleProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugerProxyTests.cs" />
-    <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
-    <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\CommunicationRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\CommunicationRepositoryWithoutExternalCommunicationTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\ConfigurationRepositoryTests.cs" />
@@ -494,6 +475,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Integrationstests\Testdata\DKFoodComp701_2009-11-16.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

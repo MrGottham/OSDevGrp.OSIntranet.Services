@@ -46,7 +46,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tester, at container konfiguraiton kan indlæses og typer kan resolves.
         /// </summary>
         [Test]
-        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof(IContainer), typeof(IArgumentNullGuard), typeof(IDomainObjectBuilder), typeof(IObjectMapper), typeof(IFoodWasteObjectMapper), typeof(IExceptionBuilder), typeof(IFaultExceptionBuilder<FoodWasteFault>), typeof(IClaimValueProvider), typeof(IDomainObjectValidations), typeof(ISpecification), typeof(ICommandBus), typeof(IQueryBus), typeof(ILogicExecutor), typeof(ICommonValidations), typeof(IStaticTextFieldMerge), typeof(IWelcomeLetterDispatcher), typeof(IMySqlDataProvider), typeof(IFoodWasteDataProvider), typeof(IAdresseRepository), typeof(IFinansstyringRepository), typeof(IKalenderRepository), typeof(IFællesRepository), typeof(ISystemDataRepository), typeof(IHouseholdDataRepository), typeof(ICommunicationRepository), typeof(IConfigurationRepository), typeof(IKalenderService), typeof(ICommonService), typeof(IFoodWasteSystemDataService), typeof(IFoodWasteHouseholdDataService))] Type type)
+        public void TestAtContainerConfigurationIndlæsesOgTyperKanResolves([Values(typeof(IContainer), typeof(IArgumentNullGuard), typeof(IObjectMapper), typeof(IFoodWasteObjectMapper), typeof(IExceptionBuilder), typeof(IFaultExceptionBuilder<FoodWasteFault>), typeof(IClaimValueProvider), typeof(IDomainObjectValidations), typeof(ISpecification), typeof(ICommandBus), typeof(IQueryBus), typeof(ILogicExecutor), typeof(ICommonValidations), typeof(IStaticTextFieldMerge), typeof(IWelcomeLetterDispatcher), typeof(IMySqlDataProvider), typeof(IFoodWasteDataProvider), typeof(IKalenderRepository), typeof(IFællesRepository), typeof(ISystemDataRepository), typeof(IHouseholdDataRepository), typeof(ICommunicationRepository), typeof(IConfigurationRepository), typeof(IKalenderService), typeof(ICommonService), typeof(IFoodWasteSystemDataService), typeof(IFoodWasteHouseholdDataService))] Type type)
         {
             var resolvedType = _container.Resolve(type);
             Assert.That(resolvedType, Is.Not.Null);
@@ -56,7 +56,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Infrastructure
         /// Tests that the container resolves the same object each time.
         /// </summary>
         [Test]
-        public void TestThatContainerResolvesSameObjectEachTime([Values(typeof(IContainer), typeof(IArgumentNullGuard), typeof(IDomainObjectBuilder), typeof(IObjectMapper), typeof(IFoodWasteObjectMapper), typeof(IExceptionBuilder), typeof(IFaultExceptionBuilder<FoodWasteFault>), typeof(IDomainObjectValidations), typeof(ICommonValidations))] Type type)
+        public void TestThatContainerResolvesSameObjectEachTime([Values(typeof(IContainer), typeof(IArgumentNullGuard), typeof(IObjectMapper), typeof(IFoodWasteObjectMapper), typeof(IExceptionBuilder), typeof(IFaultExceptionBuilder<FoodWasteFault>), typeof(IDomainObjectValidations), typeof(ICommonValidations))] Type type)
         {
             var firstResolvedType = _container.Resolve(type);
             Assert.That(firstResolvedType, Is.Not.Null);

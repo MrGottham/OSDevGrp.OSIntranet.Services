@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Domain;
 using NUnit.Framework;
 using AutoFixture;
@@ -17,14 +16,14 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain
         /// <summary>
         /// Egen klasse til test af hjælper på en liste af domæneobjekter.
         /// </summary>
-        private class MyDomainObjectListHelper : DomainObjectListHelper<Regnskab, int>
+        private class MyDomainObjectListHelper : DomainObjectListHelper<OSIntranet.Domain.Fælles.System, int>
         {
             /// <summary>
             /// Danner egen klasse til test af hjælper på en liste af domæneobjekter.
             /// </summary>
-            /// <param name="regnskaber">Regnskaber.</param>
-            public MyDomainObjectListHelper(IEnumerable<Regnskab> regnskaber)
-                : base(regnskaber)
+            /// <param name="systemer">Systemer.</param>
+            public MyDomainObjectListHelper(IEnumerable<OSIntranet.Domain.Fælles.System> systemer)
+                : base(systemer)
             {
             }
 
@@ -33,7 +32,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain
             /// </summary>
             /// <param name="id">Unik identifikation af regnskabet.</param>
             /// <returns></returns>
-            public override Regnskab GetById(int id)
+            public override OSIntranet.Domain.Fælles.System GetById(int id)
             {
                 return DomainObjetcs.Single(m => m.Nummer == id);
             }
@@ -45,7 +44,9 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain
         [Test]
         public void TestAtConstructorKasterArgumentNullExceptionHvisDomainObjectsErNull()
         {
+            // ReSharper disable ObjectCreationAsStatement
             Assert.Throws<ArgumentNullException>(() => new MyDomainObjectListHelper(null));
+            // ReSharper restore ObjectCreationAsStatement
         }
 
         /// <summary>
@@ -55,15 +56,17 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Domain
         public void TestAtGetByIdHenterDomainObject()
         {
             var fixture = new Fixture();
-            var regnskaber = fixture.CreateMany<Regnskab>(3).ToList();
-            var domainObjectListHelper = new MyDomainObjectListHelper(regnskaber);
+            var systemer = fixture.CreateMany<OSIntranet.Domain.Fælles.System>(3).ToList();
+            var domainObjectListHelper = new MyDomainObjectListHelper(systemer);
             Assert.That(domainObjectListHelper, Is.Not.Null);
 
-            var regnskab = domainObjectListHelper.GetById(regnskaber.ElementAt(1).Nummer);
-            Assert.That(regnskab, Is.Not.Null);
-            Assert.That(regnskab.Nummer, Is.EqualTo(regnskaber.ElementAt(1).Nummer));
-            Assert.That(regnskab.Navn, Is.Not.Null);
-            Assert.That(regnskab.Navn, Is.EqualTo(regnskaber.ElementAt(1).Navn));
+            var system = domainObjectListHelper.GetById(systemer.ElementAt(1).Nummer);
+            Assert.That(system, Is.Not.Null);
+            Assert.That(system.Nummer, Is.EqualTo(systemer.ElementAt(1).Nummer));
+            Assert.That(system.Titel, Is.Not.Null);
+            Assert.That(system.Titel, Is.EqualTo(systemer.ElementAt(1).Titel));
+            Assert.That(system.Properties, Is.EqualTo(systemer.ElementAt(1).Properties));
+            Assert.That(system.Kalender, Is.EqualTo(systemer.ElementAt(1).Kalender));
         }
     }
 }

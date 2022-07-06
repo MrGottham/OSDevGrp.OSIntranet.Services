@@ -49,22 +49,13 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adressekartotek\AdressegruppelisteHelper.cs" />
-    <Compile Include="Adressekartotek\AdresselisteHelper.cs" />
-    <Compile Include="Adressekartotek\BetalingsbetingelselisteHelper.cs" />
     <Compile Include="Comparers\BrugeraftaleComparer.cs" />
     <Compile Include="Comparers\KalenderbrugerComparer.cs" />
     <Compile Include="DomainObjectListHelper.cs" />
-    <Compile Include="Finansstyring\BudgetkontogruppelisteHelper.cs" />
-    <Compile Include="Finansstyring\KontogruppelisteHelper.cs" />
-    <Compile Include="Finansstyring\RegnskabslisteHelper.cs" />
     <Compile Include="FoodWaste\DomainObjectValidations.cs" />
     <Compile Include="FoodWaste\DataProvider.cs" />
     <Compile Include="FoodWaste\DomainObjectBase.cs" />
@@ -84,7 +75,6 @@
     <Compile Include="FoodWaste\TranslatableBase.cs" />
     <Compile Include="FoodWaste\Translation.cs" />
     <Compile Include="FoodWaste\TranslationInfo.cs" />
-    <Compile Include="Fælles\BrevhovedlisteHelper.cs" />
     <Compile Include="Fælles\System.cs" />
     <Compile Include="Fælles\SystemlisteHelper.cs" />
     <Compile Include="Kalender\Aftale.cs" />

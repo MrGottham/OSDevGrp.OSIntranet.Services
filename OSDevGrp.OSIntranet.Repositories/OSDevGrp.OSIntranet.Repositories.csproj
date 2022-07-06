@@ -73,9 +73,6 @@
     <Reference Include="MySql.Data, Version=8.0.27.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.8.0.27\lib\net452\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces, Version=1.0.1.0, Culture=neutral, PublicKeyToken=1719c289d1070527, processorArchitecture=MSIL">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -91,12 +88,6 @@
     </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface.dll</HintPath>
-    </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Wcf">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll</HintPath>
-    </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.DataAccess.Contracts">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Renci.SshNet, Version=2020.0.1.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>..\packages\SSH.NET.2020.0.1\lib\net40\Renci.SshNet.dll</HintPath>
@@ -140,7 +131,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdresseRepository.cs" />
     <Compile Include="DataProviders\DataProviderBase.cs" />
     <Compile Include="DataProxies\DataProxyCache.cs" />
     <Compile Include="DataProxies\DbCommandBuilderBase.cs" />
@@ -169,8 +159,6 @@
     <Compile Include="DataProxies\Kalender\AftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\BrugeraftaleProxy.cs" />
     <Compile Include="DataProxies\Kalender\BrugerProxy.cs" />
-    <Compile Include="DomainObjectBuilder.cs" />
-    <Compile Include="FinansstyringRepository.cs" />
     <Compile Include="FoodWaste\CommunicationRepository.cs" />
     <Compile Include="FoodWaste\CommunicationRepositoryWithoutExternalCommunication.cs" />
     <Compile Include="FoodWaste\ConfigurationRepository.cs" />

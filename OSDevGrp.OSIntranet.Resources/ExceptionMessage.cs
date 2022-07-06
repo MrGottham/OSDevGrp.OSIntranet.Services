@@ -11,7 +11,6 @@
         IllegalValue,
         ErrorInCommandHandlerWithoutReturnValue,
         ErrorInCommandHandlerWithReturnValue,
-        NoRegistrationForDelegate,
         UserAppointmentAlreadyExists,
         UserAppointmentDontExists,
         NoCalendarUserWithThoseInitials,
