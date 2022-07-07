@@ -25,7 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External references", "Exte
 	ProjectSection(SolutionItems) = preProject
 		External references\Castle.Core.dll = External references\Castle.Core.dll
 		External references\Castle.Windsor.dll = External references\Castle.Windsor.dll
-		External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.IoC.dll
@@ -34,7 +33,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External references", "Exte
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Repositories.Interface.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Resources.dll
 		External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll = External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll
-		External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll = External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSDevGrp.OSIntranet.Infrastructure", "OSDevGrp.OSIntranet.Infrastructure\OSDevGrp.OSIntranet.Infrastructure.csproj", "{1DEE3090-20BE-4ED3-9AAB-5ACBA2B909E9}"

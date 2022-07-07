@@ -1,6 +1,4 @@
 ﻿using System;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Fælles;
-using OSDevGrp.OSIntranet.Domain.Fælles;
 using OSDevGrp.OSIntranet.Infrastructure.Interfaces;
 using OSDevGrp.OSIntranet.Repositories.Interfaces;
 
@@ -47,21 +45,6 @@ namespace OSDevGrp.OSIntranet.QueryHandlers.Core
             {
                 return _fællesRepository;
             }
-        }
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Henter og returnerer et givent brevhoved.
-        /// </summary>
-        /// <param name="nummer">Unik identifikation af brevhovedet.</param>
-        /// <returns>Brevhoved.</returns>
-        public virtual Brevhoved BrevhovedGetByNummer(int nummer)
-        {
-            var brevhovedlisteHelper = new BrevhovedlisteHelper(Repository.BrevhovedGetAll());
-            return brevhovedlisteHelper.GetById(nummer);
         }
 
         #endregion

@@ -53,79 +53,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Storages, opt => opt.MapFrom(s => s.Storages));
 
                 config.CreateMap<IHousehold, IHouseholdProxy>()
-                    .ConstructUsing(m =>
-                    {
-                        IHouseholdProxy householdProxy = m as IHouseholdProxy;
-                        if (householdProxy != null)
-                        {
-                            return householdProxy;
-                        }
-                        householdProxy = new HouseholdProxy(m.Name, m.Description, m.CreationTime)
-                        {
-                            Identifier = m.Identifier
-                        };
-                        lock (SyncRoot)
-                        {
-                            _mappingHousehold = householdProxy;
-                            try
-                            {
-                                if (_mappingHouseholdMember == null)
-                                {
-                                    foreach (var householdMember in m.HouseholdMembers)
-                                    {
-                                        if (householdMember is IHouseholdMemberProxy)
-                                        {
-                                            if (householdProxy.HouseholdMembers.Contains(householdMember))
-                                            {
-                                                continue;
-                                            }
-                                            householdProxy.HouseholdMemberAdd(householdMember);
-                                            continue;
-                                        }
-                                        if (Mapper != null)
-                                        {
-                                            var householdMemberProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>(householdMember);
-                                            if (householdProxy.HouseholdMembers.Contains(householdMemberProxy))
-                                            {
-                                                continue;
-                                            }
-                                            householdProxy.HouseholdMemberAdd(householdMemberProxy);
-                                        }
-                                    }
-                                }
-                                else if (householdProxy.HouseholdMembers.Contains(_mappingHouseholdMember) == false)
-                                {
-                                    householdProxy.HouseholdMemberAdd(_mappingHouseholdMember);
-                                }
-                                foreach (IStorage storage in m.Storages.OrderBy(n => n.SortOrder).ThenByDescending(n => n.CreationTime))
-                                {
-                                    if (storage is IStorageProxy)
-                                    {
-                                        if (householdProxy.Storages.Contains(storage))
-                                        {
-                                            continue;
-                                        }
-                                        householdProxy.StorageAdd(storage);
-                                        continue;
-                                    }
-                                    if (Mapper != null)
-                                    {
-                                        IStorageProxy storageProxy = Mapper.Map<IStorage, IStorageProxy>(storage);
-                                        if (householdProxy.Storages.Contains(storageProxy))
-                                        {
-                                            continue;
-                                        }
-                                        householdProxy.StorageAdd(storageProxy);
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                _mappingHousehold = null;
-                            }
-                        }
-                        return householdProxy;
-                    });
+                    .ConvertUsing(m => ToHouseholdProxy(m));
 
                 config.CreateMap<IStorageType, StorageTypeIdentificationView>()
                     .ForMember(m => m.StorageTypeIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -172,64 +100,10 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime));
 
                 config.CreateMap<IStorage, IStorageProxy>()
-                    .ConstructUsing(m =>
-                    {
-                        IStorageProxy storageProxy = m as IStorageProxy;
-                        if (storageProxy != null)
-                        {
-                            return storageProxy;
-                        }
-                        IHouseholdProxy householdProxy;
-                        lock (SyncRoot)
-                        {
-                            if (_mappingHousehold == null)
-                            {
-                                householdProxy = m.Household as IHouseholdProxy;
-                                if (householdProxy == null && Mapper != null)
-                                {
-                                    householdProxy = Mapper.Map<IHousehold, IHouseholdProxy>(m.Household);
-                                }
-                            }
-                            else
-                            {
-                                householdProxy = _mappingHousehold;
-                            }
-                        }
-                        IStorageTypeProxy storageTypeProxy = m.StorageType as IStorageTypeProxy;
-                        if (storageTypeProxy == null && Mapper != null)
-                        {
-                            storageTypeProxy = Mapper.Map<IStorageType, IStorageTypeProxy>(m.StorageType);
-                        }
-                        return new StorageProxy(householdProxy, m.SortOrder, storageTypeProxy, m.Temperature, m.CreationTime, m.Description);
-                    });
+                    .ConvertUsing(m => ToStorageProxy(m));
 
                 config.CreateMap<IStorageType, IStorageTypeProxy>()
-                    .ConstructUsing(m =>
-                    {
-                        IStorageTypeProxy storageTypeProxy = m as IStorageTypeProxy;
-                        if (storageTypeProxy != null)
-                        {
-                            return storageTypeProxy;
-                        }
-                        IRange<int> temperatureRange = new Range<int>(m.TemperatureRange.StartValue, m.TemperatureRange.EndValue);
-                        storageTypeProxy = new StorageTypeProxy(m.SortOrder, m.Temperature, temperatureRange, m.Creatable, m.Editable, m.Deletable)
-                        {
-                            Identifier = m.Identifier
-                        };
-                        foreach (ITranslation translation in m.Translations)
-                        {
-                            if (translation is ITranslationProxy)
-                            {
-                                storageTypeProxy.TranslationAdd(translation);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                storageTypeProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                            }
-                        }
-                        return storageTypeProxy;
-                    });
+                    .ConvertUsing(m => ToStorageTypeProxy(m));
 
                 config.CreateMap<IHouseholdMember, HouseholdMemberIdentificationView>()
                     .ForMember(m => m.HouseholdMemberIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -260,72 +134,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Payments, opt => opt.MapFrom(s => s.Payments));
 
                 config.CreateMap<IHouseholdMember, IHouseholdMemberProxy>()
-                    .ConstructUsing(m =>
-                    {
-                        IHouseholdMemberProxy householdMemberProxy = m as IHouseholdMemberProxy;
-                        if (householdMemberProxy != null)
-                        {
-                            return householdMemberProxy;
-                        }
-                        householdMemberProxy = new HouseholdMemberProxy(m.MailAddress, m.Membership, m.MembershipExpireTime, m.ActivationCode, m.CreationTime)
-                        {
-                            Identifier = m.Identifier,
-                            ActivationTime = m.ActivationTime,
-                            PrivacyPolicyAcceptedTime = m.PrivacyPolicyAcceptedTime
-                        };
-                        lock (SyncRoot)
-                        {
-                            _mappingHouseholdMember = householdMemberProxy;
-                            try
-                            {
-                                if (_mappingHousehold == null)
-                                {
-                                    foreach (var household in m.Households)
-                                    {
-                                        if (household is IHouseholdProxy)
-                                        {
-                                            if (householdMemberProxy.Households.Contains(household))
-                                            {
-                                                continue;
-                                            }
-                                            householdMemberProxy.HouseholdAdd(household);
-                                            continue;
-                                        }
-                                        if (Mapper != null)
-                                        {
-                                            var householdProxy = Mapper.Map<IHousehold, IHouseholdProxy>(household);
-                                            if (householdMemberProxy.Households.Contains(householdProxy))
-                                            {
-                                                continue;
-                                            }
-                                            householdMemberProxy.HouseholdAdd(householdProxy);
-                                        }
-                                    }
-                                }
-                                else if (householdMemberProxy.Households.Contains(_mappingHousehold) == false)
-                                {
-                                    householdMemberProxy.HouseholdAdd(_mappingHousehold);
-                                }
-                                foreach (var payment in m.Payments)
-                                {
-                                    if (payment is IPaymentProxy)
-                                    {
-                                        householdMemberProxy.PaymentAdd(payment);
-                                        continue;
-                                    }
-                                    if (Mapper != null)
-                                    {
-                                        householdMemberProxy.PaymentAdd(Mapper.Map<IPayment, IPaymentProxy>(payment));
-                                    }
-                                }
-                            }
-                            finally
-                            {
-                                _mappingHouseholdMember = null;
-                            }
-                        }
-                        return householdMemberProxy;
-                    });
+                    .ConvertUsing(m => ToHouseholdMemberProxy(m));
 
                 config.CreateMap<IPayment, PaymentView>()
                     .ForMember(m => m.PaymentIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -337,47 +146,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.CreationTime, opt => opt.MapFrom(s => s.CreationTime));
 
                 config.CreateMap<IPayment, IPaymentProxy>()
-                    .ConstructUsing(m =>
-                    {
-                        IPaymentProxy paymentProxy = m as IPaymentProxy;
-                        if (paymentProxy != null)
-                        {
-                            return paymentProxy;
-                        }
-                        IStakeholder stakeholderProxy = null;
-                        if (m.Stakeholder != null)
-                        {
-                            switch (m.Stakeholder.StakeholderType)
-                            {
-                                case StakeholderType.HouseholdMember:
-                                    lock (SyncRoot)
-                                    {
-                                        if (_mappingHouseholdMember != null)
-                                        {
-                                            stakeholderProxy = _mappingHouseholdMember;
-                                        }
-                                        else if (m.Stakeholder is IHouseholdMember)
-                                        {
-                                            stakeholderProxy = m.Stakeholder as IHouseholdMemberProxy;
-                                            if (stakeholderProxy == null && Mapper != null)
-                                            {
-                                                stakeholderProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>((IHouseholdMember) m.Stakeholder);
-                                            }
-                                        }
-                                    }
-                                    break;
-                            }
-                        }
-                        var dataProviderProxy = m.DataProvider as IDataProviderProxy;
-                        if (dataProviderProxy == null && Mapper != null)
-                        {
-                            dataProviderProxy = Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
-                        }
-                        return new PaymentProxy(stakeholderProxy, dataProviderProxy, m.PaymentTime, m.PaymentReference, m.PaymentReceipt, m.CreationTime)
-                        {
-                            Identifier = m.Identifier
-                        };
-                    });
+                    .ConvertUsing(m => ToPaymentProxy(m));
 
                 config.CreateMap<IStakeholder, StakeholderView>()
                     .ForMember(m => m.StakeholderIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -412,69 +181,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.ForeignKeys, opt => opt.MapFrom(s => s.ForeignKeys));
 
                 config.CreateMap<IFoodItem, IFoodItemProxy>()
-                    .ConvertUsing(m =>
-                    {
-                        IFoodItemProxy foodItemProxy = m as IFoodItemProxy;
-                        if (foodItemProxy != null)
-                        {
-                            return foodItemProxy;
-                        }
-                        IFoodGroupProxy primaryFoodGroup = null;
-                        if (m.PrimaryFoodGroup != null)
-                        {
-                            primaryFoodGroup = m.PrimaryFoodGroup as IFoodGroupProxy;
-                            if (primaryFoodGroup == null && Mapper != null)
-                            {
-                                primaryFoodGroup = Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.PrimaryFoodGroup);
-                            }
-                        }
-                        foodItemProxy = new FoodItemProxy(primaryFoodGroup)
-                        {
-                            Identifier = m.Identifier,
-                            IsActive = m.IsActive
-                        };
-                        foreach (var foodGroup in m.FoodGroups)
-                        {
-                            if (primaryFoodGroup != null && primaryFoodGroup.Identifier == foodGroup.Identifier)
-                            {
-                                continue;
-                            }
-                            if (foodGroup is IFoodGroupProxy)
-                            {
-                                foodItemProxy.FoodGroupAdd(foodGroup);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                foodItemProxy.FoodGroupAdd(Mapper.Map<IFoodGroup, IFoodGroupProxy>(foodGroup));
-                            }
-                        }
-                        foreach (var translation in m.Translations)
-                        {
-                            if (translation is ITranslationProxy)
-                            {
-                                foodItemProxy.TranslationAdd(translation);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                foodItemProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                            }
-                        }
-                        foreach (var foreignKey in m.ForeignKeys)
-                        {
-                            if (foreignKey is IForeignKeyProxy)
-                            {
-                                foodItemProxy.ForeignKeyAdd(foreignKey);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                foodItemProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
-                            }
-                        }
-                        return foodItemProxy;
-                    });
+                    .ConvertUsing(m => ToFoodItemProxy(m));
 
                 config.CreateMap<IFoodGroupCollection, FoodGroupTreeView>()
                     .ForMember(m => m.FoodGroups, opt => opt.MapFrom(s => s))
@@ -513,71 +220,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Children, opt => opt.MapFrom(s => s.Children));
 
                 config.CreateMap<IFoodGroup, IFoodGroupProxy>()
-                    .ConvertUsing(m =>
-                    {
-                        IFoodGroupProxy foodGroupProxy = m as IFoodGroupProxy;
-                        if (foodGroupProxy != null)
-                        {
-                            return (IFoodGroupProxy) m;
-                        }
-                        IFoodGroupProxy parentFoodGroupProxy = null;
-                        if (m.Parent != null)
-                        {
-                            parentFoodGroupProxy = m.Parent as IFoodGroupProxy;
-                            if (parentFoodGroupProxy == null && Mapper != null)
-                            {
-                                parentFoodGroupProxy = Mapper.Map<IFoodGroup, IFoodGroupProxy>(m.Parent);
-                            }
-                        }
-                        var childFoodGroupProxyCollection = new List<IFoodGroupProxy>();
-                        foreach (var child in m.Children)
-                        {
-                            IFoodGroupProxy childFoodGroupProxy = child as IFoodGroupProxy;
-                            if (childFoodGroupProxy != null)
-                            {
-                                childFoodGroupProxyCollection.Add((IFoodGroupProxy) child);
-                                continue;
-                            }
-                            childFoodGroupProxy = new FoodGroupProxy
-                            {
-                                Identifier = m.Identifier,
-                                Parent = parentFoodGroupProxy,
-                                IsActive = m.IsActive
-                            };
-                            childFoodGroupProxyCollection.Add(childFoodGroupProxy);
-                        }
-                        foodGroupProxy = new FoodGroupProxy(childFoodGroupProxyCollection)
-                        {
-                            Identifier = m.Identifier,
-                            Parent = parentFoodGroupProxy,
-                            IsActive = m.IsActive
-                        };
-                        foreach (var translation in m.Translations)
-                        {
-                            if (translation is ITranslationProxy)
-                            {
-                                foodGroupProxy.TranslationAdd(translation);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                foodGroupProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                            }
-                        }
-                        foreach (var foreignKey in m.ForeignKeys)
-                        {
-                            if (foreignKey is IForeignKeyProxy)
-                            {
-                                foodGroupProxy.ForeignKeyAdd(foreignKey);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                foodGroupProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
-                            }
-                        }
-                        return foodGroupProxy;
-                    });
+                    .ConvertUsing(m => ToFoodGroupProxy(m));
 
                 config.CreateMap<IForeignKey, ForeignKeyView>()
                     .ForMember(m => m.ForeignKeyIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -592,24 +235,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.ForeignKey, opt => opt.MapFrom(s => s.ForeignKeyValue));
 
                 config.CreateMap<IForeignKey, IForeignKeyProxy>()
-                    .ConvertUsing(m =>
-                    {
-                        IForeignKeyProxy foreignKeyProxy = m as IForeignKeyProxy;
-                        if (foreignKeyProxy != null)
-                        {
-                            return foreignKeyProxy;
-                        }
-                        var dataProvider = m.DataProvider as IDataProviderProxy;
-                        if (dataProvider == null && Mapper != null)
-                        {
-                            dataProvider = Mapper.Map<IDataProvider, IDataProviderProxy>(m.DataProvider);
-                        }
-                        foreignKeyProxy = new ForeignKeyProxy(dataProvider, m.ForeignKeyForIdentifier, m.ForeignKeyForTypes, m.ForeignKeyValue)
-                        {
-                            Identifier = m.Identifier
-                        };
-                        return foreignKeyProxy;
-                    });
+                    .ConvertUsing(m => ToForeignKeyProxy(m));
 
                 config.CreateMap<IStaticText, StaticTextView>()
                     .ForMember(m => m.StaticTextIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -628,31 +254,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.BodyTranslations, opt => opt.MapFrom(s => s.BodyTranslationIdentifier.HasValue ? s.BodyTranslations : null));
 
                 config.CreateMap<IStaticText, IStaticTextProxy>()
-                    .ConvertUsing(m =>
-                    {
-                        IStaticTextProxy staticTextProxy = m as IStaticTextProxy;
-                        if (staticTextProxy != null)
-                        {
-                            return staticTextProxy;
-                        }
-                        staticTextProxy = new StaticTextProxy(m.Type, m.SubjectTranslationIdentifier, m.BodyTranslationIdentifier)
-                        {
-                            Identifier = m.Identifier
-                        };
-                        foreach (var translation in m.Translations)
-                        {
-                            if (translation is ITranslationProxy)
-                            {
-                                staticTextProxy.TranslationAdd(translation);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                staticTextProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                            }
-                        }
-                        return staticTextProxy;
-                    });
+                    .ConvertUsing(m => ToStaticTextProxy(m));
 
                 config.CreateMap<IDataProvider, DataProviderView>()
                     .ForMember(m => m.DataProviderIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -667,31 +269,7 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.DataSourceStatements, opt => opt.MapFrom(s => s.DataSourceStatements));
 
                 config.CreateMap<IDataProvider, IDataProviderProxy>()
-                    .ConvertUsing(m =>
-                    {
-                        IDataProviderProxy dataProviderProxy = m as IDataProviderProxy;
-                        if (dataProviderProxy != null)
-                        {
-                            return dataProviderProxy;
-                        }
-                        dataProviderProxy = new DataProviderProxy(m.Name, m.HandlesPayments, m.DataSourceStatementIdentifier)
-                        {
-                            Identifier = m.Identifier
-                        };
-                        foreach (var translation in m.Translations)
-                        {
-                            if (translation is ITranslationProxy)
-                            {
-                                dataProviderProxy.TranslationAdd(translation);
-                                continue;
-                            }
-                            if (Mapper != null)
-                            {
-                                dataProviderProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
-                            }
-                        }
-                        return dataProviderProxy;
-                    });
+                    .ConvertUsing(m => ToDataProviderProxy(m));
 
                 config.CreateMap<ITranslation, TranslationSystemView>()
                     .ForMember(m => m.TranslationIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
@@ -700,34 +278,14 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                     .ForMember(m => m.Translation, opt => opt.MapFrom(s => s.Value));
 
                 config.CreateMap<ITranslation, ITranslationProxy>()
-                    .ConvertUsing(m =>
-                    {
-                        ITranslationProxy translationProxy = m as ITranslationProxy;
-                        if (translationProxy != null)
-                        {
-                            return translationProxy;
-                        }
-                        var translationInfoProxy = m.TranslationInfo as ITranslationInfoProxy;
-                        if (translationInfoProxy == null && Mapper != null)
-                        {
-                            translationInfoProxy = Mapper.Map<ITranslationInfo, ITranslationInfoProxy>(m.TranslationInfo);
-                        }
-                        return new TranslationProxy(m.TranslationOfIdentifier, translationInfoProxy, m.Value)
-                        {
-                            Identifier = m.Identifier
-                        };
-                    });
+                    .ConvertUsing(m => ToTranslationProxy(m));
 
                 config.CreateMap<ITranslationInfo, TranslationInfoSystemView>()
                     .ForMember(m => m.TranslationInfoIdentifier, opt => opt.MapFrom(s => s.Identifier ?? Guid.Empty))
                     .ForMember(m => m.CultureName, opt => opt.MapFrom(s => s.CultureName));
 
                 config.CreateMap<ITranslationInfo, ITranslationInfoProxy>()
-                    .ConvertUsing(m =>
-                    {
-                        ITranslationInfoProxy translationInfoProxy = m as ITranslationInfoProxy;
-                        return translationInfoProxy ?? new TranslationInfoProxy(m.CultureName) {Identifier = m.Identifier};
-                    });
+                    .ConvertUsing(m => ToTranslationInfoProxy(m));
 
                 config.CreateMap<IIdentifiable, ServiceReceiptResponse>()
                     .ForMember(m => m.Identifier, opt => opt.MapFrom(s => s.Identifier))
@@ -792,6 +350,528 @@ namespace OSDevGrp.OSIntranet.Infrastructure
                 }
             }
             return Mapper.Map<TSource, TDestination>(source);
+        }
+
+        private static IHouseholdProxy ToHouseholdProxy(IHousehold source)
+        {
+            IHouseholdProxy householdProxy = source as IHouseholdProxy;
+            if (householdProxy != null)
+            {
+                return householdProxy;
+            }
+
+            householdProxy = new HouseholdProxy(source.Name, source.Description, source.CreationTime)
+            {
+                Identifier = source.Identifier
+            };
+            lock (SyncRoot)
+            {
+                _mappingHousehold = householdProxy;
+                try
+                {
+                    if (_mappingHouseholdMember == null)
+                    {
+                        foreach (var householdMember in source.HouseholdMembers)
+                        {
+                            if (householdMember is IHouseholdMemberProxy)
+                            {
+                                if (householdProxy.HouseholdMembers.Contains(householdMember))
+                                {
+                                    continue;
+                                }
+
+                                householdProxy.HouseholdMemberAdd(householdMember);
+                                continue;
+                            }
+
+                            if (Mapper != null)
+                            {
+                                var householdMemberProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>(householdMember);
+                                if (householdProxy.HouseholdMembers.Contains(householdMemberProxy))
+                                {
+                                    continue;
+                                }
+
+                                householdProxy.HouseholdMemberAdd(householdMemberProxy);
+                            }
+                        }
+                    }
+                    else if (householdProxy.HouseholdMembers.Contains(_mappingHouseholdMember) == false)
+                    {
+                        householdProxy.HouseholdMemberAdd(_mappingHouseholdMember);
+                    }
+
+                    foreach (IStorage storage in source.Storages.OrderBy(n => n.SortOrder).ThenByDescending(n => n.CreationTime))
+                    {
+                        if (storage is IStorageProxy)
+                        {
+                            if (householdProxy.Storages.Contains(storage))
+                            {
+                                continue;
+                            }
+
+                            householdProxy.StorageAdd(storage);
+                            continue;
+                        }
+
+                        if (Mapper != null)
+                        {
+                            IStorageProxy storageProxy = Mapper.Map<IStorage, IStorageProxy>(storage);
+                            if (householdProxy.Storages.Contains(storageProxy))
+                            {
+                                continue;
+                            }
+
+                            householdProxy.StorageAdd(storageProxy);
+                        }
+                    }
+                }
+                finally
+                {
+                    _mappingHousehold = null;
+                }
+            }
+
+            return householdProxy;
+        }
+
+        private static IStorageProxy ToStorageProxy(IStorage source)
+        {
+            IStorageProxy storageProxy = source as IStorageProxy;
+            if (storageProxy != null)
+            {
+                return storageProxy;
+            }
+
+            IHouseholdProxy householdProxy;
+            lock (SyncRoot)
+            {
+                if (_mappingHousehold == null)
+                {
+                    householdProxy = source.Household as IHouseholdProxy;
+                    if (householdProxy == null && Mapper != null)
+                    {
+                        householdProxy = Mapper.Map<IHousehold, IHouseholdProxy>(source.Household);
+                    }
+                }
+                else
+                {
+                    householdProxy = _mappingHousehold;
+                }
+            }
+
+            IStorageTypeProxy storageTypeProxy = source.StorageType as IStorageTypeProxy;
+            if (storageTypeProxy == null && Mapper != null)
+            {
+                storageTypeProxy = Mapper.Map<IStorageType, IStorageTypeProxy>(source.StorageType);
+            }
+
+            return new StorageProxy(householdProxy, source.SortOrder, storageTypeProxy, source.Temperature, source.CreationTime, source.Description)
+            {
+                Identifier = source.Identifier
+            };
+        }
+
+        private static IStorageTypeProxy ToStorageTypeProxy(IStorageType source)
+        {
+            IStorageTypeProxy storageTypeProxy = source as IStorageTypeProxy;
+            if (storageTypeProxy != null)
+            {
+                return storageTypeProxy;
+            }
+
+            IRange<int> temperatureRange = new Range<int>(source.TemperatureRange.StartValue, source.TemperatureRange.EndValue);
+            storageTypeProxy = new StorageTypeProxy(source.SortOrder, source.Temperature, temperatureRange, source.Creatable, source.Editable, source.Deletable)
+            {
+                Identifier = source.Identifier
+            };
+            foreach (ITranslation translation in source.Translations)
+            {
+                if (translation is ITranslationProxy)
+                {
+                    storageTypeProxy.TranslationAdd(translation);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    storageTypeProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                }
+            }
+
+            return storageTypeProxy;
+        }
+
+        private static IHouseholdMemberProxy ToHouseholdMemberProxy(IHouseholdMember source)
+        {
+            IHouseholdMemberProxy householdMemberProxy = source as IHouseholdMemberProxy;
+            if (householdMemberProxy != null)
+            {
+                return householdMemberProxy;
+            }
+
+            householdMemberProxy = new HouseholdMemberProxy(source.MailAddress, source.Membership, source.MembershipExpireTime, source.ActivationCode, source.CreationTime)
+            {
+                Identifier = source.Identifier,
+                ActivationTime = source.ActivationTime,
+                PrivacyPolicyAcceptedTime = source.PrivacyPolicyAcceptedTime
+            };
+            lock (SyncRoot)
+            {
+                _mappingHouseholdMember = householdMemberProxy;
+                try
+                {
+                    if (_mappingHousehold == null)
+                    {
+                        foreach (var household in source.Households)
+                        {
+                            if (household is IHouseholdProxy)
+                            {
+                                if (householdMemberProxy.Households.Contains(household))
+                                {
+                                    continue;
+                                }
+
+                                householdMemberProxy.HouseholdAdd(household);
+                                continue;
+                            }
+
+                            if (Mapper != null)
+                            {
+                                var householdProxy = Mapper.Map<IHousehold, IHouseholdProxy>(household);
+                                if (householdMemberProxy.Households.Contains(householdProxy))
+                                {
+                                    continue;
+                                }
+
+                                householdMemberProxy.HouseholdAdd(householdProxy);
+                            }
+                        }
+                    }
+                    else if (householdMemberProxy.Households.Contains(_mappingHousehold) == false)
+                    {
+                        householdMemberProxy.HouseholdAdd(_mappingHousehold);
+                    }
+
+                    foreach (var payment in source.Payments)
+                    {
+                        if (payment is IPaymentProxy)
+                        {
+                            householdMemberProxy.PaymentAdd(payment);
+                            continue;
+                        }
+
+                        if (Mapper != null)
+                        {
+                            householdMemberProxy.PaymentAdd(Mapper.Map<IPayment, IPaymentProxy>(payment));
+                        }
+                    }
+                }
+                finally
+                {
+                    _mappingHouseholdMember = null;
+                }
+            }
+
+            return householdMemberProxy;
+        }
+
+        private static IPaymentProxy ToPaymentProxy(IPayment source)
+        {
+            IPaymentProxy paymentProxy = source as IPaymentProxy;
+            if (paymentProxy != null)
+            {
+                return paymentProxy;
+            }
+
+            IStakeholder stakeholderProxy = null;
+            if (source.Stakeholder != null)
+            {
+                switch (source.Stakeholder.StakeholderType)
+                {
+                    case StakeholderType.HouseholdMember:
+                        lock (SyncRoot)
+                        {
+                            if (_mappingHouseholdMember != null)
+                            {
+                                stakeholderProxy = _mappingHouseholdMember;
+                            }
+                            else if (source.Stakeholder is IHouseholdMember)
+                            {
+                                stakeholderProxy = source.Stakeholder as IHouseholdMemberProxy;
+                                if (stakeholderProxy == null && Mapper != null)
+                                {
+                                    stakeholderProxy = Mapper.Map<IHouseholdMember, IHouseholdMemberProxy>((IHouseholdMember) source.Stakeholder);
+                                }
+                            }
+                        }
+
+                        break;
+                }
+            }
+
+            var dataProviderProxy = source.DataProvider as IDataProviderProxy;
+            if (dataProviderProxy == null && Mapper != null)
+            {
+                dataProviderProxy = Mapper.Map<IDataProvider, IDataProviderProxy>(source.DataProvider);
+            }
+
+            return new PaymentProxy(stakeholderProxy, dataProviderProxy, source.PaymentTime, source.PaymentReference, source.PaymentReceipt, source.CreationTime)
+            {
+                Identifier = source.Identifier
+            };
+        }
+
+        private static IFoodItemProxy ToFoodItemProxy(IFoodItem source)
+        {
+            IFoodItemProxy foodItemProxy = source as IFoodItemProxy;
+            if (foodItemProxy != null)
+            {
+                return foodItemProxy;
+            }
+
+            IFoodGroupProxy primaryFoodGroup = null;
+            if (source.PrimaryFoodGroup != null)
+            {
+                primaryFoodGroup = source.PrimaryFoodGroup as IFoodGroupProxy;
+                if (primaryFoodGroup == null && Mapper != null)
+                {
+                    primaryFoodGroup = Mapper.Map<IFoodGroup, IFoodGroupProxy>(source.PrimaryFoodGroup);
+                }
+            }
+
+            foodItemProxy = new FoodItemProxy(primaryFoodGroup)
+            {
+                Identifier = source.Identifier,
+                IsActive = source.IsActive
+            };
+            foreach (var foodGroup in source.FoodGroups)
+            {
+                if (primaryFoodGroup != null && primaryFoodGroup.Identifier == foodGroup.Identifier)
+                {
+                    continue;
+                }
+
+                if (foodGroup is IFoodGroupProxy)
+                {
+                    foodItemProxy.FoodGroupAdd(foodGroup);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    foodItemProxy.FoodGroupAdd(Mapper.Map<IFoodGroup, IFoodGroupProxy>(foodGroup));
+                }
+            }
+
+            foreach (var translation in source.Translations)
+            {
+                if (translation is ITranslationProxy)
+                {
+                    foodItemProxy.TranslationAdd(translation);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    foodItemProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                }
+            }
+
+            foreach (var foreignKey in source.ForeignKeys)
+            {
+                if (foreignKey is IForeignKeyProxy)
+                {
+                    foodItemProxy.ForeignKeyAdd(foreignKey);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    foodItemProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
+                }
+            }
+
+            return foodItemProxy;
+        }
+
+        private static IFoodGroupProxy ToFoodGroupProxy(IFoodGroup source)
+        {
+            IFoodGroupProxy foodGroupProxy = source as IFoodGroupProxy;
+            if (foodGroupProxy != null)
+            {
+                return (IFoodGroupProxy) source;
+            }
+
+            IFoodGroupProxy parentFoodGroupProxy = null;
+            if (source.Parent != null)
+            {
+                parentFoodGroupProxy = source.Parent as IFoodGroupProxy;
+                if (parentFoodGroupProxy == null && Mapper != null)
+                {
+                    parentFoodGroupProxy = Mapper.Map<IFoodGroup, IFoodGroupProxy>(source.Parent);
+                }
+            }
+
+            var childFoodGroupProxyCollection = new List<IFoodGroupProxy>();
+            foreach (var child in source.Children)
+            {
+                IFoodGroupProxy childFoodGroupProxy = child as IFoodGroupProxy;
+                if (childFoodGroupProxy != null)
+                {
+                    childFoodGroupProxyCollection.Add((IFoodGroupProxy) child);
+                    continue;
+                }
+
+                childFoodGroupProxy = new FoodGroupProxy
+                {
+                    Identifier = source.Identifier,
+                    Parent = parentFoodGroupProxy,
+                    IsActive = source.IsActive
+                };
+                childFoodGroupProxyCollection.Add(childFoodGroupProxy);
+            }
+
+            foodGroupProxy = new FoodGroupProxy(childFoodGroupProxyCollection)
+            {
+                Identifier = source.Identifier,
+                Parent = parentFoodGroupProxy,
+                IsActive = source.IsActive
+            };
+            foreach (var translation in source.Translations)
+            {
+                if (translation is ITranslationProxy)
+                {
+                    foodGroupProxy.TranslationAdd(translation);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    foodGroupProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                }
+            }
+
+            foreach (var foreignKey in source.ForeignKeys)
+            {
+                if (foreignKey is IForeignKeyProxy)
+                {
+                    foodGroupProxy.ForeignKeyAdd(foreignKey);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    foodGroupProxy.ForeignKeyAdd(Mapper.Map<IForeignKey, IForeignKeyProxy>(foreignKey));
+                }
+            }
+
+            return foodGroupProxy;
+        }
+
+        private static IForeignKeyProxy ToForeignKeyProxy(IForeignKey source)
+        {
+            IForeignKeyProxy foreignKeyProxy = source as IForeignKeyProxy;
+            if (foreignKeyProxy != null)
+            {
+                return foreignKeyProxy;
+            }
+
+            var dataProvider = source.DataProvider as IDataProviderProxy;
+            if (dataProvider == null && Mapper != null)
+            {
+                dataProvider = Mapper.Map<IDataProvider, IDataProviderProxy>(source.DataProvider);
+            }
+
+            foreignKeyProxy = new ForeignKeyProxy(dataProvider, source.ForeignKeyForIdentifier, source.ForeignKeyForTypes, source.ForeignKeyValue)
+            {
+                Identifier = source.Identifier
+            };
+            return foreignKeyProxy;
+        }
+
+        private static IStaticTextProxy ToStaticTextProxy(IStaticText source)
+        {
+            IStaticTextProxy staticTextProxy = source as IStaticTextProxy;
+            if (staticTextProxy != null)
+            {
+                return staticTextProxy;
+            }
+
+            staticTextProxy = new StaticTextProxy(source.Type, source.SubjectTranslationIdentifier, source.BodyTranslationIdentifier)
+            {
+                Identifier = source.Identifier
+            };
+            foreach (var translation in source.Translations)
+            {
+                if (translation is ITranslationProxy)
+                {
+                    staticTextProxy.TranslationAdd(translation);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    staticTextProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                }
+            }
+
+            return staticTextProxy;
+        }
+
+        private static IDataProviderProxy ToDataProviderProxy(IDataProvider source)
+        {
+            IDataProviderProxy dataProviderProxy = source as IDataProviderProxy;
+            if (dataProviderProxy != null)
+            {
+                return dataProviderProxy;
+            }
+
+            dataProviderProxy = new DataProviderProxy(source.Name, source.HandlesPayments, source.DataSourceStatementIdentifier)
+            {
+                Identifier = source.Identifier
+            };
+            foreach (var translation in source.Translations)
+            {
+                if (translation is ITranslationProxy)
+                {
+                    dataProviderProxy.TranslationAdd(translation);
+                    continue;
+                }
+
+                if (Mapper != null)
+                {
+                    dataProviderProxy.TranslationAdd(Mapper.Map<ITranslation, ITranslationProxy>(translation));
+                }
+            }
+
+            return dataProviderProxy;
+        }
+
+        private static ITranslationProxy ToTranslationProxy(ITranslation source)
+        {
+            ITranslationProxy translationProxy = source as ITranslationProxy;
+            if (translationProxy != null)
+            {
+                return translationProxy;
+            }
+
+            var translationInfoProxy = source.TranslationInfo as ITranslationInfoProxy;
+            if (translationInfoProxy == null && Mapper != null)
+            {
+                translationInfoProxy = Mapper.Map<ITranslationInfo, ITranslationInfoProxy>(source.TranslationInfo);
+            }
+
+            return new TranslationProxy(source.TranslationOfIdentifier, translationInfoProxy, source.Value)
+            {
+                Identifier = source.Identifier
+            };
+        }
+
+        private static ITranslationInfoProxy ToTranslationInfoProxy(ITranslationInfo source)
+        {
+            ITranslationInfoProxy translationInfoProxy = source as ITranslationInfoProxy;
+            return translationInfoProxy ?? new TranslationInfoProxy(source.CultureName) {Identifier = source.Identifier};
         }
 
         #endregion

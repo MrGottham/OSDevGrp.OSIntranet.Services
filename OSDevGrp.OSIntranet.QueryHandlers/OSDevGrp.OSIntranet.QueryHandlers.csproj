@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OSDevGrp.OSIntranet.QueryHandlers</RootNamespace>
     <AssemblyName>OSDevGrp.OSIntranet.QueryHandlers</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -49,9 +49,6 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll</HintPath>
     </Reference>
@@ -59,31 +56,15 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdressegrupperGetQueryHandler.cs" />
-    <Compile Include="BrevhovederGetQueryHandler.cs" />
-    <Compile Include="Core\AdressekartotekQueryHandlerBase.cs" />
-    <Compile Include="AdressekontolisteGetQueryHandler.cs" />
-    <Compile Include="AdressekontoGetQueryHandler.cs" />
-    <Compile Include="BetalingsbetingelserGetQueryHandler.cs" />
-    <Compile Include="BogføringerGetQueryHandler.cs" />
-    <Compile Include="BudgetkontogrupperGetQueryHandler.cs" />
-    <Compile Include="BudgetkontoplanGetQueryHandler.cs" />
-    <Compile Include="BudgetkontoGetQueryHandler.cs" />
     <Compile Include="Core\FoodGroupTreeGetQueryHandlerBase.cs" />
     <Compile Include="Core\FoodItemCollectionGetQueryHandlerBase.cs" />
     <Compile Include="Core\HouseholdMemberDataGetQueryHandlerBase.cs" />
     <Compile Include="Core\KalenderQueryHandlerBase.cs" />
-    <Compile Include="Core\RegnskabQueryHandlerBase.cs" />
     <Compile Include="Core\StaticTextGetQueryHandlerBase.cs" />
     <Compile Include="Core\StorageTypeCollectionGetQueryHandlerBase.cs" />
     <Compile Include="DataProviderCollectionGetQueryHandler.cs" />
     <Compile Include="DataProviderWhoHandlesPaymentsCollectionGetQueryHandler.cs" />
-    <Compile Include="DebitorGetQueryHandler.cs" />
-    <Compile Include="DebitorlisteGetQueryHandler.cs" />
-    <Compile Include="Core\FinansstyringQueryHandlerBase.cs" />
     <Compile Include="Core\FællesElementQueryHandlerBase.cs" />
-    <Compile Include="FirmaGetQueryHandler.cs" />
-    <Compile Include="FirmalisteGetQueryHandler.cs" />
     <Compile Include="FoodGroupTreeGetQueryHandler.cs" />
     <Compile Include="FoodGroupTreeGetQueryHandlerForSystemView.cs" />
     <Compile Include="FoodItemCollectionGetQueryHandler.cs" />
@@ -96,23 +77,13 @@
     <Compile Include="KalenderbrugerAftaleGetQueryHandler.cs" />
     <Compile Include="KalenderbrugerAftalerGetQueryHandler.cs" />
     <Compile Include="KalenderbrugereGetQueryHandler.cs" />
-    <Compile Include="KontoGetQueryHandler.cs" />
-    <Compile Include="KontogrupperGetQueryHandler.cs" />
-    <Compile Include="KontoplanGetQueryHandler.cs" />
-    <Compile Include="KreditorGetQueryHandler.cs" />
-    <Compile Include="KreditorlisteGetQueryHandler.cs" />
-    <Compile Include="PersonGetQueryHandler.cs" />
-    <Compile Include="PersonlisteGetQueryHandler.cs" />
-    <Compile Include="PostnumreGetQueryHandler.cs" />
     <Compile Include="PrivacyPolicyGetQueryHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\QueryHandlerBase.cs" />
-    <Compile Include="RegnskabslisteGetQueryHandler.cs" />
     <Compile Include="StaticTextCollectionGetQueryHandler.cs" />
     <Compile Include="StorageTypeCollectionGetQueryHandler.cs" />
     <Compile Include="StorageTypeCollectionGetQueryHandlerForSystemView.cs" />
     <Compile Include="SystemerGetQueryHandler.cs" />
-    <Compile Include="TelefonlisteGetQueryHandler.cs" />
     <Compile Include="TranslationInfoCollectionGetQueryHandler.cs" />
   </ItemGroup>
   <ItemGroup>

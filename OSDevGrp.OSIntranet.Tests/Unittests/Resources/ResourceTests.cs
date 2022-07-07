@@ -2,7 +2,6 @@
 using System.Reflection;
 using AutoFixture;
 using NUnit.Framework;
-using OSDevGrp.OSIntranet.CommonLibrary.Domain.Finansstyring;
 using OSDevGrp.OSIntranet.Resources;
 
 namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
@@ -38,7 +37,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod().Name, _fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.RepositoryError, MethodBase.GetCurrentMethod()?.Name, _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -53,7 +52,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, _fixture.Create<int>(), _fixture.Create<string>(), MethodBase.GetCurrentMethod().Name);
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.UnhandledSwitchValue, _fixture.Create<int>(), _fixture.Create<string>(), MethodBase.GetCurrentMethod()?.Name);
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -68,7 +67,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, typeof(Konto).Name, _fixture.Create<string>());
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantFindObjectById, nameof(OSIntranet.Domain.Fælles.System), _fixture.Create<string>());
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -84,21 +83,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.IllegalValue, null, _fixture.Create<string>());
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for CantAutoMapType hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForCantAutoMapTypeHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.CantAutoMapType, typeof(Konto));
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -129,113 +113,6 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
             exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.ErrorInCommandHandlerWithReturnValue, _fixture.Create<string>(), _fixture.Create<string>(), _fixture.Create<string>());
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineDateToOld hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineDateToOldHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateToOld, _fixture.Create<int>());
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineDateIsForwardInTime hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineDateIsForwardInTimeHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineDateIsForwardInTime);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineAccountNumberMissing hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineAccountNumberMissingHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineAccountNumberMissing);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineTextMissing hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineTextMissingHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineTextMissing);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineValueBelowZero hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineValueBelowZeroHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueBelowZero);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BalanceLineValueMissing hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBalanceLineValueMissingHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BalanceLineValueMissing);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for AccountIsOverdrawn hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForAccountIsOverdrawnHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.AccountIsOverdrawn);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for BudgetAccountIsOverdrawn hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForBudgetAccountIsOverdrawnHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.BudgetAccountIsOverdrawn);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-        }
-
-        /// <summary>
-        /// Tester, at ExceptionMessage for NoRegistrationForDelegate hentes.
-        /// </summary>
-        [Test]
-        public void TestAtExceptionMessageForNoRegistrationForDelegateHentes()
-        {
-            string exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate);
-            Assert.That(exceptionMessage, Is.Not.Null);
-            Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
-
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.NoRegistrationForDelegate, typeof(Func<int, Kontogruppe>));
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }
@@ -509,7 +386,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Resources
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
 
-            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType, _fixture.Create<string>(), typeof (object).Name);
+            exceptionMessage = Resource.GetExceptionMessage(ExceptionMessage.GenericTypeHasInvalidType, _fixture.Create<string>(), nameof(Object));
             Assert.That(exceptionMessage, Is.Not.Null);
             Assert.That(exceptionMessage.Length, Is.GreaterThan(0));
         }

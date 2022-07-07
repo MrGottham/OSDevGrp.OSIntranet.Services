@@ -29,17 +29,6 @@ namespace OSDevGrp.OSIntranet.Tests.Integrationstests.Repositories
         }
 
         /// <summary>
-        /// Tester, at BrevhovedGetAll henter brevhoveder.
-        /// </summary>
-        [Test]
-        public void TestAtBrevhovedGetAllHenterBrevhoveder()
-        {
-            var brevhoveder = _fællesRepository.BrevhovedGetAll();
-            Assert.That(brevhoveder, Is.Not.Null);
-            Assert.That(brevhoveder.Count(), Is.GreaterThan(0));
-        }
-
-        /// <summary>
         /// Tester, at SystemGetAll henter systemer.
         /// </summary>
         [Test]

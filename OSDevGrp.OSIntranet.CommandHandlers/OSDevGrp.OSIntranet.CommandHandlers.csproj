@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OSDevGrp.OSIntranet.CommandHandlers</RootNamespace>
     <AssemblyName>OSDevGrp.OSIntranet.CommandHandlers</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -49,10 +49,6 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1719c289d1070527, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
-    </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.Interfaces.dll</HintPath>
     </Reference>
@@ -61,18 +57,13 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BogføringslinjeOpretCommandHandler.cs" />
-    <Compile Include="Core\AdressekartotekCommandHandlerBase.cs" />
-    <Compile Include="Core\FinansstyringCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteHouseholdDataCommandHandlerBase.cs" />
     <Compile Include="Core\FoodWasteSystemDataCommandHandlerBase.cs" />
-    <Compile Include="Core\FællesElementCommandHandlerBase.cs" />
     <Compile Include="Core\HouseholdDataModificationCommandHandlerBase.cs" />
     <Compile Include="Core\HouseholdMemberDataModificationCommandHandlerBase.cs" />
     <Compile Include="Core\ILogicExecutor.cs" />
     <Compile Include="Core\KalenderCommandHandlerBase.cs" />
     <Compile Include="Core\LogicExecutor.cs" />
-    <Compile Include="Core\RegnskabCommandHandlerBase.cs" />
     <Compile Include="Dispatchers\DispatcherBase.cs" />
     <Compile Include="Dispatchers\IDispatcher.cs" />
     <Compile Include="Dispatchers\IStaticTextFieldMerge.cs" />

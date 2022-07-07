@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
+  <Import Project="..\packages\NUnit.3.13.3\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.13.3\build\NUnit.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OSDevGrp.OSIntranet.Tests</RootNamespace>
     <AssemblyName>OSDevGrp.OSIntranet.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>
     </SccProjectName>
@@ -54,11 +54,14 @@
     <AssemblyOriginatorKeyFile>OSDevGrp.OSIntranet.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoFixture, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.4.5.0\lib\net452\AutoFixture.dll</HintPath>
+    <Reference Include="AutoFixture, Version=4.17.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.4.17.0\lib\net452\AutoFixture.dll</HintPath>
     </Reference>
-    <Reference Include="AutoMapper, Version=7.0.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.7.0.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.9\lib\BouncyCastle.Crypto.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core">
       <HintPath>..\External references\Castle.Core.dll</HintPath>
@@ -66,25 +69,30 @@
     <Reference Include="Castle.Windsor">
       <HintPath>..\External references\Castle.Windsor.dll</HintPath>
     </Reference>
-    <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
+    <Reference Include="Fare, Version=2.2.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fare.2.2.1\lib\net35\Fare.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Protobuf, Version=3.6.1.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Protobuf.3.6.1\lib\net45\Google.Protobuf.dll</HintPath>
+    <Reference Include="Google.Protobuf, Version=3.21.2.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.21.2\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
+    <Reference Include="K4os.Compression.LZ4, Version=1.2.16.0, Culture=neutral, PublicKeyToken=2186fa9121ef231d, processorArchitecture=MSIL">
+      <HintPath>..\packages\K4os.Compression.LZ4.1.2.16\lib\net46\K4os.Compression.LZ4.dll</HintPath>
+    </Reference>
+    <Reference Include="K4os.Compression.LZ4.Streams, Version=1.2.16.0, Culture=neutral, PublicKeyToken=2186fa9121ef231d, processorArchitecture=MSIL">
+      <HintPath>..\packages\K4os.Compression.LZ4.Streams.1.2.16\lib\net46\K4os.Compression.LZ4.Streams.dll</HintPath>
+    </Reference>
+    <Reference Include="K4os.Hash.xxHash, Version=1.0.7.0, Culture=neutral, PublicKeyToken=32cd54395057cec3, processorArchitecture=MSIL">
+      <HintPath>..\packages\K4os.Hash.xxHash.1.0.7\lib\net46\K4os.Hash.xxHash.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.6.1.7600.16394\lib\net35\Microsoft.IdentityModel.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="microsoft.identitymodel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.7.0.0\lib\net35\microsoft.identitymodel.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=8.0.13.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <HintPath>..\packages\MySql.Data.8.0.13\lib\net452\MySql.Data.dll</HintPath>
+    <Reference Include="MySql.Data, Version=8.0.29.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.8.0.29\lib\net452\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Domain">
-      <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Domain.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.13.3.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.13.3\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="OSDevGrp.OSIntranet.CommonLibrary.Infrastructure">
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Infrastructure.dll</HintPath>
@@ -109,14 +117,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External references\OSDevGrp.OSIntranet.CommonLibrary.Wcf.dll</HintPath>
     </Reference>
-    <Reference Include="OSDevGrp.OSIntranet.DataAccess.Contracts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4e66eaaa909a8fa2, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External references\OSDevGrp.OSIntranet.DataAccess.Contracts.dll</HintPath>
+    <Reference Include="Renci.SshNet, Version=2020.0.2.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
+      <HintPath>..\packages\SSH.NET.2020.0.2\lib\net40\Renci.SshNet.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks">
       <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\netstandard1.1\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -127,6 +137,16 @@
     <Reference Include="System.Drawing.Design" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
     <Reference Include="System.ServiceModel" />
@@ -135,45 +155,40 @@
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.XML" />
+    <Reference Include="Ubiety.Dns.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.8.0.29\lib\net452\Ubiety.Dns.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ZstdNet, Version=1.4.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.8.0.29\lib\net452\ZstdNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Integrationstests\ClaimsPrincipalTestExecutor.cs" />
     <Compile Include="Integrationstests\Flows\ClaimValueProviderTests.cs" />
     <Compile Include="Integrationstests\Flows\HouseholdMemberTests.cs" />
     <Compile Include="Integrationstests\Flows\HouseholdTests.cs" />
-    <Compile Include="Integrationstests\Repositories\AdresseRepositoryTests.cs" />
-    <Compile Include="Integrationstests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\CommunicationRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\ConfigurationRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\HouseholdDataRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FoodWaste\SystemDataRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Integrationstests\Repositories\KalenderRepositoryTests.cs" />
-    <Compile Include="Integrationstests\Services\ClientCalls\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\CommonServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\ClientCalls\FinansstyringServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\ClientCalls\KalenderServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\Implementations\AdressekartotekServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\CommonServiceTests.cs" />
-    <Compile Include="Integrationstests\Services\Implementations\FinansstyringServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Integrationstests\Services\Implementations\KalenderServiceTests.cs" />
     <Compile Include="Integrationstests\Services\TestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Unittests\CommandHandlers\BogføringslinjeOpretCommandHandlerTests.cs" />
-    <Compile Include="Unittests\CommandHandlers\Core\AdressekartotekCommandHandlerBaseTests.cs" />
-    <Compile Include="Unittests\CommandHandlers\Core\FinansstyringCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FoodWasteHouseholdDataCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\FoodWasteSystemDataCommandHandlerBaseTests.cs" />
-    <Compile Include="Unittests\CommandHandlers\Core\FællesElementCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\HouseholdDataModificationCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\HouseholdMemberDataModificationCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\KalenderCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Core\LogicExecutorTests.cs" />
-    <Compile Include="Unittests\CommandHandlers\Core\RegnskabCommandHandlerBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Dispatchers\DispatcherBaseTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Dispatchers\StaticTextFieldMergeTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Dispatchers\WelcomeLetterDispatcherTests.cs" />
@@ -194,7 +209,6 @@
     <Compile Include="Unittests\CommandHandlers\TranslationDeleteCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\TranslationModifyCommandHandlerTests.cs" />
     <Compile Include="Unittests\CommandHandlers\Validation\CommonValidationsTests.cs" />
-    <Compile Include="Unittests\Contracts\Commands\BogføringslinjeOpretCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\FoodItemImportFromDataProviderCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyAddCommandTests.cs" />
     <Compile Include="Unittests\Contracts\Commands\ForeignKeyDeleteCommandTests.cs" />
@@ -216,21 +230,8 @@
     <Compile Include="Unittests\Contracts\Faults\IntranetBusinessFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetRepositoryFaultTests.cs" />
     <Compile Include="Unittests\Contracts\Faults\IntranetSystemFaultTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\AdressegrupperGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\AdressekontolisteGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\AdressekontoGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BetalingsbetingelserGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BogføringerGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BrevhovederGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BudgetkontoGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BudgetkontogrupperGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\BudgetkontoplanGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DataProviderCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\DataProviderWhoHandlesPaymentsCollectionGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\DebitorGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\DebitorlisteGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\FirmaGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\FirmalisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodGroupTreeGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\FoodItemCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\HouseholdDataGetQueryTests.cs" />
@@ -241,41 +242,15 @@
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftaleGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugerAftalerGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\KalenderbrugereGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KontoGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KontogrupperGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KontoplanGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KreditorGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\KreditorlisteGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\PersonGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\PersonlisteGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\PostnumreGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\PrivacyPolicyGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\RegnskabslisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StaticTextCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\StorageTypeCollectionGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\SystemerGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Queries\TelefonlisteGetQueryTests.cs" />
     <Compile Include="Unittests\Contracts\Queries\TranslationInfoCollectionGetQueryTests.cs" />
-    <Compile Include="Unittests\Contracts\Responses\BogføringsadvarselResponseTests.cs" />
-    <Compile Include="Unittests\Contracts\Responses\BogføringslinjeOpretResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\BooleanResultResponseTests.cs" />
     <Compile Include="Unittests\Contracts\Responses\ServiceReceiptResponseTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\AdressegruppeViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\AdressekontolisteViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\AdressekontoViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BetalingsbetingelseViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BogføringslinjeViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BrevhovedreferenceViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BrevhovedViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BudgetkontogruppeViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BudgetkontoplanViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BudgetkontoViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\BudgetoplysningerViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\DataProviderSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\DataProviderViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\DebitorlisteViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\DebitorViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\FirmaViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FoodGroupIdentificationViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FoodGroupSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\FoodGroupTreeSystemViewTests.cs" />
@@ -295,16 +270,7 @@
     <Compile Include="Unittests\Contracts\Views\IntRangeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerAftaleViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\KalenderbrugerViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\KontogruppeViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\KontoplanViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\KontoViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\KreditoplysningerViewTest.cs" />
-    <Compile Include="Unittests\Contracts\Views\KreditorlisteViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\KreditorViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\PaymentViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\PersonViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\PostnummerViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\RegnskabslisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StakeholderViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StaticTextViewTests.cs" />
@@ -314,21 +280,11 @@
     <Compile Include="Unittests\Contracts\Views\StorageTypeViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\StorageViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\SystemViewTests.cs" />
-    <Compile Include="Unittests\Contracts\Views\TelefonlisteViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TranslationInfoSystemViewTests.cs" />
     <Compile Include="Unittests\Contracts\Views\TranslationSystemViewTests.cs" />
-    <Compile Include="Unittests\Domain\Adressekartotek\AdressegruppelisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Adressekartotek\AdresselisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Adressekartotek\BetalingsbetingelselisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Comparers\AdressekontoSaldoComparerTests.cs" />
     <Compile Include="Unittests\Domain\Comparers\BrugeraftaleComparerTests.cs" />
     <Compile Include="Unittests\Domain\Comparers\KalenderbrugerComparerTests.cs" />
     <Compile Include="Unittests\Domain\DomainObjectListHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\BogføringsadvarselTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\BogføringsresultatTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\BudgetkontogruppelisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\KontogruppelisteHelperTests.cs" />
-    <Compile Include="Unittests\Domain\Finansstyring\RegnskabslisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DataProviderTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\DomainObjectMockBuilder.cs" />
@@ -349,7 +305,6 @@
     <Compile Include="Unittests\Domain\FoodWaste\TranslatableBaseTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationInfoTests.cs" />
     <Compile Include="Unittests\Domain\FoodWaste\TranslationTests.cs" />
-    <Compile Include="Unittests\Domain\Fælles\BrevhovedlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemlisteHelperTests.cs" />
     <Compile Include="Unittests\Domain\Fælles\SystemTests.cs" />
     <Compile Include="Unittests\Domain\Kalender\AftaleBaseTests.cs" />
@@ -369,31 +324,15 @@
     <Compile Include="Unittests\Infrastructure\IntranetSystemExceptionTests.cs" />
     <Compile Include="Unittests\Infrastructure\ObjectMapperTests.cs" />
     <Compile Include="Unittests\Infrastructure\Validation\SpecificationTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\AdressegrupperGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BrevhovederGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\Core\AdressekartotekQueryHandlerBaseTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\AdressekontolisteGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\AdressekontoGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BetalingsbetingelserGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BogføringerGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BudgetkontogrupperGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BudgetkontoplanGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\BudgetkontoGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FoodGroupTreeGetQueryHandlerBaseTest.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FoodItemCollectionGetQueryHandlerBaseTest.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\HouseholdMemberDataGetQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\KalenderQueryHandlerBaseTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\Core\RegnskabQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\StaticTextGetQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\StorageTypeCollectionGetQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DataProviderCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\DataProviderWhoHandlesPaymentsCollectionGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\DebitorGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\DebitorlisteGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\Core\FinansstyringQueryHandlerBaseTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\FællesElementQueryHandlerBaseTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\FirmaGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\FirmalisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerForSystemViewTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodGroupTreeGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\FoodItemCollectionGetQueryHandlerForSystemViewTests.cs" />
@@ -406,24 +345,13 @@
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftaleGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugerAftalerGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\KalenderbrugereGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KontoGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KontogrupperGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KontoplanGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KreditorGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\KreditorlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\Core\QueryHandlerBaseTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\PersonGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\PersonlisteGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\PostnumreGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\PrivacyPolicyGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\RegnskabslisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StaticTextCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StorageTypeCollectionGetQueryHandlerForSystemViewTests.cs" />
     <Compile Include="Unittests\QueryHandlers\StorageTypeCollectionGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\SystemerGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\QueryHandlers\TelefonlisteGetQueryHandlerTests.cs" />
     <Compile Include="Unittests\QueryHandlers\TranslationInfoCollectionGetQueryHandlerTests.cs" />
-    <Compile Include="Unittests\Repositories\AdresseRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\DataProviderBaseTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\FoodWasteDataProviderTests.cs" />
     <Compile Include="Unittests\Repositories\DataProviders\MySqlDataProviderTests.cs" />
@@ -449,8 +377,6 @@
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\AftaleProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugeraftaleProxyTests.cs" />
     <Compile Include="Unittests\Repositories\DataProxies\Kalender\BrugerProxyTests.cs" />
-    <Compile Include="Unittests\Repositories\DomainObjectBuilderTest.cs" />
-    <Compile Include="Unittests\Repositories\FinansstyringRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\CommunicationRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\CommunicationRepositoryWithoutExternalCommunicationTests.cs" />
     <Compile Include="Unittests\Repositories\FoodWaste\ConfigurationRepositoryTests.cs" />
@@ -459,7 +385,6 @@
     <Compile Include="Unittests\Repositories\FoodWaste\SystemDataRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\FællesRepositoryTests.cs" />
     <Compile Include="Unittests\Repositories\KalenderRepositoryTests.cs" />
-    <Compile Include="Unittests\Repositories\KonfigurationRepositoryTests.cs" />
     <Compile Include="Unittests\Resources\ResourceExceptionTests.cs" />
     <Compile Include="Unittests\Resources\ResourceTests.cs" />
     <Compile Include="Unittests\Security\Claims\FoodWasteClaimTypesTests.cs" />
@@ -477,9 +402,7 @@
     <Compile Include="Unittests\Security\Services\BasicSecurityTokenServiceConfigurationTests.cs" />
     <Compile Include="Unittests\Security\Services\BasicSecurityTokenServiceTests.cs" />
     <Compile Include="Unittests\Security\TestHelper.cs" />
-    <Compile Include="Unittests\Services\AdressekartotekServiceTests.cs" />
     <Compile Include="Unittests\Services\CommonServiceTests.cs" />
-    <Compile Include="Unittests\Services\FinansstyringServiceTests.cs" />
     <Compile Include="Unittests\Services\FoodWasteSystemDataServiceTests.cs" />
     <Compile Include="Unittests\Services\FoodWasteHouseholdDataServiceTests.cs" />
     <Compile Include="Unittests\Services\IntranetServiceBaseTests.cs" />
@@ -552,6 +475,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Integrationstests\Testdata\DKFoodComp701_2009-11-16.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -559,7 +483,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-    <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit.3.13.3\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.13.3\build\NUnit.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

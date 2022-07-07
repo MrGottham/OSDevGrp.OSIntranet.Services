@@ -117,35 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountIsOverdrawn" xml:space="preserve">
-    <value>The account is overdrawn.</value>
-  </data>
-  <data name="BalanceLineAccountNumberMissing" xml:space="preserve">
-    <value>The account number must be entered.</value>
-  </data>
-  <data name="BalanceLineDateIsForwardInTime" xml:space="preserve">
-    <value>The date may not be forward in time.</value>
-  </data>
-  <data name="BalanceLineDateToOld" xml:space="preserve">
-    <value>The date may not be older than {0} days.</value>
-    <comment>{0} = Days.</comment>
-  </data>
-  <data name="BalanceLineTextMissing" xml:space="preserve">
-    <value>The text must be entered.</value>
-  </data>
-  <data name="BalanceLineValueBelowZero" xml:space="preserve">
-    <value>A value may not be below 0.</value>
-  </data>
-  <data name="BalanceLineValueMissing" xml:space="preserve">
-    <value>A value must be entered.</value>
-  </data>
-  <data name="BudgetAccountIsOverdrawn" xml:space="preserve">
-    <value>The budget account is overdrawn.</value>
-  </data>
-  <data name="CantAutoMapType" xml:space="preserve">
-    <value>Can't automap the type '{0}'.</value>
-    <comment>{0} = Name of type.</comment>
-  </data>
   <data name="CantFindObjectById" xml:space="preserve">
     <value>Unabled to find an instance of the type '{0}' with the unique identification '{1}'.</value>
     <comment>{0} = Name of type, {1} = Unique identification.</comment>

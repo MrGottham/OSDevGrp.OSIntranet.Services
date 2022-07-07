@@ -166,7 +166,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         /// <returns>The builder which can build a database command tester.</returns>
         public IDbCommandTestBuilder AddTextDataParameter(string parameterName, string value, bool isNullable = false)
         {
-            AddDataParameter(parameterName, value, value == null ? DbType.AnsiString : DbType.String, isNullable: isNullable);
+            AddDataParameter(parameterName, value, DbType.String, isNullable: isNullable);
             return this;
         }
 
@@ -179,7 +179,7 @@ namespace OSDevGrp.OSIntranet.Tests.Unittests.Repositories.DataProxies
         /// <returns>The builder which can build a database command tester.</returns>
         public IDbCommandTestBuilder AddLongTextDataParameter(string parameterName, string value, bool isNullable = false)
         {
-            AddDataParameter(parameterName, value, value == null ? DbType.AnsiString : DbType.String, isNullable: isNullable);
+            AddDataParameter(parameterName, value, DbType.String, isNullable: isNullable);
             return this;
         }
 

@@ -117,35 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AccountIsOverdrawn" xml:space="preserve">
-    <value>Det disponible beløb på kontoen er overtrukket.</value>
-  </data>
-  <data name="BalanceLineAccountNumberMissing" xml:space="preserve">
-    <value>Kontonummer skal indtastes.</value>
-  </data>
-  <data name="BalanceLineDateIsForwardInTime" xml:space="preserve">
-    <value>Bogføringsdatoen må ikke være fremme i tiden.</value>
-  </data>
-  <data name="BalanceLineDateToOld" xml:space="preserve">
-    <value>Bogføringsdatoen må ikke være ældre end {0} dage.</value>
-    <comment>{0} = Dage.</comment>
-  </data>
-  <data name="BalanceLineTextMissing" xml:space="preserve">
-    <value>Tekst skal indtastes.</value>
-  </data>
-  <data name="BalanceLineValueBelowZero" xml:space="preserve">
-    <value>Et beløb må ikke være under 0.</value>
-  </data>
-  <data name="BalanceLineValueMissing" xml:space="preserve">
-    <value>Debit eller kreditbeløb skal indtastes.</value>
-  </data>
-  <data name="BudgetAccountIsOverdrawn" xml:space="preserve">
-    <value>Budgettet på budgetkontoen er overtrukket.</value>
-  </data>
-  <data name="CantAutoMapType" xml:space="preserve">
-    <value>Kan ikke automappe typen '{0}'.</value>
-    <comment>{0} = Navn på typen.</comment>
-  </data>
   <data name="CantFindObjectById" xml:space="preserve">
     <value>Kan ikke finde en instans af typen '{0}' med den unikke identifikation '{1}'.</value>
     <comment>{0} = Navn på typen, {1} = Unik identifikation.</comment>
